@@ -1,0 +1,7 @@
+{
+  "name": "pokemon-battle-simulator",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

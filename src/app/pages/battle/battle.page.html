@@ -1,0 +1,95 @@
+<ion-content>
+  <div class="field" #field>
+    <div class="platform opponent-platform"></div>
+    <div class="platform player-platform"></div>
+
+    <div class="hud opponent-hud">
+      <div class="name">{{ opponent().name }}</div>
+      <div class="hp-track">
+        <div class="hp-fill" [style.width.%]="hpPercent(opponent())" [style.background]="hpColor(opponent())"></div>
+      </div>
+    </div>
+    <img #oppSprite class="sprite opponent-sprite" [src]="opponentSpriteSrc()" [alt]="opponent().name" />
+
+    <div class="hud player-hud">
+      <div class="name">{{ player().name }}</div>
+      <div class="hp-track">
+        <div class="hp-fill" [style.width.%]="hpPercent(player())" [style.background]="hpColor(player())"></div>
+      </div>
+    </div>
+    <img #playerSprite class="sprite player-sprite" [src]="playerSpriteSrc()" [alt]="player().name" />
+
+    <div #fx class="fx-layer"></div>
+    <div #screenFx class="screen-fx-layer"></div>
+  </div>
+
+  <div class="party-indicator">
+    @for (pokemon of playerTeam(); track pokemon.dexId; let i = $index) {
+      <span class="party-dot" [class.active]="i === activePlayerIndex()" [class.fainted]="pokemon.currentHp <= 0"></span>
+    }
+  </div>
+
+  <p class="battle-log">{{ log() }}</p>
+
+  <div class="action-panel">
+    @switch (menuState()) {
+      @case ('main') {
+        <div class="menu-grid">
+          <button type="button" class="menu-btn" [disabled]="isAnimating() || isActiveFainted()" (click)="openFightMenu()">
+            <span class="menu-title">KAMPF</span>
+            <span class="menu-subtitle">Wähle deinen Angriff.</span>
+          </button>
+          <button type="button" class="menu-btn" [disabled]="isAnimating()" (click)="openBag()">
+            <span class="menu-title">BEUTEL</span>
+            <span class="menu-subtitle">Items verwenden.</span>
+          </button>
+          <button type="button" class="menu-btn" [disabled]="isAnimating()" (click)="openPokemonMenu()">
+            <span class="menu-title">POKÉMON</span>
+            <span class="menu-subtitle">Pokémon wechseln.</span>
+          </button>
+          <button type="button" class="menu-btn" [disabled]="isAnimating()" (click)="runAway()">
+            <span class="menu-title">FLUCHT</span>
+            <span class="menu-subtitle">Vor dem Kampf fliehen.</span>
+          </button>
+        </div>
+      }
+      @case ('fight') {
+        <div class="submenu">
+          <div class="move-grid">
+            @for (move of moves; track move.id) {
+              <button type="button" class="move-btn" [disabled]="isAnimating()" (click)="useMove(move)">
+                {{ move.name }}
+              </button>
+            }
+          </div>
+          <button type="button" class="back-btn" [disabled]="isAnimating()" (click)="backToMain()">Zurück</button>
+        </div>
+      }
+      @case ('pokemon') {
+        <div class="submenu">
+          <div class="party-list">
+            @for (pokemon of playerTeam(); track pokemon.dexId; let i = $index) {
+              <button
+                type="button"
+                class="party-entry"
+                [class.active]="i === activePlayerIndex()"
+                [class.fainted]="pokemon.currentHp <= 0"
+                [disabled]="!canSwitchTo(i)"
+                (click)="switchPokemon(i)"
+              >
+                <img [src]="partySpriteSrc(pokemon)" [alt]="pokemon.name" class="party-sprite" />
+                <span class="party-name">{{ pokemon.name }}</span>
+                <div class="party-hp-track">
+                  <div class="party-hp-fill" [style.width.%]="hpPercent(pokemon)" [style.background]="hpColor(pokemon)"></div>
+                </div>
+              </button>
+            }
+          </div>
+          <button type="button" class="back-btn" (click)="backToMain()">Zurück</button>
+        </div>
+      }
+    }
+  </div>
+
+  <ion-button size="small" fill="clear" class="reset-btn" (click)="resetBattle()">Reset</ion-button>
+</ion-content>

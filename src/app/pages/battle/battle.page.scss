@@ -1,0 +1,275 @@
+.field {
+  position: relative;
+  width: 100%;
+  max-width: 640px;
+  height: 300px;
+  margin: 0 auto;
+  background: #fff;
+  overflow: hidden;
+}
+
+.platform {
+  position: absolute;
+  background: #e8e8e0;
+  border-radius: 50%;
+}
+
+.opponent-platform {
+  left: 470px;
+  top: 140px;
+  width: 100px;
+  height: 22px;
+}
+
+.player-platform {
+  left: 65px;
+  top: 195px;
+  width: 120px;
+  height: 26px;
+}
+
+.hud {
+  position: absolute;
+  width: 150px;
+
+  .name {
+    font-size: 12px;
+    font-weight: 500;
+    color: #222;
+    margin-bottom: 2px;
+  }
+
+  .hp-track {
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .hp-fill {
+    height: 100%;
+    transition: width 0.4s;
+  }
+}
+
+.opponent-hud {
+  left: 480px;
+  top: 20px;
+}
+
+.player-hud {
+  left: 60px;
+  top: 250px;
+}
+
+.sprite {
+  position: absolute;
+  image-rendering: pixelated;
+}
+
+.opponent-sprite {
+  left: 480px;
+  top: 52px;
+  width: 90px;
+}
+
+.player-sprite {
+  left: 60px;
+  top: 112px;
+  width: 110px;
+}
+
+.fx-layer,
+.screen-fx-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.screen-fx-layer {
+  opacity: 0;
+}
+
+.party-indicator {
+  display: flex;
+  gap: 6px;
+  padding: 8px 16px 0;
+}
+
+.party-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #639922;
+  border: 2px solid transparent;
+
+  &.fainted {
+    background: #999;
+  }
+
+  &.active {
+    border-color: #222;
+  }
+}
+
+.battle-log {
+  padding: 8px 16px;
+  font-size: 13px;
+  color: var(--ion-color-medium, #666);
+  min-height: 1.2em;
+}
+
+.action-panel {
+  padding: 0 16px 16px;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.menu-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: #2b2f38;
+  color: #fff;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+
+  &:hover:not(:disabled) {
+    background: #3a3f4b;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.menu-title {
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.menu-subtitle {
+  font-size: 11px;
+  color: #b7bcc7;
+}
+
+.submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.move-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.move-btn {
+  padding: 10px 14px;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+
+  &:hover:not(:disabled) {
+    background: #f2f2f2;
+  }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+}
+
+.back-btn {
+  align-self: flex-start;
+  padding: 6px 14px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ion-color-medium, #666);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 13px;
+
+  &:hover:not(:disabled) {
+    text-decoration: underline;
+  }
+}
+
+.party-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.party-entry {
+  display: grid;
+  grid-template-columns: 32px 1fr 80px;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+
+  &:hover:not(:disabled) {
+    background: #f2f2f2;
+  }
+
+  &.active {
+    border-color: #222;
+  }
+
+  &.fainted {
+    opacity: 0.5;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+}
+
+.party-sprite {
+  width: 32px;
+  height: 32px;
+  image-rendering: pixelated;
+}
+
+.party-name {
+  font-size: 13px;
+}
+
+.party-hp-track {
+  height: 6px;
+  background: #ddd;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.party-hp-fill {
+  height: 100%;
+  transition: width 0.4s;
+}
+
+.reset-btn {
+  display: block;
+  margin: 0 auto;
+}
