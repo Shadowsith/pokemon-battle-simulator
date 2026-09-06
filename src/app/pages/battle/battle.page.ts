@@ -38,6 +38,11 @@ export class BattlePage {
 
   readonly opponent = signal<BattlePokemon>({ dexId: 6, name: 'Glurak', maxHp: 100, currentHp: 100, types: ['fire', 'flying'] });
 
+  /** Move pool the NPC opponent picks from on its counter-turn (prototype). */
+  private readonly opponentMoves: Move[] = ['flamethrower', 'wingattack', 'dragonclaw', 'slash', 'airslash', 'heatwave']
+    .map((showdownId) => MOVE_LIBRARY.find((m) => m.showdownId === showdownId))
+    .filter((m): m is Move => m !== undefined);
+
   playerSpriteSrc = () => backSpritePath(this.player().dexId);
   opponentSpriteSrc = () => frontSpritePath(this.opponent().dexId);
   partySpriteSrc(pokemon: BattlePokemon): string {
@@ -51,24 +56,60 @@ export class BattlePage {
   ) {}
 
   async useMove(move: Move): Promise<void> {
-    if (this.isAnimating()) return;
+    if (this.isAnimating() || this.isActiveFainted()) return;
     this.isAnimating.set(true);
-    this.log.set(`${this.player().name} setzt ${move.name} ein...`);
+    this.menuState.set('main');
+
+    await this.performMove(move, 'player');
+
+    if (this.opponent().currentHp > 0 && !this.isActiveFainted()) {
+      await this.wait(550);
+      const reply = this.opponentMoves[Math.floor(Math.random() * this.opponentMoves.length)];
+      await this.performMove(reply, 'opponent');
+    }
+
+    this.isAnimating.set(false);
+    this.menuState.set('main');
+  }
+
+  /**
+   * Plays one move in whichever direction the acting side implies: the
+   * player casts left -> right (player -> opponent), the NPC casts
+   * right -> left (opponent -> player). Same animation, mirrored.
+   */
+  private async performMove(move: Move, side: 'player' | 'opponent'): Promise<void> {
+    const attacker = side === 'player' ? this.player() : this.opponent();
+    this.log.set(`${attacker.name} setzt ${move.name} ein...`);
     this.audio.playMove(move.showdownId);
 
+    const playerEl = this.playerSpriteRef.nativeElement;
+    const oppEl = this.oppSpriteRef.nativeElement;
     await this.animation.playMove(move, {
       fieldEl: this.fieldRef.nativeElement,
       fxEl: this.fxRef.nativeElement,
       screenFxEl: this.screenFxRef.nativeElement,
-      launchEl: this.playerSpriteRef.nativeElement,
-      targetEl: this.oppSpriteRef.nativeElement
+      launchEl: side === 'player' ? playerEl : oppEl,
+      targetEl: side === 'player' ? oppEl : playerEl
     });
 
-    const damage = this.damageCalc.calculateDamage(this.player(), this.opponent(), move);
-    this.opponent.update((p) => ({ ...p, currentHp: Math.max(0, p.currentHp - damage) }));
-    this.log.set(`${move.name} trifft ${this.opponent().name}!`);
-    this.isAnimating.set(false);
-    this.menuState.set('main');
+    if (side === 'player') {
+      const damage = this.damageCalc.calculateDamage(this.player(), this.opponent(), move);
+      this.opponent.update((p) => ({ ...p, currentHp: Math.max(0, p.currentHp - damage) }));
+      const opp = this.opponent();
+      this.log.set(opp.currentHp <= 0 ? `${opp.name} wurde besiegt!` : `${move.name} trifft ${opp.name}!`);
+    } else {
+      const damage = this.damageCalc.calculateDamage(this.opponent(), this.player(), move);
+      const idx = this.activePlayerIndex();
+      this.playerTeam.update((team) =>
+        team.map((p, i) => (i === idx ? { ...p, currentHp: Math.max(0, p.currentHp - damage) } : p))
+      );
+      const me = this.player();
+      this.log.set(me.currentHp <= 0 ? `${me.name} wurde besiegt!` : `${move.name} trifft ${me.name}!`);
+    }
+  }
+
+  private wait(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   openFightMenu(): void {

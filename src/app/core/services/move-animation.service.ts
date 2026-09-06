@@ -55,6 +55,8 @@ interface MoveVisual {
   delivery: Delivery;
   meleeStyle: MeleeStyle;
   type: PokemonType;
+  /** +1 when the caster is left of the target (player -> opponent), -1 otherwise. */
+  dir: 1 | -1;
   /** Primary tint (from the Move model). */
   color: string;
   /** 0-1 intensity from base power - scales beams, bursts, flash and shake. */
@@ -160,6 +162,7 @@ export class MoveAnimationService {
     const launch = this.centerOf(refs.launchEl, refs.fieldEl);
     const target = this.centerOf(refs.targetEl, refs.fieldEl);
     const v = this.buildVisual(move);
+    v.dir = target.x >= launch.x ? 1 : -1;
 
     if (v.charge) await this.chargeUp(refs, launch, v);
 
@@ -220,6 +223,7 @@ export class MoveAnimationService {
       delivery,
       meleeStyle: meleeStyle(flags, name),
       type: move.type,
+      dir: 1, // set from real sprite positions in playMove()
       color: move.color,
       power: bp ? clamp(bp / 150, 0.14, 1) : 0,
       hits: multiHitCount(d?.multihit),
@@ -238,7 +242,7 @@ export class MoveAnimationService {
 
   private async playMelee(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
     const { launchEl, targetEl, fxEl } = refs;
-    const dir = launch.x < target.x ? 1 : -1;
+    const dir = v.dir;
     const original = launchEl.style.transform;
     for (let hit = 0; hit < v.hits; hit++) {
       await this.anim(launchEl, [
@@ -355,14 +359,16 @@ export class MoveAnimationService {
   private async playField(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { fieldEl, fxEl, screenFxEl, targetEl } = refs;
     const rect = fieldEl.getBoundingClientRect();
-    this.screenWash(screenFxEl, `${v.color}55`, 150, 460);
+    this.screenWash(screenFxEl, `${v.color}55`, 150, 460, v.dir === 1 ? '65%' : '35%');
     this.shakeField(fieldEl, 0.7 + v.power * 0.6);
 
     if (v.type === 'Ground' || v.type === 'Rock') {
+      // Cracks radiate from under whoever is being hit, not always mid-field.
+      const originX = clamp(target.x, rect.width * 0.22, rect.width * 0.78);
       for (let i = 0; i < 5; i++) {
         const w = 40 + i * 26;
         const crack = document.createElement('div');
-        crack.style.cssText = `position:absolute;left:${rect.width / 2 - w / 2}px;top:${rect.height * 0.72}px;height:3px;width:2px;background:${v.color};border-radius:2px`;
+        crack.style.cssText = `position:absolute;left:${originX - w / 2}px;top:${rect.height * 0.72}px;height:3px;width:2px;background:${v.color};border-radius:2px`;
         fxEl.appendChild(crack);
         this.anim(crack, [
           { width: '2px', opacity: 0.9 },
@@ -371,13 +377,17 @@ export class MoveAnimationService {
         ], { duration: 620, easing: 'ease-out' }).then(() => crack.remove());
       }
     } else {
+      // Wave sweeps from the caster's side across to the target's side.
+      const from = v.dir === 1 ? -80 : rect.width + 80;
+      const to = v.dir === 1 ? rect.width + 80 : -80;
+      const mid = v.dir === 1 ? rect.width * 0.35 : rect.width * 0.65;
       const wave = document.createElement('div');
       wave.style.cssText = `position:absolute;left:0;top:${rect.height * 0.45}px;width:60px;height:${rect.height * 0.5}px;background:linear-gradient(90deg,transparent,${v.color}cc,transparent);filter:blur(2px)`;
       fxEl.appendChild(wave);
       this.anim(wave, [
-        { transform: 'translateX(-80px) scaleY(.6)', opacity: 0 },
-        { transform: `translateX(${rect.width * 0.35}px) scaleY(1)`, opacity: 1, offset: 0.4 },
-        { transform: `translateX(${rect.width + 80}px) scaleY(.7)`, opacity: 0 }
+        { transform: `translateX(${from}px) scaleY(.6)`, opacity: 0 },
+        { transform: `translateX(${mid}px) scaleY(1)`, opacity: 1, offset: 0.4 },
+        { transform: `translateX(${to}px) scaleY(.7)`, opacity: 0 }
       ], { duration: 620, easing: 'ease-in-out' }).then(() => wave.remove());
     }
     await this.wait(360);
@@ -512,7 +522,7 @@ export class MoveAnimationService {
     this.flash(refs.targetEl, v.color, strong);
     this.shake(refs.targetEl, 3 + v.power * 6);
     if (hitIndex === 0 && (v.spread || v.power > 0.8)) {
-      this.screenWash(refs.screenFxEl, `${v.color}44`, 120, 260);
+      this.screenWash(refs.screenFxEl, `${v.color}44`, 120, 260, v.dir === 1 ? '65%' : '35%');
       this.shakeField(refs.fieldEl, 0.5 + v.power * 0.5);
     }
     await this.wait(v.hits > 1 ? 140 : 90);
@@ -612,14 +622,17 @@ export class MoveAnimationService {
       punch: `width:38px;height:38px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff,${c});box-shadow:0 0 12px ${c}`,
       bite: `width:46px;height:46px;border-radius:50%;background:conic-gradient(${c} 0 30deg,transparent 30deg 60deg,${c} 60deg 90deg,transparent 90deg 120deg,${c} 120deg 150deg,transparent 150deg 180deg,${c} 180deg 210deg,transparent 210deg 240deg,${c} 240deg 270deg,transparent 270deg 300deg,${c} 300deg 330deg,transparent 330deg)`,
       kick: `width:50px;height:14px;border-radius:7px;background:linear-gradient(90deg,transparent,${c},#fff)`,
-      slash: `width:56px;height:10px;border-radius:6px;background:linear-gradient(90deg,transparent,#fff,${c},transparent);transform:rotate(-35deg)`
+      slash: `width:56px;height:10px;border-radius:6px;background:linear-gradient(90deg,transparent,#fff,${c},transparent)`
     };
     el.style.cssText = `position:absolute;left:${at.x}px;top:${at.y}px;margin:-24px 0 0 -24px;${shapes[v.meleeStyle]}`;
     fxEl.appendChild(el);
+    // Mirror the directional glyphs (kick/slash gradients, slash tilt) so an
+    // opponent -> player strike reads the same as a player -> opponent one.
+    const pre = `scaleX(${v.dir}) ${v.meleeStyle === 'slash' ? 'rotate(-35deg) ' : ''}`;
     this.anim(el, [
-      { transform: `${v.meleeStyle === 'slash' ? 'rotate(-35deg) ' : ''}scale(.4)`, opacity: 0.2 },
-      { transform: `${v.meleeStyle === 'slash' ? 'rotate(-35deg) ' : ''}scale(1)`, opacity: 1, offset: 0.4 },
-      { transform: `${v.meleeStyle === 'slash' ? 'rotate(-35deg) ' : ''}scale(1.3)`, opacity: 0 }
+      { transform: `${pre}scale(.4)`, opacity: 0.2 },
+      { transform: `${pre}scale(1)`, opacity: 1, offset: 0.4 },
+      { transform: `${pre}scale(1.3)`, opacity: 0 }
     ], { duration: 300, easing: 'ease-out' }).then(() => el.remove());
   }
 
@@ -689,8 +702,14 @@ export class MoveAnimationService {
     }, 45);
   }
 
-  private screenWash(screenFxEl: HTMLElement, color: string, rampMs: number, holdMs: number): void {
-    screenFxEl.style.background = `radial-gradient(circle at 65% 40%, ${color}, transparent 75%)`;
+  private screenWash(
+    screenFxEl: HTMLElement,
+    color: string,
+    rampMs: number,
+    holdMs: number,
+    anchorX = '65%'
+  ): void {
+    screenFxEl.style.background = `radial-gradient(circle at ${anchorX} 40%, ${color}, transparent 75%)`;
     screenFxEl.style.transition = `opacity ${rampMs}ms ease-out`;
     screenFxEl.style.opacity = '1';
     setTimeout(() => {
