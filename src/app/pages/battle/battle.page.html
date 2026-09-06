@@ -1,4 +1,46 @@
 <ion-content>
+  @if (phase() === 'intro') {
+    <div class="trainer-overlay intro" (click)="beginFight()">
+      <div class="vs-row">
+        <figure class="vs-trainer">
+          <img class="flip" [src]="playerAvatar()" alt="Dein Trainer" />
+          <figcaption>Du</figcaption>
+        </figure>
+        <span class="vs-badge">VS</span>
+        <figure class="vs-trainer">
+          <img [src]="npcAvatar()" [alt]="npcName()" />
+          <figcaption>{{ npcName() }}</figcaption>
+        </figure>
+      </div>
+      <p class="trainer-text">Herausforderer {{ npcName() }} fordert dich heraus!</p>
+      <button type="button" class="trainer-cta" (click)="beginFight(); $event.stopPropagation()">
+        Los geht's!
+      </button>
+    </div>
+  }
+
+  @if (phase() === 'result') {
+    <div class="trainer-overlay result">
+      <div class="vs-row">
+        <figure class="vs-trainer" [class.dim]="outcome() === 'loss'">
+          <img class="flip" [src]="playerAvatar()" alt="Dein Trainer" />
+          <figcaption>Du</figcaption>
+        </figure>
+        <figure class="vs-trainer" [class.dim]="outcome() === 'win'">
+          <img [src]="npcAvatar()" [alt]="npcName()" />
+          <figcaption>{{ npcName() }}</figcaption>
+        </figure>
+      </div>
+      <h2 class="result-headline" [class.win]="outcome() === 'win'" [class.loss]="outcome() === 'loss'">
+        {{ outcome() === 'win' ? 'Du hast gewonnen!' : 'Du wurdest besiegt!' }}
+      </h2>
+      <div class="trainer-actions">
+        <ion-button (click)="resetBattle()">Nochmal</ion-button>
+        <ion-button fill="outline" (click)="toTeamSelect()">Zur Auswahl</ion-button>
+      </div>
+    </div>
+  }
+
   <div class="field" #field>
     <div class="platform opponent-platform"></div>
     <div class="platform player-platform"></div>

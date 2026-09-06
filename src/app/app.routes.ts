@@ -15,5 +15,10 @@ export const routes: Routes = [
     path: 'battle',
     loadComponent: () =>
       import('./pages/battle/battle.page').then((m) => m.BattlePage)
+  },
+  {
+    path: 'settings',
+    loadComponent: () =>
+      import('./pages/settings/settings.page').then((m) => m.SettingsPage)
   }
 ];

@@ -273,3 +273,110 @@
   display: block;
   margin: 0 auto;
 }
+
+/* --- trainer intro / result screens ------------------------------------ */
+
+.trainer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 24px;
+  text-align: center;
+  background: #fff;
+
+  &.intro {
+    cursor: pointer;
+  }
+
+  &.result {
+    background: #fbfbfa;
+  }
+}
+
+.vs-row {
+  display: flex;
+  align-items: center;
+  gap: 26px;
+}
+
+.vs-trainer {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  img {
+    width: 112px;
+    height: 112px;
+    object-fit: contain;
+    image-rendering: pixelated;
+  }
+
+  img.flip {
+    transform: scaleX(-1);
+  }
+
+  figcaption {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+  }
+
+  &.dim {
+    opacity: 0.3;
+    filter: grayscale(1);
+  }
+}
+
+.vs-badge {
+  font-size: 34px;
+  font-weight: 800;
+  font-style: italic;
+  color: #d5443b;
+}
+
+.trainer-text {
+  margin: 0;
+  font-size: 15px;
+  color: #333;
+  max-width: 340px;
+}
+
+.trainer-cta {
+  padding: 10px 26px;
+  border: none;
+  border-radius: 999px;
+  background: #2b2f38;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.result-headline {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+
+  &.win {
+    color: #2f8f3f;
+  }
+
+  &.loss {
+    color: #c23b3b;
+  }
+}
+
+.trainer-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
