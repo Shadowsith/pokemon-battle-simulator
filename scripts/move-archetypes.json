@@ -1,0 +1,2238 @@
+{
+  "absorb": {
+    "archetype": "absorb",
+    "type": "Grass"
+  },
+  "acidarmor": {
+    "archetype": "statMove",
+    "type": "Poison"
+  },
+  "aircutter": {
+    "archetype": "areal",
+    "type": "Flying"
+  },
+  "airslash": {
+    "archetype": "specialAttack",
+    "type": "Flying"
+  },
+  "aromatherapy": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "assurance": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "aurasphere": {
+    "archetype": "projectile",
+    "type": "Fighting"
+  },
+  "autotomize": {
+    "archetype": "statMove",
+    "type": "Steel"
+  },
+  "barrier": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "bestow": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "blizzard": {
+    "archetype": "areal",
+    "type": "Ice"
+  },
+  "block": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "bodyslam": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "bounce": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "bubble": {
+    "archetype": "areal",
+    "type": "Water"
+  },
+  "bugbuzz": {
+    "archetype": "specialAttack",
+    "type": "Bug"
+  },
+  "camouflage": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "charm": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "chatter": {
+    "archetype": "specialAttack",
+    "type": "Flying"
+  },
+  "conversion": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "copycat": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "cottonspore": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "covet": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "crabhammer": {
+    "archetype": "melee",
+    "type": "Water"
+  },
+  "defog": {
+    "archetype": "statMove",
+    "type": "Flying"
+  },
+  "dig": {
+    "archetype": "melee",
+    "type": "Ground"
+  },
+  "dive": {
+    "archetype": "melee",
+    "type": "Water"
+  },
+  "dracometeor": {
+    "archetype": "specialAttack",
+    "type": "Dragon"
+  },
+  "dragonpulse": {
+    "archetype": "specialAttack",
+    "type": "Dragon"
+  },
+  "drainpunch": {
+    "archetype": "absorb",
+    "type": "Fighting"
+  },
+  "dragonrush": {
+    "archetype": "melee",
+    "type": "Dragon"
+  },
+  "dreameater": {
+    "archetype": "absorb",
+    "type": "Psychic"
+  },
+  "echoedvoice": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "electroball": {
+    "archetype": "projectile",
+    "type": "Electric"
+  },
+  "energyball": {
+    "archetype": "projectile",
+    "type": "Grass"
+  },
+  "extrasensory": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "feint": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "finalgambit": {
+    "archetype": "specialAttack",
+    "type": "Fighting"
+  },
+  "fireblast": {
+    "archetype": "beam",
+    "type": "Fire"
+  },
+  "firepledge": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "flamethrower": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "fly": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "followme": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "frostbreath": {
+    "archetype": "specialAttack",
+    "type": "Ice"
+  },
+  "furycutter": {
+    "archetype": "melee",
+    "type": "Bug"
+  },
+  "futuresight": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "gigadrain": {
+    "archetype": "absorb",
+    "type": "Grass"
+  },
+  "glare": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "grasswhistle": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "grasspledge": {
+    "archetype": "specialAttack",
+    "type": "Grass"
+  },
+  "growl": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "growth": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "gunkshot": {
+    "archetype": "projectile",
+    "type": "Poison"
+  },
+  "gyroball": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "healbell": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "healpulse": {
+    "archetype": "healMove",
+    "type": "Psychic"
+  },
+  "heatcrash": {
+    "archetype": "melee",
+    "type": "Fire"
+  },
+  "heatwave": {
+    "archetype": "areal",
+    "type": "Fire"
+  },
+  "hex": {
+    "archetype": "specialAttack",
+    "type": "Ghost"
+  },
+  "hiddenpower": {
+    "archetype": "specialAttack",
+    "type": "Water"
+  },
+  "hornleech": {
+    "archetype": "absorb",
+    "type": "Grass"
+  },
+  "hurricane": {
+    "archetype": "specialAttack",
+    "type": "Flying"
+  },
+  "hydropump": {
+    "archetype": "beam",
+    "type": "Water"
+  },
+  "hypervoice": {
+    "archetype": "areal",
+    "type": "Normal"
+  },
+  "icebeam": {
+    "archetype": "beam",
+    "type": "Ice"
+  },
+  "incinerate": {
+    "archetype": "areal",
+    "type": "Fire"
+  },
+  "knockoff": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "leafstorm": {
+    "archetype": "specialAttack",
+    "type": "Grass"
+  },
+  "leechlife": {
+    "archetype": "absorb",
+    "type": "Bug"
+  },
+  "lick": {
+    "archetype": "melee",
+    "type": "Ghost"
+  },
+  "lightscreen": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "lowsweep": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "magiccoat": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "magicroom": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "magmastorm": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "meanlook": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "megadrain": {
+    "archetype": "absorb",
+    "type": "Grass"
+  },
+  "metalsound": {
+    "archetype": "statMove",
+    "type": "Steel"
+  },
+  "meteormash": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "minimize": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "moonlight": {
+    "archetype": "healMove",
+    "type": "Normal"
+  },
+  "muddywater": {
+    "archetype": "areal",
+    "type": "Water"
+  },
+  "mudsport": {
+    "archetype": "statMove",
+    "type": "Ground"
+  },
+  "naturepower": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "overheat": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "perishsong": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "pinmissile": {
+    "archetype": "projectile",
+    "type": "Bug"
+  },
+  "poisonfang": {
+    "archetype": "melee",
+    "type": "Poison"
+  },
+  "poisongas": {
+    "archetype": "statMove",
+    "type": "Poison"
+  },
+  "poisonpowder": {
+    "archetype": "statMove",
+    "type": "Poison"
+  },
+  "powergem": {
+    "archetype": "specialAttack",
+    "type": "Rock"
+  },
+  "psychoshift": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "psychup": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "psywave": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "quickguard": {
+    "archetype": "statMove",
+    "type": "Fighting"
+  },
+  "ragepowder": {
+    "archetype": "statMove",
+    "type": "Bug"
+  },
+  "reflect": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "relicsong": {
+    "archetype": "areal",
+    "type": "Normal"
+  },
+  "roar": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "rocktomb": {
+    "archetype": "projectile",
+    "type": "Rock"
+  },
+  "round": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "sacredsword": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "scald": {
+    "archetype": "specialAttack",
+    "type": "Water"
+  },
+  "screech": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "secretpower": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "shadowforce": {
+    "archetype": "melee",
+    "type": "Ghost"
+  },
+  "sing": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "skullbash": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "skydrop": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "sleeppowder": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "smellingsalts": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "smog": {
+    "archetype": "specialAttack",
+    "type": "Poison"
+  },
+  "snarl": {
+    "archetype": "areal",
+    "type": "Dark"
+  },
+  "snore": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "soak": {
+    "archetype": "statMove",
+    "type": "Water"
+  },
+  "spore": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "stormthrow": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "stringshot": {
+    "archetype": "statMove",
+    "type": "Bug"
+  },
+  "strugglebug": {
+    "archetype": "areal",
+    "type": "Bug"
+  },
+  "stunspore": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "substitute": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "submission": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "supersonic": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "surf": {
+    "archetype": "areal",
+    "type": "Water"
+  },
+  "sweetkiss": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "sweetscent": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "swordsdance": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "synchronoise": {
+    "archetype": "areal",
+    "type": "Psychic"
+  },
+  "tailwind": {
+    "archetype": "statMove",
+    "type": "Flying"
+  },
+  "technoblast": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "thief": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "thunder": {
+    "archetype": "specialAttack",
+    "type": "Electric"
+  },
+  "thunderbolt": {
+    "archetype": "specialAttack",
+    "type": "Electric"
+  },
+  "toxic": {
+    "archetype": "statMove",
+    "type": "Poison"
+  },
+  "uproar": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "vinewhip": {
+    "archetype": "melee",
+    "type": "Grass"
+  },
+  "wakeupslap": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "waterpledge": {
+    "archetype": "specialAttack",
+    "type": "Water"
+  },
+  "watersport": {
+    "archetype": "statMove",
+    "type": "Water"
+  },
+  "whirlwind": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "wideguard": {
+    "archetype": "statMove",
+    "type": "Rock"
+  },
+  "willowisp": {
+    "archetype": "statMove",
+    "type": "Fire"
+  },
+  "wonderroom": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "allyswitch": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "assist": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "darkvoid": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "destinybond": {
+    "archetype": "statMove",
+    "type": "Ghost"
+  },
+  "heavyslam": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "mefirst": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "metronome": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "rockblast": {
+    "archetype": "projectile",
+    "type": "Rock"
+  },
+  "sheercold": {
+    "archetype": "specialAttack",
+    "type": "Ice"
+  },
+  "sleeptalk": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "stockpile": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "suckerpunch": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "swagger": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "tackle": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "thunderwave": {
+    "archetype": "statMove",
+    "type": "Electric"
+  },
+  "barrage": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "bide": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "boneclub": {
+    "archetype": "projectile",
+    "type": "Ground"
+  },
+  "captivate": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "chipaway": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "clamp": {
+    "archetype": "melee",
+    "type": "Water"
+  },
+  "cometpunch": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "constrict": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "curse": {
+    "archetype": "statMove",
+    "type": "Ghost"
+  },
+  "dizzypunch": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "doubleslap": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "dragonrage": {
+    "archetype": "specialAttack",
+    "type": "Dragon"
+  },
+  "eggbomb": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "embargo": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "feintattack": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "flameburst": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "flash": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "foresight": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "frustration": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "grassknot": {
+    "archetype": "specialAttack",
+    "type": "Grass"
+  },
+  "healblock": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "healingwish": {
+    "archetype": "healMove",
+    "type": "Psychic"
+  },
+  "healorder": {
+    "archetype": "healMove",
+    "type": "Bug"
+  },
+  "heartstamp": {
+    "archetype": "melee",
+    "type": "Psychic"
+  },
+  "heartswap": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "howl": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "hyperfang": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "iceball": {
+    "archetype": "melee",
+    "type": "Ice"
+  },
+  "judgment": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "jumpkick": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "karatechop": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "lowkick": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "luckychant": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "lunardance": {
+    "archetype": "healMove",
+    "type": "Psychic"
+  },
+  "magnetbomb": {
+    "archetype": "projectile",
+    "type": "Steel"
+  },
+  "magnitude": {
+    "archetype": "areal",
+    "type": "Ground"
+  },
+  "meditate": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "miracleeye": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "mirrormove": {
+    "archetype": "statMove",
+    "type": "Flying"
+  },
+  "mirrorshot": {
+    "archetype": "specialAttack",
+    "type": "Steel"
+  },
+  "morningsun": {
+    "archetype": "healMove",
+    "type": "Normal"
+  },
+  "mudbomb": {
+    "archetype": "projectile",
+    "type": "Ground"
+  },
+  "naturalgift": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "needlearm": {
+    "archetype": "melee",
+    "type": "Grass"
+  },
+  "nightmare": {
+    "archetype": "statMove",
+    "type": "Ghost"
+  },
+  "odorsleuth": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "ominouswind": {
+    "archetype": "specialAttack",
+    "type": "Ghost"
+  },
+  "psychoboost": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "punishment": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "pursuit": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "quash": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "rage": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "rapidspin": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "razorwind": {
+    "archetype": "areal",
+    "type": "Normal"
+  },
+  "refresh": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "return": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "rockclimb": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "rollingkick": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "seedflare": {
+    "archetype": "specialAttack",
+    "type": "Grass"
+  },
+  "sharpen": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "signalbeam": {
+    "archetype": "beam",
+    "type": "Bug"
+  },
+  "silverwind": {
+    "archetype": "specialAttack",
+    "type": "Bug"
+  },
+  "sketch": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "skyuppercut": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "snatch": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "sonicboom": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "spiderweb": {
+    "archetype": "statMove",
+    "type": "Bug"
+  },
+  "spikecannon": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "steamroller": {
+    "archetype": "melee",
+    "type": "Bug"
+  },
+  "swallow": {
+    "archetype": "healMove",
+    "type": "Normal"
+  },
+  "switcheroo": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "synthesis": {
+    "archetype": "healMove",
+    "type": "Grass"
+  },
+  "tailglow": {
+    "archetype": "statMove",
+    "type": "Bug"
+  },
+  "telekinesis": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "teleport": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "trumpcard": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "twineedle": {
+    "archetype": "projectile",
+    "type": "Bug"
+  },
+  "wringout": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "bonemerang": {
+    "archetype": "projectile",
+    "type": "Ground"
+  },
+  "charge": {
+    "archetype": "statMove",
+    "type": "Electric"
+  },
+  "cut": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "dualchop": {
+    "archetype": "melee",
+    "type": "Dragon"
+  },
+  "geargrind": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "grudge": {
+    "archetype": "statMove",
+    "type": "Ghost"
+  },
+  "hail": {
+    "archetype": "statMove",
+    "type": "Ice"
+  },
+  "headcharge": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "kinesis": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "leaftornado": {
+    "archetype": "specialAttack",
+    "type": "Grass"
+  },
+  "lovelykiss": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "lusterpurge": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "milkdrink": {
+    "archetype": "healMove",
+    "type": "Normal"
+  },
+  "mindreader": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "mirrorcoat": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "mistball": {
+    "archetype": "projectile",
+    "type": "Psychic"
+  },
+  "octazooka": {
+    "archetype": "projectile",
+    "type": "Water"
+  },
+  "recover": {
+    "archetype": "healMove",
+    "type": "Normal"
+  },
+  "rest": {
+    "archetype": "healMove",
+    "type": "Psychic"
+  },
+  "revenge": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "roost": {
+    "archetype": "healMove",
+    "type": "Flying"
+  },
+  "searingshot": {
+    "archetype": "areal",
+    "type": "Fire"
+  },
+  "secretsword": {
+    "archetype": "specialAttack",
+    "type": "Fighting"
+  },
+  "slackoff": {
+    "archetype": "healMove",
+    "type": "Normal"
+  },
+  "softboiled": {
+    "archetype": "healMove",
+    "type": "Normal"
+  },
+  "vcreate": {
+    "archetype": "melee",
+    "type": "Fire"
+  },
+  "vitalthrow": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "acid": {
+    "archetype": "areal",
+    "type": "Poison"
+  },
+  "acidspray": {
+    "archetype": "projectile",
+    "type": "Poison"
+  },
+  "acrobatics": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "acupressure": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "aerialace": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "aeroblast": {
+    "archetype": "beam",
+    "type": "Flying"
+  },
+  "afteryou": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "agility": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "amnesia": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "ancientpower": {
+    "archetype": "specialAttack",
+    "type": "Rock"
+  },
+  "aquajet": {
+    "archetype": "melee",
+    "type": "Water"
+  },
+  "aquaring": {
+    "archetype": "statMove",
+    "type": "Water"
+  },
+  "aquatail": {
+    "archetype": "melee",
+    "type": "Water"
+  },
+  "armthrust": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "astonish": {
+    "archetype": "melee",
+    "type": "Ghost"
+  },
+  "attackorder": {
+    "archetype": "projectile",
+    "type": "Bug"
+  },
+  "attract": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "aurorabeam": {
+    "archetype": "beam",
+    "type": "Ice"
+  },
+  "avalanche": {
+    "archetype": "melee",
+    "type": "Ice"
+  },
+  "batonpass": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "beatup": {
+    "archetype": "projectile",
+    "type": "Dark"
+  },
+  "bellydrum": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "bind": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "bite": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "blastburn": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "blazekick": {
+    "archetype": "melee",
+    "type": "Fire"
+  },
+  "blueflare": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "boltstrike": {
+    "archetype": "melee",
+    "type": "Electric"
+  },
+  "bonerush": {
+    "archetype": "projectile",
+    "type": "Ground"
+  },
+  "bravebird": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "brickbreak": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "brine": {
+    "archetype": "specialAttack",
+    "type": "Water"
+  },
+  "bubblebeam": {
+    "archetype": "beam",
+    "type": "Water"
+  },
+  "bugbite": {
+    "archetype": "melee",
+    "type": "Bug"
+  },
+  "bulkup": {
+    "archetype": "statMove",
+    "type": "Fighting"
+  },
+  "bulldoze": {
+    "archetype": "areal",
+    "type": "Ground"
+  },
+  "bulletpunch": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "bulletseed": {
+    "archetype": "projectile",
+    "type": "Grass"
+  },
+  "calmmind": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "chargebeam": {
+    "archetype": "beam",
+    "type": "Electric"
+  },
+  "circlethrow": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "clearsmog": {
+    "archetype": "specialAttack",
+    "type": "Poison"
+  },
+  "closecombat": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "coil": {
+    "archetype": "statMove",
+    "type": "Poison"
+  },
+  "confuseray": {
+    "archetype": "statMove",
+    "type": "Ghost"
+  },
+  "confusion": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "conversion2": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "cosmicpower": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "cottonguard": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "counter": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "crosschop": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "crosspoison": {
+    "archetype": "melee",
+    "type": "Poison"
+  },
+  "crunch": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "crushclaw": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "crushgrip": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "darkpulse": {
+    "archetype": "areal",
+    "type": "Dark"
+  },
+  "defendorder": {
+    "archetype": "statMove",
+    "type": "Bug"
+  },
+  "defensecurl": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "detect": {
+    "archetype": "statMove",
+    "type": "Fighting"
+  },
+  "disable": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "discharge": {
+    "archetype": "areal",
+    "type": "Electric"
+  },
+  "doomdesire": {
+    "archetype": "specialAttack",
+    "type": "Steel"
+  },
+  "doubleedge": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "doublehit": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "doublekick": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "doubleteam": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "dragonbreath": {
+    "archetype": "specialAttack",
+    "type": "Dragon"
+  },
+  "dragonclaw": {
+    "archetype": "melee",
+    "type": "Dragon"
+  },
+  "dragondance": {
+    "archetype": "statMove",
+    "type": "Dragon"
+  },
+  "dragontail": {
+    "archetype": "melee",
+    "type": "Dragon"
+  },
+  "drillpeck": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "drillrun": {
+    "archetype": "melee",
+    "type": "Ground"
+  },
+  "dynamicpunch": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "earthpower": {
+    "archetype": "specialAttack",
+    "type": "Ground"
+  },
+  "earthquake": {
+    "archetype": "areal",
+    "type": "Ground"
+  },
+  "electroweb": {
+    "archetype": "areal",
+    "type": "Electric"
+  },
+  "ember": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "encore": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "endeavor": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "endure": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "entrainment": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "eruption": {
+    "archetype": "areal",
+    "type": "Fire"
+  },
+  "explosion": {
+    "archetype": "areal",
+    "type": "Normal"
+  },
+  "extremespeed": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "facade": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "fakeout": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "faketears": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "falseswipe": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "featherdance": {
+    "archetype": "statMove",
+    "type": "Flying"
+  },
+  "fierydance": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "firefang": {
+    "archetype": "melee",
+    "type": "Fire"
+  },
+  "firepunch": {
+    "archetype": "melee",
+    "type": "Fire"
+  },
+  "firespin": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "fissure": {
+    "archetype": "projectile",
+    "type": "Ground"
+  },
+  "flail": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "flamecharge": {
+    "archetype": "melee",
+    "type": "Fire"
+  },
+  "flamewheel": {
+    "archetype": "melee",
+    "type": "Fire"
+  },
+  "flareblitz": {
+    "archetype": "melee",
+    "type": "Fire"
+  },
+  "flashcannon": {
+    "archetype": "specialAttack",
+    "type": "Steel"
+  },
+  "flatter": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "fling": {
+    "archetype": "projectile",
+    "type": "Dark"
+  },
+  "focusblast": {
+    "archetype": "projectile",
+    "type": "Fighting"
+  },
+  "focusenergy": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "focuspunch": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "forcepalm": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "foulplay": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "freezeshock": {
+    "archetype": "projectile",
+    "type": "Ice"
+  },
+  "frenzyplant": {
+    "archetype": "specialAttack",
+    "type": "Grass"
+  },
+  "furyattack": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "furyswipes": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "fusionbolt": {
+    "archetype": "projectile",
+    "type": "Electric"
+  },
+  "fusionflare": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "gastroacid": {
+    "archetype": "statMove",
+    "type": "Poison"
+  },
+  "gigaimpact": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "glaciate": {
+    "archetype": "areal",
+    "type": "Ice"
+  },
+  "gravity": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "guardsplit": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "guardswap": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "guillotine": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "gust": {
+    "archetype": "specialAttack",
+    "type": "Flying"
+  },
+  "hammerarm": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "harden": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "haze": {
+    "archetype": "statMove",
+    "type": "Ice"
+  },
+  "headbutt": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "headsmash": {
+    "archetype": "melee",
+    "type": "Rock"
+  },
+  "helpinghand": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "highjumpkick": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "honeclaws": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "hornattack": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "horndrill": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "hydrocannon": {
+    "archetype": "specialAttack",
+    "type": "Water"
+  },
+  "hyperbeam": {
+    "archetype": "beam",
+    "type": "Normal"
+  },
+  "hypnosis": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "iceburn": {
+    "archetype": "specialAttack",
+    "type": "Ice"
+  },
+  "icefang": {
+    "archetype": "melee",
+    "type": "Ice"
+  },
+  "icepunch": {
+    "archetype": "melee",
+    "type": "Ice"
+  },
+  "iceshard": {
+    "archetype": "projectile",
+    "type": "Ice"
+  },
+  "iciclecrash": {
+    "archetype": "projectile",
+    "type": "Ice"
+  },
+  "iciclespear": {
+    "archetype": "projectile",
+    "type": "Ice"
+  },
+  "icywind": {
+    "archetype": "areal",
+    "type": "Ice"
+  },
+  "imprison": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "inferno": {
+    "archetype": "specialAttack",
+    "type": "Fire"
+  },
+  "ingrain": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "irondefense": {
+    "archetype": "statMove",
+    "type": "Steel"
+  },
+  "ironhead": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "irontail": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "lastresort": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "lavaplume": {
+    "archetype": "areal",
+    "type": "Fire"
+  },
+  "leafblade": {
+    "archetype": "melee",
+    "type": "Grass"
+  },
+  "leechseed": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "leer": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "lockon": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "machpunch": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "magicalleaf": {
+    "archetype": "specialAttack",
+    "type": "Grass"
+  },
+  "magnetrise": {
+    "archetype": "statMove",
+    "type": "Electric"
+  },
+  "megahorn": {
+    "archetype": "melee",
+    "type": "Bug"
+  },
+  "megakick": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "megapunch": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "memento": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "metalburst": {
+    "archetype": "projectile",
+    "type": "Steel"
+  },
+  "metalclaw": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "mimic": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "mist": {
+    "archetype": "statMove",
+    "type": "Ice"
+  },
+  "mudshot": {
+    "archetype": "specialAttack",
+    "type": "Ground"
+  },
+  "mudslap": {
+    "archetype": "specialAttack",
+    "type": "Ground"
+  },
+  "nastyplot": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "nightdaze": {
+    "archetype": "specialAttack",
+    "type": "Dark"
+  },
+  "nightshade": {
+    "archetype": "specialAttack",
+    "type": "Ghost"
+  },
+  "nightslash": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "outrage": {
+    "archetype": "melee",
+    "type": "Dragon"
+  },
+  "painsplit": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "payback": {
+    "archetype": "melee",
+    "type": "Dark"
+  },
+  "payday": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "peck": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "petaldance": {
+    "archetype": "specialAttack",
+    "type": "Grass"
+  },
+  "pluck": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "poisonjab": {
+    "archetype": "melee",
+    "type": "Poison"
+  },
+  "poisonsting": {
+    "archetype": "projectile",
+    "type": "Poison"
+  },
+  "poisontail": {
+    "archetype": "melee",
+    "type": "Poison"
+  },
+  "pound": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "powdersnow": {
+    "archetype": "areal",
+    "type": "Ice"
+  },
+  "powersplit": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "powerswap": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "powertrick": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "powerwhip": {
+    "archetype": "melee",
+    "type": "Grass"
+  },
+  "present": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "protect": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "psybeam": {
+    "archetype": "beam",
+    "type": "Psychic"
+  },
+  "psychic": {
+    "archetype": "areal",
+    "type": "Psychic"
+  },
+  "psychocut": {
+    "archetype": "projectile",
+    "type": "Psychic"
+  },
+  "psyshock": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "psystrike": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "quickattack": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "quiverdance": {
+    "archetype": "statMove",
+    "type": "Bug"
+  },
+  "raindance": {
+    "archetype": "statMove",
+    "type": "Water"
+  },
+  "razorleaf": {
+    "archetype": "areal",
+    "type": "Grass"
+  },
+  "razorshell": {
+    "archetype": "melee",
+    "type": "Water"
+  },
+  "recycle": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "reflecttype": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "retaliate": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "reversal": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "roaroftime": {
+    "archetype": "specialAttack",
+    "type": "Dragon"
+  },
+  "rockpolish": {
+    "archetype": "statMove",
+    "type": "Rock"
+  },
+  "rockslide": {
+    "archetype": "areal",
+    "type": "Rock"
+  },
+  "rocksmash": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "rockthrow": {
+    "archetype": "projectile",
+    "type": "Rock"
+  },
+  "rockwrecker": {
+    "archetype": "projectile",
+    "type": "Rock"
+  },
+  "roleplay": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "rollout": {
+    "archetype": "melee",
+    "type": "Rock"
+  },
+  "sacredfire": {
+    "archetype": "projectile",
+    "type": "Fire"
+  },
+  "safeguard": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "sandattack": {
+    "archetype": "statMove",
+    "type": "Ground"
+  },
+  "sandstorm": {
+    "archetype": "statMove",
+    "type": "Rock"
+  },
+  "sandtomb": {
+    "archetype": "projectile",
+    "type": "Ground"
+  },
+  "scaryface": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "scratch": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "seedbomb": {
+    "archetype": "projectile",
+    "type": "Grass"
+  },
+  "seismictoss": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "selfdestruct": {
+    "archetype": "areal",
+    "type": "Normal"
+  },
+  "shadowball": {
+    "archetype": "projectile",
+    "type": "Ghost"
+  },
+  "shadowclaw": {
+    "archetype": "melee",
+    "type": "Ghost"
+  },
+  "shadowpunch": {
+    "archetype": "melee",
+    "type": "Ghost"
+  },
+  "shadowsneak": {
+    "archetype": "melee",
+    "type": "Ghost"
+  },
+  "shellsmash": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "shiftgear": {
+    "archetype": "statMove",
+    "type": "Steel"
+  },
+  "shockwave": {
+    "archetype": "specialAttack",
+    "type": "Electric"
+  },
+  "simplebeam": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "skillswap": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "skyattack": {
+    "archetype": "projectile",
+    "type": "Flying"
+  },
+  "slam": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "slash": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "sludge": {
+    "archetype": "specialAttack",
+    "type": "Poison"
+  },
+  "sludgebomb": {
+    "archetype": "projectile",
+    "type": "Poison"
+  },
+  "sludgewave": {
+    "archetype": "areal",
+    "type": "Poison"
+  },
+  "smackdown": {
+    "archetype": "projectile",
+    "type": "Rock"
+  },
+  "smokescreen": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "solarbeam": {
+    "archetype": "beam",
+    "type": "Grass"
+  },
+  "spacialrend": {
+    "archetype": "specialAttack",
+    "type": "Dragon"
+  },
+  "spark": {
+    "archetype": "melee",
+    "type": "Electric"
+  },
+  "spikes": {
+    "archetype": "statMove",
+    "type": "Ground"
+  },
+  "spite": {
+    "archetype": "statMove",
+    "type": "Ghost"
+  },
+  "spitup": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "splash": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "stealthrock": {
+    "archetype": "statMove",
+    "type": "Rock"
+  },
+  "steelwing": {
+    "archetype": "melee",
+    "type": "Steel"
+  },
+  "stomp": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "stoneedge": {
+    "archetype": "projectile",
+    "type": "Rock"
+  },
+  "storedpower": {
+    "archetype": "specialAttack",
+    "type": "Psychic"
+  },
+  "strength": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "struggle": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "sunnyday": {
+    "archetype": "statMove",
+    "type": "Fire"
+  },
+  "superfang": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "superpower": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "swift": {
+    "archetype": "areal",
+    "type": "Normal"
+  },
+  "tailslap": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "tailwhip": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "takedown": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "taunt": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "teeterdance": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "thrash": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "thunderfang": {
+    "archetype": "melee",
+    "type": "Electric"
+  },
+  "thunderpunch": {
+    "archetype": "melee",
+    "type": "Electric"
+  },
+  "thundershock": {
+    "archetype": "specialAttack",
+    "type": "Electric"
+  },
+  "tickle": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "torment": {
+    "archetype": "statMove",
+    "type": "Dark"
+  },
+  "toxicspikes": {
+    "archetype": "statMove",
+    "type": "Poison"
+  },
+  "transform": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "triattack": {
+    "archetype": "specialAttack",
+    "type": "Normal"
+  },
+  "trick": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "trickroom": {
+    "archetype": "statMove",
+    "type": "Psychic"
+  },
+  "triplekick": {
+    "archetype": "melee",
+    "type": "Fighting"
+  },
+  "twister": {
+    "archetype": "areal",
+    "type": "Dragon"
+  },
+  "uturn": {
+    "archetype": "melee",
+    "type": "Bug"
+  },
+  "vacuumwave": {
+    "archetype": "specialAttack",
+    "type": "Fighting"
+  },
+  "venoshock": {
+    "archetype": "specialAttack",
+    "type": "Poison"
+  },
+  "visegrip": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "voltswitch": {
+    "archetype": "specialAttack",
+    "type": "Electric"
+  },
+  "volttackle": {
+    "archetype": "melee",
+    "type": "Electric"
+  },
+  "waterfall": {
+    "archetype": "melee",
+    "type": "Water"
+  },
+  "watergun": {
+    "archetype": "specialAttack",
+    "type": "Water"
+  },
+  "waterpulse": {
+    "archetype": "specialAttack",
+    "type": "Water"
+  },
+  "waterspout": {
+    "archetype": "areal",
+    "type": "Water"
+  },
+  "weatherball": {
+    "archetype": "projectile",
+    "type": "Normal"
+  },
+  "whirlpool": {
+    "archetype": "specialAttack",
+    "type": "Water"
+  },
+  "wildcharge": {
+    "archetype": "melee",
+    "type": "Electric"
+  },
+  "wingattack": {
+    "archetype": "melee",
+    "type": "Flying"
+  },
+  "wish": {
+    "archetype": "healMove",
+    "type": "Normal"
+  },
+  "withdraw": {
+    "archetype": "statMove",
+    "type": "Water"
+  },
+  "woodhammer": {
+    "archetype": "melee",
+    "type": "Grass"
+  },
+  "workup": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "worryseed": {
+    "archetype": "statMove",
+    "type": "Grass"
+  },
+  "wrap": {
+    "archetype": "melee",
+    "type": "Normal"
+  },
+  "xscissor": {
+    "archetype": "melee",
+    "type": "Bug"
+  },
+  "yawn": {
+    "archetype": "statMove",
+    "type": "Normal"
+  },
+  "zapcannon": {
+    "archetype": "projectile",
+    "type": "Electric"
+  },
+  "zenheadbutt": {
+    "archetype": "melee",
+    "type": "Psychic"
+  }
+}

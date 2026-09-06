@@ -54,7 +54,7 @@ export class BattlePage {
     if (this.isAnimating()) return;
     this.isAnimating.set(true);
     this.log.set(`${this.player().name} setzt ${move.name} ein...`);
-    this.audio.play(move.soundId);
+    this.audio.playMove(move.showdownId);
 
     await this.animation.playMove(move, {
       fieldEl: this.fieldRef.nativeElement,
