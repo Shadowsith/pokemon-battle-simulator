@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Dex, StatsTable } from '@pkmn/sim';
 import { BattlePokemon } from '../models/pokemon.model';
 import { Move } from '../models/move.model';
+import { stageMultiplier } from './stat-change.service';
 
 const LEVEL = 50;
 const NEUTRAL_IV = 31;
@@ -42,6 +43,23 @@ export class DamageCalcService {
     return pp;
   }
 
+  /** Priority bracket of a move (Quick Attack +1, Roar -6, most moves 0). */
+  movePriority(move: Move): number {
+    return Dex.moves.get(move.showdownId)?.priority ?? 0;
+  }
+
+  /**
+   * Effective Speed used for turn order: base Speed stat, scaled by the Speed
+   * stage, quartered while paralysed (Gen 5).
+   */
+  effectiveSpeed(mon: BattlePokemon): number {
+    const species = this.lookupSpecies(mon.dexId);
+    if (!species) return 0;
+    let spe = calcStat(species.baseStats['spe'], false) * stageMultiplier(mon.boosts.spe);
+    if (mon.status.major === 'par') spe *= 0.25;
+    return spe;
+  }
+
   calculateDamage(attacker: BattlePokemon, defender: BattlePokemon, move: Move): number {
     const moveData = Dex.moves.get(move.showdownId);
     if (!moveData?.exists || !moveData.basePower) return 0;
@@ -53,8 +71,12 @@ export class DamageCalcService {
     if (!Dex.getImmunity(moveData.type, defenderSpecies.types)) return 0;
 
     const isPhysical = moveData.category === 'Physical';
-    const attackStat = calcStat(attackerSpecies.baseStats[isPhysical ? 'atk' : 'spa'], false);
-    const defenseStat = calcStat(defenderSpecies.baseStats[isPhysical ? 'def' : 'spd'], false);
+    const atkKey = isPhysical ? 'atk' : 'spa';
+    const defKey = isPhysical ? 'def' : 'spd';
+    const attackStat =
+      calcStat(attackerSpecies.baseStats[atkKey], false) * stageMultiplier(attacker.boosts[atkKey]);
+    const defenseStat =
+      calcStat(defenderSpecies.baseStats[defKey], false) * stageMultiplier(defender.boosts[defKey]);
     const defenderMaxHpStat = calcStat(defenderSpecies.baseStats['hp'], true);
 
     const stab = attackerSpecies.types.includes(moveData.type) ? 1.5 : 1;

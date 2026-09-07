@@ -64,6 +64,19 @@
       <div class="hp-track">
         <div class="hp-fill" [style.width.%]="hpPercent(opponent())" [style.background]="hpColor(opponent())"></div>
       </div>
+      @if (boostChips(opponent()).length) {
+        <div class="boost-row">
+          @for (c of boostChips(opponent()); track c.stat) {
+            <span
+              class="boost-chip"
+              [class.up]="c.stage > 0"
+              [class.down]="c.stage < 0"
+              [title]="statMeta[c.stat].label"
+              >{{ statMeta[c.stat].short }} {{ c.stage > 0 ? '+' : '' }}{{ c.stage }}</span
+            >
+          }
+        </div>
+      }
     </div>
     <img #oppSprite class="sprite opponent-sprite" [src]="opponentSpriteSrc()" [alt]="opponent().name" />
 
@@ -85,7 +98,21 @@
       </div>
       <div class="hp-track">
         <div class="hp-fill" [style.width.%]="hpPercent(player())" [style.background]="hpColor(player())"></div>
+        <span class="hp-text">{{ player().currentHp }} / {{ player().maxHp }} HP</span>
       </div>
+      @if (boostChips(player()).length) {
+        <div class="boost-row">
+          @for (c of boostChips(player()); track c.stat) {
+            <span
+              class="boost-chip"
+              [class.up]="c.stage > 0"
+              [class.down]="c.stage < 0"
+              [title]="statMeta[c.stat].label"
+              >{{ statMeta[c.stat].short }} {{ c.stage > 0 ? '+' : '' }}{{ c.stage }}</span
+            >
+          }
+        </div>
+      }
     </div>
     <img #playerSprite class="sprite player-sprite" [src]="playerSpriteSrc()" [alt]="player().name" />
 

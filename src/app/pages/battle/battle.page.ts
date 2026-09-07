@@ -4,8 +4,11 @@ import { IonContent, IonButton } from '@ionic/angular/standalone';
 import { MOVE_LIBRARY, Move } from '../../core/models/move.model';
 import {
   BattlePokemon,
+  STAT_META,
   STATUS_META,
+  StatKey,
   backSpritePath,
+  freshBoosts,
   freshStatus,
   frontSpritePath
 } from '../../core/models/pokemon.model';
@@ -22,6 +25,7 @@ import { SettingsService } from '../../core/services/settings.service';
 import { TrainerRosterService } from '../../core/services/trainer-roster.service';
 import { TeamService } from '../../core/services/team.service';
 import { StatusService } from '../../core/services/status.service';
+import { StatChange, StatChangeService } from '../../core/services/stat-change.service';
 
 type MenuState = 'main' | 'fight' | 'pokemon';
 /** intro = "VS" screen, fight = the battle proper, result = win/loss screen. */
@@ -46,9 +50,11 @@ export class BattlePage {
   private readonly roster = inject(TrainerRosterService);
   private readonly teamService = inject(TeamService);
   private readonly status = inject(StatusService);
+  private readonly statChange = inject(StatChangeService);
 
-  /** Status badge presentation, used by the template. */
+  /** Status badge / stat-stage presentation, used by the template. */
   readonly statusMeta = STATUS_META;
+  readonly statMeta = STAT_META;
 
   readonly log = signal('');
   readonly isAnimating = signal(false);
@@ -58,7 +64,7 @@ export class BattlePage {
   readonly outcome = signal<'win' | 'loss' | null>(null);
 
   /** Used when the player hasn't built a team yet (also the move-animation test bed). */
-  private readonly prototypeTeam: Omit<BattlePokemon, 'status'>[] = [
+  private readonly prototypeTeam: Omit<BattlePokemon, 'status' | 'boosts'>[] = [
     { dexId: 197, name: 'Nachtara', maxHp: 100, currentHp: 100, types: ['dark'] },
     { dexId: 149, name: 'Dragoran', maxHp: 100, currentHp: 100, types: ['dragon', 'flying'] },
     { dexId: 31, name: 'Nidoqueen', maxHp: 100, currentHp: 100, types: ['poison', 'ground'] }
@@ -110,10 +116,11 @@ export class BattlePage {
         maxHp: 100,
         currentHp: 100,
         types: p.types.map((t) => t.toLowerCase()),
-        status: freshStatus()
+        status: freshStatus(),
+        boosts: freshBoosts()
       }));
     }
-    return this.prototypeTeam.map((p) => ({ ...p, status: freshStatus() }));
+    return this.prototypeTeam.map((p) => ({ ...p, status: freshStatus(), boosts: freshBoosts() }));
   }
 
   readonly opponent = signal<BattlePokemon>({
@@ -122,7 +129,8 @@ export class BattlePage {
     maxHp: 100,
     currentHp: 100,
     types: ['fire', 'flying'],
-    status: freshStatus()
+    status: freshStatus(),
+    boosts: freshBoosts()
   });
 
   /** Trainer avatars shown on the intro and result screens. */
@@ -165,19 +173,41 @@ export class BattlePage {
     this.introTimer = setTimeout(() => this.beginFight(), 2400);
   }
 
-  /** Dismiss the intro and start taking turns - both trainers throw their ball. */
-  beginFight(): void {
+  /**
+   * Dismiss the intro and stage the send-out: the opponent throws their ball
+   * first (cry after the ball animation), then the player throws theirs.
+   */
+  async beginFight(): Promise<void> {
     if (this.introTimer) {
       clearTimeout(this.introTimer);
       this.introTimer = null;
     }
     if (this.phase() !== 'intro') return;
+
+    this.isAnimating.set(true);
     this.phase.set('fight');
-    this.log.set(`Was wird ${this.player().name} tun?`);
+
     const fx = this.fxRef.nativeElement;
     const field = this.fieldRef.nativeElement;
-    this.animation.playSendOut(this.playerSpriteRef.nativeElement, fx, field, 'player');
-    this.animation.playSendOut(this.oppSpriteRef.nativeElement, fx, field, 'opponent');
+    const playerEl = this.playerSpriteRef.nativeElement;
+    const oppEl = this.oppSpriteRef.nativeElement;
+    playerEl.style.opacity = '0';
+    oppEl.style.opacity = '0';
+
+    this.log.set(`${this.npcName()} schickt ${this.opponent().name} in den Kampf!`);
+    await this.animation.playSendOut(oppEl, fx, field, 'opponent');
+    await this.wait(150);
+    this.audio.playCry(this.opponent().dexId);
+    await this.wait(550);
+
+    this.log.set(`Los, ${this.player().name}!`);
+    await this.animation.playSendOut(playerEl, fx, field, 'player');
+    await this.wait(150);
+    this.audio.playCry(this.player().dexId);
+    await this.wait(300);
+
+    this.log.set(`Was wird ${this.player().name} tun?`);
+    this.isAnimating.set(false);
   }
 
   private endBattle(outcome: 'win' | 'loss'): void {
@@ -192,7 +222,12 @@ export class BattlePage {
   private faintDone: { player: boolean; opponent: boolean } = { player: false, opponent: false };
 
   private resetTeams(): void {
-    this.opponent.update((p) => ({ ...p, currentHp: p.maxHp, status: freshStatus() }));
+    this.opponent.update((p) => ({
+      ...p,
+      currentHp: p.maxHp,
+      status: freshStatus(),
+      boosts: freshBoosts()
+    }));
     this.playerTeam.set(this.derivePlayerTeam());
     this.movePp.set({});
     this.activePlayerIndex.set(0);
@@ -244,40 +279,77 @@ export class BattlePage {
       this.log.set(`${move.name} hat keine AP mehr übrig!`);
       return;
     }
-    this.movePp.update((m) => ({ ...m, [key]: remaining - 1 }));
 
     this.isAnimating.set(true);
     this.menuState.set('main');
 
-    await this.performMove(move, 'player');
-    await this.settleFaints();
+    // Both sides have now locked in their action; turn order is by priority,
+    // then by current effective Speed, then a coin flip on a tie.
+    const npcMove = this.pickNpcMove();
+    const order: ['player' | 'opponent', Move][] = this.playerActsFirst(move, npcMove)
+      ? [
+          ['player', move],
+          ['opponent', npcMove]
+        ]
+      : [
+          ['opponent', npcMove],
+          ['player', move]
+        ];
 
-    // A KO from the player's move ends the round before the NPC can reply.
-    if (this.opponent().currentHp <= 0) {
-      await this.wait(300);
-      this.endBattle('win');
-      return;
+    for (let i = 0; i < order.length; i++) {
+      const [actor, mv] = order[i];
+      const actorMon = actor === 'player' ? this.player() : this.opponent();
+      if (actorMon.currentHp <= 0) continue; // KO'd by the faster Pokémon this turn
+      if (this.battleDecided()) break;
+      if (i > 0) await this.wait(550);
+      if (actor === 'player') this.movePp.update((m) => ({ ...m, [key]: (m[key] ?? remaining) - 1 }));
+      await this.performMove(mv, actor);
+      await this.settleFaints();
     }
 
-    await this.resolveRound();
+    await this.finishRound();
   }
 
-  /** The NPC's active Pokémon takes its turn. */
+  private pickNpcMove(): Move {
+    return this.opponentMoves[Math.floor(Math.random() * this.opponentMoves.length)];
+  }
+
+  /** True when the player's chosen move resolves before the NPC's. */
+  private playerActsFirst(playerMove: Move, npcMove: Move): boolean {
+    const pPrio = this.damageCalc.movePriority(playerMove);
+    const nPrio = this.damageCalc.movePriority(npcMove);
+    if (pPrio !== nPrio) return pPrio > nPrio;
+
+    const pSpe = this.damageCalc.effectiveSpeed(this.player());
+    const nSpe = this.damageCalc.effectiveSpeed(this.opponent());
+    if (pSpe !== nSpe) return pSpe > nSpe;
+    return Math.random() < 0.5;
+  }
+
+  private battleDecided(): boolean {
+    return this.opponent().currentHp <= 0 || this.playerTeam().every((p) => p.currentHp <= 0);
+  }
+
+  /** The NPC's active Pokémon takes its turn (used after a player switch). */
   private async npcTurn(): Promise<void> {
     await this.wait(550);
-    const reply = this.opponentMoves[Math.floor(Math.random() * this.opponentMoves.length)];
-    await this.performMove(reply, 'opponent');
+    await this.performMove(this.pickNpcMove(), 'opponent');
   }
 
   /**
-   * Runs the NPC's turn (unless the player's active just fainted), then the
-   * end-of-turn status damage, then settles the round: win, loss, or hand
-   * control back to the player.
+   * Runs the NPC's turn (unless the player's active just fainted) and settles
+   * the round. Used when the player's action was a switch, so the NPC always
+   * moves second.
    */
   private async resolveRound(): Promise<void> {
     if (!this.isActiveFainted() && this.opponent().currentHp > 0) {
       await this.npcTurn();
     }
+    await this.finishRound();
+  }
+
+  /** End-of-turn status damage, then win / loss / hand control back to the player. */
+  private async finishRound(): Promise<void> {
     await this.settleFaints();
     if (await this.checkEnd()) return;
 
@@ -390,6 +462,22 @@ export class BattlePage {
       });
     }
 
+    // --- stat-stage changes (Swords Dance, Growl, Overheat's own drop, Crunch's chance …) ---
+    const statLogs: string[] = [];
+    const sc = this.statChange.resolve(move, defenderNow.types, dealt);
+    if (Object.keys(sc.toUser).length) {
+      const user = side === 'player' ? this.player() : this.opponent();
+      const res = this.statChange.apply(user.boosts, sc.toUser);
+      this.patchActive(side, { boosts: res.boosts });
+      for (const ch of res.changes) statLogs.push(this.statChangeMessage(user.name, ch));
+    }
+    if (defenderNow.currentHp > 0 && Object.keys(sc.toTarget).length) {
+      const tgt = foeSide === 'opponent' ? this.opponent() : this.player();
+      const res = this.statChange.apply(tgt.boosts, sc.toTarget);
+      this.patchActive(foeSide, { boosts: res.boosts });
+      for (const ch of res.changes) statLogs.push(this.statChangeMessage(tgt.name, ch));
+    }
+
     const foe = foeSide === 'opponent' ? this.opponent() : this.player();
     const me = side === 'player' ? this.player() : this.opponent();
 
@@ -404,6 +492,8 @@ export class BattlePage {
       line = 'Aber es misslang!';
     } else if (dealt > 0) {
       line = `${move.name} trifft ${foe.name}!`;
+    } else if (statLogs.length > 0) {
+      line = statLogs.shift() as string; // a pure stat move - lead with the first change
     } else {
       line = `${move.name} zeigt keine Wirkung …`;
     }
@@ -418,6 +508,41 @@ export class BattlePage {
     }
     if (statusMsg) line += ` ${statusMsg}`;
     this.log.set(line);
+
+    for (const msg of statLogs) {
+      await this.wait(850);
+      this.log.set(msg);
+    }
+  }
+
+  private statChangeMessage(name: string, ch: StatChange): string {
+    const stat = this.statMeta[ch.stat].label;
+    if (ch.capped) {
+      return ch.delta > 0
+        ? `${name}s ${stat} kann nicht weiter erhöht werden!`
+        : `${name}s ${stat} kann nicht weiter gesenkt werden!`;
+    }
+    const mag = Math.abs(ch.delta);
+    const verb =
+      ch.delta > 0
+        ? mag >= 3
+          ? 'steigt extrem'
+          : mag === 2
+            ? 'steigt stark'
+            : 'steigt'
+        : mag >= 3
+          ? 'sinkt extrem'
+          : mag === 2
+            ? 'sinkt stark'
+            : 'sinkt';
+    return `${name}s ${stat} ${verb}!`;
+  }
+
+  /** Non-zero stat stages for the HUD indicator row. */
+  boostChips(mon: BattlePokemon): { stat: StatKey; stage: number }[] {
+    return (Object.keys(mon.boosts) as StatKey[])
+      .filter((k) => mon.boosts[k] !== 0)
+      .map((stat) => ({ stat, stage: mon.boosts[stat] }));
   }
 
   /** Shallow-merge a patch onto one side's active Pokémon. */
@@ -485,10 +610,12 @@ export class BattlePage {
     const spriteEl = this.playerSpriteRef.nativeElement;
 
     if (!forced) {
-      // Switching out clears volatiles: confusion ends, the toxic counter resets.
+      // Switching out clears volatiles: confusion ends, the toxic counter resets,
+      // and all stat stages are lost.
       const out = this.player();
       this.patchActive('player', {
-        status: { ...out.status, confusionTurns: 0, toxicTurns: out.status.major === 'tox' ? 1 : 0 }
+        status: { ...out.status, confusionTurns: 0, toxicTurns: out.status.major === 'tox' ? 1 : 0 },
+        boosts: freshBoosts()
       });
       this.log.set(`${out.name}, komm zurück!`);
       await this.animation.playRecall(spriteEl, fx, field, 'player');
@@ -499,6 +626,8 @@ export class BattlePage {
     await this.wait(60); // let the sprite src rebind before it grows in
     this.log.set(`Los, ${this.player().name}!`);
     await this.animation.playSendOut(spriteEl, fx, field, 'player');
+    await this.wait(120);
+    this.audio.playCry(this.player().dexId);
 
     if (forced) {
       this.isAnimating.set(false);

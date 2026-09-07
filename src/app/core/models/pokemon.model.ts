@@ -15,6 +15,25 @@ export function freshStatus(): StatusState {
   return { major: null, toxicTurns: 0, sleepTurns: 0, confusionTurns: 0 };
 }
 
+export type StatKey = 'atk' | 'def' | 'spa' | 'spd' | 'spe' | 'accuracy' | 'evasion';
+
+/** Battle stat stages, each -6..+6 (0 = unmodified). Reset on switch / faint. */
+export type Boosts = Record<StatKey, number>;
+
+export function freshBoosts(): Boosts {
+  return { atk: 0, def: 0, spa: 0, spd: 0, spe: 0, accuracy: 0, evasion: 0 };
+}
+
+export const STAT_META: Record<StatKey, { short: string; label: string }> = {
+  atk: { short: 'ANG', label: 'Angriff' },
+  def: { short: 'VER', label: 'Verteidigung' },
+  spa: { short: 'SP-ANG', label: 'Spezial-Angriff' },
+  spd: { short: 'SP-VER', label: 'Spezial-Verteidigung' },
+  spe: { short: 'INI', label: 'Initiative' },
+  accuracy: { short: 'GEN', label: 'Genauigkeit' },
+  evasion: { short: 'FLU', label: 'Fluchtwert' }
+};
+
 export interface BattlePokemon {
   /** National Pokédex number, used to resolve local sprite/sound assets */
   dexId: number;
@@ -23,6 +42,7 @@ export interface BattlePokemon {
   currentHp: number;
   types: string[];
   status: StatusState;
+  boosts: Boosts;
 }
 
 /** Badge presentation per status: short code, background, text colour, full name. */
