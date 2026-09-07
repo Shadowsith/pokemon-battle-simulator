@@ -1,7 +1,7 @@
 // Builds the static data the team builder needs, from @pkmn/sim's bundled
 // Gen 5 dex, into public/assets/data/:
 //
-//   species-gen5.json    [{ num, id, name, types }]        national dex 1-649
+//   species-gen5.json    [{ num, id, name, types, fullyEvolved }]  national dex 1-649
 //   moves-gen5.json      { id: { name, type, category, bp, pp } }
 //   learnsets-gen5.json  { speciesId: [moveId, ...] }
 //
@@ -87,7 +87,14 @@ async function main() {
     .all()
     .filter((s) => s.num >= 1 && s.num <= 649 && s.gen <= 5 && !s.forme && !s.isNonstandard)
     .sort((a, b) => a.num - b.num)
-    .map((s) => ({ num: s.num, id: s.id, name: deNames[s.num] ?? s.name, types: s.types }));
+    .map((s) => ({
+      num: s.num,
+      id: s.id,
+      name: deNames[s.num] ?? s.name,
+      types: s.types,
+      // `nfe` = "not fully evolved"; the NPC team roll only draws from final stages.
+      fullyEvolved: !s.nfe
+    }));
 
   // learnsets
   const learnsets = {};

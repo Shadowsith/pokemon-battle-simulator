@@ -22,6 +22,8 @@ export interface SpeciesInfo {
   id: string;
   name: string;
   types: string[];
+  /** True for final-stage species only (no further evolution). Used by the NPC team roll. */
+  fullyEvolved?: boolean;
 }
 
 export interface MoveInfo {

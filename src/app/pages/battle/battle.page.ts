@@ -26,6 +26,7 @@ import { DamageCalcService } from '../../core/services/damage-calc.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { TrainerRosterService } from '../../core/services/trainer-roster.service';
 import { TeamService } from '../../core/services/team.service';
+import { NpcPokemon, NpcTeamService } from '../../core/services/npc-team.service';
 import { StatusService } from '../../core/services/status.service';
 import { StatChange, StatChangeService } from '../../core/services/stat-change.service';
 
@@ -58,6 +59,7 @@ export class BattlePage {
   private readonly animation = inject(MoveAnimationService);
   private readonly audio = inject(AudioService);
   private readonly damageCalc = inject(DamageCalcService);
+  private readonly npcTeam = inject(NpcTeamService);
 
   /** Every Pokémon in this simulator battles at level 100. */
   readonly level = this.damageCalc.level;
@@ -158,10 +160,21 @@ export class BattlePage {
     });
   }
 
-  readonly opponent = signal<BattlePokemon>(this.makeOpponent());
+  /** The NPC's party: 1-6 Pokémon, rolled each battle to match the player's team size. */
+  readonly opponentTeam = signal<BattlePokemon[]>([this.makeGlurak()]);
+  readonly activeOpponentIndex = signal(0);
+  readonly opponent = computed<BattlePokemon>(
+    () => this.opponentTeam()[this.activeOpponentIndex()] ?? this.opponentTeam()[0]
+  );
 
-  /** The prototype NPC's lone Pokémon (Glurak), at full level-100 HP. */
-  private makeOpponent(): BattlePokemon {
+  /** The NPC's per-slot movesets, parallel to {@link opponentTeam}. */
+  private readonly opponentMovesets = signal<Move[][]>([this.fallbackOpponentMoves()]);
+
+  /** The in-flight NPC-team roll; {@link beginFight} waits on it before sending out. */
+  private opponentRoll: Promise<void> | null = null;
+
+  /** A single fallback Pokémon so the field is always valid before the roll lands. */
+  private makeGlurak(): BattlePokemon {
     const maxHp = this.damageCalc.hpStat(6);
     return {
       dexId: 6,
@@ -174,27 +187,24 @@ export class BattlePage {
     };
   }
 
-  /** How many Pokémon the NPC opponent fields (the prototype NPC has one). */
-  private readonly opponentPartySize = 1;
+  private fallbackOpponentMoves(): Move[] {
+    return ['flamethrower', 'airslash', 'dragonclaw', 'heatwave', 'slash']
+      .map((id) => MOVE_LIBRARY.find((m) => m.showdownId === id))
+      .filter((m): m is Move => m !== undefined);
+  }
 
   /** Six Poké Ball emblems per side: owned / active / knocked-out. */
-  readonly playerEmblems = computed(() => {
-    const team = this.playerTeam();
-    const active = this.activePlayerIndex();
+  readonly playerEmblems = computed(() => this.emblems(this.playerTeam(), this.activePlayerIndex()));
+  readonly opponentEmblems = computed(() =>
+    this.emblems(this.opponentTeam(), this.activeOpponentIndex())
+  );
+
+  private emblems(team: BattlePokemon[], active: number) {
     return Array.from({ length: 6 }, (_, i) => {
       const mon = team[i];
       return { owned: !!mon, fainted: !!mon && mon.currentHp <= 0, active: !!mon && i === active };
     });
-  });
-
-  readonly opponentEmblems = computed(() => {
-    const koed = this.opponent().currentHp <= 0;
-    return Array.from({ length: 6 }, (_, i) => ({
-      owned: i < this.opponentPartySize,
-      fainted: i === 0 && koed,
-      active: i === 0 && !koed
-    }));
-  });
+  }
 
   /** Trainer avatars shown on the intro and result screens. */
   private readonly npcAvatarId = signal<string>(DEFAULT_TRAINER_AVATAR);
@@ -203,11 +213,6 @@ export class BattlePage {
   readonly npcName = computed(() => trainerLabel(this.npcAvatarId()));
 
   private introTimer: ReturnType<typeof setTimeout> | null = null;
-
-  /** Move pool the NPC opponent picks from on its counter-turn (prototype). */
-  private readonly opponentMoves: Move[] = ['flamethrower', 'wingattack', 'dragonclaw', 'slash', 'airslash', 'heatwave']
-    .map((showdownId) => MOVE_LIBRARY.find((m) => m.showdownId === showdownId))
-    .filter((m): m is Move => m !== undefined);
 
   playerSpriteSrc = () => backSpritePath(this.player().dexId);
   opponentSpriteSrc = () => frontSpritePath(this.opponent().dexId);
@@ -221,15 +226,52 @@ export class BattlePage {
 
   // --- battle lifecycle -------------------------------------------------
 
-  /** Fresh battle: heal both teams, roll a new NPC trainer, show the VS intro. */
+  /** Fresh battle: heal the player team, roll a new NPC trainer + party, show the VS intro. */
   private async startBattle(): Promise<void> {
     if (this.introTimer) clearTimeout(this.introTimer);
     this.resetTeams();
     this.outcome.set(null);
     this.log.set('');
     this.phase.set('intro');
-    this.npcAvatarId.set(await this.roster.randomId());
+    this.opponentRoll = this.rollOpponentTeam();
+    const [avatarId] = await Promise.all([this.roster.randomId(), this.opponentRoll]);
+    this.npcAvatarId.set(avatarId);
     this.introTimer = setTimeout(() => this.beginFight(), 2400);
+  }
+
+  /** Roll a fresh NPC party sized to the player's team (fully-evolved species,
+   *  strong movesets). Falls back to a lone Glurak if generation yields nothing. */
+  private async rollOpponentTeam(): Promise<void> {
+    const size = this.playerTeam().length;
+    let rolled: NpcPokemon[] = [];
+    try {
+      rolled = await this.npcTeam.generate(size);
+    } catch {
+      rolled = [];
+    }
+
+    if (!rolled.length) {
+      this.opponentTeam.set([this.makeGlurak()]);
+      this.opponentMovesets.set([this.fallbackOpponentMoves()]);
+    } else {
+      this.opponentTeam.set(
+        rolled.map((r) => {
+          const maxHp = this.damageCalc.hpStat(r.dexId);
+          return {
+            dexId: r.dexId,
+            name: r.name,
+            maxHp,
+            currentHp: maxHp,
+            types: r.types.map((t) => t.toLowerCase()),
+            status: freshStatus(),
+            boosts: freshBoosts()
+          };
+        })
+      );
+      this.opponentMovesets.set(rolled.map((r) => r.moves));
+    }
+    this.activeOpponentIndex.set(0);
+    this.faintDone.opponent = false;
   }
 
   /**
@@ -245,6 +287,8 @@ export class BattlePage {
 
     this.isAnimating.set(true);
     this.phase.set('fight');
+
+    if (this.opponentRoll) await this.opponentRoll; // the NPC party must be rolled before send-out
 
     const fx = this.fxRef.nativeElement;
     const field = this.fieldRef.nativeElement;
@@ -281,12 +325,11 @@ export class BattlePage {
   private faintDone: { player: boolean; opponent: boolean } = { player: false, opponent: false };
 
   private resetTeams(): void {
-    this.opponent.update((p) => ({
-      ...p,
-      currentHp: p.maxHp,
-      status: freshStatus(),
-      boosts: freshBoosts()
-    }));
+    // Heal whatever NPC party is still on the field; rollOpponentTeam() replaces it.
+    this.opponentTeam.update((team) =>
+      team.map((p) => ({ ...p, currentHp: p.maxHp, status: freshStatus(), boosts: freshBoosts() }))
+    );
+    this.activeOpponentIndex.set(0);
     this.playerTeam.set(this.derivePlayerTeam());
     this.movePp.set({});
     this.charge.set({ player: null, opponent: null });
@@ -381,8 +424,83 @@ export class BattlePage {
     await this.finishRound();
   }
 
+  /**
+   * The NPC's move choice for its active Pokémon: score every move by expected
+   * power against the player's current Pokémon (STAB + type effectiveness) and
+   * usually take the best, with a small chance of a free pick so it isn't
+   * perfectly predictable.
+   */
   private pickNpcMove(): Move {
-    return this.opponentMoves[Math.floor(Math.random() * this.opponentMoves.length)];
+    const set = this.opponentMovesets()[this.activeOpponentIndex()] ?? [];
+    const moves = set.length ? set : this.fallbackOpponentMoves();
+    const target = this.player();
+    const scored = moves.map((m) => ({ m, s: this.scoreNpcMove(m, target) }));
+    const best = Math.max(...scored.map((x) => x.s));
+
+    if (best <= 0 || Math.random() < 0.15) {
+      return moves[Math.floor(Math.random() * moves.length)];
+    }
+    const top = scored.filter((x) => x.s >= best * 0.85).map((x) => x.m);
+    return top[Math.floor(Math.random() * top.length)];
+  }
+
+  /**
+   * Rough "how useful is this move right now" for the NPC AI. Damaging moves
+   * score as base power x STAB x type-effectiveness vs `target`; status moves
+   * score low so they stay situational rather than spammed.
+   */
+  private scoreNpcMove(move: Move, target: BattlePokemon, user: BattlePokemon = this.opponent()): number {
+    if (this.damageCalc.isStatusMove(move)) return 12;
+    const bp = this.damageCalc.basePower(move);
+    if (bp <= 0) return 25; // fixed / variable damage (Seismic Toss, Night Shade, …)
+    const eff = this.damageCalc.effectiveness(move, target); // 0, .25, .5, 1, 2, 4
+    if (eff === 0) return 0;
+    const stab = user.types.includes(move.type.toLowerCase()) ? 1.5 : 1;
+    return bp * stab * eff;
+  }
+
+  /** Index of the healthy reserve with the best matchup vs the player's active
+   *  Pokémon, or -1 when the NPC has nobody left to send in. */
+  private pickOpponentSwitchIn(): number {
+    const team = this.opponentTeam();
+    const target = this.player();
+    let bestIdx = -1;
+    let best = -Infinity;
+    for (let i = 0; i < team.length; i++) {
+      if (i === this.activeOpponentIndex() || team[i].currentHp <= 0) continue;
+      const set = this.opponentMovesets()[i] ?? [];
+      const score = set.reduce((mx, mv) => Math.max(mx, this.scoreNpcMove(mv, target, team[i])), 0);
+      if (score > best) {
+        best = score;
+        bestIdx = i;
+      }
+    }
+    return bestIdx;
+  }
+
+  /** If the NPC's active fainted and it still has a healthy Pokémon, send in the
+   *  best matchup against the player's current Pokémon. */
+  private async replaceFaintedOpponent(): Promise<void> {
+    if (this.opponent().currentHp > 0) return;
+    const next = this.pickOpponentSwitchIn();
+    if (next < 0) return; // whole party is down - checkEnd() ends the battle
+
+    await this.wait(600);
+    this.charge.update((c) => ({ ...c, opponent: null }));
+    this.activeOpponentIndex.set(next);
+    this.faintDone.opponent = false;
+
+    const oppEl = this.oppSpriteRef.nativeElement;
+    oppEl.getAnimations?.().forEach((a) => a.cancel());
+    oppEl.style.opacity = '0';
+    oppEl.style.transform = '';
+    oppEl.style.filter = '';
+    await this.wait(60);
+    this.log.set(`${this.npcName()} schickt ${this.opponent().name} in den Kampf!`);
+    await this.animation.playSendOut(oppEl, this.fxRef.nativeElement, this.fieldRef.nativeElement, 'opponent');
+    await this.wait(120);
+    this.audio.playCry(this.opponent().dexId);
+    await this.wait(250);
   }
 
   /** True when the player's chosen move resolves before the NPC's. */
@@ -398,7 +516,10 @@ export class BattlePage {
   }
 
   private battleDecided(): boolean {
-    return this.opponent().currentHp <= 0 || this.playerTeam().every((p) => p.currentHp <= 0);
+    return (
+      this.opponentTeam().every((p) => p.currentHp <= 0) ||
+      this.playerTeam().every((p) => p.currentHp <= 0)
+    );
   }
 
   private refsFor(side: 'player' | 'opponent') {
@@ -453,10 +574,12 @@ export class BattlePage {
   /** End-of-turn status damage, then win / loss / hand control back to the player. */
   private async finishRound(): Promise<void> {
     await this.settleFaints();
+    await this.replaceFaintedOpponent();
     if (await this.checkEnd()) return;
 
     await this.applyResiduals();
     await this.settleFaints();
+    await this.replaceFaintedOpponent();
     if (await this.checkEnd()) return;
 
     // The player's Pokémon is mid two-turn move: release it automatically.
@@ -472,7 +595,7 @@ export class BattlePage {
   }
 
   private async checkEnd(): Promise<boolean> {
-    if (this.opponent().currentHp <= 0) {
+    if (this.opponentTeam().every((p) => p.currentHp <= 0)) {
       await this.wait(350);
       this.endBattle('win');
       return true;
@@ -689,7 +812,8 @@ export class BattlePage {
   /** Shallow-merge a patch onto one side's active Pokémon. */
   private patchActive(side: 'player' | 'opponent', patch: Partial<BattlePokemon>): void {
     if (side === 'opponent') {
-      this.opponent.update((p) => ({ ...p, ...patch }));
+      const idx = this.activeOpponentIndex();
+      this.opponentTeam.update((team) => team.map((p, i) => (i === idx ? { ...p, ...patch } : p)));
       return;
     }
     const idx = this.activePlayerIndex();

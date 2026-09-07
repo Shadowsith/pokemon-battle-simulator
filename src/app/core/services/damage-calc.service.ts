@@ -82,6 +82,11 @@ export class DamageCalcService {
     return Dex.moves.get(move.showdownId)?.priority ?? 0;
   }
 
+  /** A move's base power from @pkmn/sim (0 for status / fixed-damage moves). */
+  basePower(move: Move): number {
+    return Dex.moves.get(move.showdownId)?.basePower ?? 0;
+  }
+
   /**
    * Type-effectiveness multiplier of a damaging move against `defender`:
    * 0 (immune), 0.25, 0.5, 1, 2 or 4. Status / no-power moves report 1.
