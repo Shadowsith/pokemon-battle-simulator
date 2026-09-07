@@ -21,6 +21,7 @@ import { Dex } from '@pkmn/sim';
 const G5 = Dex.forGen(5);
 const OUT_DIR = path.resolve('public/assets/data');
 const MODEL_FILE = path.resolve('src/app/core/models/move.model.ts');
+const SPECIES_NAMES_DE = path.resolve('scripts/species-names.de.json');
 
 const CATEGORY = { Physical: 'phys', Special: 'spec', Status: 'status' };
 
@@ -80,12 +81,13 @@ async function main() {
     };
   }
 
-  // species (base national dex 1-649, no alternate formes)
+  // species (base national dex 1-649, no alternate formes) - German names
+  const deNames = JSON.parse(await readFile(SPECIES_NAMES_DE, 'utf8'));
   const species = G5.species
     .all()
     .filter((s) => s.num >= 1 && s.num <= 649 && s.gen <= 5 && !s.forme && !s.isNonstandard)
     .sort((a, b) => a.num - b.num)
-    .map((s) => ({ num: s.num, id: s.id, name: s.name, types: s.types }));
+    .map((s) => ({ num: s.num, id: s.id, name: deNames[s.num] ?? s.name, types: s.types }));
 
   // learnsets
   const learnsets = {};

@@ -5,6 +5,25 @@
   </header>
 
   <section class="setting">
+    <h2>Lautstärke</h2>
+    <p class="hint">Grundlautstärke für Soundeffekte und Pokémon-Schreie – aktuell {{ volumePct() }}%.</p>
+    <ion-range
+      aria-label="Lautstärke"
+      [value]="volume() * 100"
+      [min]="0"
+      [max]="100"
+      [step]="5"
+      [snaps]="true"
+      [pin]="true"
+      [pinFormatter]="volumePin"
+      (ionInput)="onVolume($event)"
+    >
+      <span slot="start" aria-hidden="true">🔈</span>
+      <span slot="end" aria-hidden="true">🔊</span>
+    </ion-range>
+  </section>
+
+  <section class="setting">
     <h2>Trainer-Avatar</h2>
     <p class="hint">Wähle das Bild, das deinen Trainer repräsentiert.</p>
 

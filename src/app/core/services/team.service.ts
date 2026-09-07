@@ -7,6 +7,7 @@ import {
   TeamPokemon,
   isBattleReady
 } from '../models/team.model';
+import { germanSpeciesName } from '../models/species-names.de';
 
 const TEAMS_KEY = 'pbs.teams';
 const ACTIVE_KEY = 'pbs.activeTeamId';
@@ -109,7 +110,7 @@ export class TeamService {
             {
               speciesNum: species.num,
               speciesId: species.id,
-              name: species.name,
+              name: germanSpeciesName(species.num, species.name),
               types: species.types,
               moves: []
             }
@@ -210,10 +211,11 @@ function sanitizeMon(p: unknown): TeamPokemon | null {
   if (!p || typeof p !== 'object') return null;
   const m = p as Record<string, unknown>;
   if (typeof m['speciesId'] !== 'string' || typeof m['speciesNum'] !== 'number') return null;
+  const num = m['speciesNum'] as number;
   return {
-    speciesNum: m['speciesNum'] as number,
+    speciesNum: num,
     speciesId: m['speciesId'] as string,
-    name: typeof m['name'] === 'string' ? (m['name'] as string) : (m['speciesId'] as string),
+    name: germanSpeciesName(num, typeof m['name'] === 'string' ? (m['name'] as string) : (m['speciesId'] as string)),
     types: Array.isArray(m['types']) ? (m['types'] as string[]) : [],
     moves: Array.isArray(m['moves'])
       ? (m['moves'] as unknown[]).filter((x): x is string => typeof x === 'string').slice(0, MOVES_PER_POKEMON)

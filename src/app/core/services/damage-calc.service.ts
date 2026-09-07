@@ -51,6 +51,24 @@ export class DamageCalcService {
     return Dex.moves.get(move.showdownId)?.priority ?? 0;
   }
 
+  /**
+   * Type-effectiveness multiplier of a damaging move against `defender`:
+   * 0 (immune), 0.25, 0.5, 1, 2 or 4. Status / no-power moves report 1.
+   */
+  effectiveness(move: Move, defender: BattlePokemon): number {
+    const moveData = Dex.moves.get(move.showdownId);
+    if (!moveData?.exists || moveData.category === 'Status' || !moveData.basePower) return 1;
+    const species = this.lookupSpecies(defender.dexId);
+    if (!species) return 1;
+    if (!Dex.getImmunity(moveData.type, species.types)) return 0;
+    return Math.pow(2, Dex.getEffectiveness(moveData.type, species.types));
+  }
+
+  /** A non-damaging status move (Swords Dance, Toxic, Thunder Wave …). */
+  isStatusMove(move: Move): boolean {
+    return Dex.moves.get(move.showdownId)?.category === 'Status';
+  }
+
   /** Two-turn move (Solar Beam, Fly, Dig, Sky Attack …): charges turn 1, hits turn 2. */
   isChargeMove(move: Move): boolean {
     return !!Dex.moves.get(move.showdownId)?.flags?.['charge'];

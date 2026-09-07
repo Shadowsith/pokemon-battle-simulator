@@ -1,6 +1,7 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Dex } from '@pkmn/sim';
 import { Move, PokemonType } from '../models/move.model';
+import { AudioService } from './audio.service';
 
 export interface BattleStageRefs {
   fieldEl: HTMLElement;
@@ -160,6 +161,8 @@ const WEATHER_COLOR: Record<Exclude<Weather, null>, string> = {
  */
 @Injectable({ providedIn: 'root' })
 export class MoveAnimationService {
+  private readonly audio = inject(AudioService);
+
   /** Resolves once the impact should register (damage applied, HP bar updated). */
   async playMove(
     move: Move,
@@ -801,6 +804,9 @@ export class MoveAnimationService {
       { transform: `translate(${midX - home.x}px, ${arcY - home.y}px) rotate(340deg)`, offset: 0.55 },
       { transform: `translate(${target.x - home.x}px, ${target.y - home.y}px) rotate(560deg)`, offset: 1 }
     ], { duration: 430, easing: 'ease-in', fill: 'forwards' });
+
+    // ball has landed and is springing open - the Pokémon is released now
+    this.audio.playBallOpen();
 
     const flash = document.createElement('div');
     const fs = 14;

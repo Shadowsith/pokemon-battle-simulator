@@ -158,11 +158,20 @@
                 type="button"
                 class="move-btn"
                 [class.depleted]="mv.cur === 0"
+                [style.background]="moveGradient(mv.move.type)"
                 [disabled]="isAnimating() || mv.cur === 0"
                 (click)="useMove(mv.move)"
               >
                 <span class="move-btn-name">{{ mv.move.name }}</span>
                 <span class="move-btn-pp">AP {{ mv.cur }} / {{ mv.max }}</span>
+                <span
+                  class="move-btn-hint"
+                  [class.strong]="mv.hint.kind === 'strong'"
+                  [class.weak]="mv.hint.kind === 'weak'"
+                  [class.immune]="mv.hint.kind === 'immune'"
+                  [class.status]="mv.hint.kind === 'status'"
+                  >{{ mv.hint.label }}</span
+                >
               </button>
             } @empty {
               <p class="move-empty-note">{{ player().name }} kennt keine Attacken.</p>

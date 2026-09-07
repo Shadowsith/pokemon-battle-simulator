@@ -10,7 +10,8 @@ import {
   backSpritePath,
   freshBoosts,
   freshStatus,
-  frontSpritePath
+  frontSpritePath,
+  typeColor
 } from '../../core/models/pokemon.model';
 import {
   DEFAULT_TRAINER_AVATAR,
@@ -18,6 +19,7 @@ import {
   trainerLabel
 } from '../../core/models/trainer.model';
 import { isBattleReady } from '../../core/models/team.model';
+import { germanSpeciesName } from '../../core/models/species-names.de';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
 import { AudioService } from '../../core/services/audio.service';
 import { DamageCalcService } from '../../core/services/damage-calc.service';
@@ -100,16 +102,29 @@ export class BattlePage {
     opponent: ChargeState | null;
   }>({ player: null, opponent: null });
 
-  /** The fight menu's moves with their current / max PP for display. */
+  /** The fight menu's moves with PP and an effectiveness hint vs the opponent. */
   readonly activeMoveViews = computed(() => {
     const pp = this.movePp();
     const slot = this.activePlayerIndex();
+    const foe = this.opponent();
     return this.activeMoves().map((move) => {
       const max = this.damageCalc.maxPp(move);
       const key = `${slot}:${move.showdownId}`;
-      return { move, max, cur: pp[key] ?? max };
+      return { move, max, cur: pp[key] ?? max, hint: this.moveHint(move, foe) };
     });
   });
+
+  private moveHint(
+    move: Move,
+    foe: BattlePokemon
+  ): { kind: 'status' | 'immune' | 'weak' | 'neutral' | 'strong'; label: string } {
+    if (this.damageCalc.isStatusMove(move)) return { kind: 'status', label: 'Status' };
+    const e = this.damageCalc.effectiveness(move, foe);
+    if (e === 0) return { kind: 'immune', label: 'Wirkungslos' };
+    if (e < 1) return { kind: 'weak', label: 'Wenig Wirkung' };
+    if (e > 1) return { kind: 'strong', label: 'Sehr effektiv' };
+    return { kind: 'neutral', label: 'Effektiv' };
+  }
 
   private ppKey(showdownId: string): string {
     return `${this.activePlayerIndex()}:${showdownId}`;
@@ -120,7 +135,7 @@ export class BattlePage {
     if (isBattleReady(built)) {
       return built.map((p) => ({
         dexId: p.speciesNum,
-        name: p.name,
+        name: germanSpeciesName(p.speciesNum, p.name),
         maxHp: 100,
         currentHp: 100,
         types: p.types.map((t) => t.toLowerCase()),
@@ -266,6 +281,7 @@ export class BattlePage {
       this.charge.update((c) => ({ ...c, [side]: null })); // a fainted Pokémon drops any charge
       this.log.set(`${mon.name} wurde besiegt!`);
       await this.wait(250);
+      this.audio.playCry(mon.dexId, true);
       await this.animation.playFaint(this.spriteEl(side));
     }
   }
@@ -510,7 +526,10 @@ export class BattlePage {
     // defender's current HP (overkilling a weak target costs less recoil).
     const rawDamage = this.damageCalc.calculateDamage(attacker, defender, move);
     const dealt = Math.min(rawDamage, defender.currentHp);
-    if (dealt > 0) this.applyHp(foeSide, -dealt);
+    if (dealt > 0) {
+      this.applyHp(foeSide, -dealt);
+      this.audio.playHit(this.damageCalc.effectiveness(move, defender));
+    }
 
     const recovery = this.damageCalc.calculateRecovery(move, attacker, dealt);
     if (recovery.amount > 0) this.applyHp(side, recovery.amount);
@@ -616,6 +635,12 @@ export class BattlePage {
             ? 'sinkt stark'
             : 'sinkt';
     return `${name}s ${stat} ${verb}!`;
+  }
+
+  /** Type-coloured gradient for a move button (yellow for Electric, blue for Water …). */
+  moveGradient(type: string): string {
+    const c = typeColor(type);
+    return `linear-gradient(140deg, ${c} 0%, ${shadeHex(c, -40)} 100%)`;
   }
 
   /** Non-zero stat stages for the HUD indicator row. */
@@ -729,4 +754,14 @@ export class BattlePage {
     if (pct < 50) return '#EF9F27';
     return '#639922';
   }
+}
+
+/** Lighten (positive amount) or darken (negative) a `#rrggbb` colour. */
+function shadeHex(hex: string, amount: number): string {
+  const n = parseInt(hex.slice(1), 16);
+  const clamp = (v: number) => Math.max(0, Math.min(255, v));
+  const r = clamp(((n >> 16) & 255) + amount);
+  const g = clamp(((n >> 8) & 255) + amount);
+  const b = clamp((n & 255) + amount);
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1)}`;
 }
