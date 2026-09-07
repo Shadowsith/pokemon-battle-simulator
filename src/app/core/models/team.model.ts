@@ -10,6 +10,13 @@ export interface TeamPokemon {
   moves: string[];
 }
 
+/** A named, saved team. The player can keep several and pick one as active. */
+export interface SavedTeam {
+  id: string;
+  name: string;
+  pokemon: TeamPokemon[];
+}
+
 export interface SpeciesInfo {
   num: number;
   id: string;

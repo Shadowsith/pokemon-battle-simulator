@@ -30,6 +30,8 @@ import { StatChange, StatChangeService } from '../../core/services/stat-change.s
 type MenuState = 'main' | 'fight' | 'pokemon';
 /** intro = "VS" screen, fight = the battle proper, result = win/loss screen. */
 type BattlePhase = 'intro' | 'fight' | 'result';
+/** A two-turn move mid-flight: the move being charged and whether its user is hidden. */
+type ChargeState = { move: Move; semiInvuln: boolean };
 
 @Component({
   selector: 'app-battle',
@@ -74,13 +76,13 @@ export class BattlePage {
   readonly activePlayerIndex = signal(0);
   readonly player = computed(() => this.playerTeam()[this.activePlayerIndex()]);
 
-  /** true when the fight is using the player's built team rather than the prototype trio. */
-  readonly usingBuiltTeam = computed(() => isBattleReady(this.teamService.team()));
+  /** true when the fight is using the player's active team rather than the prototype trio. */
+  readonly usingBuiltTeam = computed(() => this.teamService.activeReady());
 
   /** Moves shown in the fight menu: the active Pokémon's picks, or the whole
-   *  library when no team is built (move-animation testing). */
+   *  library when no team is selected (move-animation testing). */
   readonly activeMoves = computed<Move[]>(() => {
-    const built = this.teamService.team();
+    const built = this.teamService.activeTeam()?.pokemon ?? [];
     if (!isBattleReady(built)) return MOVE_LIBRARY;
     const mon = built[this.activePlayerIndex()];
     if (!mon) return [];
@@ -91,6 +93,12 @@ export class BattlePage {
 
   /** Remaining PP per move, keyed by "<active party slot>:<showdownId>". Reset each battle. */
   private readonly movePp = signal<Record<string, number>>({});
+
+  /** A side that used a two-turn move (Solar Beam, Fly, …) is locked into finishing it. */
+  private readonly charge = signal<{
+    player: ChargeState | null;
+    opponent: ChargeState | null;
+  }>({ player: null, opponent: null });
 
   /** The fight menu's moves with their current / max PP for display. */
   readonly activeMoveViews = computed(() => {
@@ -108,7 +116,7 @@ export class BattlePage {
   }
 
   private derivePlayerTeam(): BattlePokemon[] {
-    const built = this.teamService.team();
+    const built = this.teamService.activeTeam()?.pokemon ?? [];
     if (isBattleReady(built)) {
       return built.map((p) => ({
         dexId: p.speciesNum,
@@ -230,6 +238,7 @@ export class BattlePage {
     }));
     this.playerTeam.set(this.derivePlayerTeam());
     this.movePp.set({});
+    this.charge.set({ player: null, opponent: null });
     this.activePlayerIndex.set(0);
     this.menuState.set('main');
     this.isAnimating.set(false);
@@ -254,6 +263,7 @@ export class BattlePage {
       const mon = side === 'player' ? this.player() : this.opponent();
       if (mon.currentHp > 0 || this.faintDone[side]) continue;
       this.faintDone[side] = true;
+      this.charge.update((c) => ({ ...c, [side]: null })); // a fainted Pokémon drops any charge
       this.log.set(`${mon.name} wurde besiegt!`);
       await this.wait(250);
       await this.animation.playFaint(this.spriteEl(side));
@@ -272,6 +282,7 @@ export class BattlePage {
 
   async useMove(move: Move): Promise<void> {
     if (this.phase() !== 'fight' || this.isAnimating() || this.isActiveFainted()) return;
+    if (this.charge().player) return; // locked into finishing a two-turn move
 
     const key = this.ppKey(move.showdownId);
     const remaining = this.movePp()[key] ?? this.damageCalc.maxPp(move);
@@ -279,21 +290,30 @@ export class BattlePage {
       this.log.set(`${move.name} hat keine AP mehr übrig!`);
       return;
     }
+    // PP is spent when the move starts (the charge turn), not on release.
+    this.movePp.update((m) => ({ ...m, [key]: (m[key] ?? remaining) - 1 }));
 
+    await this.runRound(move);
+  }
+
+  /**
+   * One round: both sides act (player's move given, NPC picks or completes its
+   * own charge), in priority/Speed order, then {@link finishRound}. A Pokémon
+   * locked into a two-turn move re-enters here automatically to release it.
+   */
+  private async runRound(playerMove: Move): Promise<void> {
     this.isAnimating.set(true);
     this.menuState.set('main');
 
-    // Both sides have now locked in their action; turn order is by priority,
-    // then by current effective Speed, then a coin flip on a tie.
-    const npcMove = this.pickNpcMove();
-    const order: ['player' | 'opponent', Move][] = this.playerActsFirst(move, npcMove)
+    const npcMove = this.charge().opponent?.move ?? this.pickNpcMove();
+    const order: ['player' | 'opponent', Move][] = this.playerActsFirst(playerMove, npcMove)
       ? [
-          ['player', move],
+          ['player', playerMove],
           ['opponent', npcMove]
         ]
       : [
           ['opponent', npcMove],
-          ['player', move]
+          ['player', playerMove]
         ];
 
     for (let i = 0; i < order.length; i++) {
@@ -302,7 +322,6 @@ export class BattlePage {
       if (actorMon.currentHp <= 0) continue; // KO'd by the faster Pokémon this turn
       if (this.battleDecided()) break;
       if (i > 0) await this.wait(550);
-      if (actor === 'player') this.movePp.update((m) => ({ ...m, [key]: (m[key] ?? remaining) - 1 }));
       await this.performMove(mv, actor);
       await this.settleFaints();
     }
@@ -328,6 +347,37 @@ export class BattlePage {
 
   private battleDecided(): boolean {
     return this.opponent().currentHp <= 0 || this.playerTeam().every((p) => p.currentHp <= 0);
+  }
+
+  private refsFor(side: 'player' | 'opponent') {
+    const playerEl = this.playerSpriteRef.nativeElement;
+    const oppEl = this.oppSpriteRef.nativeElement;
+    return {
+      fieldEl: this.fieldRef.nativeElement,
+      fxEl: this.fxRef.nativeElement,
+      screenFxEl: this.screenFxRef.nativeElement,
+      launchEl: side === 'player' ? playerEl : oppEl,
+      targetEl: side === 'player' ? oppEl : playerEl
+    };
+  }
+
+  private chargeMessage(name: string, move: Move): string {
+    const messages: Record<string, string> = {
+      fly: `${name} flog empor!`,
+      bounce: `${name} sprang hoch!`,
+      dig: `${name} grub sich ein!`,
+      dive: `${name} tauchte unter!`,
+      skydrop: `${name} stieg mit dem Gegner auf!`,
+      shadowforce: `${name} verschwand!`,
+      phantomforce: `${name} verschwand!`,
+      solarbeam: `${name} sammelt Energie!`,
+      skyattack: `${name} hüllt sich in gleißendes Licht!`,
+      skullbash: `${name} senkt den Kopf!`,
+      razorwind: `${name} wirbelt einen Sturm auf!`,
+      freezeshock: `${name} lädt sich mit eisiger Energie auf!`,
+      iceburn: `${name} umgibt sich mit einer Kältewelle!`
+    };
+    return messages[move.showdownId] ?? `${name} lädt ${move.name} auf!`;
   }
 
   /** The NPC's active Pokémon takes its turn (used after a player switch). */
@@ -356,6 +406,14 @@ export class BattlePage {
     await this.applyResiduals();
     await this.settleFaints();
     if (await this.checkEnd()) return;
+
+    // The player's Pokémon is mid two-turn move: release it automatically.
+    const pending = this.charge().player;
+    if (pending && !this.isActiveFainted()) {
+      await this.wait(650);
+      await this.runRound(pending.move);
+      return;
+    }
 
     this.isAnimating.set(false);
     this.menuState.set('main');
@@ -413,18 +471,40 @@ export class BattlePage {
     }
     if (!pre.canAct) return;
 
+    const myCharge = this.charge()[side];
+    const foeCharge = this.charge()[foeSide];
+
+    // --- two-turn move, turn 1: start charging, deal nothing ---
+    if (this.damageCalc.isChargeMove(move) && !myCharge) {
+      const semiInvuln = this.damageCalc.isSemiInvulnMove(move);
+      this.charge.update((c) => ({ ...c, [side]: { move, semiInvuln } }));
+      this.log.set(this.chargeMessage(attacker.name, move));
+      this.audio.playMove(move.showdownId);
+      await this.animation.playMove(move, this.refsFor(side), 'charge');
+      await this.wait(350);
+      return;
+    }
+
+    // --- the target is off the field (Fly / Dig / …): the attack whiffs ---
+    if (foeCharge?.semiInvuln) {
+      this.log.set(`${attacker.name} setzt ${move.name} ein...`);
+      this.audio.playMove(move.showdownId);
+      await this.wait(650);
+      this.log.set(`Doch ${defender.name} ist nicht zu sehen!`);
+      await this.wait(700);
+      return;
+    }
+
+    // --- two-turn move, turn 2: release (skip the charge visual, then hit) ---
+    let phase: 'release' | undefined;
+    if (myCharge && myCharge.move.showdownId === move.showdownId) {
+      this.charge.update((c) => ({ ...c, [side]: null }));
+      phase = 'release';
+    }
+
     this.log.set(`${attacker.name} setzt ${move.name} ein...`);
     this.audio.playMove(move.showdownId);
-
-    const playerEl = this.playerSpriteRef.nativeElement;
-    const oppEl = this.oppSpriteRef.nativeElement;
-    await this.animation.playMove(move, {
-      fieldEl: this.fieldRef.nativeElement,
-      fxEl: this.fxRef.nativeElement,
-      screenFxEl: this.screenFxRef.nativeElement,
-      launchEl: side === 'player' ? playerEl : oppEl,
-      targetEl: side === 'player' ? oppEl : playerEl
-    });
+    await this.animation.playMove(move, this.refsFor(side), phase);
 
     // Drain and recoil scale with HP actually lost, so cap the roll at the
     // defender's current HP (overkilling a weak target costs less recoil).
@@ -604,6 +684,7 @@ export class BattlePage {
     const forced = this.isActiveFainted();
     this.isAnimating.set(true);
     this.menuState.set('main');
+    this.charge.update((c) => ({ ...c, player: null })); // switching cancels a two-turn move
 
     const fx = this.fxRef.nativeElement;
     const field = this.fieldRef.nativeElement;

@@ -15,6 +15,9 @@ const NEUTRAL_EV = 0;
  */
 const WEATHER_HEAL_MOVES = new Set(['moonlight', 'synthesis', 'morningsun']);
 
+/** Two-turn moves whose user disappears and is (mostly) untargetable turn 1. */
+const SEMI_INVULN = new Set(['fly', 'dig', 'bounce', 'dive', 'skydrop', 'shadowforce', 'phantomforce']);
+
 export type Recovery = { amount: number; kind: 'drain' | 'selfHeal' | 'none' };
 export type SelfDamage = { amount: number; kind: 'recoil' | 'selfKo' | 'none' };
 
@@ -46,6 +49,16 @@ export class DamageCalcService {
   /** Priority bracket of a move (Quick Attack +1, Roar -6, most moves 0). */
   movePriority(move: Move): number {
     return Dex.moves.get(move.showdownId)?.priority ?? 0;
+  }
+
+  /** Two-turn move (Solar Beam, Fly, Dig, Sky Attack …): charges turn 1, hits turn 2. */
+  isChargeMove(move: Move): boolean {
+    return !!Dex.moves.get(move.showdownId)?.flags?.['charge'];
+  }
+
+  /** The subset of two-turn moves where the user vanishes and dodges attacks turn 1. */
+  isSemiInvulnMove(move: Move): boolean {
+    return SEMI_INVULN.has(move.showdownId);
   }
 
   /**

@@ -141,6 +141,9 @@ const FLECK_COLOR: Record<Exclude<Fleck, null>, string> = {
   statDown: '#E08C8C'
 };
 
+/** Two-turn moves where the user leaves the field on turn 1 (Fly, Dig, …). */
+const SEMI_INVULN_ANIM = new Set(['fly', 'dig', 'bounce', 'dive', 'skydrop', 'shadowforce', 'phantomforce']);
+
 const WEATHER_COLOR: Record<Exclude<Weather, null>, string> = {
   sun: '#FFB13C',
   rain: '#4C8FD6',
@@ -158,13 +161,24 @@ const WEATHER_COLOR: Record<Exclude<Weather, null>, string> = {
 @Injectable({ providedIn: 'root' })
 export class MoveAnimationService {
   /** Resolves once the impact should register (damage applied, HP bar updated). */
-  async playMove(move: Move, refs: BattleStageRefs): Promise<void> {
+  async playMove(
+    move: Move,
+    refs: BattleStageRefs,
+    phase?: 'charge' | 'release'
+  ): Promise<void> {
     const launch = this.centerOf(refs.launchEl, refs.fieldEl);
     const target = this.centerOf(refs.targetEl, refs.fieldEl);
     const v = this.buildVisual(move);
     v.dir = target.x >= launch.x ? 1 : -1;
 
-    if (v.charge) await this.chargeUp(refs, launch, v);
+    if (phase === 'charge') {
+      return this.playChargeTurn(move, refs, launch, v);
+    }
+    if (phase === 'release') {
+      await this.playReleaseIntro(move, refs);
+    } else if (v.charge) {
+      await this.chargeUp(refs, launch, v);
+    }
 
     switch (v.delivery) {
       case 'weather':
@@ -487,6 +501,36 @@ export class MoveAnimationService {
   }
 
   // --- shared beats -----------------------------------------------------
+
+  /** Turn 1 of a two-turn move: gather energy, or duck under / fly up out of sight. */
+  private async playChargeTurn(move: Move, refs: BattleStageRefs, launch: Point, v: MoveVisual) {
+    if (SEMI_INVULN_ANIM.has(move.showdownId)) {
+      const el = refs.launchEl;
+      const down = move.showdownId === 'dig' || move.showdownId === 'dive';
+      el.getAnimations?.().forEach((a) => a.cancel());
+      el.style.transformOrigin = 'center bottom';
+      await this.anim(el, [
+        { transform: 'translateY(0) scale(1)', opacity: 1 },
+        { transform: `translateY(${down ? 58 : -74}px) scale(${down ? 0.7 : 0.55})`, opacity: 0 }
+      ], { duration: 400, easing: 'ease-in', fill: 'forwards' });
+      el.style.opacity = '0';
+      return;
+    }
+    await this.chargeUp(refs, launch, v);
+  }
+
+  /** Turn 2 of a semi-invulnerable move: the user drops back into view. */
+  private async playReleaseIntro(move: Move, refs: BattleStageRefs) {
+    if (!SEMI_INVULN_ANIM.has(move.showdownId)) return;
+    const el = refs.launchEl;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    el.style.opacity = '1';
+    await this.anim(el, [
+      { transform: 'translateY(-46px) scale(.6)', opacity: 0 },
+      { transform: 'translateY(0) scale(1)', opacity: 1 }
+    ], { duration: 260, easing: 'ease-out' });
+    el.style.transform = '';
+  }
 
   private async chargeUp(refs: BattleStageRefs, launch: Point, v: MoveVisual) {
     const { launchEl, fxEl } = refs;
