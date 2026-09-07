@@ -20,6 +20,16 @@ export function stageMultiplier(stage: number): number {
 }
 
 /**
+ * Multiplier a combined accuracy/evasion stage applies to a move's hit chance.
+ * Accuracy/evasion use a 3-based table (±6 → 3× … ⅓×), unlike the 2-based table
+ * for the offensive/defensive stats.
+ */
+export function accuracyStageMultiplier(stage: number): number {
+  const s = Math.max(-6, Math.min(6, stage));
+  return s >= 0 ? (3 + s) / 3 : 3 / (3 - s);
+}
+
+/**
  * Resolves the stat-stage changes a move causes (Swords Dance, Agility, Growl,
  * Leer, Overheat's own drop, Crunch's chance to lower Defense, …), reading
  * @pkmn/sim move data. Pure - the battle page applies the deltas.

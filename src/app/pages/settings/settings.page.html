@@ -8,7 +8,7 @@
     <h2>Lautstärke</h2>
     <p class="hint">Grundlautstärke für Soundeffekte und Pokémon-Schreie – aktuell {{ volumePct() }}%.</p>
     <ion-range
-      aria-label="Lautstärke"
+      aria-label="Lautstärke Soundeffekte"
       [value]="volume() * 100"
       [min]="0"
       [max]="100"
@@ -21,6 +21,38 @@
       <span slot="start" aria-hidden="true">🔈</span>
       <span slot="end" aria-hidden="true">🔊</span>
     </ion-range>
+  </section>
+
+  <section class="setting">
+    <h2>Musik</h2>
+    <p class="hint">Lautstärke des Kampf-Themes – aktuell {{ musicVolumePct() }}%.</p>
+    <ion-range
+      aria-label="Lautstärke Musik"
+      [value]="musicVolume() * 100"
+      [min]="0"
+      [max]="100"
+      [step]="5"
+      [snaps]="true"
+      [pin]="true"
+      [pinFormatter]="volumePin"
+      (ionInput)="onMusicVolume($event)"
+    >
+      <span slot="start" aria-hidden="true">🎵</span>
+      <span slot="end" aria-hidden="true">🔊</span>
+    </ion-range>
+  </section>
+
+  <section class="setting">
+    <h2>Zufallskämpfe</h2>
+    <p class="hint">Ob der zufällige NPC-Gegner legendäre Pokémon einsetzen darf.</p>
+    <label class="check-row">
+      <input
+        type="checkbox"
+        [checked]="allowLegendaries()"
+        (change)="onAllowLegendaries($event)"
+      />
+      <span>Legendäre Pokémon erlauben</span>
+    </label>
   </section>
 
   <section class="setting">

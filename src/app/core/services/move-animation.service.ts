@@ -713,6 +713,20 @@ export class MoveAnimationService {
 
   // --- faint / recall / send-out ------------------------------------
 
+  /** A quick sidestep-and-back: the target slips the attack when it misses. */
+  async playDodge(spriteEl: HTMLElement): Promise<void> {
+    await this.anim(
+      spriteEl,
+      [
+        { transform: 'translateX(0)' },
+        { transform: 'translateX(-18px) skewX(8deg)', offset: 0.3 },
+        { transform: 'translateX(12px) skewX(-4deg)', offset: 0.65 },
+        { transform: 'translateX(0) skewX(0)' }
+      ],
+      { duration: 360, easing: 'ease-out', fill: 'none' }
+    );
+  }
+
   /** The classic faint: the Pokémon drops below its platform and fades out. */
   async playFaint(spriteEl: HTMLElement): Promise<void> {
     spriteEl.getAnimations?.().forEach((a) => a.cancel());

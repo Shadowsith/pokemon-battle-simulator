@@ -40,6 +40,22 @@
   ion-range span[slot] {
     font-size: 16px;
   }
+
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+    color: #333;
+    cursor: pointer;
+
+    input {
+      width: 18px;
+      height: 18px;
+      accent-color: #3c6cb4;
+      cursor: pointer;
+    }
+  }
 }
 
 .avatar-grid {

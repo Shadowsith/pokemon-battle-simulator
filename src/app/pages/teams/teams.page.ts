@@ -36,6 +36,10 @@ export class TeamsPage {
   readonly search = signal('');
   private readonly legalMoveIds = signal<string[]>([]);
 
+  /** Drag-to-reorder state for the team-edit grid. */
+  readonly dragIndex = signal<number | null>(null);
+  readonly dragOverIndex = signal<number | null>(null);
+
   readonly spritePath = frontSpritePath;
   readonly typeColor = typeColor;
 
@@ -138,6 +142,43 @@ export class TeamsPage {
 
   removePokemon(index: number): void {
     this.teamService.removePokemon(this.tid(), index);
+  }
+
+  // --- reordering Pokémon within a team ------------------------
+
+  /** Nudge a Pokémon one slot earlier (-1) or later (+1). */
+  movePokemon(index: number, dir: -1 | 1): void {
+    this.teamService.reorderPokemon(this.tid(), index, index + dir);
+  }
+
+  onDragStart(index: number, ev: DragEvent): void {
+    this.dragIndex.set(index);
+    this.dragOverIndex.set(index);
+    if (ev.dataTransfer) {
+      ev.dataTransfer.effectAllowed = 'move';
+      ev.dataTransfer.setData('text/plain', String(index)); // Firefox needs a payload
+    }
+  }
+
+  onDragOver(index: number, ev: DragEvent): void {
+    if (this.dragIndex() === null) return;
+    ev.preventDefault(); // allow the drop
+    if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move';
+    if (this.dragOverIndex() !== index) this.dragOverIndex.set(index);
+  }
+
+  onDrop(index: number, ev: DragEvent): void {
+    ev.preventDefault();
+    const from = this.dragIndex();
+    if (from !== null && from !== index) {
+      this.teamService.reorderPokemon(this.tid(), from, index);
+    }
+    this.onDragEnd();
+  }
+
+  onDragEnd(): void {
+    this.dragIndex.set(null);
+    this.dragOverIndex.set(null);
   }
 
   moveName(id: string): string {

@@ -122,6 +122,17 @@ export class TeamService {
     this.updatePokemon(teamId, (pk) => pk.filter((_, i) => i !== index));
   }
 
+  /** Move the Pokémon at `from` to position `to`, shifting the rest. */
+  reorderPokemon(teamId: string, from: number, to: number): void {
+    this.updatePokemon(teamId, (pk) => {
+      if (from < 0 || from >= pk.length || to < 0 || to >= pk.length || from === to) return pk;
+      const next = pk.slice();
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  }
+
   /** Set (moveId) or clear (null) the move in a given slot, de-duping. */
   setMove(teamId: string, pokeIndex: number, slot: number, moveId: string | null): void {
     if (slot < 0 || slot >= MOVES_PER_POKEMON) return;

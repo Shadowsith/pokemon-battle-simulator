@@ -3,6 +3,8 @@ import { DEFAULT_TRAINER_AVATAR, isTrainerAvatarId } from '../models/trainer.mod
 
 const TRAINER_AVATAR_KEY = 'pbs.settings.trainerAvatar';
 const VOLUME_KEY = 'pbs.settings.volume';
+const MUSIC_VOLUME_KEY = 'pbs.settings.musicVolume';
+const ALLOW_LEGENDARIES_KEY = 'pbs.settings.allowLegendaries';
 const DEFAULT_VOLUME = 0.5;
 
 /**
@@ -13,7 +15,9 @@ const DEFAULT_VOLUME = 0.5;
 @Injectable({ providedIn: 'root' })
 export class SettingsService {
   private readonly _trainerAvatar = signal<string>(this.loadTrainerAvatar());
-  private readonly _volume = signal<number>(this.loadVolume());
+  private readonly _volume = signal<number>(this.loadVolume(VOLUME_KEY));
+  private readonly _musicVolume = signal<number>(this.loadVolume(MUSIC_VOLUME_KEY));
+  private readonly _allowLegendaries = signal<boolean>(this.loadFlag(ALLOW_LEGENDARIES_KEY, true));
 
   /** Showdown sprite id of the player's chosen trainer avatar. */
   readonly trainerAvatar = this._trainerAvatar.asReadonly();
@@ -21,19 +25,52 @@ export class SettingsService {
   /** Base volume (0-1) for sound effects and cries. */
   readonly volume = this._volume.asReadonly();
 
-  setVolume(value: number): void {
-    const clamped = Math.max(0, Math.min(1, value));
-    this._volume.set(clamped);
+  /** Volume (0-1) for the looping battle music. */
+  readonly musicVolume = this._musicVolume.asReadonly();
+
+  /** Whether the random NPC opponent may field Legendary / Mythical Pokémon. */
+  readonly allowLegendaries = this._allowLegendaries.asReadonly();
+
+  setAllowLegendaries(value: boolean): void {
+    this._allowLegendaries.set(value);
     try {
-      localStorage.setItem(VOLUME_KEY, String(clamped));
+      localStorage.setItem(ALLOW_LEGENDARIES_KEY, value ? '1' : '0');
     } catch {
       /* storage unavailable - keep the choice in memory for this session */
     }
   }
 
-  private loadVolume(): number {
+  private loadFlag(key: string, fallback: boolean): boolean {
     try {
-      const saved = localStorage.getItem(VOLUME_KEY);
+      const saved = localStorage.getItem(key);
+      if (saved !== null) return saved === '1' || saved === 'true';
+    } catch {
+      /* ignore - use the default */
+    }
+    return fallback;
+  }
+
+  setVolume(value: number): void {
+    this._volume.set(this.persistVolume(VOLUME_KEY, value));
+  }
+
+  setMusicVolume(value: number): void {
+    this._musicVolume.set(this.persistVolume(MUSIC_VOLUME_KEY, value));
+  }
+
+  private persistVolume(key: string, value: number): number {
+    const clamped = Math.max(0, Math.min(1, value));
+    try {
+      localStorage.setItem(key, String(clamped));
+    } catch {
+      /* storage unavailable - keep the choice in memory for this session */
+    }
+    return clamped;
+  }
+
+  private loadVolume(key: string): number {
+    try {
+      const saved = localStorage.getItem(key);
       if (saved !== null) {
         const n = Number(saved);
         if (Number.isFinite(n) && n >= 0 && n <= 1) return n;

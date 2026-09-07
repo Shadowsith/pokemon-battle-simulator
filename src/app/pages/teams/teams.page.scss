@@ -162,6 +162,72 @@
   border-radius: 12px;
   padding: 12px;
   background: #fff;
+  cursor: grab;
+  transition: opacity 0.12s, box-shadow 0.12s, border-color 0.12s, transform 0.12s;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.dragging {
+    opacity: 0.4;
+    cursor: grabbing;
+  }
+
+  &.drag-over {
+    border-color: #4a3ca5;
+    box-shadow: 0 0 0 2px rgba(74, 60, 165, 0.25);
+    transform: translateY(-2px);
+  }
+}
+
+.mon-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding-right: 20px; /* clear the absolute × button */
+  color: #b0b0b0;
+}
+
+.drag-grip {
+  font-size: 13px;
+  line-height: 1;
+  letter-spacing: -1px;
+  cursor: grab;
+}
+
+.mon-pos {
+  font-size: 10px;
+  font-weight: 700;
+  color: #999;
+  min-width: 12px;
+}
+
+.pos-btn {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #dcdcdc;
+  border-radius: 6px;
+  background: #fafafa;
+  color: #555;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: #9bb0cc;
+    color: #222;
+  }
+
+  &:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
 }
 
 .mon-remove {

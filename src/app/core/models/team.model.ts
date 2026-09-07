@@ -24,6 +24,8 @@ export interface SpeciesInfo {
   types: string[];
   /** True for final-stage species only (no further evolution). Used by the NPC team roll. */
   fullyEvolved?: boolean;
+  /** True for Legendary / Mythical / Sub-Legendary species. The NPC roll can be told to skip these. */
+  legendary?: boolean;
 }
 
 export interface MoveInfo {

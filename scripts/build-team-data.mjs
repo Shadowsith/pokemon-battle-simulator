@@ -93,7 +93,9 @@ async function main() {
       name: deNames[s.num] ?? s.name,
       types: s.types,
       // `nfe` = "not fully evolved"; the NPC team roll only draws from final stages.
-      fullyEvolved: !s.nfe
+      fullyEvolved: !s.nfe,
+      // Legendary / Mythical / Sub-Legendary - the NPC roll can be told to skip these.
+      legendary: (s.tags ?? []).some((t) => /Legendary|Mythical/.test(t))
     }));
 
   // learnsets

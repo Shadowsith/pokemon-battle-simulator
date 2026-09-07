@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { Dex, StatsTable } from '@pkmn/sim';
 import { BattlePokemon } from '../models/pokemon.model';
 import { Move } from '../models/move.model';
-import { stageMultiplier } from './stat-change.service';
+import { accuracyStageMultiplier, stageMultiplier } from './stat-change.service';
 
 /** Every Pokémon in this simulator is level 100. */
 const LEVEL = 100;
@@ -85,6 +85,40 @@ export class DamageCalcService {
   /** A move's base power from @pkmn/sim (0 for status / fixed-damage moves). */
   basePower(move: Move): number {
     return Dex.moves.get(move.showdownId)?.basePower ?? 0;
+  }
+
+  /**
+   * A move's base accuracy as a 0-1 fraction. Never-miss moves (Swift, Aerial
+   * Ace, Aura Sphere, most self-targeted status moves) report 1.
+   */
+  accuracy(move: Move): number {
+    const acc = Dex.moves.get(move.showdownId)?.accuracy;
+    return typeof acc === 'number' ? acc / 100 : 1;
+  }
+
+  /**
+   * Chance (0-1) that `move` connects: its base accuracy scaled by the gap
+   * between the attacker's accuracy stage and the defender's evasion stage
+   * (Sand-Attack, Double Team, …). Never-miss moves always return 1.
+   */
+  hitChance(move: Move, attacker: BattlePokemon, defender: BattlePokemon): number {
+    const acc = Dex.moves.get(move.showdownId)?.accuracy;
+    if (typeof acc !== 'number') return 1;
+    const stage = attacker.boosts.accuracy - defender.boosts.evasion;
+    return Math.max(0, Math.min(1, (acc / 100) * accuracyStageMultiplier(stage)));
+  }
+
+  /** Roll {@link hitChance}: `true` when the move lands this time. */
+  rollHit(move: Move, attacker: BattlePokemon, defender: BattlePokemon): boolean {
+    return Math.random() < this.hitChance(move, attacker, defender);
+  }
+
+  /**
+   * HP a "crash damage" move (Jump Kick, Hi Jump Kick) costs its user when it
+   * misses: half the user's max HP in Gen 5. 0 for every other move.
+   */
+  crashDamage(move: Move, user: BattlePokemon): number {
+    return Dex.moves.get(move.showdownId)?.hasCrashDamage ? Math.floor(user.maxHp / 2) : 0;
   }
 
   /**
@@ -207,8 +241,7 @@ export class DamageCalcService {
    *  - self-KO moves (Explosion, Self-Destruct, Memento, Final Gambit, …) make
    *    the user faint.
    * `amount` is clamped to the user's current HP. Jump Kick / Hi Jump Kick
-   * crash damage is not modelled - it only triggers on a miss and there is no
-   * accuracy system.
+   * crash damage on a miss is handled separately by {@link crashDamage}.
    */
   calculateSelfDamage(move: Move, user: BattlePokemon, damageDealt: number): SelfDamage {
     const md = Dex.moves.get(move.showdownId);

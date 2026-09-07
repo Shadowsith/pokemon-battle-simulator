@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, computed, inject, signal } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { IonContent, IonButton } from '@ionic/angular/standalone';
 import { MOVE_LIBRARY, Move } from '../../core/models/move.model';
@@ -43,7 +43,7 @@ type ChargeState = { move: Move; semiInvuln: boolean };
   templateUrl: './battle.page.html',
   styleUrl: './battle.page.scss'
 })
-export class BattlePage {
+export class BattlePage implements OnDestroy {
   @ViewChild('field', { static: true }) fieldRef!: ElementRef<HTMLElement>;
   @ViewChild('fx', { static: true }) fxRef!: ElementRef<HTMLElement>;
   @ViewChild('screenFx', { static: true }) screenFxRef!: ElementRef<HTMLElement>;
@@ -224,6 +224,11 @@ export class BattlePage {
     this.startBattle();
   }
 
+  ngOnDestroy(): void {
+    if (this.introTimer) clearTimeout(this.introTimer);
+    this.audio.stopBattleMusic();
+  }
+
   // --- battle lifecycle -------------------------------------------------
 
   /** Fresh battle: heal the player team, roll a new NPC trainer + party, show the VS intro. */
@@ -233,6 +238,7 @@ export class BattlePage {
     this.outcome.set(null);
     this.log.set('');
     this.phase.set('intro');
+    this.audio.startBattleMusic(); // one random looped battle theme per battle
     this.opponentRoll = this.rollOpponentTeam();
     const [avatarId] = await Promise.all([this.roster.randomId(), this.opponentRoll]);
     this.npcAvatarId.set(avatarId);
@@ -314,6 +320,7 @@ export class BattlePage {
   }
 
   private endBattle(outcome: 'win' | 'loss'): void {
+    this.audio.stopBattleMusic();
     this.outcome.set(outcome);
     this.isAnimating.set(false);
     this.menuState.set('main');
@@ -450,13 +457,14 @@ export class BattlePage {
    * score low so they stay situational rather than spammed.
    */
   private scoreNpcMove(move: Move, target: BattlePokemon, user: BattlePokemon = this.opponent()): number {
-    if (this.damageCalc.isStatusMove(move)) return 12;
+    if (this.damageCalc.isStatusMove(move)) return 12 * this.damageCalc.accuracy(move);
     const bp = this.damageCalc.basePower(move);
     if (bp <= 0) return 25; // fixed / variable damage (Seismic Toss, Night Shade, …)
     const eff = this.damageCalc.effectiveness(move, target); // 0, .25, .5, 1, 2, 4
     if (eff === 0) return 0;
     const stab = user.types.includes(move.type.toLowerCase()) ? 1.5 : 1;
-    return bp * stab * eff;
+    // Expected damage: fold in hit chance so the AI prefers reliable moves.
+    return bp * stab * eff * this.damageCalc.hitChance(move, user, target);
   }
 
   /** Index of the healthy reserve with the best matchup vs the player's active
@@ -679,6 +687,22 @@ export class BattlePage {
 
     this.log.set(`${attacker.name} setzt ${move.name} ein...`);
     this.audio.playMove(move.showdownId);
+
+    // --- accuracy check: base accuracy vs the accuracy/evasion stage gap ---
+    if (!this.damageCalc.rollHit(move, attacker, defender)) {
+      await this.wait(480);
+      await this.animation.playDodge(this.spriteEl(foeSide));
+      const crash = this.damageCalc.crashDamage(move, attacker); // Jump Kick / Hi Jump Kick
+      if (crash > 0) {
+        this.applyHp(side, -crash);
+        this.log.set(`Die Attacke von ${attacker.name} ging daneben! ${attacker.name} verletzt sich dabei selbst!`);
+      } else {
+        this.log.set(`Die Attacke von ${attacker.name} ging daneben!`);
+      }
+      await this.wait(650);
+      return;
+    }
+
     await this.animation.playMove(move, this.refsFor(side), phase);
 
     // Drain and recoil scale with HP actually lost, so cap the roll at the

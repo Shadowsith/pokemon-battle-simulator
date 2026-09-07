@@ -1,15 +1,53 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, effect, inject } from '@angular/core';
 import { SettingsService } from './settings.service';
+
+/** Battle themes under assets/sounds/music/; one is picked at random per battle. */
+const BATTLE_TRACKS = ['battle_gen1', 'battle_gen2', 'battle_gen3', 'battle_gen4', 'battle_gen5'];
 
 /**
  * Plays move / cry / misc sound files under assets/sounds/. Move files are
  * named after the move's canonical @pkmn/sim id (e.g. "solarbeam.mp3") in
  * assets/sounds/moves/. Every clip is scaled by the base volume from
  * {@link SettingsService}. Missing files fail silently.
+ *
+ * Also owns the looping battle music ({@link startBattleMusic} /
+ * {@link stopBattleMusic}), scaled by the separate music volume setting.
  */
 @Injectable({ providedIn: 'root' })
 export class AudioService {
   private readonly settings = inject(SettingsService);
+
+  /** The currently looping battle theme, if any. */
+  private music: HTMLAudioElement | null = null;
+
+  constructor() {
+    // Keep a playing track in sync with the music-volume slider.
+    effect(() => {
+      const v = this.settings.musicVolume();
+      if (this.music) this.music.volume = v;
+    });
+  }
+
+  /** Start a random battle theme on loop, replacing any track already playing. */
+  startBattleMusic(): void {
+    this.stopBattleMusic();
+    const track = BATTLE_TRACKS[Math.floor(Math.random() * BATTLE_TRACKS.length)];
+    const audio = new Audio(`assets/sounds/music/${track}.mp3`);
+    audio.loop = true;
+    audio.volume = this.settings.musicVolume();
+    this.music = audio;
+    audio.play().catch(() => {
+      /* autoplay blocked before a user gesture - ignore */
+    });
+  }
+
+  /** Stop and release the looping battle theme. */
+  stopBattleMusic(): void {
+    if (!this.music) return;
+    this.music.pause();
+    this.music.src = '';
+    this.music = null;
+  }
 
   playMove(showdownId?: string): void {
     if (showdownId) this.play(`assets/sounds/moves/${showdownId}.mp3`);

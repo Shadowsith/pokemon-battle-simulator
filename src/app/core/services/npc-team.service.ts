@@ -4,6 +4,7 @@ import { MoveInfo, SpeciesInfo } from '../models/team.model';
 import { germanSpeciesName } from '../models/species-names.de';
 import { DamageCalcService } from './damage-calc.service';
 import { DexDataService } from './dex-data.service';
+import { SettingsService } from './settings.service';
 
 /** One rolled NPC Pokémon: species identity plus a ready-to-use moveset. */
 export interface NpcPokemon {
@@ -62,12 +63,16 @@ const STATUS_PICKS = [
 export class NpcTeamService {
   private readonly dex = inject(DexDataService);
   private readonly damageCalc = inject(DamageCalcService);
+  private readonly settings = inject(SettingsService);
   private readonly moveById = new Map(MOVE_LIBRARY.map((m) => [m.showdownId, m] as const));
 
   async generate(size: number): Promise<NpcPokemon[]> {
     const [species, moveInfo] = await Promise.all([this.dex.species(), this.dex.moves()]);
 
-    const pool = shuffle(species.filter((s) => s.fullyEvolved));
+    const allowLegendaries = this.settings.allowLegendaries();
+    const pool = shuffle(
+      species.filter((s) => s.fullyEvolved && (allowLegendaries || !s.legendary))
+    );
     if (!pool.length) return [];
 
     const team: NpcPokemon[] = [];
@@ -105,7 +110,8 @@ export class NpcTeamService {
       .map((id) => {
         const stab = ownTypes.includes(info[id].type.toLowerCase()) ? 1.5 : 1;
         const fit = info[id].category === 'phys' ? physFit : specFit;
-        return { id, type: info[id].type, score: info[id].bp * stab * fit };
+        const acc = this.damageCalc.accuracy(this.moveById.get(id) as Move);
+        return { id, type: info[id].type, score: info[id].bp * stab * fit * acc };
       })
       .sort((a, b) => b.score - a.score);
 

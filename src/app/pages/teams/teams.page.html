@@ -13,12 +13,44 @@
 
     <p class="tb-hint">
       Bis zu {{ maxTeam }} Pokémon, je bis zu 4 Attacken – nur solche, die das Pokémon
-      tatsächlich erlernen kann und die es bis zur 5. Generation gibt.
+      tatsächlich erlernen kann und die es bis zur 5. Generation gibt. Ziehe die Karten
+      oder nutze ‹ ›, um die Reihenfolge zu ändern.
     </p>
 
     <div class="team-grid">
-      @for (mon of team.pokemon; track $index; let i = $index) {
-        <article class="mon-card">
+      @for (mon of team.pokemon; track $index; let i = $index; let count = $count) {
+        <article
+          class="mon-card"
+          draggable="true"
+          [class.dragging]="dragIndex() === i"
+          [class.drag-over]="dragOverIndex() === i && dragIndex() !== null && dragIndex() !== i"
+          (dragstart)="onDragStart(i, $event)"
+          (dragover)="onDragOver(i, $event)"
+          (drop)="onDrop(i, $event)"
+          (dragend)="onDragEnd()"
+        >
+          <div class="mon-toolbar">
+            <span class="drag-grip" aria-hidden="true">⠿</span>
+            <span class="mon-pos">{{ i + 1 }}</span>
+            <button
+              type="button"
+              class="pos-btn"
+              (click)="movePokemon(i, -1)"
+              [disabled]="i === 0"
+              aria-label="Nach vorn verschieben"
+            >
+              ‹
+            </button>
+            <button
+              type="button"
+              class="pos-btn"
+              (click)="movePokemon(i, 1)"
+              [disabled]="i === count - 1"
+              aria-label="Nach hinten verschieben"
+            >
+              ›
+            </button>
+          </div>
           <button type="button" class="mon-remove" (click)="removePokemon(i)" aria-label="Entfernen">×</button>
           <div class="mon-head">
             <img class="mon-sprite" [src]="spritePath(mon.speciesNum)" [alt]="mon.name" />
