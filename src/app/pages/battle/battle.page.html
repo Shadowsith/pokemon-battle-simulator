@@ -46,7 +46,21 @@
     <div class="platform player-platform"></div>
 
     <div class="hud opponent-hud">
-      <div class="name">{{ opponent().name }}</div>
+      <div class="name">
+        <span class="mon-label">{{ opponent().name }}</span>
+        @if (opponent().status.major; as st) {
+          <span
+            class="status-badge"
+            [style.background]="statusMeta[st].bg"
+            [style.color]="statusMeta[st].fg"
+            [title]="statusMeta[st].label"
+            >{{ statusMeta[st].short }}</span
+          >
+        }
+        @if (opponent().status.confusionTurns > 0) {
+          <span class="status-badge cnf" title="Verwirrung">CNF</span>
+        }
+      </div>
       <div class="hp-track">
         <div class="hp-fill" [style.width.%]="hpPercent(opponent())" [style.background]="hpColor(opponent())"></div>
       </div>
@@ -54,7 +68,21 @@
     <img #oppSprite class="sprite opponent-sprite" [src]="opponentSpriteSrc()" [alt]="opponent().name" />
 
     <div class="hud player-hud">
-      <div class="name">{{ player().name }}</div>
+      <div class="name">
+        <span class="mon-label">{{ player().name }}</span>
+        @if (player().status.major; as st) {
+          <span
+            class="status-badge"
+            [style.background]="statusMeta[st].bg"
+            [style.color]="statusMeta[st].fg"
+            [title]="statusMeta[st].label"
+            >{{ statusMeta[st].short }}</span
+          >
+        }
+        @if (player().status.confusionTurns > 0) {
+          <span class="status-badge cnf" title="Verwirrung">CNF</span>
+        }
+      </div>
       <div class="hp-track">
         <div class="hp-fill" [style.width.%]="hpPercent(player())" [style.background]="hpColor(player())"></div>
       </div>
@@ -98,10 +126,19 @@
       @case ('fight') {
         <div class="submenu">
           <div class="move-grid">
-            @for (move of moves; track move.id) {
-              <button type="button" class="move-btn" [disabled]="isAnimating()" (click)="useMove(move)">
-                {{ move.name }}
+            @for (mv of activeMoveViews(); track mv.move.id) {
+              <button
+                type="button"
+                class="move-btn"
+                [class.depleted]="mv.cur === 0"
+                [disabled]="isAnimating() || mv.cur === 0"
+                (click)="useMove(mv.move)"
+              >
+                <span class="move-btn-name">{{ mv.move.name }}</span>
+                <span class="move-btn-pp">AP {{ mv.cur }} / {{ mv.max }}</span>
               </button>
+            } @empty {
+              <p class="move-empty-note">{{ player().name }} kennt keine Attacken.</p>
             }
           </div>
           <button type="button" class="back-btn" [disabled]="isAnimating()" (click)="backToMain()">Zurück</button>
@@ -116,11 +153,21 @@
                 class="party-entry"
                 [class.active]="i === activePlayerIndex()"
                 [class.fainted]="pokemon.currentHp <= 0"
-                [disabled]="!canSwitchTo(i)"
+                [disabled]="isAnimating() || !canSwitchTo(i)"
                 (click)="switchPokemon(i)"
               >
                 <img [src]="partySpriteSrc(pokemon)" [alt]="pokemon.name" class="party-sprite" />
-                <span class="party-name">{{ pokemon.name }}</span>
+                <span class="party-name">
+                  {{ pokemon.name }}
+                  @if (pokemon.status.major; as st) {
+                    <span
+                      class="status-badge"
+                      [style.background]="statusMeta[st].bg"
+                      [style.color]="statusMeta[st].fg"
+                      >{{ statusMeta[st].short }}</span
+                    >
+                  }
+                </span>
                 <div class="party-hp-track">
                   <div class="party-hp-fill" [style.width.%]="hpPercent(pokemon)" [style.background]="hpColor(pokemon)"></div>
                 </div>

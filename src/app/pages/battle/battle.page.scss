@@ -33,6 +33,9 @@
   width: 150px;
 
   .name {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-size: 12px;
     font-weight: 500;
     color: #222;
@@ -176,14 +179,24 @@
   gap: 8px;
 }
 
+.move-empty-note {
+  grid-column: 1 / -1;
+  margin: 4px 0;
+  font-size: 13px;
+  color: #888;
+}
+
 .move-btn {
-  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  padding: 8px 14px;
   border: 1px solid #d6d6d6;
   border-radius: 8px;
   background: #fff;
   cursor: pointer;
   font-family: inherit;
-  font-size: 14px;
 
   &:hover:not(:disabled) {
     background: #f2f2f2;
@@ -193,6 +206,19 @@
     opacity: 0.45;
     cursor: default;
   }
+
+  &.depleted .move-btn-pp {
+    color: #d5443b;
+  }
+}
+
+.move-btn-name {
+  font-size: 14px;
+}
+
+.move-btn-pp {
+  font-size: 11px;
+  color: #888;
 }
 
 .back-btn {
@@ -255,6 +281,24 @@
 
 .party-name {
   font-size: 13px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-badge {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 1px 5px;
+  border-radius: 4px;
+  line-height: 1.5;
+  flex: 0 0 auto;
+
+  &.cnf {
+    background: #d98fc4;
+    color: #fff;
+  }
 }
 
 .party-hp-track {

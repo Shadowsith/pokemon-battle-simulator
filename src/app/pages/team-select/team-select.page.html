@@ -1,0 +1,126 @@
+<ion-content class="ion-padding">
+  <header class="tb-head">
+    <h1>Team-Builder</h1>
+    <button type="button" class="trainer-badge" (click)="goToSettings()">
+      <img [src]="avatarPath()" [alt]="avatarLabel()" width="40" height="40" />
+      <span class="trainer-text"><small>Trainer</small>{{ avatarLabel() }}</span>
+    </button>
+  </header>
+
+  <p class="tb-hint">
+    Wähle bis zu {{ maxTeam }} Pokémon. Jedes lernt bis zu 4 Attacken – nur solche, die es
+    tatsächlich erlernen kann und die es bis zur 5. Generation gibt.
+  </p>
+
+  <div class="team-grid">
+    @for (mon of team(); track mon.speciesId; let i = $index) {
+      <article class="mon-card">
+        <button type="button" class="mon-remove" (click)="removePokemon(i)" aria-label="Entfernen">×</button>
+        <div class="mon-head">
+          <img class="mon-sprite" [src]="spritePath(mon.speciesNum)" [alt]="mon.name" />
+          <div class="mon-id">
+            <span class="mon-name">{{ mon.name }}</span>
+            <span class="type-row">
+              @for (t of mon.types; track t) {
+                <span class="type-tag" [style.background]="typeColor(t)">{{ t }}</span>
+              }
+            </span>
+          </div>
+        </div>
+        <div class="move-list">
+          @for (slot of moveSlots; track slot) {
+            @let moveId = mon.moves[slot];
+            <button type="button" class="move-slot" [class.set]="moveId" (click)="openMovePicker(i, slot)">
+              @if (moveId) {
+                <span class="move-dot" [style.background]="typeColor(moveType(moveId))"></span>
+                <span class="move-name">{{ moveName(moveId) }}</span>
+              } @else {
+                <span class="move-empty">+ Attacke</span>
+              }
+            </button>
+          }
+        </div>
+      </article>
+    }
+
+    @if (team().length < maxTeam) {
+      <button type="button" class="mon-add" (click)="openSpeciesPicker()">
+        <span class="plus">+</span>
+        <span>Pokémon</span>
+      </button>
+    }
+  </div>
+
+  <div class="tb-actions">
+    <ion-button expand="block" [disabled]="!teamService.battleReady()" (click)="startBattle()">
+      Testkampf starten
+    </ion-button>
+    @if (team().length) {
+      <ion-button expand="block" fill="clear" color="medium" (click)="clearTeam()">Team leeren</ion-button>
+    }
+    @if (!teamService.battleReady()) {
+      <p class="tb-note">Mindestens ein Pokémon braucht eine Attacke.</p>
+    }
+  </div>
+
+  @if (picker(); as p) {
+    <div class="picker-overlay" (click)="closePicker()">
+      <div class="picker" (click)="$event.stopPropagation()">
+        <div class="picker-bar">
+          <input
+            class="picker-search"
+            type="text"
+            [placeholder]="p.kind === 'species' ? 'Pokémon suchen…' : 'Attacke suchen…'"
+            [value]="search()"
+            (input)="search.set($any($event.target).value)"
+          />
+          <button type="button" class="picker-close" (click)="closePicker()">Fertig</button>
+        </div>
+
+        <div class="picker-list">
+          @if (p.kind === 'species') {
+            @for (s of filteredSpecies(); track s.id) {
+              <button type="button" class="pick-row" (click)="pickSpecies(s)">
+                <img class="pick-sprite" [src]="spritePath(s.num)" [alt]="s.name" loading="lazy" />
+                <span class="pick-main">
+                  <span class="pick-name">{{ s.name }}</span>
+                  <span class="pick-sub">Nr. {{ s.num }}</span>
+                </span>
+                <span class="type-row">
+                  @for (t of s.types; track t) {
+                    <span class="type-tag" [style.background]="typeColor(t)">{{ t }}</span>
+                  }
+                </span>
+              </button>
+            } @empty {
+              <p class="picker-empty">Kein Treffer.</p>
+            }
+          } @else {
+            <button type="button" class="pick-row clear" (click)="pickMove(null)">
+              <span class="pick-main"><span class="pick-name">— Attacke entfernen</span></span>
+            </button>
+            @for (m of moveOptions(); track m.id) {
+              <button
+                type="button"
+                class="pick-row"
+                [disabled]="isMoveTaken(m.id)"
+                (click)="pickMove(m.id)"
+              >
+                <span class="move-dot" [style.background]="typeColor(m.info.type)"></span>
+                <span class="pick-main">
+                  <span class="pick-name">{{ m.info.name }}</span>
+                  <span class="pick-sub">
+                    {{ m.info.type }} · {{ catLabel(m.info.category) }}@if (m.info.bp) { · {{ m.info.bp }} KP }
+                  </span>
+                </span>
+                @if (isMoveTaken(m.id)) { <span class="pick-tag">gewählt</span> }
+              </button>
+            } @empty {
+              <p class="picker-empty">Keine erlernbare Attacke gefunden.</p>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+</ion-content>

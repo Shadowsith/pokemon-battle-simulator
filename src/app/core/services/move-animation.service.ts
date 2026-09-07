@@ -664,6 +664,160 @@ export class MoveAnimationService {
     }
   }
 
+  // --- faint / recall / send-out ------------------------------------
+
+  /** The classic faint: the Pokémon drops below its platform and fades out. */
+  async playFaint(spriteEl: HTMLElement): Promise<void> {
+    spriteEl.getAnimations?.().forEach((a) => a.cancel());
+    spriteEl.style.transformOrigin = 'center bottom';
+    await this.anim(spriteEl, [
+      { transform: 'translateY(0) scaleY(1)', opacity: 1, offset: 0 },
+      { transform: 'translateY(3px) scaleY(0.8)', opacity: 1, offset: 0.16 },
+      { transform: 'translateY(70px) scaleY(0.65)', opacity: 0, offset: 1 }
+    ], { duration: 640, easing: 'cubic-bezier(.5,0,.9,.35)', fill: 'forwards' });
+    spriteEl.style.opacity = '0';
+    spriteEl.style.transform = 'translateY(70px)';
+  }
+
+  /** Recall a (living) Pokémon: a ball flies in, a beam retracts it, the ball wobbles shut. */
+  async playRecall(
+    spriteEl: HTMLElement,
+    fxEl: HTMLElement,
+    fieldEl: HTMLElement,
+    side: 'player' | 'opponent'
+  ): Promise<void> {
+    spriteEl.getAnimations?.().forEach((a) => a.cancel());
+    const rect = fieldEl.getBoundingClientRect();
+    const sprite = this.centerOf(spriteEl, fieldEl);
+    const home = this.ballHome(rect, side);
+    const point = { x: sprite.x, y: sprite.y + 16 };
+
+    const ball = this.pokeball(20);
+    place(ball, home);
+    fxEl.appendChild(ball);
+    const at = (p: Point) => `translate(${p.x - home.x}px, ${p.y - home.y}px)`;
+    await this.anim(ball, [{ transform: at(home) }, { transform: at(point) }], {
+      duration: 300,
+      easing: 'ease-out',
+      fill: 'forwards'
+    });
+
+    this.beam(fxEl, point, sprite);
+    spriteEl.style.transformOrigin = 'center center';
+    await this.anim(spriteEl, [
+      { transform: 'translate(0,0) scale(1)', filter: 'brightness(1) saturate(1)', opacity: 1, offset: 0 },
+      { transform: 'translate(0,0) scale(1)', filter: 'brightness(3) saturate(0)', opacity: 1, offset: 0.25 },
+      {
+        transform: `translate(${point.x - sprite.x}px, ${point.y - sprite.y}px) scale(0.04)`,
+        filter: 'brightness(4) saturate(0)',
+        opacity: 0.4,
+        offset: 1
+      }
+    ], { duration: 360, easing: 'ease-in', fill: 'forwards' });
+    spriteEl.style.opacity = '0';
+    spriteEl.style.transform = '';
+    spriteEl.style.filter = '';
+
+    await this.anim(ball, [
+      { transform: `${at(point)} rotate(0)` },
+      { transform: `${at(point)} rotate(-20deg)`, offset: 0.3 },
+      { transform: `${at(point)} rotate(17deg)`, offset: 0.6 },
+      { transform: `${at(point)} rotate(0)` }
+    ], { duration: 260 });
+    await this.anim(ball, [{ transform: at(point), opacity: 1 }, { transform: at(home), opacity: 0 }], {
+      duration: 240,
+      easing: 'ease-in'
+    });
+    ball.remove();
+  }
+
+  /** Send a Pokémon out: a ball arcs in, bursts open with a flash, the sprite grows in. */
+  async playSendOut(
+    spriteEl: HTMLElement,
+    fxEl: HTMLElement,
+    fieldEl: HTMLElement,
+    side: 'player' | 'opponent'
+  ): Promise<void> {
+    spriteEl.getAnimations?.().forEach((a) => a.cancel());
+    spriteEl.style.transform = 'none';
+    spriteEl.style.filter = 'none';
+    spriteEl.style.opacity = '0';
+
+    const rect = fieldEl.getBoundingClientRect();
+    const target = this.centerOf(spriteEl, fieldEl);
+    const home = this.ballHome(rect, side);
+    const midX = home.x + (target.x - home.x) * 0.55;
+    const arcY = Math.min(home.y, target.y) - 80;
+
+    const ball = this.pokeball(22);
+    place(ball, home);
+    fxEl.appendChild(ball);
+    await this.anim(ball, [
+      { transform: 'translate(0,0) rotate(0)', offset: 0 },
+      { transform: `translate(${midX - home.x}px, ${arcY - home.y}px) rotate(340deg)`, offset: 0.55 },
+      { transform: `translate(${target.x - home.x}px, ${target.y - home.y}px) rotate(560deg)`, offset: 1 }
+    ], { duration: 430, easing: 'ease-in', fill: 'forwards' });
+
+    const flash = document.createElement('div');
+    const fs = 14;
+    flash.style.cssText = `position:absolute;left:${target.x - fs / 2}px;top:${target.y - fs / 2}px;width:${fs}px;height:${fs}px;border-radius:50%;background:radial-gradient(circle,#fff,#d6ecff 55%,transparent);pointer-events:none`;
+    fxEl.appendChild(flash);
+    this.anim(ball, [{ opacity: 1 }, { opacity: 0 }], { duration: 140 }).then(() => ball.remove());
+    await this.anim(flash, [
+      { transform: 'scale(.3)', opacity: 0 },
+      { transform: 'scale(4)', opacity: 1, offset: 0.35 },
+      { transform: 'scale(8)', opacity: 0 }
+    ], { duration: 340, easing: 'ease-out' });
+    flash.remove();
+
+    spriteEl.style.opacity = '1';
+    spriteEl.style.transformOrigin = 'center bottom';
+    await this.anim(spriteEl, [
+      { transform: 'scale(0)', filter: 'brightness(4) saturate(0)', offset: 0 },
+      { transform: 'scale(1.12)', filter: 'brightness(2) saturate(.4)', offset: 0.6 },
+      { transform: 'scale(1)', filter: 'brightness(1) saturate(1)', offset: 1 }
+    ], { duration: 380, easing: 'cubic-bezier(.3,1.3,.5,1)' });
+    spriteEl.style.transform = '';
+    spriteEl.style.filter = '';
+  }
+
+  private ballHome(rect: DOMRect, side: 'player' | 'opponent'): Point {
+    return side === 'player'
+      ? { x: -34, y: rect.height + 34 }
+      : { x: rect.width + 34, y: -34 };
+  }
+
+  private beam(fxEl: HTMLElement, from: Point, to: Point): void {
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const len = Math.hypot(dx, dy) + 26;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const b = document.createElement('div');
+    b.style.cssText = `position:absolute;left:${from.x}px;top:${from.y - 4}px;height:8px;width:${len}px;border-radius:4px;transform-origin:left center;background:linear-gradient(90deg,#ff5a4d,#ffd2cd);pointer-events:none`;
+    fxEl.appendChild(b);
+    this.anim(b, [
+      { transform: `rotate(${angle}deg) scaleX(0)`, opacity: 0.9 },
+      { transform: `rotate(${angle}deg) scaleX(1)`, opacity: 0.9, offset: 0.4 },
+      { transform: `rotate(${angle}deg) scaleX(0)`, opacity: 0 }
+    ], { duration: 430, easing: 'ease-in-out' }).then(() => b.remove());
+  }
+
+  private pokeball(size: number): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 20 20');
+    svg.setAttribute(
+      'style',
+      `position:absolute;width:${size}px;height:${size}px;overflow:visible;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))`
+    );
+    svg.innerHTML =
+      '<circle cx="10" cy="10" r="9" fill="#f6f6f6" stroke="#1a1a1a" stroke-width="1.4"/>' +
+      '<path d="M1.3 9.3A9 9 0 0 1 18.7 9.3Z" fill="#ec4b3b"/>' +
+      '<rect x="1" y="8.6" width="18" height="2.8" fill="#1a1a1a"/>' +
+      '<circle cx="10" cy="10" r="2.7" fill="#fff" stroke="#1a1a1a" stroke-width="1.4"/>';
+    return svg;
+  }
+
   // --- primitives ----------------------------------------------------
 
   private centerOf(el: HTMLElement, fieldEl: HTMLElement): Point {
