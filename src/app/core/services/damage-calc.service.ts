@@ -4,7 +4,8 @@ import { BattlePokemon } from '../models/pokemon.model';
 import { Move } from '../models/move.model';
 import { stageMultiplier } from './stat-change.service';
 
-const LEVEL = 50;
+/** Every Pokémon in this simulator is level 100. */
+const LEVEL = 100;
 const NEUTRAL_IV = 31;
 const NEUTRAL_EV = 0;
 
@@ -21,7 +22,10 @@ const SEMI_INVULN = new Set(['fly', 'dig', 'bounce', 'dive', 'skydrop', 'shadowf
 export type Recovery = { amount: number; kind: 'drain' | 'selfHeal' | 'none' };
 export type SelfDamage = { amount: number; kind: 'recoil' | 'selfKo' | 'none' };
 
-/** Standard Pokémon stat formula (neutral nature, no EVs, max IVs). */
+/**
+ * Standard Pokémon stat formula (neutral nature, no EVs, max IVs) - identical to
+ * @pkmn/sim's own `spreadModify`, so a level-100 result matches the simulator.
+ */
 function calcStat(base: number, isHp: boolean): number {
   const core = Math.floor(((2 * base + NEUTRAL_IV + Math.floor(NEUTRAL_EV / 4)) * LEVEL) / 100);
   return isHp ? core + LEVEL + 10 : core + 5;
@@ -29,13 +33,40 @@ function calcStat(base: number, isHp: boolean): number {
 
 /**
  * Computes real damage via @pkmn/sim's bundled Gen data (species base stats, move
- * power/category/type, type chart) using the standard damage formula, then scales
- * the result onto the app's 0-100 HP bars.
+ * power/category/type, type chart) using the standard damage formula, against the
+ * defender's real level-100 HP total.
  */
 @Injectable({ providedIn: 'root' })
 export class DamageCalcService {
   private speciesByDexId: Map<number, { baseStats: StatsTable; types: string[] }> | null = null;
   private readonly ppByMove = new Map<string, number>();
+
+  /** The level every Pokémon in this simulator is set to. */
+  readonly level = LEVEL;
+
+  /**
+   * A species' real max HP at {@link level} (31 IVs, 0 EVs, from its @pkmn/sim
+   * base HP stat) - the value the HP bar is denominated in. Falls back to 100
+   * for an unknown dex id.
+   */
+  hpStat(dexId: number): number {
+    const species = this.lookupSpecies(dexId);
+    return species ? calcStat(species.baseStats['hp'], true) : 100;
+  }
+
+  /** A species' full battle stat line at {@link level} (atk/def/spa/spd/spe + hp). */
+  statLine(dexId: number): StatsTable | null {
+    const species = this.lookupSpecies(dexId);
+    if (!species) return null;
+    return {
+      hp: calcStat(species.baseStats['hp'], true),
+      atk: calcStat(species.baseStats['atk'], false),
+      def: calcStat(species.baseStats['def'], false),
+      spa: calcStat(species.baseStats['spa'], false),
+      spd: calcStat(species.baseStats['spd'], false),
+      spe: calcStat(species.baseStats['spe'], false)
+    };
+  }
 
   /** Base PP of a move (no PP Ups), from @pkmn/sim. Cached. */
   maxPp(move: Move): number {
@@ -108,7 +139,6 @@ export class DamageCalcService {
       calcStat(attackerSpecies.baseStats[atkKey], false) * stageMultiplier(attacker.boosts[atkKey]);
     const defenseStat =
       calcStat(defenderSpecies.baseStats[defKey], false) * stageMultiplier(defender.boosts[defKey]);
-    const defenderMaxHpStat = calcStat(defenderSpecies.baseStats['hp'], true);
 
     const stab = attackerSpecies.types.includes(moveData.type) ? 1.5 : 1;
     const typeMod = Dex.getEffectiveness(moveData.type, defenderSpecies.types);
@@ -119,10 +149,7 @@ export class DamageCalcService {
 
     const rawDamage =
       (((2 * LEVEL) / 5 + 2) * moveData.basePower * (attackStat / defenseStat)) / 50 + 2;
-    const finalDamage = Math.max(1, Math.floor(rawDamage * stab * effectiveness * randomFactor * burn));
-
-    const damagePercent = finalDamage / defenderMaxHpStat;
-    return Math.max(1, Math.round(damagePercent * defender.maxHp));
+    return Math.max(1, Math.floor(rawDamage * stab * effectiveness * randomFactor * burn));
   }
 
   /**
@@ -203,11 +230,9 @@ export class DamageCalcService {
     if (!species) return Math.max(1, Math.round(mon.maxHp * 0.1));
     const atk = calcStat(species.baseStats['atk'], false);
     const def = calcStat(species.baseStats['def'], false);
-    const hpStat = calcStat(species.baseStats['hp'], true);
     const randomFactor = (85 + Math.floor(Math.random() * 16)) / 100;
     const raw = (((2 * LEVEL) / 5 + 2) * 40 * (atk / def)) / 50 + 2;
-    const dmg = Math.max(1, Math.floor(raw * randomFactor));
-    return Math.max(1, Math.round((dmg / hpStat) * mon.maxHp));
+    return Math.max(1, Math.floor(raw * randomFactor));
   }
 
   private lookupSpecies(dexId: number) {

@@ -45,9 +45,21 @@
     <div class="platform opponent-platform"></div>
     <div class="platform player-platform"></div>
 
+    <div class="party-indicator opp">
+      @for (e of opponentEmblems(); track $index) {
+        <span
+          class="party-ball"
+          [class.owned]="e.owned"
+          [class.active]="e.active"
+          [class.fainted]="e.fainted"
+        ></span>
+      }
+    </div>
+
     <div class="hud opponent-hud">
       <div class="name">
         <span class="mon-label">{{ opponent().name }}</span>
+        <span class="mon-lv">Lv. {{ level }}</span>
         @if (opponent().status.major; as st) {
           <span
             class="status-badge"
@@ -83,6 +95,7 @@
     <div class="hud player-hud">
       <div class="name">
         <span class="mon-label">{{ player().name }}</span>
+        <span class="mon-lv">Lv. {{ level }}</span>
         @if (player().status.major; as st) {
           <span
             class="status-badge"
@@ -121,8 +134,13 @@
   </div>
 
   <div class="party-indicator">
-    @for (pokemon of playerTeam(); track pokemon.dexId; let i = $index) {
-      <span class="party-dot" [class.active]="i === activePlayerIndex()" [class.fainted]="pokemon.currentHp <= 0"></span>
+    @for (e of playerEmblems(); track $index) {
+      <span
+        class="party-ball"
+        [class.owned]="e.owned"
+        [class.active]="e.active"
+        [class.fainted]="e.fainted"
+      ></span>
     }
   </div>
 

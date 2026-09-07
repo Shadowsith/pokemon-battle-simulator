@@ -55,6 +55,12 @@ export class BattlePage {
   private readonly teamService = inject(TeamService);
   private readonly status = inject(StatusService);
   private readonly statChange = inject(StatChangeService);
+  private readonly animation = inject(MoveAnimationService);
+  private readonly audio = inject(AudioService);
+  private readonly damageCalc = inject(DamageCalcService);
+
+  /** Every Pokémon in this simulator battles at level 100. */
+  readonly level = this.damageCalc.level;
 
   /** Status badge / stat-stage presentation, used by the template. */
   readonly statusMeta = STATUS_META;
@@ -68,10 +74,10 @@ export class BattlePage {
   readonly outcome = signal<'win' | 'loss' | null>(null);
 
   /** Used when the player hasn't built a team yet (also the move-animation test bed). */
-  private readonly prototypeTeam: Omit<BattlePokemon, 'status' | 'boosts'>[] = [
-    { dexId: 197, name: 'Nachtara', maxHp: 100, currentHp: 100, types: ['dark'] },
-    { dexId: 149, name: 'Dragoran', maxHp: 100, currentHp: 100, types: ['dragon', 'flying'] },
-    { dexId: 31, name: 'Nidoqueen', maxHp: 100, currentHp: 100, types: ['poison', 'ground'] }
+  private readonly prototypeTeam: Pick<BattlePokemon, 'dexId' | 'name' | 'types'>[] = [
+    { dexId: 197, name: 'Nachtara', types: ['dark'] },
+    { dexId: 149, name: 'Dragoran', types: ['dragon', 'flying'] },
+    { dexId: 31, name: 'Nidoqueen', types: ['poison', 'ground'] }
   ];
 
   readonly playerTeam = signal<BattlePokemon[]>(this.derivePlayerTeam());
@@ -133,27 +139,61 @@ export class BattlePage {
   private derivePlayerTeam(): BattlePokemon[] {
     const built = this.teamService.activeTeam()?.pokemon ?? [];
     if (isBattleReady(built)) {
-      return built.map((p) => ({
-        dexId: p.speciesNum,
-        name: germanSpeciesName(p.speciesNum, p.name),
-        maxHp: 100,
-        currentHp: 100,
-        types: p.types.map((t) => t.toLowerCase()),
-        status: freshStatus(),
-        boosts: freshBoosts()
-      }));
+      return built.map((p) => {
+        const maxHp = this.damageCalc.hpStat(p.speciesNum);
+        return {
+          dexId: p.speciesNum,
+          name: germanSpeciesName(p.speciesNum, p.name),
+          maxHp,
+          currentHp: maxHp,
+          types: p.types.map((t) => t.toLowerCase()),
+          status: freshStatus(),
+          boosts: freshBoosts()
+        };
+      });
     }
-    return this.prototypeTeam.map((p) => ({ ...p, status: freshStatus(), boosts: freshBoosts() }));
+    return this.prototypeTeam.map((p) => {
+      const maxHp = this.damageCalc.hpStat(p.dexId);
+      return { ...p, maxHp, currentHp: maxHp, status: freshStatus(), boosts: freshBoosts() };
+    });
   }
 
-  readonly opponent = signal<BattlePokemon>({
-    dexId: 6,
-    name: 'Glurak',
-    maxHp: 100,
-    currentHp: 100,
-    types: ['fire', 'flying'],
-    status: freshStatus(),
-    boosts: freshBoosts()
+  readonly opponent = signal<BattlePokemon>(this.makeOpponent());
+
+  /** The prototype NPC's lone Pokémon (Glurak), at full level-100 HP. */
+  private makeOpponent(): BattlePokemon {
+    const maxHp = this.damageCalc.hpStat(6);
+    return {
+      dexId: 6,
+      name: 'Glurak',
+      maxHp,
+      currentHp: maxHp,
+      types: ['fire', 'flying'],
+      status: freshStatus(),
+      boosts: freshBoosts()
+    };
+  }
+
+  /** How many Pokémon the NPC opponent fields (the prototype NPC has one). */
+  private readonly opponentPartySize = 1;
+
+  /** Six Poké Ball emblems per side: owned / active / knocked-out. */
+  readonly playerEmblems = computed(() => {
+    const team = this.playerTeam();
+    const active = this.activePlayerIndex();
+    return Array.from({ length: 6 }, (_, i) => {
+      const mon = team[i];
+      return { owned: !!mon, fainted: !!mon && mon.currentHp <= 0, active: !!mon && i === active };
+    });
+  });
+
+  readonly opponentEmblems = computed(() => {
+    const koed = this.opponent().currentHp <= 0;
+    return Array.from({ length: 6 }, (_, i) => ({
+      owned: i < this.opponentPartySize,
+      fainted: i === 0 && koed,
+      active: i === 0 && !koed
+    }));
   });
 
   /** Trainer avatars shown on the intro and result screens. */
@@ -175,11 +215,7 @@ export class BattlePage {
     return frontSpritePath(pokemon.dexId);
   }
 
-  constructor(
-    private readonly animation: MoveAnimationService,
-    private readonly audio: AudioService,
-    private readonly damageCalc: DamageCalcService
-  ) {
+  constructor() {
     this.startBattle();
   }
 

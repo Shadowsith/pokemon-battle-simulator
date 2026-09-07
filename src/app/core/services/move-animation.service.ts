@@ -749,6 +749,8 @@ export class MoveAnimationService {
       fill: 'forwards'
     });
 
+    // ball is in position - the recall beam fires and pulls the Pokémon in
+    this.audio.playBallReturn();
     this.beam(fxEl, point, sprite);
     spriteEl.style.transformOrigin = 'center center';
     await this.anim(spriteEl, [

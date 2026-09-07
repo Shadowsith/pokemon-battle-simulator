@@ -42,6 +42,12 @@
     margin-bottom: 2px;
   }
 
+  .mon-lv {
+    font-size: 10px;
+    font-weight: 600;
+    color: #777;
+  }
+
   .hp-track {
     position: relative;
     height: 15px;
@@ -137,23 +143,62 @@
 
 .party-indicator {
   display: flex;
-  gap: 6px;
+  gap: 5px;
   padding: 8px 16px 0;
+
+  &.opp {
+    position: absolute;
+    top: 2px;
+    left: 462px;
+    padding: 0;
+    z-index: 2;
+  }
 }
 
-.party-dot {
-  width: 10px;
-  height: 10px;
+.party-ball {
+  position: relative;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: #639922;
-  border: 2px solid transparent;
+  border: 1px solid #1c1c1c;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+  opacity: 0.25; /* empty slot */
+  transition: opacity 0.2s;
+  background:
+    radial-gradient(circle at 50% 50%, #f4f4f4 0 20%, #1c1c1c 20% 34%, rgba(0, 0, 0, 0) 34%) no-repeat,
+    linear-gradient(180deg, #e23b2e 0 44%, #1c1c1c 44% 56%, #f4f4f4 56% 100%);
 
-  &.fainted {
-    background: #999;
+  &.owned {
+    opacity: 1;
   }
 
   &.active {
-    border-color: #222;
+    outline: 2px solid #333;
+    outline-offset: 1px;
+  }
+
+  &.fainted {
+    filter: grayscale(0.9) brightness(0.75);
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 150%;
+      height: 2px;
+      background: #111;
+      border-radius: 2px;
+    }
+
+    &::before {
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    &::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
   }
 }
 

@@ -28,6 +28,11 @@ export class AudioService {
     this.play('assets/sounds/misc/ball_open.mp3');
   }
 
+  /** The whir of a Poké Ball recalling a Pokémon to its ball. */
+  playBallReturn(): void {
+    this.play('assets/sounds/misc/ball_return.mp3');
+  }
+
   /**
    * Impact sound keyed by the type-effectiveness multiplier:
    * `> 1` super effective, `< 1` not very effective, `1` normal, `0` (immune) silent.
