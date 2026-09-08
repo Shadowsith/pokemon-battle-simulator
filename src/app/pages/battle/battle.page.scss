@@ -113,21 +113,31 @@
   top: 236px;
 }
 
+/* Battlefield sprites are Showdown BW-animated GIFs whose native canvas size
+   varies a lot (Umbreon ~56px tall, Steelix ~120px). Normalise on HEIGHT, not
+   width, so every Pokémon reads at a consistent scale instead of being stretched
+   to one fixed width. `max-width` keeps very wide sprites (Gyarados, Milotic)
+   from crowding the HUD; `bottom` plants the feet on the platform regardless of
+   sprite height. centerOf() in MoveAnimationService reads the live box, so move
+   effects keep aiming correctly. */
 .sprite {
   position: absolute;
+  width: auto;
   image-rendering: pixelated;
 }
 
 .opponent-sprite {
   left: 480px;
-  top: 52px;
-  width: 90px;
+  bottom: 150px;
+  height: 96px;
+  max-width: 150px;
 }
 
 .player-sprite {
   left: 60px;
-  top: 112px;
-  width: 110px;
+  bottom: 78px;
+  height: 120px;
+  max-width: 170px;
 }
 
 .fx-layer,
