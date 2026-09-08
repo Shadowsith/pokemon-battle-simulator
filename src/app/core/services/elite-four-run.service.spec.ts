@@ -22,9 +22,31 @@ describe('EliteFourRunService', () => {
     expect(svc.currentMember()?.name).toBe('Lorelei');
   });
 
-  it('ignores an unavailable region', () => {
-    svc.start('johto');
+  it('ignores an unknown region id', () => {
+    svc.start('kalos');
     expect(svc.hasRun()).toBe(false);
+  });
+
+  it('has all five regions wired with four full members each', () => {
+    for (const id of ['kanto', 'johto', 'hoenn', 'sinnoh', 'einall']) {
+      const r = eliteFourRegion(id)!;
+      expect(r.available).toBe(true);
+      expect(r.members.length).toBe(4);
+      expect(r.members.every((m) => m.team.length >= 5 && m.team.length <= 6)).toBe(true);
+      expect(r.members.flatMap((m) => m.team).every((p) => p.speciesNum > 0 && p.moves.length === 4)).toBe(true);
+    }
+  });
+
+  it('runs the Johto Top Four in canonical order', () => {
+    const johto = eliteFourRegion('johto')!;
+    expect(johto.available).toBe(true);
+    expect(johto.members.map((m) => m.name)).toEqual(['Willi', 'Koga', 'Bruno', 'Melanie']);
+    expect(johto.members.every((m) => m.team.length === 6)).toBe(true);
+
+    svc.start('johto');
+    expect(svc.currentMember()?.name).toBe('Willi');
+    for (let i = 0; i < johto.members.length; i++) svc.recordOutcome(true, null);
+    expect(svc.run()?.status).toBe('won');
   });
 
   it('advances on a win and stores the carry', () => {
