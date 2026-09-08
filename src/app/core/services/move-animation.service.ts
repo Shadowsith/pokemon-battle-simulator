@@ -98,7 +98,8 @@ const TYPE_STYLE: Record<PokemonType, { shape: Shape; spin: boolean }> = {
   Ghost: { shape: 'wisp', spin: false },
   Dragon: { shape: 'ring', spin: true },
   Dark: { shape: 'wisp', spin: false },
-  Steel: { shape: 'shard', spin: true }
+  Steel: { shape: 'shard', spin: true },
+  Fairy: { shape: 'ring', spin: true }
 };
 
 type Shape =

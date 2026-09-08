@@ -83,12 +83,18 @@ export const POKEMON_TYPE_COLORS: Record<string, string> = {
   Ghost: '#5a4785',
   Dragon: '#4a3ca5',
   Dark: '#4a4048',
-  Steel: '#7a8a99'
+  Steel: '#7a8a99',
+  Fairy: '#c96fae'
 };
 
 export function typeColor(type: string): string {
   return POKEMON_TYPE_COLORS[type] ?? '#9a9a86';
 }
 
-/** The 17 Gen 1-5 type names, in canonical order. */
+/** German label for a type name where it differs from the English one. */
+export function germanTypeLabel(type: string): string {
+  return type === 'Fairy' ? 'Fee' : type;
+}
+
+/** The 18 type names (Gen 1-6), in canonical order. */
 export const POKEMON_TYPES: readonly string[] = Object.keys(POKEMON_TYPE_COLORS);

@@ -1,6 +1,6 @@
 // Downloads the animated Showdown-style front and back sprites (Smogon's
 // unified BW art style, which PokeAPI mirrors and which covers well beyond
-// Gen 5) for national dex numbers 1-649, i.e. Gen 1 through Gen 5.
+// Gen 5) for national dex numbers 1-721, i.e. Gen 1 through Gen 6.
 //
 // Run with: node scripts/fetch-sprites.mjs
 //
@@ -10,7 +10,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import path from 'node:path';
 
-const GEN5_LAST_DEX_ID = 649;
+const LAST_DEX_ID = 721;
 const BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown';
 const OUT_DIR = path.resolve('public/assets/sprites/showdown');
 const OUT_DIR_BACK = path.join(OUT_DIR, 'back');
@@ -34,7 +34,7 @@ async function main() {
   let ok = 0;
   let missing = 0;
 
-  for (let dexId = 1; dexId <= GEN5_LAST_DEX_ID; dexId++) {
+  for (let dexId = 1; dexId <= LAST_DEX_ID; dexId++) {
     const frontResult = await download(`${BASE_URL}/${dexId}.gif`, path.join(OUT_DIR, `${dexId}.gif`));
     const backResult = await download(`${BASE_URL}/back/${dexId}.gif`, path.join(OUT_DIR_BACK, `${dexId}.gif`));
 
@@ -46,7 +46,7 @@ async function main() {
     }
 
     if (dexId % 50 === 0) {
-      console.log(`Progress: ${dexId}/${GEN5_LAST_DEX_ID}`);
+      console.log(`Progress: ${dexId}/${LAST_DEX_ID}`);
     }
   }
 

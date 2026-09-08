@@ -1,7 +1,12 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonButton } from '@ionic/angular/standalone';
-import { POKEMON_TYPES, frontSpritePath, typeColor } from '../../core/models/pokemon.model';
+import {
+  POKEMON_TYPES,
+  frontSpritePath,
+  germanTypeLabel,
+  typeColor
+} from '../../core/models/pokemon.model';
 import { MOVES_PER_POKEMON, MoveInfo, SpeciesInfo, isBattleReady } from '../../core/models/team.model';
 import { germanSpeciesName } from '../../core/models/species-names.de';
 import { TRAINER_AVATARS, trainerAvatarPath } from '../../core/models/trainer.model';
@@ -35,6 +40,7 @@ export class CustomBattlePage {
   readonly avatarPath = trainerAvatarPath;
   readonly spritePath = frontSpritePath;
   readonly typeColor = typeColor;
+  readonly typeLabel = germanTypeLabel;
   readonly moveSlots = Array.from({ length: MOVES_PER_POKEMON }, (_, i) => i);
 
   readonly config = signal<CustomBattleConfig>(defaultCustomBattleConfig());

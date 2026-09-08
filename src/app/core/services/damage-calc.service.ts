@@ -286,8 +286,15 @@ export class DamageCalcService {
     if (!this.speciesByDexId) {
       this.speciesByDexId = new Map();
       for (const species of Dex.species.all()) {
-        if (!this.speciesByDexId.has(species.num)) {
-          this.speciesByDexId.set(species.num, { baseStats: species.baseStats, types: species.types });
+        if (species.num < 1) continue;
+        // Prefer the base forme so a Pokémon's canonical types (e.g. Steelix
+        // Steel/Ground) are used for effectiveness regardless of the order
+        // Dex.species.all() happens to yield its alternate formes in.
+        if (!species.forme || !this.speciesByDexId.has(species.num)) {
+          this.speciesByDexId.set(species.num, {
+            baseStats: species.baseStats,
+            types: species.types
+          });
         }
       }
     }

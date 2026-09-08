@@ -1,12 +1,12 @@
 import { Injectable } from '@angular/core';
 import { MoveInfo, SpeciesInfo } from '../models/team.model';
 
-const SPECIES_URL = 'assets/data/species-gen5.json';
-const MOVES_URL = 'assets/data/moves-gen5.json';
-const LEARNSETS_URL = 'assets/data/learnsets-gen5.json';
+const SPECIES_URL = 'assets/data/species-gen6.json';
+const MOVES_URL = 'assets/data/moves-gen6.json';
+const LEARNSETS_URL = 'assets/data/learnsets-gen6.json';
 
 /**
- * Loads the static Gen 5 team-builder data (built by scripts/build-team-data.mjs):
+ * Loads the static Gen 6 team-builder data (built by scripts/build-team-data.mjs):
  * the base species list, per-move display info, and per-species legal move
  * lists. Each file is fetched once and cached.
  */

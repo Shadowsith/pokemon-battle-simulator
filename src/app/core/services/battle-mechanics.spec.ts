@@ -52,4 +52,25 @@ describe('Gen 8 battle mechanics', () => {
     const poisoned = mon(6, { maxHp: 320, status: { ...freshStatus(), major: 'psn' } });
     expect(status.residual(poisoned).damage).toBe(40); // 320 / 8
   });
+
+  // Both of a defender's types must count - a resisted primary type must not
+  // hide an immune secondary type, and vice versa.
+  describe('dual-type effectiveness', () => {
+    it('Electric is useless against Steelix (Steel / Ground)', () => {
+      expect(calc.effectiveness(move('thunderbolt'), mon(208))).toBe(0);
+      expect(calc.calculateDamage(mon(25), mon(208), move('thunderbolt'))).toBe(0);
+    });
+    it('Electric is 4x against Gyarados (Water / Flying)', () => {
+      expect(calc.effectiveness(move('thunderbolt'), mon(130))).toBe(4);
+    });
+    it('Electric is 0.5x against Magneton (Electric / Steel)', () => {
+      expect(calc.effectiveness(move('thunderbolt'), mon(82))).toBe(0.5);
+    });
+    it('Ground is 2x against Steelix (Steel weak, Ground neutral)', () => {
+      expect(calc.effectiveness(move('earthquake'), mon(208))).toBe(2);
+    });
+    it('Dragon is useless against a Fairy (Gen 6 immunity)', () => {
+      expect(calc.effectiveness(move('dragonclaw'), mon(700))).toBe(0); // Sylveon
+    });
+  });
 });

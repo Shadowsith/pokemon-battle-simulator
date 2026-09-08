@@ -1,6 +1,6 @@
 // Downloads Pokémon cries from the PokeAPI/cries project (the "legacy" set,
 // i.e. the classic Gen 1-5 style cries) and converts them to mp3 via ffmpeg,
-// for national dex numbers 1-649 (Gen 1 through Gen 5).
+// for national dex numbers 1-721 (Gen 1 through Gen 6).
 //
 // Requires ffmpeg on PATH.
 // Run with: node scripts/fetch-cries.mjs
@@ -15,7 +15,7 @@ import os from 'node:os';
 
 const execFileAsync = promisify(execFile);
 
-const GEN5_LAST_DEX_ID = 649;
+const LAST_DEX_ID = 721;
 const BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/legacy';
 const OUT_DIR = path.resolve('public/assets/sounds/cries');
 const TMP_DIR = path.join(os.tmpdir(), 'pkmn-cries-ogg');
@@ -76,7 +76,7 @@ async function main() {
   let missing = 0;
   let done = 0;
 
-  const dexIds = Array.from({ length: GEN5_LAST_DEX_ID }, (_, i) => i + 1);
+  const dexIds = Array.from({ length: LAST_DEX_ID }, (_, i) => i + 1);
 
   await runPool(dexIds, async (dexId) => {
     try {
@@ -92,7 +92,7 @@ async function main() {
     }
 
     done++;
-    if (done % 50 === 0) console.log(`Progress: ${done}/${GEN5_LAST_DEX_ID}`);
+    if (done % 50 === 0) console.log(`Progress: ${done}/${LAST_DEX_ID}`);
   });
 
   await rm(TMP_DIR, { recursive: true, force: true });

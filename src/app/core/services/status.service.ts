@@ -3,7 +3,8 @@ import { Dex } from '@pkmn/sim';
 import { BattlePokemon, MajorStatus, StatusState } from '../models/pokemon.model';
 import { Move } from '../models/move.model';
 
-const G5 = Dex.forGen(5);
+/** Move data (types, effect chances, immunities) at Gen 6 - Fairy exists. */
+const MOVEDEX = Dex.forGen(6);
 
 export type Inflicted = MajorStatus | 'confusion';
 
@@ -21,7 +22,7 @@ const rollPct = (chance: number): boolean => Math.random() * 100 < chance;
 const chip = (maxHp: number, num: number, den: number): number =>
   Math.max(1, Math.floor((maxHp * num) / den));
 
-function secondaries(md: ReturnType<typeof G5.moves.get>) {
+function secondaries(md: ReturnType<typeof MOVEDEX.moves.get>) {
   return [md.secondary, ...(md.secondaries ?? [])].filter((s): s is NonNullable<typeof s> => !!s);
 }
 
@@ -31,8 +32,9 @@ function secondaries(md: ReturnType<typeof G5.moves.get>) {
  * infliction from moves (with type immunities), and end-of-turn burn / poison
  * / toxic damage. Burned physical attackers deal half; burn chips 1/16 max HP,
  * confusion self-hits 33 %, and paralysis halves Speed (see DamageCalcService) -
- * all Gen 7+ / Gen 8 values. Move DATA (types, effect chances) stays pinned to
- * Gen 5 via {@link G5} so the movepool matches the rest of the app.
+ * all Gen 7+ / Gen 8 values. Move DATA (types, effect chances) is read from the
+ * Gen 6 dex via {@link MOVEDEX} so Fairy-typed moves resolve like the rest of
+ * the app.
  */
 @Injectable({ providedIn: 'root' })
 export class StatusService {
@@ -80,7 +82,7 @@ export class StatusService {
 
   /** What status (if any) `move` inflicts on `target` this time. Rolls RNG. */
   rollInfliction(move: Move, target: BattlePokemon, damageDealt: number): Inflicted | null {
-    const md = G5.moves.get(move.showdownId);
+    const md = MOVEDEX.moves.get(move.showdownId);
     if (!md?.exists) return null;
     const isStatusMove = md.category === 'Status';
     const connected = isStatusMove || damageDealt > 0;
@@ -88,7 +90,7 @@ export class StatusService {
 
     // A status move that is type-immune (Thunder Wave vs Ground, Glare vs
     // Ghost, Toxic vs Steel) does nothing.
-    if (isStatusMove && !G5.getImmunity(md.type, target.types)) return null;
+    if (isStatusMove && !MOVEDEX.getImmunity(md.type, target.types)) return null;
 
     // Confusion (volatile) - can stack with a major status.
     const confChance =
@@ -114,7 +116,7 @@ export class StatusService {
     if (!rollPct(chance)) return null;
 
     const immunityKey = statusId === 'tox' ? 'psn' : statusId;
-    if (!G5.getImmunity(immunityKey, target.types)) return null; // Fire/brn, Ice/frz, Poison·Steel/psn
+    if (!MOVEDEX.getImmunity(immunityKey, target.types)) return null; // Fire/brn, Ice/frz, Poison·Steel/psn
     return statusId;
   }
 
@@ -174,7 +176,7 @@ export class StatusService {
 
   /** A Fire move landing on a frozen Pokémon thaws it. */
   isFireMove(move: Move): boolean {
-    return G5.moves.get(move.showdownId)?.type === 'Fire';
+    return MOVEDEX.moves.get(move.showdownId)?.type === 'Fire';
   }
 }
 

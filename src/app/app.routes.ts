@@ -30,6 +30,10 @@ export const routes: Routes = [
       import('./pages/elite-four/elite-four.page').then((m) => m.EliteFourPage)
   },
   {
+    path: 'map',
+    loadComponent: () => import('./pages/map/map.page').then((m) => m.MapPage)
+  },
+  {
     path: 'battle',
     loadComponent: () =>
       import('./pages/battle/battle.page').then((m) => m.BattlePage)

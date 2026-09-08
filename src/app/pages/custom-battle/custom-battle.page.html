@@ -90,7 +90,7 @@
               [disabled]="!canPickDistinctType(t)"
               (click)="toggleDistinctType(t)"
             >
-              {{ t }}
+              {{ typeLabel(t) }}
             </button>
           }
         </div>
@@ -114,7 +114,7 @@
           >
             <option value="">(zufällig)</option>
             @for (t of types; track t) {
-              <option [value]="t">{{ t }}</option>
+              <option [value]="t">{{ typeLabel(t) }}</option>
             }
           </select>
         </div>
@@ -152,7 +152,7 @@
                   <span class="mon-name">{{ mon.name }}</span>
                   <span class="type-row">
                     @for (t of mon.types; track t) {
-                      <span class="type-tag" [style.background]="typeColor(t)">{{ t }}</span>
+                      <span class="type-tag" [style.background]="typeColor(t)">{{ typeLabel(t) }}</span>
                     }
                   </span>
                 </div>
@@ -257,7 +257,7 @@
                 </span>
                 <span class="type-row">
                   @for (t of s.types; track t) {
-                    <span class="type-tag" [style.background]="typeColor(t)">{{ t }}</span>
+                    <span class="type-tag" [style.background]="typeColor(t)">{{ typeLabel(t) }}</span>
                   }
                 </span>
               </button>

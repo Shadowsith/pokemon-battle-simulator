@@ -1,7 +1,7 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
-import { frontSpritePath, typeColor } from '../../core/models/pokemon.model';
+import { frontSpritePath, germanTypeLabel, typeColor } from '../../core/models/pokemon.model';
 import { MAX_TEAM_SIZE, MOVES_PER_POKEMON, MoveInfo, SpeciesInfo } from '../../core/models/team.model';
 import { DexDataService } from '../../core/services/dex-data.service';
 import { TeamService } from '../../core/services/team.service';
@@ -42,6 +42,7 @@ export class TeamsPage {
 
   readonly spritePath = frontSpritePath;
   readonly typeColor = typeColor;
+  readonly typeLabel = germanTypeLabel;
 
   readonly filteredSpecies = computed(() => {
     const q = this.search().trim().toLowerCase();

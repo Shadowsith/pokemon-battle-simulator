@@ -58,7 +58,7 @@
               <span class="mon-name">{{ mon.name }}</span>
               <span class="type-row">
                 @for (t of mon.types; track t) {
-                  <span class="type-tag" [style.background]="typeColor(t)">{{ t }}</span>
+                  <span class="type-tag" [style.background]="typeColor(t)">{{ typeLabel(t) }}</span>
                 }
               </span>
             </div>
@@ -176,7 +176,7 @@
                 </span>
                 <span class="type-row">
                   @for (t of s.types; track t) {
-                    <span class="type-tag" [style.background]="typeColor(t)">{{ t }}</span>
+                    <span class="type-tag" [style.background]="typeColor(t)">{{ typeLabel(t) }}</span>
                   }
                 </span>
               </button>

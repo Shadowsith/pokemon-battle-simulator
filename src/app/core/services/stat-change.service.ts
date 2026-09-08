@@ -3,7 +3,8 @@ import { Dex } from '@pkmn/sim';
 import { Boosts, StatKey } from '../models/pokemon.model';
 import { Move } from '../models/move.model';
 
-const G5 = Dex.forGen(5);
+/** Move data (boosts, secondary effects, type immunities) at Gen 6. */
+const MOVEDEX = Dex.forGen(6);
 const STAT_KEYS: StatKey[] = ['atk', 'def', 'spa', 'spd', 'spe', 'accuracy', 'evasion'];
 
 export interface StatChange {
@@ -42,7 +43,7 @@ export class StatChangeService {
     targetTypes: string[],
     dealtDamage: number
   ): { toUser: Partial<Boosts>; toTarget: Partial<Boosts> } {
-    const md = G5.moves.get(move.showdownId);
+    const md = MOVEDEX.moves.get(move.showdownId);
     const toUser: Partial<Boosts> = {};
     const toTarget: Partial<Boosts> = {};
     if (!md?.exists) return { toUser, toTarget };
@@ -52,7 +53,7 @@ export class StatChangeService {
     const isStatus = md.category === 'Status';
     const connected = isStatus || dealtDamage > 0;
     // A status move that whiffs on a type-immune target (Growl on a Ghost) does nothing.
-    const hitsTarget = connected && (!isStatus || !!G5.getImmunity(md.type, targetTypes));
+    const hitsTarget = connected && (!isStatus || !!MOVEDEX.getImmunity(md.type, targetTypes));
 
     if (md.boosts) {
       if (selfTargeted) merge(toUser, md.boosts);

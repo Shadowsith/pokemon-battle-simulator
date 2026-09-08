@@ -10,7 +10,8 @@
     "cap:sync": "ng build && npx cap sync",
     "cap:add:ios": "npx cap add ios",
     "cap:add:android": "npx cap add android",
-    "fetch:sprites": "node scripts/fetch-sprites.mjs"
+    "fetch:sprites": "node scripts/fetch-sprites.mjs",
+    "gen:overworld-art": "node scripts/gen-overworld-art.mjs"
   },
   "prettier": {
     "printWidth": 100,

@@ -1,12 +1,10 @@
-// Categorizes every Gen 1-5 move (per @pkmn/sim's Gen 5 dex data) into one
+// Categorizes every Gen 1-6 move (per @pkmn/sim's Gen 6 dex data) into one
 // of the archetypes defined in src/app/core/models/move.model.ts
-// (MoveArchetype), and records each move's Gen 5 elemental type. Together
+// (MoveArchetype), and records each move's Gen 6 elemental type. Together
 // (archetype, type) key the eventual per-move sound lookup - e.g. a "beam"
 // shaped like an Ice-type attack vs. a "beam" shaped like a Fire-type attack.
 //
-// Uses Dex.forGen(5) rather than the latest dex so retyped moves (e.g.
-// Moonlight/Charm, Normal-type pre-Fairy) report their period-accurate Gen 5
-// type instead of the modern one.
+// Uses Dex.forGen(6) so Fairy exists and Charm / Sweet Kiss report Fairy.
 //
 // Heuristic (first match wins):
 //   1. move.drain                                -> absorb          (Giga Drain, Leech Life)
@@ -32,7 +30,7 @@ import { writeFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const OUT_FILE = path.resolve('scripts/move-archetypes.json');
-const GEN5 = Dex.forGen(5);
+const DEX = Dex.forGen(6);
 
 const BEAM_OVERRIDES = new Set(['hydropump', 'aeroblast', 'fireblast']);
 const AREAL_OVERRIDES = new Set(['psychic', 'darkpulse']);
@@ -53,7 +51,7 @@ function categorize(move) {
 }
 
 function main() {
-  const moves = GEN5.moves.all().filter((m) => m.exists && m.num > 0 && m.gen >= 1 && m.gen <= 5);
+  const moves = DEX.moves.all().filter((m) => m.exists && m.num > 0 && m.gen >= 1 && m.gen <= 6);
 
   const buckets = {
     melee: [],
@@ -73,7 +71,7 @@ function main() {
     mapping[move.id] = { archetype, type: move.type };
   }
 
-  console.log(`Categorized ${moves.length} Gen 1-5 moves:\n`);
+  console.log(`Categorized ${moves.length} Gen 1-6 moves:\n`);
   for (const [archetype, names] of Object.entries(buckets)) {
     console.log(`${archetype} (${names.length}):`);
     console.log(`  ${names.slice(0, 12).join(', ')}${names.length > 12 ? ', ...' : ''}`);

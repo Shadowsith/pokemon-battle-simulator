@@ -1,0 +1,45 @@
+<div class="map-host" #host>
+  <canvas #screen class="screen"></canvas>
+
+  @if (loading.done && !engineReady) {
+    <p class="map-error">Karte konnte nicht geladen werden.</p>
+  }
+
+  <ion-button class="back-btn" size="small" fill="solid" (click)="back()">‹ Menü</ion-button>
+
+  <!-- On-screen D-pad (works with mouse + touch; the mobile builds have no keyboard) -->
+  <div class="dpad" aria-hidden="true">
+    <button
+      type="button"
+      class="dpad-btn up"
+      (pointerdown)="press('up', true, $event)"
+      (pointerup)="press('up', false, $event)"
+      (pointerleave)="press('up', false, $event)"
+      (pointercancel)="press('up', false, $event)"
+    >▲</button>
+    <button
+      type="button"
+      class="dpad-btn left"
+      (pointerdown)="press('left', true, $event)"
+      (pointerup)="press('left', false, $event)"
+      (pointerleave)="press('left', false, $event)"
+      (pointercancel)="press('left', false, $event)"
+    >◀</button>
+    <button
+      type="button"
+      class="dpad-btn right"
+      (pointerdown)="press('right', true, $event)"
+      (pointerup)="press('right', false, $event)"
+      (pointerleave)="press('right', false, $event)"
+      (pointercancel)="press('right', false, $event)"
+    >▶</button>
+    <button
+      type="button"
+      class="dpad-btn down"
+      (pointerdown)="press('down', true, $event)"
+      (pointerup)="press('down', false, $event)"
+      (pointerleave)="press('down', false, $event)"
+      (pointercancel)="press('down', false, $event)"
+    >▼</button>
+  </div>
+</div>
