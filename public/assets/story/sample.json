@@ -1,0 +1,107 @@
+{
+  "id": "engine-test",
+  "title": "Platzhalter (Engine-Test)",
+  "startSceneId": "intro",
+  "scenes": {
+    "intro": {
+      "id": "intro",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "effects": [
+        {
+          "op": "setTeam",
+          "team": [
+            {
+              "speciesNum": 155,
+              "speciesId": "cyndaquil",
+              "name": "Feurigel",
+              "types": ["Fire"],
+              "moves": ["ember", "tackle", "quickattack", "swift"]
+            },
+            {
+              "speciesNum": 158,
+              "speciesId": "totodile",
+              "name": "Karnimani",
+              "types": ["Water"],
+              "moves": ["watergun", "scratch", "bite", "headbutt"]
+            }
+          ]
+        }
+      ],
+      "lines": [
+        {
+          "text": "Dies ist eine Platzhalter-Geschichte. Sie existiert nur, um das Story-System zu testen."
+        },
+        {
+          "speakerId": "elm",
+          "speakerName": "Prof. Lind",
+          "side": "left",
+          "text": "Hier, nimm dieses Team. Zeig mir, dass die Story-Engine sauber von Szene zu Szene führt!"
+        },
+        {
+          "text": "Du hast Feurigel und Karnimani erhalten."
+        }
+      ],
+      "next": "choice1"
+    },
+    "choice1": {
+      "id": "choice1",
+      "kind": "choice",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "prompt": "Ein Rivale stellt sich dir in den Weg. Wie reagierst du?",
+      "options": [
+        {
+          "label": "\"Bring es hinter dich.\"",
+          "next": "rivalFight",
+          "effects": [{ "op": "setFlag", "key": "tone", "value": "cocky" }]
+        },
+        {
+          "label": "\"Ich bin bereit.\"",
+          "next": "rivalFight",
+          "effects": [{ "op": "setFlag", "key": "tone", "value": "calm" }]
+        }
+      ]
+    },
+    "rivalFight": {
+      "id": "rivalFight",
+      "kind": "battle",
+      "introText": "Rivale Silver will sehen, was du kannst!",
+      "opponent": {
+        "trainerId": "silver",
+        "name": "Silver",
+        "team": [
+          {
+            "speciesNum": 17,
+            "speciesId": "pidgeotto",
+            "name": "Tauboga",
+            "types": ["Normal", "Flying"],
+            "moves": ["gust", "quickattack", "wingattack", "swift"]
+          },
+          {
+            "speciesNum": 20,
+            "speciesId": "raticate",
+            "name": "Rattikarl",
+            "types": ["Normal"],
+            "moves": ["tackle", "bite", "headbutt", "swift"]
+          }
+        ]
+      },
+      "onWin": "winEnd",
+      "onLose": "loseEnd"
+    },
+    "winEnd": {
+      "id": "winEnd",
+      "kind": "end",
+      "endingId": "win",
+      "background": "linear-gradient(180deg, #dff3d8 0%, #f6fbef 100%)",
+      "text": "Sieg! Die Engine hat den onWin-Zweig genommen. Ende der Platzhalter-Geschichte."
+    },
+    "loseEnd": {
+      "id": "loseEnd",
+      "kind": "end",
+      "endingId": "lose",
+      "background": "linear-gradient(180deg, #f3dcda 0%, #fbeeed 100%)",
+      "text": "Niederlage. Die Engine hat den onLose-Zweig genommen. Ende der Platzhalter-Geschichte."
+    }
+  }
+}

@@ -1,0 +1,123 @@
+<ion-content>
+  @switch (view()) {
+    @case ('arcs') {
+      <div class="story-screen arc-select">
+        <header class="arc-head">
+          <h1>Story-Modus</h1>
+          <p>Wähle eine Geschichte.</p>
+        </header>
+
+        @if (loadingArcs()) {
+          <p class="muted">Lade Geschichten…</p>
+        } @else {
+          <ul class="arc-list">
+            @for (arc of arcs(); track arc.id) {
+              <li>
+                <button
+                  type="button"
+                  class="arc-card"
+                  [class.locked]="!arc.available"
+                  [disabled]="!arc.available"
+                  (click)="selectArc(arc)"
+                >
+                  <span class="arc-title">{{ arc.title }}</span>
+                  @if (arc.subtitle) {
+                    <span class="arc-subtitle">{{ arc.subtitle }}</span>
+                  }
+                  @if (!arc.available) {
+                    <span class="arc-badge">In Arbeit</span>
+                  }
+                </button>
+              </li>
+            } @empty {
+              <li class="muted">Keine Geschichten gefunden.</li>
+            }
+          </ul>
+        }
+
+        <ion-button fill="clear" color="medium" (click)="toMenu()">Zurück zum Menü</ion-button>
+      </div>
+    }
+
+    @case ('start') {
+      <div class="story-screen start-card">
+        @if (selectedArc(); as arc) {
+          <h1>{{ arc.title }}</h1>
+          @if (arc.subtitle) {
+            <p class="muted">{{ arc.subtitle }}</p>
+          }
+        }
+        <div class="start-actions">
+          @if (canContinue()) {
+            <ion-button expand="block" (click)="continueStory()">Fortsetzen</ion-button>
+            <ion-button expand="block" fill="outline" (click)="newStory()">Neue Story</ion-button>
+          } @else {
+            <ion-button expand="block" (click)="newStory()">Neue Story</ion-button>
+          }
+          <ion-button expand="block" fill="clear" color="medium" (click)="backToArcs()">Zurück</ion-button>
+        </div>
+      </div>
+    }
+
+    @case ('scene') {
+      @if (currentScene(); as scene) {
+        <div class="scene-stage" [style.background]="background()">
+          @switch (scene.kind) {
+            @case ('dialogue') {
+              <div class="dialogue-layer" (click)="advanceDialogue()">
+                @if (currentLine(); as line) {
+                  @if (line.speakerId) {
+                    <img
+                      class="portrait"
+                      [class.right]="line.side === 'right'"
+                      [class.flip]="line.side !== 'right'"
+                      [src]="avatarPath(line.speakerId)"
+                      [alt]="line.speakerName || ''"
+                    />
+                  }
+                  <div class="textbox">
+                    @if (line.speakerName) {
+                      <span class="speaker">{{ line.speakerName }}</span>
+                    }
+                    <p class="line">{{ line.text }}</p>
+                    <span class="advance-hint">Weiter ▸</span>
+                  </div>
+                }
+              </div>
+            }
+
+            @case ('choice') {
+              <div class="choice-layer">
+                <p class="prompt">{{ scene.prompt }}</p>
+                <div class="choice-actions">
+                  @for (opt of visibleOptions(); track opt.label) {
+                    <ion-button expand="block" (click)="choose(opt)">{{ opt.label }}</ion-button>
+                  }
+                </div>
+              </div>
+            }
+
+            @case ('battle') {
+              <div class="battle-layer">
+                <p class="prompt">{{ scene.introText || 'Ein Kampf steht bevor!' }}</p>
+                <ion-button (click)="startSceneBattle()">Kampf beginnen</ion-button>
+              </div>
+            }
+
+            @case ('end') {
+              <div class="end-layer">
+                <p class="line">{{ scene.text }}</p>
+                <ion-button (click)="toMenu()">Zurück zum Menü</ion-button>
+              </div>
+            }
+          }
+        </div>
+      } @else {
+        <div class="story-screen">
+          <p class="muted">Kein passender Spielstand. Zurück zur Auswahl.</p>
+          <ion-button (click)="backToArcs()">Zur Auswahl</ion-button>
+        </div>
+      }
+    }
+  }
+</ion-content>

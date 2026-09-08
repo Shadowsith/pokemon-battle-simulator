@@ -1,0 +1,1229 @@
+{
+  "id": "leaf-leaves-kanto",
+  "title": "Leaf verlässt Kanto",
+  "startSceneId": "p_intro",
+  "scenes": {
+    "p_intro": {
+      "id": "p_intro",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "lines": [
+        { "text": "Indigo-Plateau. Vor einer Stunde." },
+        { "text": "Leaf steht in der Halle der Champions. Der letzte Ball ihres Cousins... nein, ihres Rivalen Blue ist längst zurückgeschnappt. Sie hat ihn geschlagen. Nach zwei Jahren quer durch Kanto trägt sie den Titel." },
+        { "text": "Eine Stunde. So lange durfte sie ihn tragen." },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "..." },
+        { "text": "Red kam die Treppe herauf, ohne ein Wort. Er forderte sie heraus. Und er gewann — so klar, dass es fast höflich wirkte." },
+        { "text": "Noch am selben Abend verließ er Kanto. Kein Brief, keine Nummer. Nur die Meldung im Radio, zwei Tage später: der stärkste Trainer der Region ist fort." }
+      ],
+      "next": "p_flash_break"
+    },
+    "p_flash_break": {
+      "id": "p_flash_break",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #d6d6de 0%, #e8e8ee 100%)",
+      "lines": [
+        { "text": "Sie waren ein Paar gewesen, auf dem letzten Drittel ihrer Reise. Zwischen Fuchsania und der Siegesstraße, als alles leicht schien." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Ich will die Schule zu Ende bringen, Red. Den erweiterten Abschluss. Danach sehen wir weiter.“" },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Ich nicht. Ein Titel ist kein Ziel. Ich will wissen, wie weit oben das Oben ist.“" },
+        { "text": "Sie haben sich nicht gestritten. Das war fast das Schlimmste. Sie haben sich einfach an zwei verschiedene Enden des Tisches gesetzt und beschlossen, dass es vorbei ist." }
+      ],
+      "next": "p_flash_champ"
+    },
+    "p_flash_champ": {
+      "id": "p_flash_champ",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #d6d6de 0%, #e8e8ee 100%)",
+      "lines": [
+        { "text": "Die eine Stunde als Champion. Leaf erinnert sich an das Foto, das Prof. Eich schoss, an die Hand des Ligapräsidenten, an das kalte Licht der Halle." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Und jetzt?“" },
+        { "text": "Niemand hatte darauf eine Antwort. Sie auch nicht." }
+      ],
+      "next": "p_home"
+    },
+    "p_home": {
+      "id": "p_home",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #e8dcc8 0%, #f4ece0 100%)",
+      "lines": [
+        { "text": "Alabastia. Sechs Wochen später." },
+        { "text": "Leafs Zimmer sieht aus wie immer: die Ligaurkunde an der Wand, der Rucksack in der Ecke, die Vorhänge zu. Es ist früher Nachmittag." },
+        { "text": "Bisaflor liegt vor der Tür und atmet langsam. Es wartet. Es wartet seit Wochen." }
+      ],
+      "next": "p_mother"
+    },
+    "p_mother": {
+      "id": "p_mother",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #e8dcc8 0%, #f4ece0 100%)",
+      "lines": [
+        { "speakerId": "mom-unova2", "speakerName": "Mutter", "side": "right", "text": "„Leaf? Du warst diese Woche noch gar nicht draußen, Schatz.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Wozu. Ich hab alles gemacht, was man machen kann. Zweimal.“" },
+        { "speakerId": "mom-unova2", "speakerName": "Mutter", "side": "right", "text": "„Du hast Kanto gemacht. Kanto ist nicht die Welt.“" },
+        { "text": "Ihre Mutter stellt einen Teller ab und geht wieder. Der Satz bleibt im Raum hängen, länger als er sollte." }
+      ],
+      "next": "p_school"
+    },
+    "p_school": {
+      "id": "p_school",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #e8dcc8 0%, #f4ece0 100%)",
+      "lines": [
+        { "text": "Der Abschluss liegt in der Schublade. Sie hat ihn durchgezogen, Kurs für Kurs, mit derselben Sturheit, mit der sie Arenaleiter besiegt hat." },
+        { "text": "Nur hat diesmal am Ende niemand geklatscht. Es war einfach vorbei, und dann war da nichts." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Nichts ist der schlechteste Gegner. Man kann nichts nicht schlagen.“" }
+      ],
+      "next": "p_green"
+    },
+    "p_green": {
+      "id": "p_green",
+      "kind": "choice",
+      "background": "linear-gradient(180deg, #e8dcc8 0%, #f4ece0 100%)",
+      "prompt": "Es klopft. Green steht in der Tür — ihr Cousin, zwanzig, mit diesem Grinsen, das sie seit der Kindheit nicht ausstehen kann. „Hab gehört, du liegst hier rum und verstaubst, Frau Ex-Champion.“ Wie reagiert Leaf?",
+      "options": [
+        {
+          "label": "„Und du bist extra hergekommen, um zuzusehen? Traurig.“",
+          "next": "p_decision",
+          "effects": [{ "op": "setFlag", "key": "tone", "value": "scharf" }]
+        },
+        {
+          "label": "Ihn kommentarlos stehen lassen und den Rucksack nehmen.",
+          "next": "p_decision",
+          "effects": [{ "op": "setFlag", "key": "tone", "value": "still" }]
+        }
+      ]
+    },
+    "p_decision": {
+      "id": "p_decision",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #e8dcc8 0%, #f4ece0 100%)",
+      "lines": [
+        { "text": "Green geht wieder, irgendwann. Leaf sitzt noch lange da." },
+        { "text": "Dann steht sie auf, zieht die Vorhänge zurück, und das Licht tut weh, so wie Licht das tut, wenn man es zu lange gemieden hat." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Kanto ist nicht die Welt. Gut. Dann schau ich mir die nächste an.“" },
+        { "text": "Johto. Die Nachbarregion. Über die Tohjo-Fälle zu Fuß erreichbar, wenn man den langen Weg nimmt. Sie nimmt immer den langen Weg." }
+      ],
+      "next": "p_team"
+    },
+    "p_team": {
+      "id": "p_team",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #bfe0f5 0%, #eaf4ec 100%)",
+      "effects": [
+        {
+          "op": "setTeam",
+          "team": [
+            { "speciesNum": 3, "speciesId": "venusaur", "name": "Bisaflor", "types": ["Grass", "Poison"], "moves": ["energyball", "sludgebomb", "earthquake", "sleeppowder"] },
+            { "speciesNum": 197, "speciesId": "umbreon", "name": "Nachtara", "types": ["Dark"], "moves": ["foulplay", "darkpulse", "toxic", "moonlight"] },
+            { "speciesNum": 31, "speciesId": "nidoqueen", "name": "Nidoqueen", "types": ["Poison", "Ground"], "moves": ["earthquake", "sludgebomb", "icebeam", "flamethrower"] },
+            { "speciesNum": 38, "speciesId": "ninetales", "name": "Vulnona", "types": ["Fire"], "moves": ["flamethrower", "energyball", "darkpulse", "willowisp"] },
+            { "speciesNum": 230, "speciesId": "kingdra", "name": "Seedraking", "types": ["Water", "Dragon"], "moves": ["hydropump", "dragonpulse", "icebeam", "raindance"] },
+            { "speciesNum": 200, "speciesId": "misdreavus", "name": "Traunfugil", "types": ["Ghost"], "moves": ["shadowball", "psychic", "thunderbolt", "confuseray"] }
+          ]
+        }
+      ],
+      "lines": [
+        { "text": "Sie ruft sie alle heraus, auf die Wiese hinterm Haus, ein letztes Mal in Kanto." },
+        { "text": "Bisaflor, ihr Starter, der schon Glumandas Flammen und Schiggys Wasser abbekommen hat und trotzdem nie einen Schritt zurückwich." },
+        { "text": "Nachtara, das aus einem verängstigten Evoli wurde, weil Leaf nachts einfach nicht schlafen konnte und lief, und das Evoli mitlief." },
+        { "text": "Nidoqueen. Vulnona. Seedraking. Und Traunfugil, das sie in einem verlassenen Turm fand und das seither über ihre Schulter kichert, wenn ihr etwas misslingt." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Okay. Wir sind zu sechst. Das reicht für eine Region.“" }
+      ],
+      "next": "p_leave"
+    },
+    "p_leave": {
+      "id": "p_leave",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #bfe0f5 0%, #eaf4ec 100%)",
+      "lines": [
+        { "text": "Sie geht nach Norden. Route 22, dann der schmale Pfad, den kaum jemand nimmt, vorbei am Wächterhäuschen, hinein in die Schlucht." },
+        { "text": "Ihre Mutter winkt vom Zaun. Green ist nicht zu sehen. Vielleicht besser so." },
+        { "text": "Nach einem halben Tag hört sie das Wasser: die Tohjo-Fälle. Die Grenze." }
+      ],
+      "next": "c1_border"
+    },
+
+    "c1_border": {
+      "id": "c1_border",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "text": "Die Tohjo-Fälle stürzen in ein Becken, das halb in Kanto und halb in Johto liegt. Ein alter Wanderer sagt, das Wasser wisse selbst nicht, zu welcher Region es gehört." },
+        { "text": "Leaf springt über die nassen Steine. Auf der anderen Seite riecht die Luft anders — nach Zeder, nach Rauch von weit her." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Johto. Na dann.“" }
+      ],
+      "next": "c1_newbark"
+    },
+    "c1_newbark": {
+      "id": "c1_newbark",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #d7e3f0 0%, #eef1f4 100%)",
+      "lines": [
+        { "text": "Neuborkia ist klein. Drei Häuser, ein Labor, ein Steg. Alles wirkt, als hätte man es gestern erst ausgepackt." },
+        { "text": "Vor dem Labor von Prof. Lind stehen zwei Leute und streiten. Der eine ist der Professor. Der andere ist ein Junge mit rotem Haar, vielleicht so alt wie Leaf, und er hat die Hände in den Taschen, als gehörte ihm der Ort." }
+      ],
+      "next": "c1_silver_meet"
+    },
+    "c1_silver_meet": {
+      "id": "c1_silver_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #d7e3f0 0%, #eef1f4 100%)",
+      "lines": [
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„Was gaffst du? Nie einen Menschen gesehen, der weiß, was er will?“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Doch. Einen. Der Vergleich fällt nicht zu deinen Gunsten aus.“" },
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„Große Klappe für eine Touristin. Zeig mir dein Team. Sofort. Dann sehen wir, ob hinter der Klappe was steckt.“" }
+      ],
+      "next": "c1_silver_fight"
+    },
+    "c1_silver_fight": {
+      "id": "c1_silver_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #d7e3f0 0%, #eef1f4 100%)",
+      "introText": "Silver mustert dich, als wärst du schon verloren.",
+      "opponent": {
+        "trainerId": "silver-gen2",
+        "name": "Silver",
+        "team": [
+          { "speciesNum": 42, "speciesId": "golbat", "name": "Golbat", "types": ["Poison", "Flying"], "moves": ["airslash", "sludgebomb", "bite", "confuseray"] },
+          { "speciesNum": 93, "speciesId": "haunter", "name": "Alpollo", "types": ["Ghost", "Poison"], "moves": ["shadowball", "sludgebomb", "hypnosis", "dreameater"] },
+          { "speciesNum": 215, "speciesId": "sneasel", "name": "Sniebel", "types": ["Dark", "Ice"], "moves": ["nightslash", "icepunch", "iceshard", "feintattack"] },
+          { "speciesNum": 159, "speciesId": "croconaw", "name": "Tyracroc", "types": ["Water"], "moves": ["aquatail", "crunch", "icefang", "slash"] }
+        ]
+      },
+      "onWin": "c1_silver_win",
+      "onLose": "c1_silver_lose"
+    },
+    "c1_silver_win": {
+      "id": "c1_silver_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #d7e3f0 0%, #eef1f4 100%)",
+      "lines": [
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„...Glück.“" },
+        { "text": "Er ruft sein letztes Pokémon zurück, dreht sich um und geht, ohne noch einmal herzusehen. Prof. Lind schaut ihm nach und schüttelt den Kopf." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Angenehmer Empfang.“" }
+      ],
+      "next": "c1_route29"
+    },
+    "c1_silver_lose": {
+      "id": "c1_silver_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #d7e3f0 0%, #eef1f4 100%)",
+      "effects": [{ "op": "setFlag", "key": "silver_lead", "value": true }],
+      "lines": [
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„Ex-Champion, ja? Von welcher Region — Tazmania?“" },
+        { "text": "Er lässt sie einfach stehen. Leaf beißt die Zähne zusammen, heilt ihr Team am Steg und merkt sich das Gesicht." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Wir sehen uns wieder, Rotschopf.“" }
+      ],
+      "next": "c1_route29"
+    },
+    "c1_route29": {
+      "id": "c1_route29",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "text": "Route 29 zieht sich flach durch hohes Gras. Voltilamm blöken irgendwo, Windschlag wetzt über die Halme." },
+        { "text": "Leaf läuft, und zum ersten Mal seit Wochen ist das Laufen nicht Flucht, sondern nur Laufen. Es ist nicht viel. Aber es ist mehr als Vorhänge zu." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Ein Schritt. Und noch einer. So hat es letztes Mal auch angefangen.“" }
+      ],
+      "next": "c1_cherrygrove"
+    },
+    "c1_cherrygrove": {
+      "id": "c1_cherrygrove",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #d7e3f0 0%, #eef1f4 100%)",
+      "lines": [
+        { "text": "Rosalia City. Ein Küstenort mit Beerensträuchern an jeder Ecke. An der Pokémon-Center-Tür hängt ein handgeschriebener Zettel." },
+        { "text": "„Gesehen: Männer in schwarzen Anzügen am alten Sendemast nördlich der Stadt. Halten Sie Abstand.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Schwarze Anzüge. Sendemast. Kommt mir bekannt vor.“" }
+      ],
+      "next": "c2_rocket1_meet"
+    },
+
+    "c2_rocket1_meet": {
+      "id": "c2_rocket1_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "text": "Am Wegrand hat ein Mann in schwarzem Anzug einen jüngeren Trainer in die Enge gedrängt und zerrt an dessen Tasche." },
+        { "speakerId": "rocketgrunt", "speakerName": "Rocket-Rüpel", "side": "right", "text": "„Team Rocket erhebt eine kleine Wegegebühr. Deine Pokémon reichen als Zahlung.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Team Rocket. In Johto. Ihr habt echt kein anderes Hobby, oder?“" }
+      ],
+      "next": "c2_rocket1_fight"
+    },
+    "c2_rocket1_fight": {
+      "id": "c2_rocket1_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "introText": "Der Rüpel lässt den jungen Trainer los und baut sich vor dir auf.",
+      "opponent": {
+        "trainerId": "rocketgrunt",
+        "name": "Rocket-Rüpel",
+        "team": [
+          { "speciesNum": 20, "speciesId": "raticate", "name": "Rattikarl", "types": ["Normal"], "moves": ["superfang", "crunch", "facade", "quickattack"] },
+          { "speciesNum": 42, "speciesId": "golbat", "name": "Golbat", "types": ["Poison", "Flying"], "moves": ["airslash", "sludgebomb", "bite", "confuseray"] },
+          { "speciesNum": 88, "speciesId": "grimer", "name": "Sleima", "types": ["Poison"], "moves": ["sludgebomb", "shadowsneak", "firepunch", "minimize"] },
+          { "speciesNum": 109, "speciesId": "koffing", "name": "Smogon", "types": ["Poison"], "moves": ["sludgebomb", "explosion", "willowisp", "thunderbolt"] }
+        ]
+      },
+      "onWin": "c2_rocket1_win",
+      "onLose": "c2_rocket1_lose"
+    },
+    "c2_rocket1_win": {
+      "id": "c2_rocket1_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "speakerId": "rocketgrunt", "speakerName": "Rocket-Rüpel", "side": "right", "text": "„Das — das war nur ein Vorposten! Du hast keine Ahnung, wie groß das hier wird!“" },
+        { "text": "Er rennt. Der junge Trainer stammelt einen Dank und verschwindet in die andere Richtung." }
+      ],
+      "next": "c2_kris_meet"
+    },
+    "c2_rocket1_lose": {
+      "id": "c2_rocket1_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "effects": [{ "op": "setFlag", "key": "rocket_scorn", "value": true }],
+      "lines": [
+        { "text": "Der Rüpel greift sich die Tasche des jungen Trainers und ist weg, bevor Leaf ihr Team zurückrufen kann." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Das nächste Mal renne ich einfach mit euch mit und trete von hinten.“" }
+      ],
+      "next": "c2_kris_meet"
+    },
+    "c2_kris_meet": {
+      "id": "c2_kris_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "text": "Am Fuß des Sendemasts kniet eine junge Frau im Gras und fotografiert Fußspuren. Sie hat ein Notizbuch voller Skizzen und ein Feudally, das neben ihr auf Wache sitzt." },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Du hast den Vorposten unten aufgemischt. Ich hab's gehört. Sauber.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Krista. Ich verfolge diese Anzugträger seit Neuborkia. Und du bist... Moment.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Die Kanto-Championesse. Aus dem Radio. Was machst du in unserem Kaff?“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Ex. Und: spazieren gehen.“" }
+      ],
+      "next": "c2_kris_banter"
+    },
+    "c2_kris_banter": {
+      "id": "c2_kris_banter",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Spazieren. Mit sechs durchtrainierten Pokémon und dem Blick von jemandem, der was gutzumachen hat.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Ich glaub dir kein Wort. Aber ich glaub deinem Team. Zeig's mir — ich will wissen, ob der Titel echt war.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Du bist ganz schön direkt.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Spart Zeit. Bälle raus.“" }
+      ],
+      "next": "c2_kris_fight"
+    },
+    "c2_kris_fight": {
+      "id": "c2_kris_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "introText": "Krista grinst. Es ist ein ehrliches Grinsen — sie freut sich auf den Kampf.",
+      "opponent": {
+        "trainerId": "kris-gen2",
+        "name": "Krista",
+        "team": [
+          { "speciesNum": 156, "speciesId": "quilava", "name": "Igelavar", "types": ["Fire"], "moves": ["flamethrower", "flamewheel", "swift", "quickattack"] },
+          { "speciesNum": 183, "speciesId": "marill", "name": "Marill", "types": ["Water"], "moves": ["aquatail", "bubblebeam", "bodyslam", "rollout"] },
+          { "speciesNum": 180, "speciesId": "flaaffy", "name": "Waaty", "types": ["Electric"], "moves": ["thunderbolt", "thunderwave", "signalbeam", "bodyslam"] },
+          { "speciesNum": 178, "speciesId": "xatu", "name": "Xatu", "types": ["Psychic", "Flying"], "moves": ["psychic", "airslash", "shadowball", "calmmind"] }
+        ]
+      },
+      "onWin": "c2_kris_win",
+      "onLose": "c2_kris_lose"
+    },
+    "c2_kris_win": {
+      "id": "c2_kris_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Okay. Okay! Der Ruf stimmt. Das war... richtig gut.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Ich mag Leute, die besser sind als ich. Man lernt was.“" }
+      ],
+      "next": "c2_after_kris"
+    },
+    "c2_kris_lose": {
+      "id": "c2_kris_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Ha! Nicht schlecht, Ex-Championesse. Aber Johto ist mein Vorgarten.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Nächstes Mal reißt du dich zusammen. Ich will dich in Bestform schlagen, nicht so.“" }
+      ],
+      "next": "c2_after_kris"
+    },
+    "c2_after_kris": {
+      "id": "c2_after_kris",
+      "kind": "choice",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "prompt": "Krista klappt ihr Notizbuch zu. „Die Spuren führen quer durch Johto Richtung Mahagonia. Ich geh da hoch. Zwei sehen mehr als eine — kommst du mit?“",
+      "options": [
+        {
+          "label": "„Zwei sehen mehr als eine. Ich komme mit.“",
+          "next": "c2_split_together",
+          "effects": [{ "op": "setFlag", "key": "kris_ally", "value": true }]
+        },
+        {
+          "label": "„Ich komme allein klar. Wir laufen uns bestimmt wieder über den Weg.“",
+          "next": "c2_split_solo"
+        }
+      ]
+    },
+    "c2_split_together": {
+      "id": "c2_split_together",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Gut. Ich rede viel, warne ich schon mal vor.“" },
+        { "text": "Sie laufen los, Richtung Norden. Krista redet tatsächlich viel. Leaf merkt nach einer Stunde, dass sie zweimal gelächelt hat." }
+      ],
+      "next": "c3_violet"
+    },
+    "c2_split_solo": {
+      "id": "c2_split_solo",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Sturkopf. Passt zum Team.“" },
+        { "text": "Krista nimmt den direkten Weg. Leaf nimmt den langen. Beide zeigen nach Norden." }
+      ],
+      "next": "c3_violet"
+    },
+
+    "c3_violet": {
+      "id": "c3_violet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "text": "Der Weg führt durch Violettas Türme, an Azalea vorbei, wo der Slowpoke-Brunnen mit Brettern vernagelt ist. Überall dasselbe: schwarze Anzüge, abgesperrte Kabel, verängstigte Leute." },
+        { "text": "Team Rocket baut hier etwas auf. Nicht heimlich. Fast selbstbewusst." }
+      ],
+      "next": "c3_exec_meet"
+    },
+    "c3_exec_meet": {
+      "id": "c3_exec_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "text": "An einem Kabelverteiler mitten im Wald steht ein Mann, der kein Rüpel ist. Der Anzug sitzt besser, die Stimme ist leiser." },
+        { "speakerId": "proton", "speakerName": "Proton", "side": "right", "text": "„Du bist die, die unten Ärger gemacht hat. Proton. Ich bin der, der solche Probleme abstellt.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Dann stell mal ab.“" }
+      ],
+      "next": "c3_exec_fight"
+    },
+    "c3_exec_fight": {
+      "id": "c3_exec_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "introText": "Proton lächelt nicht. Das ist schlimmer, als wenn er es täte.",
+      "opponent": {
+        "trainerId": "proton",
+        "name": "Proton",
+        "team": [
+          { "speciesNum": 42, "speciesId": "golbat", "name": "Golbat", "types": ["Poison", "Flying"], "moves": ["airslash", "sludgebomb", "crunch", "confuseray"] },
+          { "speciesNum": 110, "speciesId": "weezing", "name": "Smogmog", "types": ["Poison"], "moves": ["sludgebomb", "explosion", "flamethrower", "thunderbolt"] },
+          { "speciesNum": 228, "speciesId": "houndour", "name": "Hunduster", "types": ["Dark", "Fire"], "moves": ["flamethrower", "darkpulse", "suckerpunch", "nastyplot"] },
+          { "speciesNum": 89, "speciesId": "muk", "name": "Sleimok", "types": ["Poison"], "moves": ["gunkshot", "poisonjab", "shadowsneak", "firepunch"] }
+        ]
+      },
+      "onWin": "c3_exec_win",
+      "onLose": "c3_exec_lose"
+    },
+    "c3_exec_win": {
+      "id": "c3_exec_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "effects": [{ "op": "setFlag", "key": "beat_proton", "value": true }],
+      "lines": [
+        { "speakerId": "proton", "speakerName": "Proton", "side": "right", "text": "„Notiert. Du wirst uns in Mahagonia wiedersehen. Da läuft das Eigentliche.“" },
+        { "text": "Er zieht ein Kabel, das er eben verlegt hat, wieder heraus — als wäre es ihm plötzlich egal — und geht." }
+      ],
+      "next": "c3_green_meet"
+    },
+    "c3_exec_lose": {
+      "id": "c3_exec_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "speakerId": "proton", "speakerName": "Proton", "side": "right", "text": "„Problem abgestellt.“" },
+        { "text": "Er lässt sie am Kabelverteiler sitzen und verschwindet Richtung Norden. Leaf heilt ihr Team und folgt der Spur, langsamer jetzt, aber sie folgt." }
+      ],
+      "next": "c3_green_meet"
+    },
+    "c3_green_meet": {
+      "id": "c3_green_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "text": "Auf der Route nach Mahagonia, ausgerechnet, lehnt Green an einem Wegstein und poliert einen Pokéball." },
+        { "speakerId": "green", "speakerName": "Green", "side": "right", "text": "„Sieh an. Die Weltreisende. Tante hat gesagt, du wärst nach Johto. Ich hab gesagt: hält sie keine Woche durch.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Und trotzdem bist du hier. Um deine Prognose persönlich scheitern zu sehen?“" },
+        { "speakerId": "green", "speakerName": "Green", "side": "right", "text": "„Ich bin hier, weil Johto größer ist als du und ich zusammen. Und weil ich seit der Kindheit warte, dich mal in einem echten Kampf zu erwischen. Nicht Onkels Garten. Richtig.“" }
+      ],
+      "next": "c3_green_fight"
+    },
+    "c3_green_fight": {
+      "id": "c3_green_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "introText": "Zwischen Leaf und Green liegen zwanzig Jahre schlechter Laune.",
+      "opponent": {
+        "trainerId": "green",
+        "name": "Green",
+        "team": [
+          { "speciesNum": 68, "speciesId": "machamp", "name": "Machomei", "types": ["Fighting"], "moves": ["dynamicpunch", "stoneedge", "bulletpunch", "earthquake"] },
+          { "speciesNum": 59, "speciesId": "arcanine", "name": "Arkani", "types": ["Fire"], "moves": ["flareblitz", "extremespeed", "crunch", "wildcharge"] },
+          { "speciesNum": 65, "speciesId": "alakazam", "name": "Simsala", "types": ["Psychic"], "moves": ["psychic", "shadowball", "focusblast", "calmmind"] },
+          { "speciesNum": 130, "speciesId": "gyarados", "name": "Garados", "types": ["Water", "Flying"], "moves": ["waterfall", "crunch", "earthquake", "dragondance"] },
+          { "speciesNum": 103, "speciesId": "exeggutor", "name": "Kokowei", "types": ["Grass", "Psychic"], "moves": ["energyball", "psychic", "sludgebomb", "gigadrain"] },
+          { "speciesNum": 112, "speciesId": "rhydon", "name": "Rizeros", "types": ["Ground", "Rock"], "moves": ["earthquake", "stoneedge", "megahorn", "rockslide"] }
+        ]
+      },
+      "onWin": "c3_green_win",
+      "onLose": "c3_green_lose"
+    },
+    "c3_green_win": {
+      "id": "c3_green_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "text": "Green fängt seinen letzten Ball auf, ohne hinzusehen. Zum ersten Mal, seit Leaf ihn kennt, sagt er eine ganze Weile gar nichts." },
+        { "speakerId": "green", "speakerName": "Green", "side": "right", "text": "„...Eine Woche war die falsche Zahl. Vergiss, dass ich das gesagt hab.“" },
+        { "speakerId": "green", "speakerName": "Green", "side": "right", "text": "„Nicht schlecht, Cousine. Wirklich nicht schlecht.“" }
+      ],
+      "next": "c3_kris_return"
+    },
+    "c3_green_lose": {
+      "id": "c3_green_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "speakerId": "green", "speakerName": "Green", "side": "right", "text": "„Zwanzig Jahre gewartet. Hat sich gelohnt.“" },
+        { "speakerId": "green", "speakerName": "Green", "side": "right", "text": "„Geh heim, Leaf. Oder bleib. Aber hör auf, so zu tun, als wärst du wer.“" },
+        { "text": "Er geht pfeifend davon. Leaf steht im Gras und ist so wütend, dass ihr fast schwindelig wird — und ein winziger Teil von ihr ist froh darüber, überhaupt noch so viel fühlen zu können." }
+      ],
+      "next": "c3_kris_return"
+    },
+    "c3_kris_return": {
+      "id": "c3_kris_return",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #2b2d42 0%, #4a3b52 100%)",
+      "lines": [
+        { "text": "Am Abend, kurz vor Mahagonia, sitzt jemand an einem kleinen Feuer neben dem Weg und winkt. Krista." },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Ich hab dich Green hinterherziehen sehen. Familienbesuch?“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„So in der Art. Wir mögen uns ungefähr so sehr wie Feuer und Benzin.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Setz dich. Ich hab Tee. Und ich hab Zeit.“" }
+      ],
+      "next": "c3_kris_open"
+    },
+    "c3_kris_open": {
+      "id": "c3_kris_open",
+      "kind": "choice",
+      "background": "linear-gradient(180deg, #2b2d42 0%, #4a3b52 100%)",
+      "prompt": "Krista schaut sie über das Feuer an, ohne zu drängen. „Du läufst so, wie Leute laufen, die vor etwas weg wollen. Ich frag nicht weiter, wenn du nein sagst.“",
+      "options": [
+        {
+          "label": "Ihr von Red erzählen. Vom Titel. Von der Leere danach.",
+          "next": "c3_kris_night_close",
+          "effects": [{ "op": "setFlag", "key": "bond_kris", "value": true }]
+        },
+        {
+          "label": "Abwehren. Lieber über Team Rocket und den Plan reden.",
+          "next": "c3_kris_night_distant"
+        }
+      ]
+    },
+    "c3_kris_night_close": {
+      "id": "c3_kris_night_close",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #2b2d42 0%, #4a3b52 100%)",
+      "lines": [
+        { "text": "Es kommt langsam. Der Champion-Titel, die eine Stunde, Red am oberen Ende der Treppe. Der Abschluss ohne Applaus. Die Vorhänge." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Ich hab alles gewonnen und danach nicht mehr gewusst, wofür ich morgens aufstehe.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Ich kenn das andersrum. Ich hab nie was Großes gewonnen und trotzdem manchmal keinen Grund gefunden. Vielleicht ist der Grund nicht das Gewinnen.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Danke, dass du's gesagt hast. Ehrlich.“" },
+        { "text": "Sie sitzen noch lange am Feuer. Es ist das erste Gespräch seit Monaten, nach dem Leaf sich leichter fühlt statt schwerer." }
+      ],
+      "next": "c4_mahogany"
+    },
+    "c3_kris_night_distant": {
+      "id": "c3_kris_night_distant",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #2b2d42 0%, #4a3b52 100%)",
+      "lines": [
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Erzähl mir lieber, was Team Rocket in Mahagonia will.“" },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Okay. Kein Druck.“" },
+        { "text": "Krista breitet ihre Skizzen aus: der Sendemast in Mahagonia, Kabel Richtung See des Zorns, ein Diagramm von Funkwellen." },
+        { "speakerId": "kris-gen2", "speakerName": "Krista", "side": "right", "text": "„Sie senden irgendwas. Etwas, das Pokémon aggressiv macht. Am See sollen die Garados durchdrehen.“" }
+      ],
+      "next": "c4_mahogany"
+    },
+
+    "c4_mahogany": {
+      "id": "c4_mahogany",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "text": "Mahagonia City liegt unter einem tiefen Brummen. Man hört es nicht mit den Ohren, man spürt es in den Zähnen." },
+        { "text": "Über den Dächern ragt der Sendemast von Team Rocket. Kabel laufen nordwärts, den Hang hinauf, zum See des Zorns." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Das Brummen. Die Pokémon im Beutel sind unruhig. Alle sechs.“" }
+      ],
+      "next": "c4_lance_meet"
+    },
+    "c4_lance_meet": {
+      "id": "c4_lance_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "text": "Sie biegt um eine Ecke und läuft frontal in jemanden hinein. Umhang, ruhige Augen, ein Dragonite dicht hinter ihm." },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Vorsicht. — Oh. Sie sind Trainerin. Gut. Ich kann Hände gebrauchen.“" },
+        { "text": "Siegfried. Der Drachenmeister. Leaf hat ihn im Fernsehen gesehen, in der Kanto-Liga, und einmal gedacht, dass sein Lächeln unfair effektiv ist. Der Gedanke kommt sofort zurück." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Sie sind dem Signal gefolgt.“" },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Seit Ebenholz. Es macht Drachen und Wasserpokémon rasend. Am See wird es schlimm. Kommen Sie mit — wir schalten den Sender zusammen ab.“" }
+      ],
+      "next": "c4_lance_plan"
+    },
+    "c4_lance_plan": {
+      "id": "c4_lance_plan",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Der Sender steht im Keller unter dem Laden dort. Sie deckt jemand — eine der Führungsriege. Ich nehme die Wache oben, Sie die unten. Einverstanden?“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Einverstanden. Auf ein Wort: nennen Sie mich Leaf, dann spare ich mir das ‚Sie'.“" },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Dann Siegfried. Los.“" }
+      ],
+      "next": "c4_exec2_fight"
+    },
+    "c4_exec2_fight": {
+      "id": "c4_exec2_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "introText": "Ariana versperrt die Kellertreppe. Siegfried hält dir den Rücken frei.",
+      "opponent": {
+        "trainerId": "ariana",
+        "name": "Ariana",
+        "team": [
+          { "speciesNum": 24, "speciesId": "arbok", "name": "Arbok", "types": ["Poison"], "moves": ["gunkshot", "crunch", "earthquake", "glare"] },
+          { "speciesNum": 45, "speciesId": "vileplume", "name": "Giflor", "types": ["Grass", "Poison"], "moves": ["gigadrain", "sludgebomb", "energyball", "sleeppowder"] },
+          { "speciesNum": 198, "speciesId": "murkrow", "name": "Kramurx", "types": ["Dark", "Flying"], "moves": ["bravebird", "suckerpunch", "darkpulse", "heatwave"] },
+          { "speciesNum": 229, "speciesId": "houndoom", "name": "Hundemon", "types": ["Dark", "Fire"], "moves": ["fireblast", "darkpulse", "nastyplot", "suckerpunch"] }
+        ]
+      },
+      "onWin": "c4_exec2_win",
+      "onLose": "c4_exec2_lose"
+    },
+    "c4_exec2_win": {
+      "id": "c4_exec2_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "effects": [{ "op": "setFlag", "key": "beat_ariana", "value": true }],
+      "lines": [
+        { "speakerId": "ariana", "speakerName": "Ariana", "side": "right", "text": "„Der Drachenmeister und eine hergelaufene Championesse. Wie passend.“" },
+        { "text": "Sie weicht von der Treppe zurück. Leaf ist schon unten, bevor Ariana ihren Satz beendet hat." }
+      ],
+      "next": "c4_transmitter"
+    },
+    "c4_exec2_lose": {
+      "id": "c4_exec2_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "text": "Leaf wird zurückgedrängt bis an die Wand. Dann steht plötzlich Siegfried neben ihr, sein Dragonite füllt den ganzen Flur." },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Ich hab oben abgekürzt. Geh runter — ich halte sie.“" },
+        { "text": "Leaf presst sich an Ariana vorbei die Treppe hinab, das Herz im Hals." }
+      ],
+      "next": "c4_transmitter"
+    },
+    "c4_transmitter": {
+      "id": "c4_transmitter",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #45404a 0%, #6a5560 100%)",
+      "lines": [
+        { "text": "Der Keller ist voller Technik. In der Mitte summt ein schrankgroßer Sender, Kontrolllampen wie Insektenaugen." },
+        { "text": "Leaf schickt Nidoqueen vor. Ein Erdbeben, gezielt, gegen den Fuß des Geräts. Funken, ein Kreischen — dann Stille." },
+        { "text": "Das Brummen in den Zähnen hört auf. Zum ersten Mal seit Mahagonia ist es einfach nur still." }
+      ],
+      "next": "c4_lakeofrage"
+    },
+    "c4_lakeofrage": {
+      "id": "c4_lakeofrage",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #6c4f80 0%, #c65f4e 100%)",
+      "lines": [
+        { "text": "See des Zorns, kurz vor Sonnenuntergang. Das Wasser, das eben noch gekocht hat, glättet sich in Ringen." },
+        { "text": "In der Mitte hebt sich ein Garados aus den Wellen — rot, riesig, uralt vor Wut. Es sieht Leaf an. Dann sinkt es zurück, und der See wird zu Glas." },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Es ist nicht mehr rasend. Nur noch... traurig, glaube ich. So sieht Wut aus, wenn ihr der Grund abhandenkommt.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Ich weiß, wie das aussieht.“" }
+      ],
+      "next": "c4_lance_offer"
+    },
+    "c4_lance_offer": {
+      "id": "c4_lance_offer",
+      "kind": "choice",
+      "background": "linear-gradient(180deg, #6c4f80 0%, #c65f4e 100%)",
+      "prompt": "Siegfried steckt einen Pokéball weg und schaut aufs Wasser. „Ich reise um die Welt, Leaf. Region für Region, ihre Top Vier. Wer alle schlägt, wird zu den Masters Acht eingeladen — dem Turnier der Besten aller Regionen. Ich suche jemanden, der mithält. Komm mit.“",
+      "options": [
+        {
+          "label": "„Ich komme mit. Ich hab sowieso nichts zu verlieren — außer Stillstand.“",
+          "next": "c4_lance_duel_yes",
+          "effects": [{ "op": "setFlag", "key": "bond_lance", "value": true }]
+        },
+        {
+          "label": "„Frag mich später nochmal. Erst muss ich Johto zu Ende gehen — allein.“",
+          "next": "c4_lance_duel_no"
+        }
+      ]
+    },
+    "c4_lance_duel_yes": {
+      "id": "c4_lance_duel_yes",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #6c4f80 0%, #c65f4e 100%)",
+      "lines": [
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Gut. Aber ich reise nicht mit jemandem, gegen den ich nicht mindestens einmal verloren hätte — oder umgekehrt.“" },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Zeig mir, worauf ich mich einlasse.“" }
+      ],
+      "next": "c4_lance_fight"
+    },
+    "c4_lance_duel_no": {
+      "id": "c4_lance_duel_no",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #6c4f80 0%, #c65f4e 100%)",
+      "lines": [
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Fair. Dann gib mir wenigstens einen Kampf zum Erinnern. Damit ich weiß, wonach ich später frage.“" },
+        { "text": "Er tritt zurück und ruft sein Dragonite. Das Abendlicht steht rot auf dem See." }
+      ],
+      "next": "c4_lance_fight"
+    },
+    "c4_lance_fight": {
+      "id": "c4_lance_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #6c4f80 0%, #c65f4e 100%)",
+      "introText": "Siegfried am See des Zorns. Drei Dragonite, und dieses unfair effektive Lächeln.",
+      "opponent": {
+        "trainerId": "lance-gen2",
+        "name": "Siegfried",
+        "team": [
+          { "speciesNum": 130, "speciesId": "gyarados", "name": "Garados", "types": ["Water", "Flying"], "moves": ["waterfall", "crunch", "icefang", "dragondance"] },
+          { "speciesNum": 149, "speciesId": "dragonite", "name": "Dragoran", "types": ["Dragon", "Flying"], "moves": ["outrage", "firepunch", "earthquake", "extremespeed"] },
+          { "speciesNum": 149, "speciesId": "dragonite", "name": "Dragoran", "types": ["Dragon", "Flying"], "moves": ["dragonclaw", "thunderpunch", "aquatail", "dragondance"] },
+          { "speciesNum": 149, "speciesId": "dragonite", "name": "Dragoran", "types": ["Dragon", "Flying"], "moves": ["hurricane", "firepunch", "outrage", "roost"] },
+          { "speciesNum": 142, "speciesId": "aerodactyl", "name": "Aerodactyl", "types": ["Rock", "Flying"], "moves": ["stoneedge", "aerialace", "earthquake", "crunch"] },
+          { "speciesNum": 6, "speciesId": "charizard", "name": "Glurak", "types": ["Fire", "Flying"], "moves": ["fireblast", "airslash", "dragonpulse", "focusblast"] }
+        ]
+      },
+      "onWin": "c4_lance_win",
+      "onLose": "c4_lance_lose"
+    },
+    "c4_lance_win": {
+      "id": "c4_lance_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #6c4f80 0%, #c65f4e 100%)",
+      "lines": [
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Ha. Ich hab am See des Zorns gegen die Kanto-Championesse verloren. Das erzähle ich niemandem — und allen.“" },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Du hältst mit. Mehr als das.“" }
+      ],
+      "next": "c4_parting"
+    },
+    "c4_lance_lose": {
+      "id": "c4_lance_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #6c4f80 0%, #c65f4e 100%)",
+      "lines": [
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Stark. Roh an den Rändern, aber stark. Das lässt sich schleifen.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„‚Schleifen'. Charmant.“" },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Ich meinte es als Kompliment. Bei mir klingt das so.“" }
+      ],
+      "next": "c4_parting"
+    },
+    "c4_parting": {
+      "id": "c4_parting",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #6c4f80 0%, #c65f4e 100%)",
+      "lines": [
+        { "text": "Sie trennen sich am Nordufer. Siegfried bleibt beim See, bis die Ranger da sind; Leaf nimmt den Weg Richtung Johto-Liga." },
+        { "speakerId": "lance-gen2", "speakerName": "Siegfried", "side": "right", "text": "„Wir sehen uns, Leaf. Auf die eine oder andere Art.“" },
+        { "text": "Sie geht, und der See liegt hinter ihr wie ein Spiegel, in dem nichts Schlimmes mehr steht." }
+      ],
+      "next": "c5_silver2_meet"
+    },
+
+    "c5_silver2_meet": {
+      "id": "c5_silver2_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "text": "Auf der Route zur Drachenhöhle steht Silver mitten im Weg. Er wirkt schmaler geworden, härter, wie ein Messer, das man zu oft geschärft hat." },
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„Ich hab von Mahagonia gehört. Du und der Drachenmeister. Nett für dich.“" },
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„Ich brauch niemanden. Ich brauch nur stärker zu werden, bis mir keiner mehr etwas nehmen kann. Kämpf.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Du redest wie jemand, den ich kenne. Und dem es damit nicht gut ging.“" }
+      ],
+      "next": "c5_silver2_fight"
+    },
+    "c5_silver2_fight": {
+      "id": "c5_silver2_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "introText": "Silver, zum zweiten Mal. Diesmal hat er nichts Herablassendes mehr — nur Härte.",
+      "opponent": {
+        "trainerId": "silver-gen2",
+        "name": "Silver",
+        "team": [
+          { "speciesNum": 169, "speciesId": "crobat", "name": "Iksbat", "types": ["Poison", "Flying"], "moves": ["bravebird", "poisonjab", "airslash", "uturn"] },
+          { "speciesNum": 94, "speciesId": "gengar", "name": "Gengar", "types": ["Ghost", "Poison"], "moves": ["shadowball", "sludgebomb", "focusblast", "hypnosis"] },
+          { "speciesNum": 64, "speciesId": "kadabra", "name": "Kadabra", "types": ["Psychic"], "moves": ["psychic", "shadowball", "energyball", "calmmind"] },
+          { "speciesNum": 82, "speciesId": "magneton", "name": "Magneton", "types": ["Electric", "Steel"], "moves": ["thunderbolt", "flashcannon", "signalbeam", "thunderwave"] },
+          { "speciesNum": 215, "speciesId": "sneasel", "name": "Sniebel", "types": ["Dark", "Ice"], "moves": ["nightslash", "icepunch", "iceshard", "lowkick"] },
+          { "speciesNum": 160, "speciesId": "feraligatr", "name": "Impergator", "types": ["Water"], "moves": ["waterfall", "crunch", "icepunch", "dragondance"] }
+        ]
+      },
+      "onWin": "c5_silver2_win",
+      "onLose": "c5_silver2_lose"
+    },
+    "c5_silver2_win": {
+      "id": "c5_silver2_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "lines": [
+        { "text": "Silver bleibt stehen, den letzten Ball in der Faust, und schaut zu Boden." },
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„...Wie machst du das. Du kämpfst nicht, als hättest du Angst zu verlieren.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Weil ich schon verloren hab. Alles Wichtige. Man überlebt es. Das nimmt der Angst die Zähne.“" },
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„...Danke.“ Er sagt es so leise, dass man es fast überhört. Dann ist er weg." }
+      ],
+      "next": "c5_red_meet"
+    },
+    "c5_silver2_lose": {
+      "id": "c5_silver2_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #cfe8ff 0%, #eef6ec 100%)",
+      "effects": [{ "op": "setFlag", "key": "silver_lead", "value": true }],
+      "lines": [
+        { "speakerId": "silver-gen2", "speakerName": "Silver", "side": "right", "text": "„Stärker werden. So einfach ist das. Solltest du auch mal probieren.“" },
+        { "text": "Er geht Richtung Drachenhöhle. Leaf sieht ihm nach und denkt: genauso hat Red geklungen, kurz bevor er ging." }
+      ],
+      "next": "c5_red_meet"
+    },
+    "c5_red_meet": {
+      "id": "c5_red_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "lines": [
+        { "text": "Vor dem Eingang zur Route auf den Silberberg, im ersten Schnee, steht jemand mit dem Rücken zu ihr. Rote Kappe. Kein Wort." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„...Red.“" },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Leaf.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Zwei Jahre. Kein Anruf, keine Karte. Und jetzt stehst du einfach im Schnee, als wär das normal.“" },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Ich wusste nicht, was ich hätte schreiben sollen.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„‚Ich lebe noch.' Wäre ein Anfang gewesen.“" }
+      ],
+      "next": "c5_red_argue2"
+    },
+    "c5_red_argue2": {
+      "id": "c5_red_argue2",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "lines": [
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Du wolltest den Abschluss. Ich wollte weiter. Wir haben beide gekriegt, was wir wollten.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Ich hab gekriegt, was ich wollte, und danach ein halbes Jahr die Vorhänge nicht aufgemacht. Du?“" },
+        { "text": "Red schweigt lange. Der Schnee fällt dichter." },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„...Ich bin ganz nach oben gegangen. Da ist niemand. Nur der Berg.“" },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Wenn du reden willst, dann so, wie wir am besten reden. Da oben. Zeig's mir.“" }
+      ],
+      "next": "c5_mtsilver_climb"
+    },
+    "c5_mtsilver_climb": {
+      "id": "c5_mtsilver_climb",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "lines": [
+        { "text": "Der Aufstieg ist still. Nur Schritte im Schnee, das Schnaufen, die Kälte, die sich durch die Jacke frisst." },
+        { "text": "Leaf denkt an alles, was sie sagen wollte, und merkt, dass sie das meiste davon in Kämpfen besser sagt als in Worten. Vielleicht hatte Red damit immer recht." },
+        { "text": "Oben ist eine flache Kuppe über den Wolken. Kanto auf der einen Seite, Johto auf der anderen. Red stellt sich in die Mitte und wartet." }
+      ],
+      "next": "c5_red_fight"
+    },
+    "c5_red_fight": {
+      "id": "c5_red_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "introText": "Silberberg, über den Wolken. Alles, was gesagt werden muss, wird jetzt gesagt.",
+      "opponent": {
+        "trainerId": "red-gen2",
+        "name": "Red",
+        "team": [
+          { "speciesNum": 25, "speciesId": "pikachu", "name": "Pikachu", "types": ["Electric"], "moves": ["thunderbolt", "voltswitch", "irontail", "grassknot"] },
+          { "speciesNum": 196, "speciesId": "espeon", "name": "Psiana", "types": ["Psychic"], "moves": ["psychic", "shadowball", "morningsun", "calmmind"] },
+          { "speciesNum": 143, "speciesId": "snorlax", "name": "Relaxo", "types": ["Normal"], "moves": ["bodyslam", "crunch", "earthquake", "firepunch"] },
+          { "speciesNum": 3, "speciesId": "venusaur", "name": "Bisaflor", "types": ["Grass", "Poison"], "moves": ["energyball", "sludgebomb", "sleeppowder", "earthquake"] },
+          { "speciesNum": 6, "speciesId": "charizard", "name": "Glurak", "types": ["Fire", "Flying"], "moves": ["flamethrower", "airslash", "dragonpulse", "focusblast"] },
+          { "speciesNum": 9, "speciesId": "blastoise", "name": "Turtok", "types": ["Water"], "moves": ["hydropump", "icebeam", "flashcannon", "aurorabeam"] }
+        ]
+      },
+      "onWin": "c5_red_win",
+      "onLose": "c5_red_lose"
+    },
+    "c5_red_win": {
+      "id": "c5_red_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "lines": [
+        { "text": "Reds Glurak sinkt in den Schnee. Er ruft es zurück und bleibt einen Moment einfach stehen, den Kopf gesenkt." },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Du bist besser geworden. Viel besser.“" },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Ich hätte schreiben sollen. Ich hätte vieles anders machen sollen. Ich war nicht gut darin, zu bleiben.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Das war das erste Ehrliche seit zwei Jahren.“" }
+      ],
+      "next": "c5_red_choice_win"
+    },
+    "c5_red_choice_win": {
+      "id": "c5_red_choice_win",
+      "kind": "choice",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "prompt": "Red schaut sie an, ohne Kappe jetzt, die Haare voller Schnee. „Ich weiß nicht, ob wir das nochmal hinkriegen. Aber ich würde es versuchen. Wenn du willst.“",
+      "options": [
+        {
+          "label": "„Ich will es versuchen. Aber diesmal reden wir. Auch wenn's schwerfällt.“",
+          "next": "c5_descent_reconciled",
+          "effects": [{ "op": "setFlag", "key": "bond_red", "value": true }]
+        },
+        {
+          "label": "„Nein. Aber ich bin froh, dass wir es sauber beendet haben. Pass auf dich auf, Red.“",
+          "next": "c5_descent_apart"
+        }
+      ]
+    },
+    "c5_red_lose": {
+      "id": "c5_red_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "lines": [
+        { "text": "Ihr letztes Pokémon geht zu Boden. Red gewinnt — wieder. Aber diesmal dreht er sich nicht weg. Er kommt zu ihr herüber, durch den Schnee." },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Ich geh nicht wieder einfach. Nicht diesmal.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Warum bist du überhaupt hier hoch, Red? Ehrlich.“" },
+        { "speakerId": "red-gen2", "speakerName": "Red", "side": "right", "text": "„Weil ich im Radio gehört hab, dass du in Johto bist. Und dann konnte ich an nichts anderes mehr denken.“" }
+      ],
+      "next": "c5_red_choice_lose"
+    },
+    "c5_red_choice_lose": {
+      "id": "c5_red_choice_lose",
+      "kind": "choice",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "prompt": "Der Schnee legt sich auf seine Schultern. „Ich würde runtergehen. Mit dir. Nach Kanto, oder wohin du willst. Wenn du mich lässt.“",
+      "options": [
+        {
+          "label": "„Dann geh mit mir runter. Wir fangen nochmal an — richtig diesmal.“",
+          "next": "c5_descent_reconciled",
+          "effects": [{ "op": "setFlag", "key": "bond_red", "value": true }]
+        },
+        {
+          "label": "„Nicht so. Ich muss diesen Weg zu Ende gehen, auf eigenen Beinen. Leb wohl, Red.“",
+          "next": "c5_descent_apart"
+        }
+      ]
+    },
+    "c5_descent_reconciled": {
+      "id": "c5_descent_reconciled",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "lines": [
+        { "text": "Sie steigen zusammen ab, langsam, ohne viel zu reden — aber es ist ein anderes Schweigen als vorher. Eins mit einer Tür darin." },
+        { "text": "An der Weggabelung unten drückt Red ihr die Hand. „Ich warte auf dich. Egal wie die Johto-Liga ausgeht.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Erst die Top Vier. Dann sehen wir weiter — zusammen.“" }
+      ],
+      "next": "c6_league_gate"
+    },
+    "c5_descent_apart": {
+      "id": "c5_descent_apart",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #dfe6ee 0%, #f4f7fb 100%)",
+      "lines": [
+        { "text": "Sie steigen getrennt ab, jeder auf seiner Seite des Grats. An der Gabelung nickt Red ihr zu, setzt die Kappe auf und geht Richtung Kanto." },
+        { "text": "Leaf sieht ihm nach, und zum ersten Mal tut es nicht weh. Es ist einfach fertig. Fertig ist auch eine Art von Freiheit." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Weiter. Die Top Vier warten.“" }
+      ],
+      "next": "c6_league_gate"
+    },
+
+    "c6_league_gate": {
+      "id": "c6_league_gate",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "lines": [
+        { "text": "Indigo-Plateau, die Johto-Seite. Dieselbe Halle, in der sie vor Monaten eine Stunde lang Champion war. Andere Tür, andere Region, dieselbe Leaf — und doch nicht ganz." },
+        { "text": "Vier Türen. Dahinter die Top Vier von Johto. Leaf heilt ihr Team, atmet einmal tief durch und öffnet die erste." }
+      ],
+      "next": "c6_will_fight"
+    },
+    "c6_will_fight": {
+      "id": "c6_will_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "introText": "Will, der Erste der Top Vier. Psycho-Pokémon und eine ruhige, unbewegte Stimme.",
+      "opponent": {
+        "trainerId": "will-gen2",
+        "name": "Will",
+        "team": [
+          { "speciesNum": 178, "speciesId": "xatu", "name": "Xatu", "types": ["Psychic", "Flying"], "moves": ["psychic", "airslash", "shadowball", "calmmind"] },
+          { "speciesNum": 124, "speciesId": "jynx", "name": "Rossana", "types": ["Ice", "Psychic"], "moves": ["icebeam", "psychic", "lovelykiss", "nastyplot"] },
+          { "speciesNum": 80, "speciesId": "slowbro", "name": "Lahmus", "types": ["Water", "Psychic"], "moves": ["scald", "psychic", "icebeam", "calmmind"] },
+          { "speciesNum": 103, "speciesId": "exeggutor", "name": "Kokowei", "types": ["Grass", "Psychic"], "moves": ["energyball", "psychic", "sludgebomb", "gigadrain"] },
+          { "speciesNum": 203, "speciesId": "girafarig", "name": "Girafarig", "types": ["Normal", "Psychic"], "moves": ["psychic", "crunch", "thunderbolt", "zenheadbutt"] }
+        ]
+      },
+      "onWin": "c6_will_win",
+      "onLose": "c6_will_lose"
+    },
+    "c6_will_win": {
+      "id": "c6_will_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "lines": [
+        { "speakerId": "will-gen2", "speakerName": "Will", "side": "right", "text": "„Makellos vorbereitet zu sein reicht nicht gegen jemanden, der schon alles verloren hat und weiterkämpft. Geh weiter.“" }
+      ],
+      "next": "c6_koga_fight"
+    },
+    "c6_will_lose": {
+      "id": "c6_will_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "effects": [{ "op": "setFlag", "key": "stumbled", "value": true }],
+      "lines": [
+        { "speakerId": "will-gen2", "speakerName": "Will", "side": "right", "text": "„Noch nicht. Aber du warst nah dran. Komm wieder, wenn du bereit bist.“" },
+        { "text": "Leaf tritt zurück auf den Gang, heilt ihr Team und geht zur nächsten Tür. Näher dran ist nicht durch. Aber es ist auch nicht nichts." }
+      ],
+      "next": "c6_koga_fight"
+    },
+    "c6_koga_fight": {
+      "id": "c6_koga_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "introText": "Koga, der Zweite. Gift, Nebel und der Geruch von Räucherwerk.",
+      "opponent": {
+        "trainerId": "koga-gen2",
+        "name": "Koga",
+        "team": [
+          { "speciesNum": 168, "speciesId": "ariados", "name": "Ariados", "types": ["Bug", "Poison"], "moves": ["poisonjab", "xscissor", "suckerpunch", "nightslash"] },
+          { "speciesNum": 205, "speciesId": "forretress", "name": "Forstellka", "types": ["Bug", "Steel"], "moves": ["gyroball", "earthquake", "explosion", "bugbite"] },
+          { "speciesNum": 89, "speciesId": "muk", "name": "Sleimok", "types": ["Poison"], "moves": ["gunkshot", "poisonjab", "shadowsneak", "firepunch"] },
+          { "speciesNum": 49, "speciesId": "venomoth", "name": "Omot", "types": ["Bug", "Poison"], "moves": ["bugbuzz", "sludgebomb", "quiverdance", "sleeppowder"] },
+          { "speciesNum": 169, "speciesId": "crobat", "name": "Iksbat", "types": ["Poison", "Flying"], "moves": ["bravebird", "poisonjab", "airslash", "uturn"] }
+        ]
+      },
+      "onWin": "c6_koga_win",
+      "onLose": "c6_koga_lose"
+    },
+    "c6_koga_win": {
+      "id": "c6_koga_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "lines": [
+        { "speakerId": "koga-gen2", "speakerName": "Koga", "side": "right", "text": "„Durch meinen Nebel gegangen, ohne die Richtung zu verlieren. Weiter mit dir.“" }
+      ],
+      "next": "c6_bruno_fight"
+    },
+    "c6_koga_lose": {
+      "id": "c6_koga_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "effects": [{ "op": "setFlag", "key": "stumbled", "value": true }],
+      "lines": [
+        { "speakerId": "koga-gen2", "speakerName": "Koga", "side": "right", "text": "„Der Nebel hat dich diesmal geschluckt. Beim nächsten Mal nicht.“" },
+        { "text": "Leaf hustet den Giftdunst aus der Lunge, heilt ihr Team und geht weiter. Eine Tür nach der anderen." }
+      ],
+      "next": "c6_bruno_fight"
+    },
+    "c6_bruno_fight": {
+      "id": "c6_bruno_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "introText": "Bruno, der Dritte. Keine Worte, nur Fäuste und Fels.",
+      "opponent": {
+        "trainerId": "bruno-gen2",
+        "name": "Bruno",
+        "team": [
+          { "speciesNum": 237, "speciesId": "hitmontop", "name": "Kapoera", "types": ["Fighting"], "moves": ["closecombat", "machpunch", "stoneedge", "suckerpunch"] },
+          { "speciesNum": 106, "speciesId": "hitmonlee", "name": "Kicklee", "types": ["Fighting"], "moves": ["highjumpkick", "closecombat", "stoneedge", "blazekick"] },
+          { "speciesNum": 107, "speciesId": "hitmonchan", "name": "Nockchan", "types": ["Fighting"], "moves": ["machpunch", "firepunch", "icepunch", "thunderpunch"] },
+          { "speciesNum": 95, "speciesId": "onix", "name": "Onix", "types": ["Rock", "Ground"], "moves": ["earthquake", "stoneedge", "rockslide", "ironhead"] },
+          { "speciesNum": 68, "speciesId": "machamp", "name": "Machomei", "types": ["Fighting"], "moves": ["dynamicpunch", "stoneedge", "bulletpunch", "earthquake"] }
+        ]
+      },
+      "onWin": "c6_bruno_win",
+      "onLose": "c6_bruno_lose"
+    },
+    "c6_bruno_win": {
+      "id": "c6_bruno_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "lines": [
+        { "speakerId": "bruno-gen2", "speakerName": "Bruno", "side": "right", "text": "„Stark. Im Körper und dahinter. Eine bleibt noch. Geh.“" }
+      ],
+      "next": "c6_karen_meet"
+    },
+    "c6_bruno_lose": {
+      "id": "c6_bruno_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #3a2f5a 0%, #6a4b8a 100%)",
+      "effects": [{ "op": "setFlag", "key": "stumbled", "value": true }],
+      "lines": [
+        { "speakerId": "bruno-gen2", "speakerName": "Bruno", "side": "right", "text": "„Der Fels hat gehalten. Steh auf. Die Letzte wartet trotzdem auf dich.“" },
+        { "text": "Leaf rappelt sich hoch, jeder Muskel Blei, und geht zur letzten Tür." }
+      ],
+      "next": "c6_karen_meet"
+    },
+    "c6_karen_meet": {
+      "id": "c6_karen_meet",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #2b2d42 0%, #4a3b52 100%)",
+      "lines": [
+        { "text": "Der letzte Raum ist dunkel gehalten, nur ein paar Lichtinseln. Karen sitzt auf der Kante eines Podests und lässt die Beine baumeln, ihr Nachtara zu ihren Füßen." },
+        { "speakerId": "karen-gen2", "speakerName": "Karen", "side": "right", "text": "„Da bist du also. Die Frau mit dem Nachtara, das aus schlaflosen Nächten wurde. Man erzählt sich das.“" },
+        { "speakerId": "karen-gen2", "speakerName": "Karen", "side": "right", "text": "„Starke Pokémon, schwache Pokémon — das ist nur Geschmack der Menschen. Wer mit seinen Lieblingen gewinnt, hat wirklich gewonnen. Zeig mir deine.“" },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Die stehen seit Alabastia bei mir. Alle sechs.“" }
+      ],
+      "next": "c6_karen_fight"
+    },
+    "c6_karen_fight": {
+      "id": "c6_karen_fight",
+      "kind": "battle",
+      "background": "linear-gradient(180deg, #2b2d42 0%, #4a3b52 100%)",
+      "introText": "Karen, das letzte Tor der Johto-Liga. Ihr Nachtara sieht deinem in die Augen.",
+      "opponent": {
+        "trainerId": "karen-gen2",
+        "name": "Karen",
+        "team": [
+          { "speciesNum": 197, "speciesId": "umbreon", "name": "Nachtara", "types": ["Dark"], "moves": ["foulplay", "darkpulse", "toxic", "moonlight"] },
+          { "speciesNum": 45, "speciesId": "vileplume", "name": "Giflor", "types": ["Grass", "Poison"], "moves": ["gigadrain", "sludgebomb", "energyball", "sleeppowder"] },
+          { "speciesNum": 94, "speciesId": "gengar", "name": "Gengar", "types": ["Ghost", "Poison"], "moves": ["shadowball", "sludgebomb", "focusblast", "thunderbolt"] },
+          { "speciesNum": 198, "speciesId": "murkrow", "name": "Kramurx", "types": ["Dark", "Flying"], "moves": ["bravebird", "suckerpunch", "darkpulse", "heatwave"] },
+          { "speciesNum": 229, "speciesId": "houndoom", "name": "Hundemon", "types": ["Dark", "Fire"], "moves": ["fireblast", "darkpulse", "nastyplot", "suckerpunch"] }
+        ]
+      },
+      "onWin": "c6_karen_win",
+      "onLose": "c6_karen_lose"
+    },
+    "c6_karen_win": {
+      "id": "c6_karen_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #f7e0a3 0%, #fbe6cd 100%)",
+      "lines": [
+        { "text": "Karens Houndoom sinkt zu Boden. Für einen Moment ist es ganz still in dem dunklen Raum." },
+        { "speakerId": "karen-gen2", "speakerName": "Karen", "side": "right", "text": "„Du hast mit deinen Lieblingen gewonnen. Gegen meine. Das ist der einzige Sieg, der zählt.“" },
+        { "text": "Ein Ligabeamter kommt herein, mit einer Urkunde und diesem eingeübten Lächeln. Leaf ist Siegerin der Johto-Liga." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Diesmal ist da kein leeres Gefühl. Nur... Weite.“" }
+      ],
+      "next": "fin_reflect_win"
+    },
+    "c6_karen_lose": {
+      "id": "c6_karen_lose",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #2b2d42 0%, #4a3b52 100%)",
+      "effects": [{ "op": "setFlag", "key": "stumbled", "value": true }],
+      "lines": [
+        { "speakerId": "karen-gen2", "speakerName": "Karen", "side": "right", "text": "„Nicht heute. Aber du hast mit denen gekämpft, die du liebst, bis zum letzten Ball. Das ist mehr wert als eine Urkunde.“" },
+        { "text": "Leaf tritt hinaus in den hellen Gang. Keine Urkunde, kein Titel. Und trotzdem geht sie aufrechter als bei ihrem ersten Championsieg." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Der Weg war der Punkt. Nicht die Tür am Ende.“" }
+      ],
+      "next": "fin_reflect_stumble"
+    },
+
+    "fin_reflect_win": {
+      "id": "fin_reflect_win",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #f7e0a3 0%, #fbe6cd 100%)",
+      "lines": [
+        { "text": "Abends steht Leaf auf der Terrasse des Ligagebäudes. Unter ihr Johto, hinter ihr der Grat, der nach Kanto führt." },
+        { "text": "Sie denkt an Silver, der lernen musste, dass Stärke kein Ziel ist. An Green, der zwanzig Jahre auf einen Kampf gewartet hat. An das rote Garados, dessen Wut ins Leere lief, als der Grund verschwand." },
+        { "text": "An Krista am Feuer. An Siegfried am See. An Red im Schnee." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Ich bin nicht mehr die, die die Vorhänge zugezogen hat. Bleibt die Frage, wer ich stattdessen bin.“" }
+      ],
+      "next": "fin_choice"
+    },
+    "fin_reflect_stumble": {
+      "id": "fin_reflect_stumble",
+      "kind": "dialogue",
+      "background": "linear-gradient(180deg, #f7e0a3 0%, #fbe6cd 100%)",
+      "lines": [
+        { "text": "Abends steht Leaf am Rand des Ligageländes. Kein Titel diesmal. Sie hat nicht alle vier Türen bezwungen — und stellt fest, dass sie darüber erstaunlich ruhig ist." },
+        { "text": "Sie denkt an Silver, an Green, an das rote Garados. An Krista am Feuer, an Siegfried am See, an Red im Schnee. Die Reise hat sie zurückgeholt, ganz ohne Urkunde." },
+        { "speakerId": "leaf-gen3", "speakerName": "Leaf", "side": "left", "text": "„Ich bin nicht mehr die, die die Vorhänge zugezogen hat. Der Rest ist offen.“" }
+      ],
+      "next": "fin_choice"
+    },
+    "fin_choice": {
+      "id": "fin_choice",
+      "kind": "choice",
+      "background": "linear-gradient(180deg, #f7e0a3 0%, #fbe6cd 100%)",
+      "prompt": "Wie geht Leafs Geschichte weiter?",
+      "options": [
+        {
+          "label": "Allein an Bord des Schiffs nach Hoenn.",
+          "next": "end_hoenn"
+        },
+        {
+          "label": "In Johto bleiben — unabhängig, mit sich im Reinen.",
+          "next": "end_solo"
+        },
+        {
+          "label": "Zurück nach Kanto — mit Red.",
+          "next": "end_red",
+          "requires": { "key": "bond_red", "equals": true }
+        },
+        {
+          "label": "In Johto bleiben — an Kristas Seite.",
+          "next": "end_kris_love",
+          "requires": { "key": "bond_kris", "equals": true }
+        },
+        {
+          "label": "In Johto bleiben — Krista als beste Freundin.",
+          "next": "end_kris_friend",
+          "requires": { "key": "bond_kris", "equals": true }
+        },
+        {
+          "label": "Mit Siegfried um die Welt — bis zu den Masters Acht.",
+          "next": "end_lance",
+          "requires": { "key": "bond_lance", "equals": true }
+        }
+      ]
+    },
+
+    "end_hoenn": {
+      "id": "end_hoenn",
+      "kind": "end",
+      "endingId": "hoenn",
+      "background": "linear-gradient(180deg, #8fb3c8 0%, #d5e4ec 100%)",
+      "text": "Im Hafen von Fuchsania legt am Morgen ein Frachter nach Hoenn ab. Leaf steht an der Reling, das Team im Beutel, niemanden an der Kaje, der winkt. Sie hat Krista nicht angerufen, Siegfried keine Antwort geschickt, Reds Nummer nie gewählt. Vielleicht war das falsch. Vielleicht braucht sie einfach noch mehr Meer zwischen sich und allem. Der Titel wärmt nicht, die Reise hat nur den Frost aufgetaut, nicht das Loch gefüllt. Als die Küste im Dunst verschwindet, sagt sie sich leise, dass Weitergehen auch dann zählt, wenn man nicht weiß, wohin. Hoenn wird schon irgendwo am Horizont auftauchen. Fortsetzung offen."
+    },
+    "end_solo": {
+      "id": "end_solo",
+      "kind": "end",
+      "endingId": "solo",
+      "background": "linear-gradient(180deg, #f7e0a3 0%, #fbe6cd 100%)",
+      "text": "Leaf bleibt in Johto. Sie mietet sich ein Zimmer über einem Café in Dukatia City, mit einem Fenster, das sie jeden Morgen aufmacht. Sie trainiert, sie reist die Regionen ab, sie schlägt Herausforderer und verliert auch mal — und beides ist okay. Krista kommt auf einen Kaffee vorbei, wenn sie in der Nähe ist; Siegfried schickt Postkarten von fremden Ligen; von Red hört sie ab und zu über Dritte. Nichts davon füllt sie aus, und sie merkt irgendwann: Das muss es auch nicht. Sie füllt sich selbst aus. Zum ersten Mal seit dem Champion-Titel steht sie morgens auf, weil sie es will, nicht weil sie muss."
+    },
+    "end_red": {
+      "id": "end_red",
+      "kind": "end",
+      "endingId": "red",
+      "background": "linear-gradient(180deg, #e5a3a0 0%, #f6ded9 100%)",
+      "text": "Sie gehen zusammen zurück nach Kanto. Nicht in Leafs altes Zimmer — sie nehmen ein Haus am Rand von Alabastia, mit Blick auf dieselbe Wiese, auf der sie ihr Team ein letztes Mal gerufen hat, bevor sie ging. Es ist nicht wie früher; es ist besser und schwerer zugleich. Red lernt zu bleiben, in kleinen Schritten, und zu reden, in noch kleineren. Leaf lernt, ihm zu glauben, wenn er sagt, dass er da ist. Manchmal steigen sie zusammen auf den Silberberg, nur die zwei und der Schnee, und tragen dort oben aus, was sich unten nicht sagen lässt. An guten Tagen braucht es nicht mal das."
+    },
+    "end_kris_love": {
+      "id": "end_kris_love",
+      "kind": "end",
+      "endingId": "kris_love",
+      "background": "linear-gradient(180deg, #b7d4a8 0%, #eaf4e2 100%)",
+      "text": "Es fängt am Feuer an und hört dort nie ganz auf. Leaf bleibt in Johto, bei Krista, in einem schiefen kleinen Haus bei Rosalia City, wo an jeder Ecke Beeren wachsen. Sie jagen zusammen den letzten Resten von Team Rocket hinterher, sie streiten übers Kochen, sie lachen mehr, als Leaf für möglich gehalten hätte. Krista sagt einmal: „Du hast mir am Feuer erzählt, dass du nicht wusstest, wofür du aufstehst. Ich hoffe, das hat sich geklärt.“ Und Leaf, die Frau, die alles gewonnen und sich trotzdem verloren hatte, muss nicht überlegen. Es hat sich geklärt."
+    },
+    "end_kris_friend": {
+      "id": "end_kris_friend",
+      "kind": "end",
+      "endingId": "kris_friend",
+      "background": "linear-gradient(180deg, #b7d4a8 0%, #eaf4e2 100%)",
+      "text": "Keine Romanze — dafür etwas, das genauso selten ist. Leaf bleibt in Johto und teilt sich mit Krista eine Basis in Rosalia City: zwei Trainerinnen, zwei Teams, ein Küchentisch voller Karten. Sie ziehen gemeinsam los, wenn irgendwo Rocket-Reste auftauchen, und getrennt, wenn eine von beiden Ruhe braucht. Krista ist die Erste, die Leaf anruft, wenn es ihr schlecht geht, und die Erste, die es merkt, bevor Leaf anruft. Für jemanden, der ein halbes Jahr die Vorhänge zugezogen hatte, ist ein Mensch, der einfach da bleibt, mehr wert als jeder Titel."
+    },
+    "end_lance": {
+      "id": "end_lance",
+      "kind": "end",
+      "endingId": "lance",
+      "background": "linear-gradient(180deg, #7c9bd0 0%, #dfe8f6 100%)",
+      "text": "Sie reisen zu zweit. Kanto, Johto, dann weiter über die See: Region um Region, ihre Top Vier, eine Halle der Champions nach der anderen. Siegfried und Leaf streiten über Aufstellungen, teilen sich Zugabteile und Berggipfel und die stille Übereinkunft, dass keiner den anderen schont. Ihr Verhältnis hat nie einen Namen bekommen und braucht auch keinen; es ist eine Partnerschaft aus Ehrgeiz und einem Lächeln, das immer noch unfair effektiv ist. Als die Einladung zu den Masters Acht kommt — für beide, im selben Umschlag — legt Leaf sie auf den Tisch, schaut Siegfried an und sagt nur: „Weiter.“"
+    }
+  }
+}

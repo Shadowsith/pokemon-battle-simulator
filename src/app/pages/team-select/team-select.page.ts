@@ -30,6 +30,10 @@ export class TeamSelectPage {
     this.router.navigateByUrl('/battle');
   }
 
+  goToStory(): void {
+    this.router.navigateByUrl('/story');
+  }
+
   goToTeams(): void {
     this.router.navigateByUrl('/teams');
   }

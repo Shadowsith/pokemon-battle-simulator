@@ -19,8 +19,10 @@ import {
   trainerLabel
 } from '../../core/models/trainer.model';
 import { isBattleReady } from '../../core/models/team.model';
-import { germanSpeciesName } from '../../core/models/species-names.de';
+import { toBattlePokemon } from '../../core/models/battle-pokemon';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
+import { StoryProgressService } from '../../core/services/story-progress.service';
+import { BattleHandoffService, PendingStoryBattle } from '../../core/services/battle-handoff.service';
 import { AudioService } from '../../core/services/audio.service';
 import { DamageCalcService } from '../../core/services/damage-calc.service';
 import { SettingsService } from '../../core/services/settings.service';
@@ -60,6 +62,13 @@ export class BattlePage implements OnDestroy {
   private readonly audio = inject(AudioService);
   private readonly damageCalc = inject(DamageCalcService);
   private readonly npcTeam = inject(NpcTeamService);
+  private readonly storyProgress = inject(StoryProgressService);
+  private readonly handoff = inject(BattleHandoffService);
+
+  /** Set when this battle was launched from the story runner; null for a free battle. */
+  private readonly storyBattle: PendingStoryBattle | null = this.handoff.take();
+  readonly inStoryBattle = this.storyBattle !== null;
+  readonly storyIntroText = this.storyBattle?.introText ?? null;
 
   /** Every Pokémon in this simulator battles at level 100. */
   readonly level = this.damageCalc.level;
@@ -139,23 +148,20 @@ export class BattlePage implements OnDestroy {
   }
 
   private derivePlayerTeam(): BattlePokemon[] {
+    const hp = (dexId: number) => this.damageCalc.hpStat(dexId);
+
+    // Story mode brings its own team; fall through if the run has none yet.
+    if (this.storyBattle) {
+      const storyTeam = this.storyProgress.save()?.team ?? [];
+      if (storyTeam.length) return storyTeam.map((p) => toBattlePokemon(p, hp));
+    }
+
     const built = this.teamService.activeTeam()?.pokemon ?? [];
     if (isBattleReady(built)) {
-      return built.map((p) => {
-        const maxHp = this.damageCalc.hpStat(p.speciesNum);
-        return {
-          dexId: p.speciesNum,
-          name: germanSpeciesName(p.speciesNum, p.name),
-          maxHp,
-          currentHp: maxHp,
-          types: p.types.map((t) => t.toLowerCase()),
-          status: freshStatus(),
-          boosts: freshBoosts()
-        };
-      });
+      return built.map((p) => toBattlePokemon(p, hp));
     }
     return this.prototypeTeam.map((p) => {
-      const maxHp = this.damageCalc.hpStat(p.dexId);
+      const maxHp = hp(p.dexId);
       return { ...p, maxHp, currentHp: maxHp, status: freshStatus(), boosts: freshBoosts() };
     });
   }
@@ -208,9 +214,11 @@ export class BattlePage implements OnDestroy {
 
   /** Trainer avatars shown on the intro and result screens. */
   private readonly npcAvatarId = signal<string>(DEFAULT_TRAINER_AVATAR);
+  /** A story opponent's authored name; overrides the sprite-derived label. */
+  private readonly npcNameOverride = signal<string | null>(null);
   readonly playerAvatar = computed(() => trainerAvatarPath(this.settings.trainerAvatar()));
   readonly npcAvatar = computed(() => trainerAvatarPath(this.npcAvatarId()));
-  readonly npcName = computed(() => trainerLabel(this.npcAvatarId()));
+  readonly npcName = computed(() => this.npcNameOverride() ?? trainerLabel(this.npcAvatarId()));
 
   private introTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -231,7 +239,7 @@ export class BattlePage implements OnDestroy {
 
   // --- battle lifecycle -------------------------------------------------
 
-  /** Fresh battle: heal the player team, roll a new NPC trainer + party, show the VS intro. */
+  /** Fresh battle: heal the player team, set up the NPC trainer + party, show the VS intro. */
   private async startBattle(): Promise<void> {
     if (this.introTimer) clearTimeout(this.introTimer);
     this.resetTeams();
@@ -239,10 +247,36 @@ export class BattlePage implements OnDestroy {
     this.log.set('');
     this.phase.set('intro');
     this.audio.startBattleMusic(); // one random looped battle theme per battle
+
+    if (this.storyBattle) {
+      this.applyStoryOpponent(this.storyBattle);
+      this.opponentRoll = Promise.resolve();
+      this.npcAvatarId.set(this.storyBattle.opponent.trainerId);
+      this.npcNameOverride.set(this.storyBattle.opponent.name);
+      this.introTimer = setTimeout(() => this.beginFight(), 2400);
+      return;
+    }
+
     this.opponentRoll = this.rollOpponentTeam();
     const [avatarId] = await Promise.all([this.roster.randomId(), this.opponentRoll]);
     this.npcAvatarId.set(avatarId);
     this.introTimer = setTimeout(() => this.beginFight(), 2400);
+  }
+
+  /** Load an authored story opponent in place of the random NPC roll. */
+  private applyStoryOpponent(sb: PendingStoryBattle): void {
+    const hp = (dexId: number) => this.damageCalc.hpStat(dexId);
+    const mons = sb.opponent.team;
+    this.opponentTeam.set(mons.map((m) => toBattlePokemon(m, hp)));
+    this.opponentMovesets.set(
+      mons.map((m) =>
+        m.moves
+          .map((id) => MOVE_LIBRARY.find((mv) => mv.showdownId === id))
+          .filter((mv): mv is Move => mv !== undefined)
+      )
+    );
+    this.activeOpponentIndex.set(0);
+    this.faintDone.opponent = false;
   }
 
   /** Roll a fresh NPC party sized to the player's team (fully-evolved species,
@@ -378,6 +412,13 @@ export class BattlePage implements OnDestroy {
 
   toTeamSelect(): void {
     this.router.navigateByUrl('/team-select');
+  }
+
+  /** Story battle over: report the outcome to the run and hand back to the runner. */
+  storyContinue(): void {
+    if (!this.storyBattle) return;
+    this.storyProgress.recordBattleOutcome(this.outcome() === 'win', this.storyBattle.scene);
+    this.router.navigate(['/story'], { queryParams: { resume: 1 } });
   }
 
   // --- turns ----------------------------------------------------------
