@@ -39,8 +39,12 @@ import { StatChange, StatChangeService } from '../../core/services/stat-change.s
 type MenuState = 'main' | 'fight' | 'pokemon';
 /** intro = "VS" screen, fight = the battle proper, result = win/loss screen. */
 type BattlePhase = 'intro' | 'fight' | 'result';
-/** A two-turn move mid-flight: the move being charged and whether its user is hidden. */
-type ChargeState = { move: Move; semiInvuln: boolean };
+/**
+ * A move that ties up a side across turns: a two-turn move being charged
+ * (`semiInvuln` = the user is hidden on turn 1), or the mandatory rest turn a
+ * recharge move like Hyper Beam forces afterwards (`recharge`).
+ */
+type ChargeState = { move: Move; semiInvuln: boolean; recharge?: boolean };
 
 @Component({
   selector: 'app-battle',
@@ -769,6 +773,14 @@ export class BattlePage implements OnDestroy {
     const attacker = side === 'player' ? this.player() : this.opponent();
     const defender = side === 'player' ? this.opponent() : this.player();
 
+    // --- recharge turn: a move like Hyper Beam forces its user to sit out ---
+    if (this.charge()[side]?.recharge) {
+      this.charge.update((c) => ({ ...c, [side]: null }));
+      this.log.set(`${attacker.name} muss sich von der Attacke erholen!`);
+      await this.wait(900);
+      return;
+    }
+
     // --- status gate: sleep / freeze / paralysis / confusion may stop the move ---
     const pre = this.status.resolvePreMove(attacker);
     this.patchActive(side, { status: pre.status });
@@ -803,6 +815,7 @@ export class BattlePage implements OnDestroy {
       await this.wait(650);
       this.log.set(`Doch ${defender.name} ist nicht zu sehen!`);
       await this.wait(700);
+      this.queueRecharge(side, move); // Hyper Beam still exhausts its user
       return;
     }
 
@@ -828,6 +841,7 @@ export class BattlePage implements OnDestroy {
         this.log.set(`Die Attacke von ${attacker.name} ging daneben!`);
       }
       await this.wait(650);
+      this.queueRecharge(side, move); // a missed Hyper Beam still exhausts its user (Gen 4+)
       return;
     }
 
@@ -923,6 +937,20 @@ export class BattlePage implements OnDestroy {
       await this.wait(850);
       this.log.set(msg);
     }
+
+    // Hyper Beam & co.: lock the user into a recharge turn (unless it just fainted).
+    const userNow = side === 'player' ? this.player() : this.opponent();
+    if (userNow.currentHp > 0) this.queueRecharge(side, move);
+  }
+
+  /**
+   * If `move` is a recharge move (Hyper Beam …), park it on the acting side so
+   * {@link finishRound} plays out the mandatory rest turn next round. Cleared
+   * when the Pokémon faints ({@link settleFaints}) or switches out.
+   */
+  private queueRecharge(side: 'player' | 'opponent', move: Move): void {
+    if (!this.damageCalc.needsRecharge(move)) return;
+    this.charge.update((c) => ({ ...c, [side]: { move, semiInvuln: false, recharge: true } }));
   }
 
   private statChangeMessage(name: string, ch: StatChange): string {

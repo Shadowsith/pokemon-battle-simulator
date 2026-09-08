@@ -26,10 +26,13 @@ function secondaries(md: ReturnType<typeof G5.moves.get>) {
 }
 
 /**
- * Gen 5 status-condition rules, as pure decisions the battle page applies:
+ * Gen 8 status-condition rules, as pure decisions the battle page applies:
  * sleep / freeze / paralysis / confusion gating before a move, status
  * infliction from moves (with type immunities), and end-of-turn burn / poison
- * / toxic damage. Burned physical attackers deal half.
+ * / toxic damage. Burned physical attackers deal half; burn chips 1/16 max HP,
+ * confusion self-hits 33 %, and paralysis halves Speed (see DamageCalcService) -
+ * all Gen 7+ / Gen 8 values. Move DATA (types, effect chances) stays pinned to
+ * Gen 5 via {@link G5} so the movepool matches the rest of the app.
  */
 @Injectable({ providedIn: 'root' })
 export class StatusService {
@@ -62,7 +65,8 @@ export class StatusService {
       s.confusionTurns -= 1;
       if (s.confusionTurns === 0) {
         message = merge(message, `${mon.name} ist nicht mehr verwirrt!`);
-      } else if (rollPct(50)) {
+      } else if (rollPct(33)) {
+        // Gen 7+: 33 % self-hit chance (was 50 % up to Gen 6).
         return { canAct: false, status: s, message: merge(message, `${mon.name} ist so verwirrt, dass es sich selbst verletzt!`), confusionSelfHit: true };
       }
     }
@@ -154,7 +158,8 @@ export class StatusService {
     if (mon.currentHp <= 0 || !s.major) return { damage: 0, status: s, message: null };
 
     if (s.major === 'brn') {
-      return { damage: chip(mon.maxHp, 1, 8), status: s, message: `${mon.name} leidet unter seiner Verbrennung!` };
+      // Gen 7+: burn chips 1/16 max HP (was 1/8 up to Gen 6).
+      return { damage: chip(mon.maxHp, 1, 16), status: s, message: `${mon.name} leidet unter seiner Verbrennung!` };
     }
     if (s.major === 'psn') {
       return { damage: chip(mon.maxHp, 1, 8), status: s, message: `${mon.name} leidet unter der Vergiftung!` };

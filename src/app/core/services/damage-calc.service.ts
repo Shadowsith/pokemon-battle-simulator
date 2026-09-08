@@ -115,7 +115,7 @@ export class DamageCalcService {
 
   /**
    * HP a "crash damage" move (Jump Kick, Hi Jump Kick) costs its user when it
-   * misses: half the user's max HP in Gen 5. 0 for every other move.
+   * misses: half the user's max HP (Gen 6+ / Gen 8). 0 for every other move.
    */
   crashDamage(move: Move, user: BattlePokemon): number {
     return Dex.moves.get(move.showdownId)?.hasCrashDamage ? Math.floor(user.maxHp / 2) : 0;
@@ -144,6 +144,15 @@ export class DamageCalcService {
     return !!Dex.moves.get(move.showdownId)?.flags?.['charge'];
   }
 
+  /**
+   * Recharge move (Hyper Beam, Giga Impact, Blast Burn, Hydro Cannon, Frenzy
+   * Plant, Rock Wrecker, Roar of Time): hits on the turn it is used, then the
+   * user must spend the following turn recharging and cannot act.
+   */
+  needsRecharge(move: Move): boolean {
+    return !!Dex.moves.get(move.showdownId)?.flags?.['recharge'];
+  }
+
   /** The subset of two-turn moves where the user vanishes and dodges attacks turn 1. */
   isSemiInvulnMove(move: Move): boolean {
     return SEMI_INVULN.has(move.showdownId);
@@ -151,13 +160,13 @@ export class DamageCalcService {
 
   /**
    * Effective Speed used for turn order: base Speed stat, scaled by the Speed
-   * stage, quartered while paralysed (Gen 5).
+   * stage, halved while paralysed (Gen 7+ / Gen 8 mechanics — Gen 1-6 quartered).
    */
   effectiveSpeed(mon: BattlePokemon): number {
     const species = this.lookupSpecies(mon.dexId);
     if (!species) return 0;
     let spe = calcStat(species.baseStats['spe'], false) * stageMultiplier(mon.boosts.spe);
-    if (mon.status.major === 'par') spe *= 0.25;
+    if (mon.status.major === 'par') spe *= 0.5;
     return spe;
   }
 
@@ -237,7 +246,7 @@ export class DamageCalcService {
    * HP the move costs its **user** right after it connects:
    *  - recoil moves (Brave Bird, Flare Blitz, Volt Tackle, Double-Edge, Wood
    *    Hammer, Take Down, Head Smash, Submission, Wild Charge, Head Charge)
-   *    cost a fraction of the damage dealt (Gen 5 rounding, min 1);
+   *    cost a fraction of the damage dealt (rounded, min 1);
    *  - self-KO moves (Explosion, Self-Destruct, Memento, Final Gambit, …) make
    *    the user faint.
    * `amount` is clamped to the user's current HP. Jump Kick / Hi Jump Kick
