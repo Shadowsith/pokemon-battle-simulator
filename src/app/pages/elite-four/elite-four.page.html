@@ -1,0 +1,109 @@
+<ion-content class="ion-padding">
+  <header class="ef-head">
+    <a class="back-link" routerLink="/team-select">‹ Zurück</a>
+    <h1>Top-Vier-Herausforderung</h1>
+  </header>
+
+  @if (view() === 'config') {
+    <p class="ef-hint">
+      Wähle eine Region und fordere ihre Top Vier in kanonischer Reihenfolge heraus. Zwischen den
+      Kämpfen werden die KP deines Teams aufgefüllt – verbrauchte AP und Statusprobleme bleiben aber
+      bestehen. Eine Niederlage beendet den Lauf.
+    </p>
+
+    <div class="region-list">
+      @for (r of regions; track r.id) {
+        <button
+          type="button"
+          class="region-row"
+          [class.selected]="r.id === selectedRegionId()"
+          [class.locked]="!r.available"
+          [disabled]="!r.available"
+          (click)="pickRegion(r.id)"
+        >
+          <span class="region-label">{{ r.label }}</span>
+          @if (!r.available) {
+            <span class="region-badge">bald verfügbar</span>
+          }
+        </button>
+      }
+    </div>
+
+    @if (selectedRegion(); as region) {
+      @if (region.available) {
+        <div class="member-preview">
+          @for (m of region.members; track m.trainerId + m.name) {
+            <figure class="preview-cell">
+              <img [src]="avatarPath(m.trainerId)" [alt]="m.name" />
+              <figcaption>{{ m.name }}</figcaption>
+            </figure>
+          }
+        </div>
+      }
+    }
+
+    <div class="ef-actions">
+      <ion-button
+        expand="block"
+        [disabled]="!teamService.activeReady() || !selectedRegion()?.available"
+        (click)="startRun()"
+      >
+        Herausforderung starten
+      </ion-button>
+      @if (!teamService.activeReady()) {
+        <p class="ef-hint">Du brauchst ein kampfbereites aktives Team.</p>
+      }
+    </div>
+  } @else {
+    @if (run(); as r) {
+      <h2 class="ef-region-title">{{ runRegion()?.label }}</h2>
+
+      <ol class="member-track">
+        @for (row of memberRows(); track row.member.trainerId + row.member.name; let i = $index) {
+          <li class="track-row" [class]="'state-' + row.state">
+            <span class="track-mark">
+              @switch (row.state) {
+                @case ('beaten') { ✓ }
+                @case ('next') { ▶ }
+                @case ('lost') { ✕ }
+                @default { {{ i + 1 }} }
+              }
+            </span>
+            <img class="track-avatar" [src]="avatarPath(row.member.trainerId)" [alt]="row.member.name" />
+            <span class="track-id">
+              <span class="track-name">{{ row.member.name }}</span>
+              <span class="track-title">{{ row.member.title }}</span>
+            </span>
+          </li>
+        }
+      </ol>
+
+      @switch (r.status) {
+        @case ('active') {
+          <div class="ef-panel">
+            @if (nextMember(); as m) {
+              <p class="panel-line">Nächster Kampf: <strong>{{ m.name }}</strong></p>
+              <ion-button expand="block" (click)="startNextFight()">Kampf starten</ion-button>
+            }
+            <ion-button expand="block" fill="clear" color="medium" (click)="newRun()">Aufgeben</ion-button>
+          </div>
+        }
+        @case ('won') {
+          <div class="ef-panel win">
+            <p class="panel-headline">🏆 Du hast die Top Vier von {{ runRegion()?.label }} besiegt!</p>
+            <ion-button expand="block" (click)="restartRun()">Neue Runde</ion-button>
+            <ion-button expand="block" fill="outline" (click)="toMenu()">Zum Menü</ion-button>
+          </div>
+        }
+        @case ('lost') {
+          <div class="ef-panel loss">
+            <p class="panel-headline">{{ r.lostTo }} hat dich besiegt.</p>
+            <p class="panel-line">Die Top Vier lassen dich nicht durch. Sammle dich und versuch es erneut.</p>
+            <ion-button expand="block" (click)="restartRun()">Von vorn beginnen</ion-button>
+            <ion-button expand="block" fill="outline" (click)="toMenu()">Zum Menü</ion-button>
+          </div>
+        }
+      }
+    }
+  }
+</ion-content>

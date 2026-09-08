@@ -15,6 +15,16 @@ export interface NpcPokemon {
   moves: Move[];
 }
 
+/** Primary-type constraints for a constrained roll (Custom Battle mode). */
+export interface NpcTeamOptions {
+  /** Force every Pokémon's primary type to equal this (case-insensitive). */
+  singleType?: string | null;
+  /** No primary type may repeat across the team. */
+  distinctPrimaryTypes?: boolean;
+  /** Primary types that must each appear exactly once (implies distinct). */
+  guaranteedTypes?: string[];
+}
+
 const MOVES_PER_NPC = 5;
 /** A damaging move only counts for the NPC if it hits at least this hard. */
 const MIN_DAMAGING_BP = 70;
@@ -66,24 +76,48 @@ export class NpcTeamService {
   private readonly settings = inject(SettingsService);
   private readonly moveById = new Map(MOVE_LIBRARY.map((m) => [m.showdownId, m] as const));
 
-  async generate(size: number): Promise<NpcPokemon[]> {
+  async generate(size: number, opts: NpcTeamOptions = {}): Promise<NpcPokemon[]> {
     const [species, moveInfo] = await Promise.all([this.dex.species(), this.dex.moves()]);
 
     const allowLegendaries = this.settings.allowLegendaries();
-    const pool = shuffle(
-      species.filter((s) => s.fullyEvolved && (allowLegendaries || !s.legendary))
-    );
+    const single = opts.singleType ? opts.singleType.toLowerCase() : null;
+
+    let pool = shuffle(species.filter((s) => s.fullyEvolved && (allowLegendaries || !s.legendary)));
+    if (single) pool = pool.filter((s) => primaryType(s) === single);
     if (!pool.length) return [];
 
+    const distinct = !single && (!!opts.distinctPrimaryTypes || !!opts.guaranteedTypes?.length);
+    const usedTypes = new Set<string>();
     const team: NpcPokemon[] = [];
-    for (const s of pool) {
-      if (team.length >= size) break;
+
+    const tryAdd = async (s: SpeciesInfo): Promise<boolean> => {
+      if (team.some((m) => m.dexId === s.num)) return false;
       const legal = await this.dex.legalMoves(s.id);
       const moves = this.buildMoveset(s, legal, moveInfo);
-      if (moves) {
-        team.push({ dexId: s.num, name: germanSpeciesName(s.num, s.name), types: s.types, moves });
+      if (!moves) return false;
+      team.push({ dexId: s.num, name: germanSpeciesName(s.num, s.name), types: s.types, moves });
+      usedTypes.add(primaryType(s));
+      return true;
+    };
+
+    // Pass 1: guarantee each requested primary type, one species apiece.
+    for (const t of opts.guaranteedTypes ?? []) {
+      if (team.length >= size) break;
+      const want = t.toLowerCase();
+      if (usedTypes.has(want)) continue;
+      for (const s of pool) {
+        if (primaryType(s) !== want) continue;
+        if (await tryAdd(s)) break;
       }
     }
+
+    // Pass 2: fill the remaining slots.
+    for (const s of pool) {
+      if (team.length >= size) break;
+      if (distinct && usedTypes.has(primaryType(s))) continue;
+      await tryAdd(s);
+    }
+
     return team;
   }
 
@@ -153,6 +187,11 @@ export class NpcTeamService {
     }
     return out;
   }
+}
+
+/** A species' lowercased primary (first) type, or '' when it has none. */
+function primaryType(s: SpeciesInfo): string {
+  return (s.types[0] ?? '').toLowerCase();
 }
 
 function shuffle<T>(arr: T[]): T[] {

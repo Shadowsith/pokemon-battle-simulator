@@ -35,6 +35,12 @@
     <ion-button expand="block" [disabled]="!teamService.activeReady()" (click)="startBattle()">
       Zufälligen Kampf starten
     </ion-button>
+    <ion-button expand="block" [disabled]="!teamService.activeReady()" (click)="goToCustomBattle()">
+      Benutzerdefinierter Kampf
+    </ion-button>
+    <ion-button expand="block" [disabled]="!teamService.activeReady()" (click)="goToEliteFour()">
+      Top-Vier-Herausforderung
+    </ion-button>
     <ion-button expand="block" (click)="goToStory()">Story-Modus</ion-button>
     <ion-button expand="block" fill="outline" (click)="goToTeams()">Team-Builder</ion-button>
     <ion-button expand="block" fill="clear" color="medium" (click)="goToSettings()">Einstellungen</ion-button>

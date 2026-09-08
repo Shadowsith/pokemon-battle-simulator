@@ -20,6 +20,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/story/story.page').then((m) => m.StoryPage)
   },
   {
+    path: 'custom-battle',
+    loadComponent: () =>
+      import('./pages/custom-battle/custom-battle.page').then((m) => m.CustomBattlePage)
+  },
+  {
+    path: 'elite-four',
+    loadComponent: () =>
+      import('./pages/elite-four/elite-four.page').then((m) => m.EliteFourPage)
+  },
+  {
     path: 'battle',
     loadComponent: () =>
       import('./pages/battle/battle.page').then((m) => m.BattlePage)

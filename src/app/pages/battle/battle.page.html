@@ -37,6 +37,8 @@
       <div class="trainer-actions">
         @if (inStoryBattle) {
           <ion-button (click)="storyContinue()">Weiter</ion-button>
+        } @else if (inEliteFourBattle) {
+          <ion-button (click)="eliteFourContinue()">Weiter</ion-button>
         } @else {
           <ion-button (click)="resetBattle()">Nochmal</ion-button>
           <ion-button fill="outline" (click)="toTeamSelect()">Zur Auswahl</ion-button>
@@ -238,7 +240,7 @@
     }
   </div>
 
-  @if (!inStoryBattle) {
+  @if (!inStoryBattle && !inEliteFourBattle) {
     <ion-button size="small" fill="clear" class="reset-btn" (click)="resetBattle()">Reset</ion-button>
   }
 </ion-content>

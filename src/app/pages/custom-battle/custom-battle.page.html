@@ -1,0 +1,295 @@
+<ion-content class="ion-padding">
+  <header class="cb-head">
+    <a class="back-link" routerLink="/team-select">‹ Zurück</a>
+    <h1>Benutzerdefinierter Kampf</h1>
+  </header>
+
+  <!-- ---------- preset load ---------- -->
+  <section class="cb-section">
+    <label class="cb-label" for="cb-preset">Gespeicherte Konfiguration laden</label>
+    <div class="cb-row">
+      <select
+        id="cb-preset"
+        class="cb-select grow"
+        [value]="presetId()"
+        (change)="loadPreset($any($event.target).value)"
+      >
+        <option value="">— Neu —</option>
+        @for (p of customBattleSvc.saved(); track p.id) {
+          <option [value]="p.id">{{ p.name }}</option>
+        }
+      </select>
+      <button
+        type="button"
+        class="cb-btn ghost"
+        [disabled]="!presetId()"
+        (click)="deletePreset()"
+      >
+        Löschen
+      </button>
+    </div>
+  </section>
+
+  <!-- ---------- opponent count ---------- -->
+  <section class="cb-section">
+    <span class="cb-label">Anzahl gegnerischer Pokémon</span>
+    <div class="cb-stepper">
+      <button type="button" class="cb-btn" [disabled]="config().opponentCount <= 1" (click)="stepCount(-1)">−</button>
+      <span class="cb-count">{{ config().opponentCount }}</span>
+      <button type="button" class="cb-btn" [disabled]="config().opponentCount >= 6" (click)="stepCount(1)">+</button>
+    </div>
+  </section>
+
+  <!-- ---------- mode ---------- -->
+  <section class="cb-section">
+    <span class="cb-label">Gegner-Team</span>
+    <div class="cb-segment">
+      <button
+        type="button"
+        class="seg-btn"
+        [class.active]="config().mode === 'random'"
+        (click)="setMode('random')"
+      >
+        Zufällige Auswahl
+      </button>
+      <button
+        type="button"
+        class="seg-btn"
+        [class.active]="config().mode === 'team'"
+        (click)="setMode('team')"
+      >
+        Vorgegebenes Team
+      </button>
+    </div>
+  </section>
+
+  @if (config().mode === 'random') {
+    <!-- ---------- random constraints ---------- -->
+    <section class="cb-section">
+      <label class="check-row">
+        <input
+          type="checkbox"
+          [checked]="config().forceDistinctTypes"
+          (change)="toggleForceDistinct($any($event.target).checked)"
+        />
+        <span>Multitypen-Team erzwingen (jeder Haupttyp nur einmal)</span>
+      </label>
+
+      @if (config().forceDistinctTypes) {
+        <p class="cb-hint">
+          Optional: wähle bis zu {{ config().opponentCount }} Haupttypen, die sicher vorkommen
+          sollen. Leer = beliebige Typen.
+        </p>
+        <div class="type-chips">
+          @for (t of types; track t) {
+            <button
+              type="button"
+              class="type-chip"
+              [class.on]="isDistinctType(t)"
+              [style.background]="isDistinctType(t) ? typeColor(t) : ''"
+              [disabled]="!canPickDistinctType(t)"
+              (click)="toggleDistinctType(t)"
+            >
+              {{ t }}
+            </button>
+          }
+        </div>
+      }
+
+      <label class="check-row">
+        <input
+          type="checkbox"
+          [checked]="config().forceSingleType"
+          (change)="toggleForceSingle($any($event.target).checked)"
+        />
+        <span>Monotyp-Team erzwingen (alle denselben Haupttyp)</span>
+      </label>
+
+      @if (config().forceSingleType) {
+        <div class="cb-row">
+          <select
+            class="cb-select grow"
+            [value]="config().singleType ?? ''"
+            (change)="setSingleType($any($event.target).value)"
+          >
+            <option value="">(zufällig)</option>
+            @for (t of types; track t) {
+              <option [value]="t">{{ t }}</option>
+            }
+          </select>
+        </div>
+        <p class="cb-hint">
+          Es könnte weniger als {{ config().opponentCount }} Pokémon geben, wenn der Typ selten ist –
+          der Kampf startet dann mit einem kleineren Team.
+        </p>
+      }
+    </section>
+  } @else {
+    <!-- ---------- predefined opponent team ---------- -->
+    <section class="cb-section">
+      <label class="cb-label" for="cb-copy">Spieler-Team kopieren</label>
+      <select
+        id="cb-copy"
+        class="cb-select"
+        [value]="''"
+        (change)="copyPlayerTeam($any($event.target).value); $any($event.target).value = ''"
+      >
+        <option value="" disabled>Team wählen…</option>
+        @for (t of teamService.teams(); track t.id) {
+          <option [value]="t.id">{{ t.name }} ({{ t.pokemon.length }})</option>
+        }
+      </select>
+
+      <div class="team-grid">
+        @for (i of slotIndexes(); track i) {
+          @let mon = config().team[i];
+          @if (mon) {
+            <article class="mon-card">
+              <button type="button" class="mon-remove" (click)="removeMon(i)" aria-label="Entfernen">×</button>
+              <div class="mon-head">
+                <img class="mon-sprite" [src]="spritePath(mon.speciesNum)" [alt]="mon.name" />
+                <div class="mon-id">
+                  <span class="mon-name">{{ mon.name }}</span>
+                  <span class="type-row">
+                    @for (t of mon.types; track t) {
+                      <span class="type-tag" [style.background]="typeColor(t)">{{ t }}</span>
+                    }
+                  </span>
+                </div>
+              </div>
+              <div class="move-list">
+                @for (slot of moveSlots; track slot) {
+                  @let moveId = mon.moves[slot];
+                  <button type="button" class="move-slot" [class.set]="moveId" (click)="openMovePicker(i, slot)">
+                    @if (moveId) {
+                      <span class="move-dot" [style.background]="typeColor(moveType(moveId))"></span>
+                      <span class="move-name">{{ moveName(moveId) }}</span>
+                    } @else {
+                      <span class="move-empty">+ Attacke</span>
+                    }
+                  </button>
+                }
+              </div>
+            </article>
+          } @else {
+            <button type="button" class="mon-add" (click)="openSpeciesPicker()">
+              <span class="plus">+</span>
+              <span>Pokémon</span>
+            </button>
+          }
+        }
+      </div>
+      @if (!canStart()) {
+        <p class="cb-hint">Jedes Pokémon im Team braucht mindestens eine Attacke.</p>
+      }
+    </section>
+  }
+
+  <!-- ---------- optional avatar ---------- -->
+  <section class="cb-section">
+    <label class="check-row">
+      <input type="checkbox" [checked]="avatarEnabled" (change)="toggleAvatar($any($event.target).checked)" />
+      <span>NPC-Avatar festlegen</span>
+    </label>
+    @if (avatarEnabled) {
+      <div class="avatar-grid">
+        @for (avatar of avatars; track avatar.id) {
+          <button
+            type="button"
+            class="avatar-cell"
+            [class.selected]="avatar.id === config().avatarId"
+            [title]="avatar.label"
+            (click)="chooseAvatar(avatar.id)"
+          >
+            <img [src]="avatarPath(avatar.id)" [alt]="avatar.label" width="72" height="72" loading="lazy" />
+            <span class="avatar-label">{{ avatar.label }}</span>
+          </button>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- ---------- save ---------- -->
+  <section class="cb-section">
+    <label class="cb-label" for="cb-name">Konfiguration speichern</label>
+    <div class="cb-row">
+      <input
+        id="cb-name"
+        class="cb-input grow"
+        type="text"
+        placeholder="Name…"
+        [value]="saveName()"
+        (input)="saveName.set($any($event.target).value)"
+      />
+      <button type="button" class="cb-btn" [disabled]="!saveName().trim()" (click)="savePreset()">
+        Speichern
+      </button>
+    </div>
+  </section>
+
+  <div class="cb-actions">
+    <ion-button expand="block" [disabled]="!canStart()" (click)="start()">Kampf starten</ion-button>
+  </div>
+
+  <!-- ---------- species / move picker ---------- -->
+  @if (picker(); as p) {
+    <div class="picker-overlay" (click)="closePicker()">
+      <div class="picker" (click)="$event.stopPropagation()">
+        <div class="picker-bar">
+          <input
+            class="picker-search"
+            type="text"
+            [placeholder]="p.kind === 'species' ? 'Pokémon suchen…' : 'Attacke suchen…'"
+            [value]="search()"
+            (input)="search.set($any($event.target).value)"
+          />
+          <button type="button" class="picker-close" (click)="closePicker()">Fertig</button>
+        </div>
+
+        <div class="picker-list">
+          @if (p.kind === 'species') {
+            @for (s of filteredSpecies(); track s.id) {
+              <button type="button" class="pick-row" (click)="pickSpecies(s)">
+                <img class="pick-sprite" [src]="spritePath(s.num)" [alt]="s.name" loading="lazy" />
+                <span class="pick-main">
+                  <span class="pick-name">{{ s.name }}</span>
+                  <span class="pick-sub">Nr. {{ s.num }}</span>
+                </span>
+                <span class="type-row">
+                  @for (t of s.types; track t) {
+                    <span class="type-tag" [style.background]="typeColor(t)">{{ t }}</span>
+                  }
+                </span>
+              </button>
+            } @empty {
+              <p class="picker-empty">Kein Treffer.</p>
+            }
+          } @else {
+            <button type="button" class="pick-row clear" (click)="pickMove(null)">
+              <span class="pick-main"><span class="pick-name">— Attacke entfernen</span></span>
+            </button>
+            @for (m of moveOptions(); track m.id) {
+              <button
+                type="button"
+                class="pick-row"
+                [disabled]="isMoveTaken(m.id)"
+                (click)="pickMove(m.id)"
+              >
+                <span class="move-dot" [style.background]="typeColor(m.info.type)"></span>
+                <span class="pick-main">
+                  <span class="pick-name">{{ m.info.name }}</span>
+                  <span class="pick-sub">
+                    {{ m.info.type }} · {{ catLabel(m.info.category) }}@if (m.info.bp) { · {{ m.info.bp }} KP }
+                  </span>
+                </span>
+                @if (isMoveTaken(m.id)) { <span class="pick-tag">gewählt</span> }
+              </button>
+            } @empty {
+              <p class="picker-empty">Keine erlernbare Attacke gefunden.</p>
+            }
+          }
+        </div>
+      </div>
+    </div>
+  }
+</ion-content>

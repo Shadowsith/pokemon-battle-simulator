@@ -23,6 +23,10 @@ import { toBattlePokemon } from '../../core/models/battle-pokemon';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
 import { StoryProgressService } from '../../core/services/story-progress.service';
 import { BattleHandoffService, PendingStoryBattle } from '../../core/services/battle-handoff.service';
+import { CustomBattleService } from '../../core/services/custom-battle.service';
+import { CustomBattleConfig, configToNpcOptions } from '../../core/models/custom-battle.model';
+import { EliteFourRunService, RunCarry } from '../../core/services/elite-four-run.service';
+import { EliteFourMember } from '../../core/models/elite-four.model';
 import { AudioService } from '../../core/services/audio.service';
 import { DamageCalcService } from '../../core/services/damage-calc.service';
 import { SettingsService } from '../../core/services/settings.service';
@@ -64,11 +68,21 @@ export class BattlePage implements OnDestroy {
   private readonly npcTeam = inject(NpcTeamService);
   private readonly storyProgress = inject(StoryProgressService);
   private readonly handoff = inject(BattleHandoffService);
+  private readonly customBattleSvc = inject(CustomBattleService);
+  private readonly e4Svc = inject(EliteFourRunService);
 
   /** Set when this battle was launched from the story runner; null for a free battle. */
   private readonly storyBattle: PendingStoryBattle | null = this.handoff.take();
   readonly inStoryBattle = this.storyBattle !== null;
   readonly storyIntroText = this.storyBattle?.introText ?? null;
+
+  /** Set when this battle was launched from the Custom Battle config page. */
+  private readonly customBattle: CustomBattleConfig | null = this.customBattleSvc.take();
+  readonly inCustomBattle = this.customBattle !== null;
+
+  /** Set when this battle is one leg of a Top 4 Run. */
+  private readonly e4Battle: EliteFourMember | null = this.e4Svc.takePending();
+  readonly inEliteFourBattle = this.e4Battle !== null;
 
   /** Every Pokémon in this simulator battles at level 100. */
   readonly level = this.damageCalc.level;
@@ -257,6 +271,32 @@ export class BattlePage implements OnDestroy {
       return;
     }
 
+    if (this.customBattle) {
+      const cfg = this.customBattle;
+      if (cfg.mode === 'team') {
+        this.setOpponentMons(cfg.team);
+        this.opponentRoll = Promise.resolve();
+      } else {
+        this.opponentRoll = this.rollOpponentTeam(cfg);
+      }
+      const [avatarId] = await Promise.all([
+        cfg.avatarId ? Promise.resolve(cfg.avatarId) : this.roster.randomId(),
+        this.opponentRoll
+      ]);
+      this.npcAvatarId.set(avatarId);
+      this.introTimer = setTimeout(() => this.beginFight(), 2400);
+      return;
+    }
+
+    if (this.e4Battle) {
+      this.setOpponentMons(this.e4Battle.team);
+      this.opponentRoll = Promise.resolve();
+      this.npcAvatarId.set(this.e4Battle.trainerId);
+      this.npcNameOverride.set(this.e4Battle.name);
+      this.introTimer = setTimeout(() => this.beginFight(), 2400);
+      return;
+    }
+
     this.opponentRoll = this.rollOpponentTeam();
     const [avatarId] = await Promise.all([this.roster.randomId(), this.opponentRoll]);
     this.npcAvatarId.set(avatarId);
@@ -265,8 +305,17 @@ export class BattlePage implements OnDestroy {
 
   /** Load an authored story opponent in place of the random NPC roll. */
   private applyStoryOpponent(sb: PendingStoryBattle): void {
+    this.setOpponentMons(sb.opponent.team);
+  }
+
+  /**
+   * Puts an exact, pre-built party on the opponent's side (story mode, custom
+   * "team" mode). `moves` are @pkmn/sim ids resolved against MOVE_LIBRARY.
+   */
+  private setOpponentMons(
+    mons: { speciesNum: number; name: string; types: string[]; moves: string[] }[]
+  ): void {
     const hp = (dexId: number) => this.damageCalc.hpStat(dexId);
-    const mons = sb.opponent.team;
     this.opponentTeam.set(mons.map((m) => toBattlePokemon(m, hp)));
     this.opponentMovesets.set(
       mons.map((m) =>
@@ -279,13 +328,14 @@ export class BattlePage implements OnDestroy {
     this.faintDone.opponent = false;
   }
 
-  /** Roll a fresh NPC party sized to the player's team (fully-evolved species,
-   *  strong movesets). Falls back to a lone Glurak if generation yields nothing. */
-  private async rollOpponentTeam(): Promise<void> {
-    const size = this.playerTeam().length;
+  /** Roll a fresh NPC party. Size and type constraints come from a Custom Battle
+   *  config when given, otherwise the party mirrors the player's team size.
+   *  Falls back to a lone Glurak if generation yields nothing. */
+  private async rollOpponentTeam(cfg?: CustomBattleConfig): Promise<void> {
+    const size = cfg?.opponentCount ?? this.playerTeam().length;
     let rolled: NpcPokemon[] = [];
     try {
-      rolled = await this.npcTeam.generate(size);
+      rolled = await this.npcTeam.generate(size, cfg ? configToNpcOptions(cfg) : undefined);
     } catch {
       rolled = [];
     }
@@ -373,6 +423,7 @@ export class BattlePage implements OnDestroy {
     this.activeOpponentIndex.set(0);
     this.playerTeam.set(this.derivePlayerTeam());
     this.movePp.set({});
+    this.applyEliteFourCarry();
     this.charge.set({ player: null, opponent: null });
     this.activePlayerIndex.set(0);
     this.menuState.set('main');
@@ -419,6 +470,42 @@ export class BattlePage implements OnDestroy {
     if (!this.storyBattle) return;
     this.storyProgress.recordBattleOutcome(this.outcome() === 'win', this.storyBattle.scene);
     this.router.navigate(['/story'], { queryParams: { resume: 1 } });
+  }
+
+  /**
+   * Top 4 Run leg: in a fresh (full-HP) team, restore the spent PP and lingering
+   * major status carried over from the previous won fight.
+   */
+  private applyEliteFourCarry(): void {
+    if (!this.e4Battle) return;
+    const carry = this.e4Svc.run()?.carry;
+    if (!carry) return;
+    this.playerTeam.update((team) =>
+      team.map((p, i) =>
+        carry.status[i] ? { ...p, status: { ...freshStatus(), ...carry.status[i] } } : p
+      )
+    );
+    this.movePp.set({ ...carry.pp });
+  }
+
+  /** Snapshot the player team's status + PP for the next leg of a Top 4 Run. */
+  private snapshotRunCarry(): RunCarry {
+    return {
+      status: this.playerTeam().map((p) =>
+        p.currentHp <= 0
+          ? { major: null, toxicTurns: 0, sleepTurns: 0 }
+          : { major: p.status.major, toxicTurns: p.status.toxicTurns, sleepTurns: p.status.sleepTurns }
+      ),
+      pp: { ...this.movePp() }
+    };
+  }
+
+  /** Top 4 Run leg over: report the outcome and hand back to the run screen. */
+  eliteFourContinue(): void {
+    if (!this.e4Battle) return;
+    const won = this.outcome() === 'win';
+    this.e4Svc.recordOutcome(won, won ? this.snapshotRunCarry() : null);
+    this.router.navigate(['/elite-four'], { queryParams: { resume: 1 } });
   }
 
   // --- turns ----------------------------------------------------------

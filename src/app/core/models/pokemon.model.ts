@@ -89,3 +89,6 @@ export const POKEMON_TYPE_COLORS: Record<string, string> = {
 export function typeColor(type: string): string {
   return POKEMON_TYPE_COLORS[type] ?? '#9a9a86';
 }
+
+/** The 17 Gen 1-5 type names, in canonical order. */
+export const POKEMON_TYPES: readonly string[] = Object.keys(POKEMON_TYPE_COLORS);
