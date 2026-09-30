@@ -146,6 +146,157 @@
   }
 }
 
+/* --- import / export ------------------------------------------------ */
+
+.transfer-bar {
+  max-width: 720px;
+  margin: 12px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 6px 0;
+  background: var(--ion-background-color, #fff);
+
+  button {
+    border: 1px solid #d6d6d6;
+    background: #fff;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #f2f2f2;
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    &.primary {
+      border-color: #3c6cb4;
+      background: #3c6cb4;
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+}
+
+.check-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.transfer-notice {
+  max-width: 720px;
+  margin: 4px auto 0;
+  font-size: 13px;
+  color: #2e7d32;
+}
+
+.saved-team.selectable {
+  cursor: pointer;
+}
+
+.saved-team.selected {
+  border-color: #3c6cb4;
+  box-shadow: 0 0 0 1px #3c6cb4;
+}
+
+.team-check {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+
+.import-dialog .picker-bar {
+  align-items: center;
+
+  .picker-close {
+    padding: 8px 16px;
+  }
+}
+
+.import-row {
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+
+  &.skipped {
+    opacity: 0.55;
+  }
+}
+
+.import-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.import-name {
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.conflict {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.conflict-note {
+  font-size: 12px;
+  color: #b26a00;
+}
+
+.segmented {
+  display: flex;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  overflow: hidden;
+
+  button {
+    flex: 1;
+    border: none;
+    background: #fff;
+    padding: 6px 4px;
+    font: inherit;
+    font-size: 13px;
+    cursor: pointer;
+
+    & + button {
+      border-left: 1px solid #d6d6d6;
+    }
+
+    &.on {
+      background: #3c6cb4;
+      color: #fff;
+      font-weight: 600;
+    }
+  }
+}
+
+.import-actions {
+  padding: 12px;
+  border-top: 1px solid #eee;
+
+  .wide-btn:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
 /* --- team edit grid ------------------------------------------------- */
 
 .team-grid {

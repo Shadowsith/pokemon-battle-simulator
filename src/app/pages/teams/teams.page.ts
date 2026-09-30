@@ -1,12 +1,42 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewChild,
+  computed,
+  inject,
+  signal
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
 import { frontSpritePath, germanTypeLabel, typeColor } from '../../core/models/pokemon.model';
-import { MAX_TEAM_SIZE, MOVES_PER_POKEMON, MoveInfo, SpeciesInfo } from '../../core/models/team.model';
+import {
+  ImportedTeam,
+  MAX_TEAM_SIZE,
+  MOVES_PER_POKEMON,
+  MoveInfo,
+  SavedTeam,
+  SpeciesInfo
+} from '../../core/models/team.model';
+import {
+  buildExportFile,
+  exportFileName,
+  parseImportFile
+} from '../../core/models/team-transfer.model';
 import { DexDataService } from '../../core/services/dex-data.service';
+import { TeamFileService } from '../../core/services/team-file.service';
 import { TeamService } from '../../core/services/team.service';
 
 type Picker = { kind: 'species' } | { kind: 'move'; pokeIndex: number; slot: number };
+
+/** How a team from an import file clashes with / lands among the saved teams. */
+type ImportChoice = 'new' | 'replace' | 'skip';
+interface ImportRow {
+  team: ImportedTeam;
+  /** Existing team with the same name, if any. */
+  conflictId: string | null;
+  choice: ImportChoice;
+}
 
 @Component({
   selector: 'app-teams',
@@ -15,8 +45,11 @@ type Picker = { kind: 'species' } | { kind: 'move'; pokeIndex: number; slot: num
   templateUrl: './teams.page.html',
   styleUrl: './teams.page.scss'
 })
-export class TeamsPage {
+export class TeamsPage implements OnDestroy {
+  @ViewChild('importInput') importInputRef?: ElementRef<HTMLInputElement>;
+
   private readonly dex = inject(DexDataService);
+  private readonly teamFile = inject(TeamFileService);
   readonly teamService = inject(TeamService);
 
   readonly maxTeam = MAX_TEAM_SIZE;
@@ -61,9 +94,36 @@ export class TeamsPage {
       .sort((a, b) => a.info.name.localeCompare(b.info.name));
   });
 
+  /** Export selection mode on the team list: which team ids are ticked. */
+  readonly exportSelecting = signal(false);
+  readonly exportSelected = signal<ReadonlySet<string>>(new Set());
+  readonly allExportSelected = computed(
+    () =>
+      this.teamService.teams().length > 0 &&
+      this.exportSelected().size === this.teamService.teams().length
+  );
+
+  /** Teams read from an import file, shown in the import dialog; null when closed. */
+  readonly importRows = signal<ImportRow[] | null>(null);
+  readonly importCount = computed(
+    () => (this.importRows() ?? []).filter((r) => r.choice !== 'skip').length
+  );
+  readonly allImportSelected = computed(() => {
+    const rows = this.importRows() ?? [];
+    return rows.length > 0 && rows.every((r) => r.choice !== 'skip');
+  });
+
+  /** Short confirmation under the toolbar ("3 Teams importiert"). */
+  readonly notice = signal<string | null>(null);
+  private noticeTimer: ReturnType<typeof setTimeout> | null = null;
+
   constructor() {
     this.dex.species().then((s) => this.species.set(s));
     this.dex.moves().then((m) => this.movesById.set(m));
+  }
+
+  ngOnDestroy(): void {
+    if (this.noticeTimer) clearTimeout(this.noticeTimer);
   }
 
   // --- team list ---------------------------------------------------
@@ -103,6 +163,135 @@ export class TeamsPage {
   clearEditing(): void {
     const id = this.editingId();
     if (id) this.teamService.clearTeam(id);
+  }
+
+  // --- export ------------------------------------------------------
+
+  startExportSelect(): void {
+    this.exportSelected.set(new Set());
+    this.exportSelecting.set(true);
+  }
+
+  cancelExportSelect(): void {
+    this.exportSelecting.set(false);
+  }
+
+  toggleExport(id: string): void {
+    this.exportSelected.update((sel) => {
+      const next = new Set(sel);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  }
+
+  toggleAllExport(): void {
+    this.exportSelected.set(
+      this.allExportSelected() ? new Set() : new Set(this.teamService.teams().map((t) => t.id))
+    );
+  }
+
+  async exportSelectedTeams(): Promise<void> {
+    const sel = this.exportSelected();
+    const teams = this.teamService.teams().filter((t) => sel.has(t.id));
+    if (!teams.length) return;
+    await this.saveTeams(teams);
+    this.exportSelecting.set(false);
+  }
+
+  async exportOne(id: string): Promise<void> {
+    const team = this.teamService.team(id);
+    if (team) await this.saveTeams([team]);
+  }
+
+  private async saveTeams(teams: SavedTeam[]): Promise<void> {
+    try {
+      await this.teamFile.save(
+        exportFileName(teams),
+        JSON.stringify(buildExportFile(teams), null, 2)
+      );
+    } catch {
+      alert('Export fehlgeschlagen.');
+    }
+  }
+
+  // --- import ------------------------------------------------------
+
+  pickImportFile(): void {
+    this.importInputRef?.nativeElement.click();
+  }
+
+  async onImportFile(ev: Event): Promise<void> {
+    const input = ev.target as HTMLInputElement;
+    const file = input.files?.[0];
+    input.value = ''; // allow picking the same file again
+    if (!file) return;
+
+    let text: string;
+    try {
+      text = await this.teamFile.read(file);
+    } catch {
+      alert('Die Datei konnte nicht gelesen werden.');
+      return;
+    }
+    const { teams, error } = parseImportFile(text);
+    if (error) {
+      alert(error);
+      return;
+    }
+    this.importRows.set(
+      teams.map((team) => {
+        const conflictId = this.teamService.findByName(team.name)?.id ?? null;
+        return { team, conflictId, choice: 'new' as const };
+      })
+    );
+  }
+
+  setImportChoice(index: number, choice: ImportChoice): void {
+    this.importRows.update(
+      (rows) => rows?.map((r, i) => (i === index ? { ...r, choice } : r)) ?? null
+    );
+  }
+
+  /** Checkbox on a row: include (as copy) or skip. */
+  toggleImportRow(index: number): void {
+    const row = this.importRows()?.[index];
+    if (row) this.setImportChoice(index, row.choice === 'skip' ? 'new' : 'skip');
+  }
+
+  toggleAllImport(): void {
+    const all = this.allImportSelected();
+    this.importRows.update(
+      (rows) =>
+        rows?.map((r) => ({
+          ...r,
+          choice: all ? ('skip' as const) : r.choice === 'skip' ? ('new' as const) : r.choice
+        })) ?? null
+    );
+  }
+
+  closeImport(): void {
+    this.importRows.set(null);
+  }
+
+  confirmImport(): void {
+    const rows = this.importRows() ?? [];
+    const count = this.teamService.importTeams(
+      rows
+        .filter((r) => r.choice !== 'skip')
+        .map((r) =>
+          r.choice === 'replace' && r.conflictId
+            ? { team: r.team, mode: 'replace' as const, replaceId: r.conflictId }
+            : { team: r.team, mode: 'new' as const }
+        )
+    );
+    this.importRows.set(null);
+    this.showNotice(count === 1 ? '1 Team importiert' : `${count} Teams importiert`);
+  }
+
+  private showNotice(text: string): void {
+    if (this.noticeTimer) clearTimeout(this.noticeTimer);
+    this.notice.set(text);
+    this.noticeTimer = setTimeout(() => this.notice.set(null), 3500);
   }
 
   // --- editing one team's Pokémon --------------------------------

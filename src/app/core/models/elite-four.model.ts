@@ -1,7 +1,7 @@
 /**
- * Elite Four rosters for the "Top 4 Run" game mode. One region per generation;
- * only Kanto (Gen 1) is authored so far, using the Feuerrot / Blattgrün
- * (FireRed / LeafGreen) **rematch** teams. Every Pokémon battles at level 100 in
+ * Elite Four rosters for the "Top 4 Run" game mode. One region per generation
+ * (Kanto through Kalos); Kanto uses the Feuerrot / Blattgrün (FireRed /
+ * LeafGreen) **rematch** teams, the other regions note their source below. Every Pokémon battles at level 100 in
  * this simulator, so only the species + movesets are honoured, not the levels.
  */
 
@@ -687,12 +687,119 @@ const EINALL: EliteFourRegion = {
   ]
 };
 
+/**
+ * Kalos Top Four, Pokémon X / Y. The Kalos Top Four have no rematch teams, so
+ * these are the only sets: four Pokémon each. Held items and abilities aren't
+ * modelled, so Aegislash stays in one form (King's Shield acts as a plain protect).
+ */
+const KALOS: EliteFourRegion = {
+  id: 'kalos',
+  gen: 6,
+  label: 'Kalos (Gen 6)',
+  available: true,
+  members: [
+    {
+      trainerId: 'wikstrom',
+      name: 'Thymelot',
+      title: 'Meister der Stahl-Pokémon',
+      team: [
+        {
+          speciesNum: 707, speciesId: 'klefki', name: 'Clavion', types: ['Steel', 'Fairy'],
+          moves: ['dazzlinggleam', 'flashcannon', 'torment', 'spikes']
+        },
+        {
+          speciesNum: 476, speciesId: 'probopass', name: 'Voluminas', types: ['Rock', 'Steel'],
+          moves: ['earthpower', 'powergem', 'discharge', 'flashcannon']
+        },
+        {
+          speciesNum: 212, speciesId: 'scizor', name: 'Scherox', types: ['Bug', 'Steel'],
+          moves: ['bulletpunch', 'xscissor', 'ironhead', 'nightslash']
+        },
+        {
+          speciesNum: 681, speciesId: 'aegislash', name: 'Durengard', types: ['Steel', 'Ghost'],
+          moves: ['kingsshield', 'sacredsword', 'shadowclaw', 'ironhead']
+        }
+      ]
+    },
+    {
+      trainerId: 'malva',
+      name: 'Pachira',
+      title: 'Meisterin der Feuer-Pokémon',
+      team: [
+        {
+          speciesNum: 668, speciesId: 'pyroar', name: 'Pyroleo', types: ['Fire', 'Normal'],
+          moves: ['hypervoice', 'flamethrower', 'wildcharge', 'nobleroar']
+        },
+        {
+          speciesNum: 324, speciesId: 'torkoal', name: 'Qurtel', types: ['Fire'],
+          moves: ['curse', 'earthquake', 'stoneedge', 'flamewheel']
+        },
+        {
+          speciesNum: 609, speciesId: 'chandelure', name: 'Skelabra', types: ['Ghost', 'Fire'],
+          moves: ['flamethrower', 'shadowball', 'confuseray', 'confide']
+        },
+        {
+          speciesNum: 663, speciesId: 'talonflame', name: 'Fiaro', types: ['Fire', 'Flying'],
+          moves: ['bravebird', 'quickattack', 'flareblitz', 'flail']
+        }
+      ]
+    },
+    {
+      trainerId: 'drasna',
+      name: 'Dracena',
+      title: 'Meisterin der Drachen-Pokémon',
+      team: [
+        {
+          speciesNum: 691, speciesId: 'dragalge', name: 'Tandrak', types: ['Poison', 'Dragon'],
+          moves: ['dragonpulse', 'surf', 'sludgebomb', 'thunderbolt']
+        },
+        {
+          speciesNum: 334, speciesId: 'altaria', name: 'Altaria', types: ['Dragon', 'Flying'],
+          moves: ['moonblast', 'dragonpulse', 'cottonguard', 'sing']
+        },
+        {
+          speciesNum: 621, speciesId: 'druddigon', name: 'Shardrago', types: ['Dragon'],
+          moves: ['dragontail', 'revenge', 'retaliate', 'chipaway']
+        },
+        {
+          speciesNum: 715, speciesId: 'noivern', name: 'UHaFnir', types: ['Flying', 'Dragon'],
+          moves: ['airslash', 'dragonpulse', 'flamethrower', 'superfang']
+        }
+      ]
+    },
+    {
+      trainerId: 'siebold',
+      name: 'Narcisse',
+      title: 'Meister der Wasser-Pokémon',
+      team: [
+        {
+          speciesNum: 693, speciesId: 'clawitzer', name: 'Wummer', types: ['Water'],
+          moves: ['waterpulse', 'darkpulse', 'dragonpulse', 'aurasphere']
+        },
+        {
+          speciesNum: 130, speciesId: 'gyarados', name: 'Garados', types: ['Water', 'Flying'],
+          moves: ['waterfall', 'icefang', 'earthquake', 'dragondance']
+        },
+        {
+          speciesNum: 121, speciesId: 'starmie', name: 'Starmie', types: ['Water', 'Psychic'],
+          moves: ['dazzlinggleam', 'psychic', 'surf', 'lightscreen']
+        },
+        {
+          speciesNum: 689, speciesId: 'barbaracle', name: 'Thanathora', types: ['Rock', 'Water'],
+          moves: ['crosschop', 'stoneedge', 'razorshell', 'xscissor']
+        }
+      ]
+    }
+  ]
+};
+
 export const ELITE_FOUR_REGIONS: EliteFourRegion[] = [
   KANTO,
   JOHTO,
   HOENN,
   SINNOH,
-  EINALL
+  EINALL,
+  KALOS
 ];
 
 export function eliteFourRegion(id: string): EliteFourRegion | undefined {

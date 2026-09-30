@@ -12,9 +12,9 @@
     </header>
 
     <p class="tb-hint">
-      Bis zu {{ maxTeam }} Pokémon, je bis zu 4 Attacken – nur solche, die das Pokémon
-      tatsächlich erlernen kann und die es bis zur 5. Generation gibt. Ziehe die Karten
-      oder nutze ‹ ›, um die Reihenfolge zu ändern.
+      Bis zu {{ maxTeam }} Pokémon, je bis zu 4 Attacken – nur solche, die das Pokémon tatsächlich
+      erlernen kann und die es bis zur 5. Generation gibt. Ziehe die Karten oder nutze ‹ ›, um die
+      Reihenfolge zu ändern.
     </p>
 
     <div class="team-grid">
@@ -51,7 +51,14 @@
               ›
             </button>
           </div>
-          <button type="button" class="mon-remove" (click)="removePokemon(i)" aria-label="Entfernen">×</button>
+          <button
+            type="button"
+            class="mon-remove"
+            (click)="removePokemon(i)"
+            aria-label="Entfernen"
+          >
+            ×
+          </button>
           <div class="mon-head">
             <img class="mon-sprite" [src]="spritePath(mon.speciesNum)" [alt]="mon.name" />
             <div class="mon-id">
@@ -66,7 +73,12 @@
           <div class="move-list">
             @for (slot of moveSlots; track slot) {
               @let moveId = mon.moves[slot];
-              <button type="button" class="move-slot" [class.set]="moveId" (click)="openMovePicker(i, slot)">
+              <button
+                type="button"
+                class="move-slot"
+                [class.set]="moveId"
+                (click)="openMovePicker(i, slot)"
+              >
                 @if (moveId) {
                   <span class="move-dot" [style.background]="typeColor(moveType(moveId))"></span>
                   <span class="move-name">{{ moveName(moveId) }}</span>
@@ -104,10 +116,68 @@
       Erstelle mehrere Teams und wähle eines als aktiv – nur das aktive Team tritt im Testkampf an.
     </p>
 
+    <div class="transfer-bar">
+      @if (exportSelecting()) {
+        <label class="check-all">
+          <input
+            type="checkbox"
+            [checked]="allExportSelected()"
+            [indeterminate]="exportSelected().size > 0 && !allExportSelected()"
+            (change)="toggleAllExport()"
+          />
+          Alle auswählen
+        </label>
+        <button type="button" (click)="cancelExportSelect()">Abbrechen</button>
+        <button
+          type="button"
+          class="primary"
+          [disabled]="!exportSelected().size"
+          (click)="exportSelectedTeams()"
+        >
+          Exportieren ({{ exportSelected().size }})
+        </button>
+      } @else {
+        <button
+          type="button"
+          [disabled]="!teamService.teams().length"
+          (click)="startExportSelect()"
+        >
+          Exportieren
+        </button>
+        <button type="button" (click)="pickImportFile()">Importieren</button>
+      }
+      <input
+        #importInput
+        type="file"
+        accept=".json,application/json"
+        hidden
+        (change)="onImportFile($event)"
+      />
+    </div>
+    @if (notice(); as n) {
+      <p class="transfer-notice">{{ n }}</p>
+    }
+
     <div class="team-list">
       @for (t of teamService.teams(); track t.id) {
-        <article class="saved-team" [class.active]="t.id === teamService.activeTeamId()">
+        <article
+          class="saved-team"
+          [class.active]="t.id === teamService.activeTeamId()"
+          [class.selectable]="exportSelecting()"
+          [class.selected]="exportSelecting() && exportSelected().has(t.id)"
+          (click)="exportSelecting() && toggleExport(t.id)"
+        >
           <div class="saved-head">
+            @if (exportSelecting()) {
+              <input
+                type="checkbox"
+                class="team-check"
+                [checked]="exportSelected().has(t.id)"
+                (click)="$event.stopPropagation()"
+                (change)="toggleExport(t.id)"
+                [attr.aria-label]="t.name + ' exportieren'"
+              />
+            }
             <span class="saved-name">{{ t.name }}</span>
             @if (t.id === teamService.activeTeamId()) {
               <span class="active-badge">AKTIV</span>
@@ -123,19 +193,22 @@
               }
             }
           </div>
-          <div class="saved-actions">
-            <button
-              type="button"
-              class="use"
-              [disabled]="t.id === teamService.activeTeamId() || !teamService.isReady(t.id)"
-              (click)="useTeam(t.id)"
-            >
-              {{ t.id === teamService.activeTeamId() ? 'Aktiv' : 'Verwenden' }}
-            </button>
-            <button type="button" (click)="editTeam(t.id)">Bearbeiten</button>
-            <button type="button" (click)="duplicateTeam(t.id)">Duplizieren</button>
-            <button type="button" class="danger" (click)="deleteTeam(t.id)">Löschen</button>
-          </div>
+          @if (!exportSelecting()) {
+            <div class="saved-actions">
+              <button
+                type="button"
+                class="use"
+                [disabled]="t.id === teamService.activeTeamId() || !teamService.isReady(t.id)"
+                (click)="useTeam(t.id)"
+              >
+                {{ t.id === teamService.activeTeamId() ? 'Aktiv' : 'Verwenden' }}
+              </button>
+              <button type="button" (click)="editTeam(t.id)">Bearbeiten</button>
+              <button type="button" (click)="duplicateTeam(t.id)">Duplizieren</button>
+              <button type="button" (click)="exportOne(t.id)">Exportieren</button>
+              <button type="button" class="danger" (click)="deleteTeam(t.id)">Löschen</button>
+            </div>
+          }
           @if (!teamService.isReady(t.id)) {
             <p class="saved-note">Braucht mindestens ein Pokémon mit einer Attacke.</p>
           }
@@ -144,10 +217,96 @@
         <p class="picker-empty">Noch keine Teams. Lege dein erstes an.</p>
       }
 
-      <button type="button" class="mon-add" (click)="newTeam()">
-        <span class="plus">+</span>
-        <span>Neues Team</span>
-      </button>
+      @if (!exportSelecting()) {
+        <button type="button" class="mon-add" (click)="newTeam()">
+          <span class="plus">+</span>
+          <span>Neues Team</span>
+        </button>
+      }
+    </div>
+  }
+
+  @if (importRows(); as rows) {
+    <div class="picker-overlay" (click)="closeImport()">
+      <div class="picker import-dialog" (click)="$event.stopPropagation()">
+        <div class="picker-bar">
+          <label class="check-all">
+            <input
+              type="checkbox"
+              [checked]="allImportSelected()"
+              [indeterminate]="importCount() > 0 && !allImportSelected()"
+              (change)="toggleAllImport()"
+            />
+            Alle auswählen
+          </label>
+          <button type="button" class="picker-close" (click)="closeImport()">Abbrechen</button>
+        </div>
+
+        <div class="picker-list">
+          @for (r of rows; track $index; let i = $index) {
+            <div class="import-row" [class.skipped]="r.choice === 'skip'">
+              <label class="import-main">
+                <input
+                  type="checkbox"
+                  [checked]="r.choice !== 'skip'"
+                  (change)="toggleImportRow(i)"
+                  [attr.aria-label]="r.team.name + ' importieren'"
+                />
+                <span class="import-name">{{ r.team.name }}</span>
+              </label>
+              <div class="saved-mons">
+                @for (slot of slotIndexes; track slot) {
+                  @let mon = r.team.pokemon[slot];
+                  @if (mon) {
+                    <img [src]="spritePath(mon.speciesNum)" [alt]="mon.name" [title]="mon.name" />
+                  } @else {
+                    <span class="empty-slot"></span>
+                  }
+                }
+              </div>
+              @if (r.conflictId) {
+                <div class="conflict">
+                  <span class="conflict-note">Ein Team mit diesem Namen existiert bereits.</span>
+                  <div class="segmented" role="radiogroup" aria-label="Namenskonflikt">
+                    <button
+                      type="button"
+                      [class.on]="r.choice === 'replace'"
+                      (click)="setImportChoice(i, 'replace')"
+                    >
+                      Ersetzen
+                    </button>
+                    <button
+                      type="button"
+                      [class.on]="r.choice === 'new'"
+                      (click)="setImportChoice(i, 'new')"
+                    >
+                      Als Kopie
+                    </button>
+                    <button
+                      type="button"
+                      [class.on]="r.choice === 'skip'"
+                      (click)="setImportChoice(i, 'skip')"
+                    >
+                      Überspringen
+                    </button>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        <div class="import-actions">
+          <button
+            type="button"
+            class="wide-btn primary"
+            [disabled]="!importCount()"
+            (click)="confirmImport()"
+          >
+            Importieren ({{ importCount() }})
+          </button>
+        </div>
+      </div>
     </div>
   }
 
@@ -176,7 +335,9 @@
                 </span>
                 <span class="type-row">
                   @for (t of s.types; track t) {
-                    <span class="type-tag" [style.background]="typeColor(t)">{{ typeLabel(t) }}</span>
+                    <span class="type-tag" [style.background]="typeColor(t)">{{
+                      typeLabel(t)
+                    }}</span>
                   }
                 </span>
               </button>
@@ -198,10 +359,15 @@
                 <span class="pick-main">
                   <span class="pick-name">{{ m.info.name }}</span>
                   <span class="pick-sub">
-                    {{ m.info.type }} · {{ catLabel(m.info.category) }}@if (m.info.bp) { · {{ m.info.bp }} KP }
+                    {{ m.info.type }} · {{ catLabel(m.info.category) }}
+                    @if (m.info.bp) {
+                      · {{ m.info.bp }} KP
+                    }
                   </span>
                 </span>
-                @if (isMoveTaken(m.id)) { <span class="pick-tag">gewählt</span> }
+                @if (isMoveTaken(m.id)) {
+                  <span class="pick-tag">gewählt</span>
+                }
               </button>
             } @empty {
               <p class="picker-empty">Keine erlernbare Attacke gefunden.</p>

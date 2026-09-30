@@ -1,11 +1,14 @@
 import { Injectable, computed, signal } from '@angular/core';
 import {
+  ImportedTeam,
   MAX_TEAM_SIZE,
   MOVES_PER_POKEMON,
   SavedTeam,
   SpeciesInfo,
   TeamPokemon,
-  isBattleReady
+  isBattleReady,
+  sanitizeMon,
+  sanitizeTeam
 } from '../models/team.model';
 import { germanSpeciesName } from '../models/species-names.de';
 
@@ -13,8 +16,27 @@ const TEAMS_KEY = 'pbs.teams';
 const ACTIVE_KEY = 'pbs.activeTeamId';
 const LEGACY_TEAM_KEY = 'pbs.team';
 
+/** One team picked in the import dialog and how to apply it. */
+export interface TeamImportEntry {
+  team: ImportedTeam;
+  mode: 'new' | 'replace';
+  /** Existing team to overwrite when `mode` is `replace`. */
+  replaceId?: string;
+}
+
+/** `name`, or `name (Import)`, `name (Import 2)` … if already taken. Records the result in `used`. */
+function uniqueName(name: string, used: Set<string>): string {
+  let candidate = name;
+  for (let n = 1; used.has(candidate); n++) {
+    candidate = n === 1 ? `${name} (Import)` : `${name} (Import ${n})`;
+  }
+  used.add(candidate);
+  return candidate;
+}
+
 const uid = (): string =>
-  globalThis.crypto?.randomUUID?.() ?? `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
+  globalThis.crypto?.randomUUID?.() ??
+  `t${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`;
 
 /**
  * The player's saved teams. Several may exist; exactly one is "active" and is
@@ -93,6 +115,48 @@ export class TeamService {
     return newId;
   }
 
+  findByName(name: string): SavedTeam | null {
+    const n = name.trim();
+    return this._teams().find((t) => t.name === n) ?? null;
+  }
+
+  /**
+   * Add imported teams in one go. `new` appends with a fresh id (suffixing a
+   * clashing name); `replace` swaps name + Pokémon of an existing team, keeping
+   * its id so an active team stays active. Returns how many were applied.
+   */
+  importTeams(entries: TeamImportEntry[]): number {
+    let applied = 0;
+    let firstNewId: string | null = null;
+    const next = this._teams().slice();
+    const used = new Set(next.map((t) => t.name));
+
+    for (const e of entries) {
+      const pokemon = e.team.pokemon.map((p) => ({
+        ...p,
+        types: [...p.types],
+        moves: [...p.moves]
+      }));
+      if (e.mode === 'replace') {
+        const idx = next.findIndex((t) => t.id === e.replaceId);
+        if (idx < 0) continue;
+        next[idx] = { ...next[idx], name: e.team.name, pokemon };
+      } else {
+        const id = uid();
+        const name = uniqueName(e.team.name, used);
+        next.push({ id, name, pokemon });
+        firstNewId ??= id;
+      }
+      used.add(e.team.name);
+      applied++;
+    }
+
+    this._teams.set(next);
+    if (this._activeId() === null && firstNewId) this._activeId.set(firstNewId);
+    this.persist();
+    return applied;
+  }
+
   setActive(id: string): void {
     if (!this._teams().some((t) => t.id === id)) return;
     this._activeId.set(id);
@@ -156,7 +220,9 @@ export class TeamService {
   }
 
   private updatePokemon(teamId: string, fn: (pk: TeamPokemon[]) => TeamPokemon[]): void {
-    this._teams.update((ts) => ts.map((t) => (t.id === teamId ? { ...t, pokemon: fn(t.pokemon) } : t)));
+    this._teams.update((ts) =>
+      ts.map((t) => (t.id === teamId ? { ...t, pokemon: fn(t.pokemon) } : t))
+    );
     this.persist();
   }
 
@@ -186,13 +252,17 @@ export class TeamService {
       const rawTeams = localStorage.getItem(TEAMS_KEY);
       if (rawTeams) {
         const parsed = JSON.parse(rawTeams);
-        this._teams.set(Array.isArray(parsed) ? parsed.map(sanitizeTeam).filter((t): t is SavedTeam => !!t) : []);
+        this._teams.set(
+          Array.isArray(parsed) ? parsed.map(sanitizeTeam).filter((t): t is SavedTeam => !!t) : []
+        );
       } else {
         this.migrateLegacy();
       }
       const active = localStorage.getItem(ACTIVE_KEY);
       this._activeId.set(
-        active && this._teams().some((t) => t.id === active) ? active : (this._teams()[0]?.id ?? null)
+        active && this._teams().some((t) => t.id === active)
+          ? active
+          : (this._teams()[0]?.id ?? null)
       );
     } catch {
       this._teams.set([]);
@@ -206,7 +276,9 @@ export class TeamService {
       const raw = localStorage.getItem(LEGACY_TEAM_KEY);
       if (!raw) return;
       const parsed = JSON.parse(raw);
-      const pokemon = Array.isArray(parsed) ? parsed.map(sanitizeMon).filter((p): p is TeamPokemon => !!p) : [];
+      const pokemon = Array.isArray(parsed)
+        ? parsed.map(sanitizeMon).filter((p): p is TeamPokemon => !!p)
+        : [];
       if (pokemon.length) {
         this._teams.set([{ id: uid(), name: 'Team 1', pokemon }]);
         this.persist();
@@ -216,33 +288,4 @@ export class TeamService {
       /* ignore a bad legacy blob */
     }
   }
-}
-
-function sanitizeMon(p: unknown): TeamPokemon | null {
-  if (!p || typeof p !== 'object') return null;
-  const m = p as Record<string, unknown>;
-  if (typeof m['speciesId'] !== 'string' || typeof m['speciesNum'] !== 'number') return null;
-  const num = m['speciesNum'] as number;
-  return {
-    speciesNum: num,
-    speciesId: m['speciesId'] as string,
-    name: germanSpeciesName(num, typeof m['name'] === 'string' ? (m['name'] as string) : (m['speciesId'] as string)),
-    types: Array.isArray(m['types']) ? (m['types'] as string[]) : [],
-    moves: Array.isArray(m['moves'])
-      ? (m['moves'] as unknown[]).filter((x): x is string => typeof x === 'string').slice(0, MOVES_PER_POKEMON)
-      : []
-  };
-}
-
-function sanitizeTeam(t: unknown): SavedTeam | null {
-  if (!t || typeof t !== 'object') return null;
-  const s = t as Record<string, unknown>;
-  if (typeof s['id'] !== 'string') return null;
-  return {
-    id: s['id'] as string,
-    name: typeof s['name'] === 'string' && s['name'] ? (s['name'] as string) : 'Team',
-    pokemon: Array.isArray(s['pokemon'])
-      ? (s['pokemon'] as unknown[]).map(sanitizeMon).filter((p): p is TeamPokemon => !!p).slice(0, MAX_TEAM_SIZE)
-      : []
-  };
 }

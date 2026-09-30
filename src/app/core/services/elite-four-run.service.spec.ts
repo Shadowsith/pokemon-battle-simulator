@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { EliteFourRunService, RunCarry } from './elite-four-run.service';
-import { eliteFourRegion } from '../models/elite-four.model';
+import { ELITE_FOUR_REGIONS, eliteFourRegion } from '../models/elite-four.model';
+import { MOVE_LIBRARY } from '../models/move.model';
 
 const carry = (): RunCarry => ({ status: [{ major: 'brn', toxicTurns: 0, sleepTurns: 0 }], pp: { '0:surf': 3 } });
 
@@ -23,7 +24,7 @@ describe('EliteFourRunService', () => {
   });
 
   it('ignores an unknown region id', () => {
-    svc.start('kalos');
+    svc.start('alola');
     expect(svc.hasRun()).toBe(false);
   });
 
@@ -35,6 +36,24 @@ describe('EliteFourRunService', () => {
       expect(r.members.every((m) => m.team.length >= 5 && m.team.length <= 6)).toBe(true);
       expect(r.members.flatMap((m) => m.team).every((p) => p.speciesNum > 0 && p.moves.length === 4)).toBe(true);
     }
+  });
+
+  it('wires Kalos (X / Y) with four Pokémon per member', () => {
+    const kalos = eliteFourRegion('kalos')!;
+    expect(kalos.available).toBe(true);
+    expect(kalos.members.map((m) => m.name)).toEqual(['Thymelot', 'Pachira', 'Dracena', 'Narcisse']);
+    expect(kalos.members.every((m) => m.team.length === 4)).toBe(true);
+    expect(kalos.members.flatMap((m) => m.team).every((p) => p.moves.length === 4)).toBe(true);
+    svc.start('kalos');
+    expect(svc.currentMember()?.name).toBe('Thymelot');
+  });
+
+  it('uses only moves the battle engine knows', () => {
+    const known = new Set(MOVE_LIBRARY.map((m) => m.showdownId));
+    const unknown = ELITE_FOUR_REGIONS.flatMap((r) =>
+      r.members.flatMap((m) => m.team.flatMap((p) => p.moves.filter((id) => !known.has(id))))
+    );
+    expect(unknown).toEqual([]);
   });
 
   it('runs the Johto Top Four in canonical order', () => {
