@@ -11,7 +11,8 @@
     "cap:add:ios": "npx cap add ios",
     "cap:add:android": "npx cap add android",
     "fetch:sprites": "node scripts/fetch-sprites.mjs",
-    "gen:overworld-art": "node scripts/gen-overworld-art.mjs"
+    "gen:overworld-art": "node scripts/gen-overworld-art.mjs",
+    "gen:overworld-map": "node scripts/gen-overworld-map.mjs"
   },
   "prettier": {
     "printWidth": 100,

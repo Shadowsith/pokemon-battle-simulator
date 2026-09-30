@@ -26,6 +26,20 @@ export interface OverworldMap {
   /** Collision, parallel to the layers: 1 = blocked, 0 = walkable. */
   solid: (0 | 1)[];
   spawn: { x: number; y: number; facing: Facing };
+  /**
+   * Optional shore auto-tiling: which tileset ids to overlay on a `fill` water
+   * tile for each side / outer corner that touches land. Omit for no shore.
+   */
+  water?: {
+    fill: number;
+    edges: { n: number; e: number; s: number; w: number };
+    corners: { ne: number; nw: number; se: number; sw: number };
+  };
+  /**
+   * Optional tall-grass effect: standing on a `tile` ground tile, the engine
+   * redraws `front` over the player so the blades cover the lower body.
+   */
+  tallGrass?: { tile: number; front: number };
 }
 
 /** Fetches and lightly validates one map JSON. Returns null on any failure. */

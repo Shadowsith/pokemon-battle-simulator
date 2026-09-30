@@ -77,6 +77,10 @@ export class OverworldEngine {
     return this.map.solid[y * this.map.width + x] === 1;
   }
 
+  private groundAt(x: number, y: number): number {
+    return this.map.layers.ground[y * this.map.width + x] ?? 0;
+  }
+
   private pressedDir(input: OverworldInput): Facing | null {
     // Vertical wins ties, matching the classic games' feel.
     if (input.up) return 'up';
@@ -160,8 +164,52 @@ export class OverworldEngine {
       }
     }
 
+    // --- water shore auto-tiling (over the fill, under the player) ---
+    const w = this.map.water;
+    if (w && this.tileset.ready) {
+      for (let ty = y0; ty <= y1; ty++) {
+        for (let tx = x0; tx <= x1; tx++) {
+          if (this.groundAt(tx, ty) !== w.fill) continue;
+          const dx = tx * T - camX;
+          const dy = ty * T - camY;
+          const land = (ax: number, ay: number): boolean => {
+            const gx = tx + ax;
+            const gy = ty + ay;
+            if (gx < 0 || gy < 0 || gx >= this.map.width || gy >= this.map.height) return false;
+            return this.groundAt(gx, gy) !== w.fill;
+          };
+          const n = land(0, -1);
+          const s = land(0, 1);
+          const e = land(1, 0);
+          const wLand = land(-1, 0);
+          if (n) this.tileset.draw(ctx, w.edges.n, dx, dy);
+          if (s) this.tileset.draw(ctx, w.edges.s, dx, dy);
+          if (e) this.tileset.draw(ctx, w.edges.e, dx, dy);
+          if (wLand) this.tileset.draw(ctx, w.edges.w, dx, dy);
+          if (!n && !e && land(1, -1)) this.tileset.draw(ctx, w.corners.ne, dx, dy);
+          if (!n && !wLand && land(-1, -1)) this.tileset.draw(ctx, w.corners.nw, dx, dy);
+          if (!s && !e && land(1, 1)) this.tileset.draw(ctx, w.corners.se, dx, dy);
+          if (!s && !wLand && land(-1, 1)) this.tileset.draw(ctx, w.corners.sw, dx, dy);
+        }
+      }
+    }
+
     // --- player (between ground and overlay) ---
     this.drawPlayer(ctx, Math.round(this.player.pixelX) - camX, Math.round(this.player.pixelY) - camY);
+
+    // --- tall grass covers the player's lower body ---
+    const tg = this.map.tallGrass;
+    if (tg && this.tileset.ready) {
+      const px = Math.round(this.player.pixelX);
+      const py = Math.round(this.player.pixelY);
+      for (let ty = Math.floor(py / T); ty <= Math.floor((py + T - 1) / T); ty++) {
+        for (let tx = Math.floor(px / T); tx <= Math.floor((px + T - 1) / T); tx++) {
+          if (this.groundAt(tx, ty) === tg.tile) {
+            this.tileset.draw(ctx, tg.front, tx * T - camX, ty * T - camY);
+          }
+        }
+      }
+    }
 
     // --- overlay (canopies, house fronts - draw over the player) ---
     for (let ty = y0; ty <= y1; ty++) {
