@@ -12,7 +12,7 @@
           <figcaption>{{ npcName() }}</figcaption>
         </figure>
       </div>
-      <p class="trainer-text">{{ storyIntroText || 'Herausforderer ' + npcName() + ' fordert dich heraus!' }}</p>
+      <p class="trainer-text">Herausforderer {{ npcName() }} fordert dich heraus!</p>
       <button type="button" class="trainer-cta" (click)="beginFight(); $event.stopPropagation()">
         Los geht's!
       </button>
@@ -35,9 +35,7 @@
         {{ outcome() === 'win' ? 'Du hast gewonnen!' : 'Du wurdest besiegt!' }}
       </h2>
       <div class="trainer-actions">
-        @if (inStoryBattle) {
-          <ion-button (click)="storyContinue()">Weiter</ion-button>
-        } @else if (inEliteFourBattle) {
+        @if (inEliteFourBattle) {
           <ion-button (click)="eliteFourContinue()">Weiter</ion-button>
         } @else {
           <ion-button (click)="resetBattle()">Nochmal</ion-button>
@@ -240,7 +238,7 @@
     }
   </div>
 
-  @if (!inStoryBattle && !inEliteFourBattle) {
+  @if (!inEliteFourBattle) {
     <ion-button size="small" fill="clear" class="reset-btn" (click)="resetBattle()">Reset</ion-button>
   }
 </ion-content>

@@ -16,10 +16,6 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/teams/teams.page').then((m) => m.TeamsPage)
   },
   {
-    path: 'story',
-    loadComponent: () => import('./pages/story/story.page').then((m) => m.StoryPage)
-  },
-  {
     path: 'custom-battle',
     loadComponent: () =>
       import('./pages/custom-battle/custom-battle.page').then((m) => m.CustomBattlePage)
@@ -28,10 +24,6 @@ export const routes: Routes = [
     path: 'elite-four',
     loadComponent: () =>
       import('./pages/elite-four/elite-four.page').then((m) => m.EliteFourPage)
-  },
-  {
-    path: 'map',
-    loadComponent: () => import('./pages/map/map.page').then((m) => m.MapPage)
   },
   {
     path: 'battle',

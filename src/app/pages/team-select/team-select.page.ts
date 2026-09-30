@@ -38,14 +38,6 @@ export class TeamSelectPage {
     this.router.navigateByUrl('/elite-four');
   }
 
-  goToStory(): void {
-    this.router.navigateByUrl('/story');
-  }
-
-  goToMap(): void {
-    this.router.navigateByUrl('/map');
-  }
-
   goToTeams(): void {
     this.router.navigateByUrl('/teams');
   }

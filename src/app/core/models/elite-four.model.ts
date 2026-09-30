@@ -5,7 +5,7 @@
  * this simulator, so only the species + movesets are honoured, not the levels.
  */
 
-/** One opponent Pokémon; same shape as StoryMon / TeamPokemon. */
+/** One opponent Pokémon; same shape as TeamPokemon. */
 export interface EliteFourMon {
   speciesNum: number;
   speciesId: string;

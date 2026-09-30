@@ -1,7 +1,7 @@
 import { BattlePokemon, freshBoosts, freshStatus } from './pokemon.model';
 import { germanSpeciesName } from './species-names.de';
 
-/** The fields any team-source entry (TeamPokemon, StoryMon) shares. */
+/** The fields any team-source entry (TeamPokemon, EliteFourMon) shares. */
 export interface SpeciesSlot {
   speciesNum: number;
   name: string;
@@ -10,8 +10,8 @@ export interface SpeciesSlot {
 
 /**
  * Turns a stored team slot into a fresh, full-HP {@link BattlePokemon}. Shared by
- * the battle screen (player's built team) and story mode (story-owned team and
- * authored opponents) so the conversion lives in one place.
+ * the battle screen for the player's built team and authored opponents (Top 4,
+ * custom teams) so the conversion lives in one place.
  *
  * @param hpStat resolves a species' real level-100 max HP (DamageCalcService.hpStat)
  */

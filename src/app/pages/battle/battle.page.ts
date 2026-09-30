@@ -21,8 +21,6 @@ import {
 import { isBattleReady } from '../../core/models/team.model';
 import { toBattlePokemon } from '../../core/models/battle-pokemon';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
-import { StoryProgressService } from '../../core/services/story-progress.service';
-import { BattleHandoffService, PendingStoryBattle } from '../../core/services/battle-handoff.service';
 import { CustomBattleService } from '../../core/services/custom-battle.service';
 import { CustomBattleConfig, configToNpcOptions } from '../../core/models/custom-battle.model';
 import { EliteFourRunService, RunCarry } from '../../core/services/elite-four-run.service';
@@ -70,15 +68,8 @@ export class BattlePage implements OnDestroy {
   private readonly audio = inject(AudioService);
   private readonly damageCalc = inject(DamageCalcService);
   private readonly npcTeam = inject(NpcTeamService);
-  private readonly storyProgress = inject(StoryProgressService);
-  private readonly handoff = inject(BattleHandoffService);
   private readonly customBattleSvc = inject(CustomBattleService);
   private readonly e4Svc = inject(EliteFourRunService);
-
-  /** Set when this battle was launched from the story runner; null for a free battle. */
-  private readonly storyBattle: PendingStoryBattle | null = this.handoff.take();
-  readonly inStoryBattle = this.storyBattle !== null;
-  readonly storyIntroText = this.storyBattle?.introText ?? null;
 
   /** Set when this battle was launched from the Custom Battle config page. */
   private readonly customBattle: CustomBattleConfig | null = this.customBattleSvc.take();
@@ -167,13 +158,6 @@ export class BattlePage implements OnDestroy {
 
   private derivePlayerTeam(): BattlePokemon[] {
     const hp = (dexId: number) => this.damageCalc.hpStat(dexId);
-
-    // Story mode brings its own team; fall through if the run has none yet.
-    if (this.storyBattle) {
-      const storyTeam = this.storyProgress.save()?.team ?? [];
-      if (storyTeam.length) return storyTeam.map((p) => toBattlePokemon(p, hp));
-    }
-
     const built = this.teamService.activeTeam()?.pokemon ?? [];
     if (isBattleReady(built)) {
       return built.map((p) => toBattlePokemon(p, hp));
@@ -232,7 +216,7 @@ export class BattlePage implements OnDestroy {
 
   /** Trainer avatars shown on the intro and result screens. */
   private readonly npcAvatarId = signal<string>(DEFAULT_TRAINER_AVATAR);
-  /** A story opponent's authored name; overrides the sprite-derived label. */
+  /** An authored opponent's name (Top 4); overrides the sprite-derived label. */
   private readonly npcNameOverride = signal<string | null>(null);
   readonly playerAvatar = computed(() => trainerAvatarPath(this.settings.trainerAvatar()));
   readonly npcAvatar = computed(() => trainerAvatarPath(this.npcAvatarId()));
@@ -266,15 +250,6 @@ export class BattlePage implements OnDestroy {
     this.phase.set('intro');
     this.audio.startBattleMusic(); // one random looped battle theme per battle
 
-    if (this.storyBattle) {
-      this.applyStoryOpponent(this.storyBattle);
-      this.opponentRoll = Promise.resolve();
-      this.npcAvatarId.set(this.storyBattle.opponent.trainerId);
-      this.npcNameOverride.set(this.storyBattle.opponent.name);
-      this.introTimer = setTimeout(() => this.beginFight(), 2400);
-      return;
-    }
-
     if (this.customBattle) {
       const cfg = this.customBattle;
       if (cfg.mode === 'team') {
@@ -307,13 +282,8 @@ export class BattlePage implements OnDestroy {
     this.introTimer = setTimeout(() => this.beginFight(), 2400);
   }
 
-  /** Load an authored story opponent in place of the random NPC roll. */
-  private applyStoryOpponent(sb: PendingStoryBattle): void {
-    this.setOpponentMons(sb.opponent.team);
-  }
-
   /**
-   * Puts an exact, pre-built party on the opponent's side (story mode, custom
+   * Puts an exact, pre-built party on the opponent's side (Top 4, custom
    * "team" mode). `moves` are @pkmn/sim ids resolved against MOVE_LIBRARY.
    */
   private setOpponentMons(
@@ -467,13 +437,6 @@ export class BattlePage implements OnDestroy {
 
   toTeamSelect(): void {
     this.router.navigateByUrl('/team-select');
-  }
-
-  /** Story battle over: report the outcome to the run and hand back to the runner. */
-  storyContinue(): void {
-    if (!this.storyBattle) return;
-    this.storyProgress.recordBattleOutcome(this.outcome() === 'win', this.storyBattle.scene);
-    this.router.navigate(['/story'], { queryParams: { resume: 1 } });
   }
 
   /**
