@@ -20,6 +20,33 @@ import {
 } from '../../core/models/trainer.model';
 import { isBattleReady } from '../../core/models/team.model';
 import { toBattlePokemon } from '../../core/models/battle-pokemon';
+import {
+  BattleFormat,
+  FieldView,
+  PROTECT_MOVES,
+  REDIRECT_MOVES,
+  Redirector,
+  SIDE_GUARD_MOVES,
+  Side,
+  Slot,
+  SlotPos,
+  applyRedirection,
+  isContactMove,
+  isSpreadMove,
+  livingAlly,
+  livingFoes,
+  livingSlots,
+  needsTargetChoice,
+  orderActions,
+  otherSide,
+  positions,
+  protectBlocks,
+  protectSuccessChance,
+  resolveTargets,
+  slotKey,
+  targetChoices
+} from '../../core/battle/battle-format';
+import { chooseNpcMove, pickSwitchIn } from '../../core/battle/npc-ai';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
 import { CustomBattleService } from '../../core/services/custom-battle.service';
 import { CustomBattleConfig, configToNpcOptions } from '../../core/models/custom-battle.model';
@@ -34,15 +61,48 @@ import { NpcPokemon, NpcTeamService } from '../../core/services/npc-team.service
 import { StatusService } from '../../core/services/status.service';
 import { StatChange, StatChangeService } from '../../core/services/stat-change.service';
 
-type MenuState = 'main' | 'fight' | 'pokemon';
+type MenuState = 'main' | 'fight' | 'target' | 'pokemon';
 /** intro = "VS" screen, fight = the battle proper, result = win/loss screen. */
 type BattlePhase = 'intro' | 'fight' | 'result';
 /**
- * A move that ties up a side across turns: a two-turn move being charged
+ * A move that ties up a slot across turns: a two-turn move being charged
  * (`semiInvuln` = the user is hidden on turn 1), or the mandatory rest turn a
- * recharge move like Hyper Beam forces afterwards (`recharge`).
+ * recharge move like Hyper Beam forces afterwards (`recharge`). `target` keeps
+ * the chosen target for the release turn.
  */
-type ChargeState = { move: Move; semiInvuln: boolean; recharge?: boolean };
+type ChargeState = { move: Move; semiInvuln: boolean; recharge?: boolean; target?: Slot | null };
+
+/** A player command waiting for the turn to start. */
+type Command = { kind: 'move'; move: Move; target: Slot | null } | { kind: 'switch'; to: number };
+
+/** One queued action of a round, ordered by {@link orderActions}. */
+interface TurnAction {
+  slot: Slot;
+  /** Party index of the actor when chosen; the action is dropped if it left the field. */
+  partyIdx: number;
+  kind: 'move' | 'switch';
+  move?: Move;
+  target?: Slot | null;
+  switchTo?: number;
+  priority: number;
+  speed: number;
+}
+
+/** Everything the template needs to draw one battle position. */
+interface SlotView {
+  slot: Slot;
+  key: string;
+  mon: BattlePokemon;
+  acting: boolean;
+}
+
+/** Hint shown on a move button: effectiveness against one foe. */
+interface MoveHint {
+  kind: 'status' | 'immune' | 'weak' | 'neutral' | 'strong';
+  label: string;
+  short: string;
+  foe: string | null;
+}
 
 @Component({
   selector: 'app-battle',
@@ -55,8 +115,6 @@ export class BattlePage implements OnDestroy {
   @ViewChild('field', { static: true }) fieldRef!: ElementRef<HTMLElement>;
   @ViewChild('fx', { static: true }) fxRef!: ElementRef<HTMLElement>;
   @ViewChild('screenFx', { static: true }) screenFxRef!: ElementRef<HTMLElement>;
-  @ViewChild('playerSprite', { static: true }) playerSpriteRef!: ElementRef<HTMLElement>;
-  @ViewChild('oppSprite', { static: true }) oppSpriteRef!: ElementRef<HTMLElement>;
 
   private readonly router = inject(Router);
   private readonly settings = inject(SettingsService);
@@ -93,6 +151,10 @@ export class BattlePage implements OnDestroy {
   readonly phase = signal<BattlePhase>('intro');
   readonly outcome = signal<'win' | 'loss' | null>(null);
 
+  /** Singles (1 vs 1) or doubles (2 vs 2); decided at the start of each battle. */
+  readonly format = signal<BattleFormat>('singles');
+  readonly isDoubles = computed(() => this.format() === 'doubles');
+
   /** Used when the player hasn't built a team yet (also the move-animation test bed). */
   private readonly prototypeTeam: Pick<BattlePokemon, 'dexId' | 'name' | 'types'>[] = [
     { dexId: 197, name: 'Nachtara', types: ['dark'] },
@@ -101,59 +163,148 @@ export class BattlePage implements OnDestroy {
   ];
 
   readonly playerTeam = signal<BattlePokemon[]>(this.derivePlayerTeam());
-  readonly activePlayerIndex = signal(0);
-  readonly player = computed(() => this.playerTeam()[this.activePlayerIndex()]);
+  /** Party index standing in each player position (−1 = empty). */
+  readonly activePlayer = signal<number[]>([0]);
+
+  /** The NPC's party: 1-6 Pokémon, rolled each battle to match the player's team size. */
+  readonly opponentTeam = signal<BattlePokemon[]>([this.makeGlurak()]);
+  /** Party index standing in each opponent position (−1 = empty). */
+  readonly activeOpponent = signal<number[]>([0]);
+
+  /** The NPC's per-slot movesets, parallel to {@link opponentTeam}. */
+  private readonly opponentMovesets = signal<Move[][]>([this.fallbackOpponentMoves()]);
+
+  /** The player position currently being given a command. */
+  readonly actingPos = signal<SlotPos>(0);
+  /** Commands chosen so far this turn, per player position. */
+  private readonly commands = signal<(Command | null)[]>([]);
+  /** Positions in the order they were commanded, for "Zurück". */
+  private readonly commandHistory = signal<SlotPos[]>([]);
+  /** A single-target move waiting for its target in the target menu. */
+  readonly pendingMove = signal<Move | null>(null);
+  /** Player position that must be refilled after a faint (forced switch). */
+  readonly replacingPos = signal<SlotPos | null>(null);
+
+  /** The player's Pokémon currently choosing (singles: the only one). */
+  readonly player = computed<BattlePokemon>(() => {
+    const idx = this.activePlayer()[this.actingPos()] ?? this.activePlayer()[0];
+    return this.playerTeam()[idx] ?? this.playerTeam()[0];
+  });
+  readonly activePlayerIndex = computed(() => this.activePlayer()[this.actingPos()] ?? -1);
+
+  /** The opponent's first active Pokémon (singles: the only one). */
+  readonly opponent = computed<BattlePokemon>(
+    () => this.opponentTeam()[this.activeOpponent()[0]] ?? this.opponentTeam()[0]
+  );
 
   /** true when the fight is using the player's active team rather than the prototype trio. */
   readonly usingBuiltTeam = computed(() => this.teamService.activeReady());
 
-  /** Moves shown in the fight menu: the active Pokémon's picks, or the whole
-   *  library when no team is selected (move-animation testing). */
-  readonly activeMoves = computed<Move[]>(() => {
-    const built = this.teamService.activeTeam()?.pokemon ?? [];
-    if (!isBattleReady(built)) return MOVE_LIBRARY;
-    const mon = built[this.activePlayerIndex()];
-    if (!mon) return [];
-    return mon.moves
-      .map((id) => MOVE_LIBRARY.find((m) => m.showdownId === id))
-      .filter((m): m is Move => m !== undefined);
-  });
+  /** Moves shown in the fight menu for the acting Pokémon. */
+  readonly activeMoves = computed<Move[]>(() => this.movesFor('player', this.activePlayerIndex()));
 
-  /** Remaining PP per move, keyed by "<active party slot>:<showdownId>". Reset each battle. */
+  /** Remaining PP per move, keyed "<party slot>:<showdownId>". Reset each battle. */
   private readonly movePp = signal<Record<string, number>>({});
 
-  /** A side that used a two-turn move (Solar Beam, Fly, …) is locked into finishing it. */
-  private readonly charge = signal<{
-    player: ChargeState | null;
-    opponent: ChargeState | null;
-  }>({ player: null, opponent: null });
+  /** Two-turn / recharge locks, keyed by slot ("p0", "o1" …). */
+  private readonly charge = signal<Record<string, ChargeState | null>>({});
 
-  /** The fight menu's moves with PP and an effectiveness hint vs the opponent. */
+  /** Successful protection moves in a row, keyed "<side>:<party index>". */
+  private protectStreak: Record<string, number> = {};
+
+  // --- per-turn volatiles (cleared at the start of each round) ---
+  private protectedSlots = new Map<string, string>();
+  private sideGuards: Record<Side, { wide: boolean; quick: boolean }> = this.freshGuards();
+  private helpingHand = new Set<string>();
+  private redirector: Partial<Record<Side, Redirector>> = {};
+  private moved = new Set<string>();
+
+  /** The fight menu's moves with PP and effectiveness hints vs the foe(s). */
   readonly activeMoveViews = computed(() => {
     const pp = this.movePp();
-    const slot = this.activePlayerIndex();
-    const foe = this.opponent();
+    const idx = this.activePlayerIndex();
+    const user: Slot = { side: 'player', pos: this.actingPos() };
+    const foes = livingFoes(user, this.field())
+      .map((s) => this.monAt(s))
+      .filter((m): m is BattlePokemon => !!m);
     return this.activeMoves().map((move) => {
       const max = this.damageCalc.maxPp(move);
-      const key = `${slot}:${move.showdownId}`;
-      return { move, max, cur: pp[key] ?? max, hint: this.moveHint(move, foe) };
+      const key = `${idx}:${move.showdownId}`;
+      return { move, max, cur: pp[key] ?? max, hints: this.moveHints(move, foes) };
     });
   });
 
-  private moveHint(
-    move: Move,
-    foe: BattlePokemon
-  ): { kind: 'status' | 'immune' | 'weak' | 'neutral' | 'strong'; label: string } {
-    if (this.damageCalc.isStatusMove(move)) return { kind: 'status', label: 'Status' };
-    const e = this.damageCalc.effectiveness(move, foe);
-    if (e === 0) return { kind: 'immune', label: 'Wirkungslos' };
-    if (e < 1) return { kind: 'weak', label: 'Wenig Wirkung' };
-    if (e > 1) return { kind: 'strong', label: 'Sehr effektiv' };
-    return { kind: 'neutral', label: 'Effektiv' };
+  /** Target buttons for the pending single-target move. */
+  readonly targetOptions = computed(() => {
+    const move = this.pendingMove();
+    if (!move) return [];
+    const user: Slot = { side: 'player', pos: this.actingPos() };
+    return targetChoices(move, user, this.field()).map((slot) => ({
+      slot,
+      key: slotKey(slot),
+      mon: this.monAt(slot)!,
+      ally: slot.side === 'player'
+    }));
+  });
+
+  /** "Zurück" in the main menu undoes the previous Pokémon's command (doubles). */
+  readonly undoTarget = computed(() => {
+    const hist = this.commandHistory();
+    if (!hist.length || this.replacingPos() !== null) return null;
+    const pos = hist[hist.length - 1];
+    return this.playerTeam()[this.activePlayer()[pos]] ?? null;
+  });
+
+  /** Doubles: whose command is being chosen, shown above the menu. */
+  readonly commandPrompt = computed(() => {
+    if (!this.isDoubles() || this.phase() !== 'fight' || this.isAnimating() || this.replacingPos() !== null) {
+      return null;
+    }
+    const open = positions(this.format()).filter((pos) => this.alive({ side: 'player', pos })).length;
+    const step = this.commandHistory().length + 1;
+    return open > 1 ? `${this.player().name} ist am Zug (${step}/${open})` : `${this.player().name} ist am Zug`;
+  });
+
+  readonly playerSlotViews = computed(() => this.slotViews('player'));
+  readonly opponentSlotViews = computed(() => this.slotViews('opponent'));
+
+  private slotViews(side: Side): SlotView[] {
+    const active = side === 'player' ? this.activePlayer() : this.activeOpponent();
+    const team = side === 'player' ? this.playerTeam() : this.opponentTeam();
+    const commanding = this.phase() === 'fight' && !this.isAnimating() && this.isDoubles();
+    return positions(this.format())
+      .map((pos) => {
+        const mon = team[active[pos]];
+        const slot: Slot = { side, pos };
+        return mon
+          ? {
+              slot,
+              key: slotKey(slot),
+              mon,
+              acting: commanding && side === 'player' && pos === this.actingPos()
+            }
+          : null;
+      })
+      .filter((v): v is SlotView => v !== null);
   }
 
-  private ppKey(showdownId: string): string {
-    return `${this.activePlayerIndex()}:${showdownId}`;
+  private moveHints(move: Move, foes: BattlePokemon[]): MoveHint[] {
+    if (this.damageCalc.isStatusMove(move)) {
+      return [{ kind: 'status', label: 'Status', short: 'Status', foe: null }];
+    }
+    const hints = foes.map((foe) => {
+      const e = this.damageCalc.effectiveness(move, foe);
+      const h: Omit<MoveHint, 'foe'> =
+        e === 0
+          ? { kind: 'immune', label: 'Wirkungslos', short: 'Keine' }
+          : e < 1
+            ? { kind: 'weak', label: 'Wenig Wirkung', short: 'Wenig' }
+            : e > 1
+              ? { kind: 'strong', label: 'Sehr effektiv', short: 'Sehr eff.' }
+              : { kind: 'neutral', label: 'Effektiv', short: 'Normal' };
+      return { ...h, foe: foe.name };
+    });
+    return hints.length ? hints : [{ kind: 'neutral', label: 'Effektiv', short: 'Normal', foe: null }];
   }
 
   private derivePlayerTeam(): BattlePokemon[] {
@@ -167,19 +318,6 @@ export class BattlePage implements OnDestroy {
       return { ...p, maxHp, currentHp: maxHp, status: freshStatus(), boosts: freshBoosts() };
     });
   }
-
-  /** The NPC's party: 1-6 Pokémon, rolled each battle to match the player's team size. */
-  readonly opponentTeam = signal<BattlePokemon[]>([this.makeGlurak()]);
-  readonly activeOpponentIndex = signal(0);
-  readonly opponent = computed<BattlePokemon>(
-    () => this.opponentTeam()[this.activeOpponentIndex()] ?? this.opponentTeam()[0]
-  );
-
-  /** The NPC's per-slot movesets, parallel to {@link opponentTeam}. */
-  private readonly opponentMovesets = signal<Move[][]>([this.fallbackOpponentMoves()]);
-
-  /** The in-flight NPC-team roll; {@link beginFight} waits on it before sending out. */
-  private opponentRoll: Promise<void> | null = null;
 
   /** A single fallback Pokémon so the field is always valid before the roll lands. */
   private makeGlurak(): BattlePokemon {
@@ -201,16 +339,31 @@ export class BattlePage implements OnDestroy {
       .filter((m): m is Move => m !== undefined);
   }
 
-  /** Six Poké Ball emblems per side: owned / active / knocked-out. */
-  readonly playerEmblems = computed(() => this.emblems(this.playerTeam(), this.activePlayerIndex()));
-  readonly opponentEmblems = computed(() =>
-    this.emblems(this.opponentTeam(), this.activeOpponentIndex())
-  );
+  /** A party member's moves: the player's built picks (or the whole library when
+   *  no team is selected — move-animation testing), or the NPC's rolled set. */
+  private movesFor(side: Side, partyIdx: number): Move[] {
+    if (partyIdx < 0) return [];
+    if (side === 'opponent') {
+      const set = this.opponentMovesets()[partyIdx] ?? [];
+      return set.length ? set : this.fallbackOpponentMoves();
+    }
+    const built = this.teamService.activeTeam()?.pokemon ?? [];
+    if (!isBattleReady(built)) return MOVE_LIBRARY;
+    const mon = built[partyIdx];
+    if (!mon) return [];
+    return mon.moves
+      .map((id) => MOVE_LIBRARY.find((m) => m.showdownId === id))
+      .filter((m): m is Move => m !== undefined);
+  }
 
-  private emblems(team: BattlePokemon[], active: number) {
+  /** Six Poké Ball emblems per side: owned / active / knocked-out. */
+  readonly playerEmblems = computed(() => this.emblems(this.playerTeam(), this.activePlayer()));
+  readonly opponentEmblems = computed(() => this.emblems(this.opponentTeam(), this.activeOpponent()));
+
+  private emblems(team: BattlePokemon[], active: number[]) {
     return Array.from({ length: 6 }, (_, i) => {
       const mon = team[i];
-      return { owned: !!mon, fainted: !!mon && mon.currentHp <= 0, active: !!mon && i === active };
+      return { owned: !!mon, fainted: !!mon && mon.currentHp <= 0, active: !!mon && active.includes(i) };
     });
   }
 
@@ -224,8 +377,10 @@ export class BattlePage implements OnDestroy {
 
   private introTimer: ReturnType<typeof setTimeout> | null = null;
 
-  playerSpriteSrc = () => backSpritePath(this.player().dexId);
-  opponentSpriteSrc = () => frontSpritePath(this.opponent().dexId);
+  spriteSrc(view: SlotView): string {
+    return view.slot.side === 'player' ? backSpritePath(view.mon.dexId) : frontSpritePath(view.mon.dexId);
+  }
+
   partySpriteSrc(pokemon: BattlePokemon): string {
     return frontSpritePath(pokemon.dexId);
   }
@@ -239,11 +394,104 @@ export class BattlePage implements OnDestroy {
     this.audio.stopBattleMusic();
   }
 
+  // --- slot helpers ------------------------------------------------------
+
+  private activeOf(side: Side): number[] {
+    return side === 'player' ? this.activePlayer() : this.activeOpponent();
+  }
+
+  private teamOf(side: Side): BattlePokemon[] {
+    return side === 'player' ? this.playerTeam() : this.opponentTeam();
+  }
+
+  /** Party index standing in a slot, or −1. */
+  private partyIdxAt(slot: Slot): number {
+    return this.activeOf(slot.side)[slot.pos] ?? -1;
+  }
+
+  monAt(slot: Slot): BattlePokemon | null {
+    const idx = this.partyIdxAt(slot);
+    return idx >= 0 ? (this.teamOf(slot.side)[idx] ?? null) : null;
+  }
+
+  private alive(slot: Slot): boolean {
+    return (this.monAt(slot)?.currentHp ?? 0) > 0;
+  }
+
+  private field(): FieldView {
+    return { format: this.format(), alive: (s) => this.alive(s) };
+  }
+
+  private setActive(side: Side, pos: SlotPos, partyIdx: number): void {
+    const upd = (a: number[]) => a.map((v, i) => (i === pos ? partyIdx : v));
+    if (side === 'player') this.activePlayer.update(upd);
+    else this.activeOpponent.update(upd);
+  }
+
+  /** Leads for a party of `n`: positions 0..(1) take party slots 0..(1). */
+  private initialActive(n: number): number[] {
+    return positions(this.format()).map((p) => (p < n ? p : -1));
+  }
+
+  /** Shallow-merge a patch onto the Pokémon in a slot. */
+  private patchSlot(slot: Slot, patch: Partial<BattlePokemon>): void {
+    const idx = this.partyIdxAt(slot);
+    if (idx < 0) return;
+    const upd = (team: BattlePokemon[]) => team.map((p, i) => (i === idx ? { ...p, ...patch } : p));
+    if (slot.side === 'player') this.playerTeam.update(upd);
+    else this.opponentTeam.update(upd);
+  }
+
+  /** Add (heal) or subtract (damage) HP on the Pokémon in a slot, clamped. */
+  private applyHp(slot: Slot, delta: number): void {
+    const mon = this.monAt(slot);
+    if (!mon) return;
+    this.patchSlot(slot, { currentHp: Math.max(0, Math.min(mon.maxHp, mon.currentHp + delta)) });
+  }
+
+  private spriteEl(slot: Slot): HTMLElement {
+    const el = this.fieldRef.nativeElement.querySelector<HTMLElement>(`[data-slot="${slotKey(slot)}"]`);
+    return el ?? this.fieldRef.nativeElement;
+  }
+
+  private chargeOf(slot: Slot): ChargeState | null {
+    return this.charge()[slotKey(slot)] ?? null;
+  }
+
+  private setCharge(slot: Slot, state: ChargeState | null): void {
+    this.charge.update((c) => ({ ...c, [slotKey(slot)]: state }));
+  }
+
+  private streakKey(slot: Slot): string {
+    return `${slot.side}:${this.partyIdxAt(slot)}`;
+  }
+
+  private freshGuards(): Record<Side, { wide: boolean; quick: boolean }> {
+    return { player: { wide: false, quick: false }, opponent: { wide: false, quick: false } };
+  }
+
+  private clearTurnVolatiles(): void {
+    this.protectedSlots = new Map();
+    this.sideGuards = this.freshGuards();
+    this.helpingHand = new Set();
+    this.redirector = {};
+    this.moved = new Set();
+  }
+
   // --- battle lifecycle -------------------------------------------------
 
-  /** Fresh battle: heal the player team, set up the NPC trainer + party, show the VS intro. */
+  /** Singles or doubles for this battle. Doubles needs 2+ Pokémon in the player's team. */
+  private pickFormat(): BattleFormat {
+    if (this.playerTeam().length < 2) return 'singles';
+    if (this.customBattle) return this.customBattle.format;
+    if (this.e4Battle) return this.e4Svc.run()?.format ?? 'singles';
+    return this.settings.allowDoubleBattles() && Math.random() < 0.5 ? 'doubles' : 'singles';
+  }
+
+  /** Fresh battle: pick the format, heal the player team, set up the NPC trainer + party, show the VS intro. */
   private async startBattle(): Promise<void> {
     if (this.introTimer) clearTimeout(this.introTimer);
+    this.format.set(this.pickFormat());
     this.resetTeams();
     this.outcome.set(null);
     this.log.set('');
@@ -282,6 +530,9 @@ export class BattlePage implements OnDestroy {
     this.introTimer = setTimeout(() => this.beginFight(), 2400);
   }
 
+  /** The in-flight NPC-team roll; {@link beginFight} waits on it before sending out. */
+  private opponentRoll: Promise<void> | null = null;
+
   /**
    * Puts an exact, pre-built party on the opponent's side (Top 4, custom
    * "team" mode). `moves` are @pkmn/sim ids resolved against MOVE_LIBRARY.
@@ -298,15 +549,15 @@ export class BattlePage implements OnDestroy {
           .filter((mv): mv is Move => mv !== undefined)
       )
     );
-    this.activeOpponentIndex.set(0);
-    this.faintDone.opponent = false;
+    this.activeOpponent.set(this.initialActive(mons.length));
   }
 
   /** Roll a fresh NPC party. Size and type constraints come from a Custom Battle
-   *  config when given, otherwise the party mirrors the player's team size.
-   *  Falls back to a lone Glurak if generation yields nothing. */
+   *  config when given, otherwise the party mirrors the player's team size
+   *  (at least two in doubles). Falls back to a lone Glurak if generation yields nothing. */
   private async rollOpponentTeam(cfg?: CustomBattleConfig): Promise<void> {
-    const size = cfg?.opponentCount ?? this.playerTeam().length;
+    const minSize = this.isDoubles() ? 2 : 1;
+    const size = Math.max(minSize, cfg?.opponentCount ?? this.playerTeam().length);
     let rolled: NpcPokemon[] = [];
     try {
       rolled = await this.npcTeam.generate(size, cfg ? configToNpcOptions(cfg) : undefined);
@@ -334,13 +585,12 @@ export class BattlePage implements OnDestroy {
       );
       this.opponentMovesets.set(rolled.map((r) => r.moves));
     }
-    this.activeOpponentIndex.set(0);
-    this.faintDone.opponent = false;
+    this.activeOpponent.set(this.initialActive(this.opponentTeam().length));
   }
 
   /**
-   * Dismiss the intro and stage the send-out: the opponent throws their ball
-   * first (cry after the ball animation), then the player throws theirs.
+   * Dismiss the intro and stage the send-out: the opponent throws their ball(s)
+   * first (cry after each ball animation), then the player throws theirs.
    */
   async beginFight(): Promise<void> {
     if (this.introTimer) {
@@ -353,28 +603,32 @@ export class BattlePage implements OnDestroy {
     this.phase.set('fight');
 
     if (this.opponentRoll) await this.opponentRoll; // the NPC party must be rolled before send-out
+    await this.wait(30); // let the slot sprites render
 
     const fx = this.fxRef.nativeElement;
     const field = this.fieldRef.nativeElement;
-    const playerEl = this.playerSpriteRef.nativeElement;
-    const oppEl = this.oppSpriteRef.nativeElement;
-    playerEl.style.opacity = '0';
-    oppEl.style.opacity = '0';
+    const oppSlots = livingSlots('opponent', this.field());
+    const playerSlots = livingSlots('player', this.field());
+    for (const s of [...oppSlots, ...playerSlots]) this.spriteEl(s).style.opacity = '0';
 
-    this.log.set(`${this.npcName()} schickt ${this.opponent().name} in den Kampf!`);
-    await this.animation.playSendOut(oppEl, fx, field, 'opponent');
-    await this.wait(150);
-    this.audio.playCry(this.opponent().dexId);
-    await this.wait(550);
+    const names = (slots: Slot[]) => slots.map((s) => this.monAt(s)!.name).join(' und ');
+    this.log.set(`${this.npcName()} schickt ${names(oppSlots)} in den Kampf!`);
+    for (const s of oppSlots) {
+      await this.animation.playSendOut(this.spriteEl(s), fx, field, 'opponent');
+      await this.wait(150);
+      this.audio.playCry(this.monAt(s)!.dexId);
+      await this.wait(oppSlots.length > 1 ? 350 : 550);
+    }
 
-    this.log.set(`Los, ${this.player().name}!`);
-    await this.animation.playSendOut(playerEl, fx, field, 'player');
-    await this.wait(150);
-    this.audio.playCry(this.player().dexId);
-    await this.wait(300);
+    this.log.set(`Los, ${names(playerSlots)}!`);
+    for (const s of playerSlots) {
+      await this.animation.playSendOut(this.spriteEl(s), fx, field, 'player');
+      await this.wait(150);
+      this.audio.playCry(this.monAt(s)!.dexId);
+      await this.wait(playerSlots.length > 1 ? 250 : 300);
+    }
 
-    this.log.set(`Was wird ${this.player().name} tun?`);
-    this.isAnimating.set(false);
+    await this.beginCommandPhase(true);
   }
 
   private endBattle(outcome: 'win' | 'loss'): void {
@@ -382,30 +636,40 @@ export class BattlePage implements OnDestroy {
     this.outcome.set(outcome);
     this.isAnimating.set(false);
     this.menuState.set('main');
-    this.log.set(outcome === 'win' ? `${this.npcName()} wurde besiegt!` : `${this.player().name} wurde besiegt!`);
+    this.replacingPos.set(null);
+    this.log.set(
+      outcome === 'win'
+        ? `${this.npcName()} wurde besiegt!`
+        : `${this.isDoubles() ? 'Dein Team' : this.player().name} wurde besiegt!`
+    );
     this.phase.set('result');
   }
 
-  /** Which side's active sprite has already played its faint animation. */
-  private faintDone: { player: boolean; opponent: boolean } = { player: false, opponent: false };
+  /** Which slot's active sprite has already played its faint animation. */
+  private faintDone: Record<string, boolean> = {};
 
   private resetTeams(): void {
     // Heal whatever NPC party is still on the field; rollOpponentTeam() replaces it.
     this.opponentTeam.update((team) =>
       team.map((p) => ({ ...p, currentHp: p.maxHp, status: freshStatus(), boosts: freshBoosts() }))
     );
-    this.activeOpponentIndex.set(0);
+    this.activeOpponent.set(this.initialActive(this.opponentTeam().length));
     this.playerTeam.set(this.derivePlayerTeam());
+    this.activePlayer.set(this.initialActive(this.playerTeam().length));
     this.movePp.set({});
     this.applyEliteFourCarry();
-    this.charge.set({ player: null, opponent: null });
-    this.activePlayerIndex.set(0);
+    this.charge.set({});
+    this.protectStreak = {};
+    this.clearTurnVolatiles();
+    this.commands.set([]);
+    this.commandHistory.set([]);
+    this.pendingMove.set(null);
+    this.replacingPos.set(null);
+    this.actingPos.set(0);
     this.menuState.set('main');
     this.isAnimating.set(false);
-    this.faintDone = { player: false, opponent: false };
-    for (const ref of [this.playerSpriteRef, this.oppSpriteRef]) {
-      const el = ref?.nativeElement;
-      if (!el) continue;
+    this.faintDone = {};
+    for (const el of Array.from(this.fieldRef?.nativeElement.querySelectorAll<HTMLElement>('.sprite') ?? [])) {
       el.getAnimations?.().forEach((a) => a.cancel());
       el.style.opacity = '';
       el.style.transform = '';
@@ -413,21 +677,21 @@ export class BattlePage implements OnDestroy {
     }
   }
 
-  private spriteEl(side: 'player' | 'opponent'): HTMLElement {
-    return (side === 'player' ? this.playerSpriteRef : this.oppSpriteRef).nativeElement;
-  }
-
   /** Play the faint drop for any active Pokémon that just hit 0 HP (once). */
   private async settleFaints(): Promise<void> {
     for (const side of ['player', 'opponent'] as const) {
-      const mon = side === 'player' ? this.player() : this.opponent();
-      if (mon.currentHp > 0 || this.faintDone[side]) continue;
-      this.faintDone[side] = true;
-      this.charge.update((c) => ({ ...c, [side]: null })); // a fainted Pokémon drops any charge
-      this.log.set(`${mon.name} wurde besiegt!`);
-      await this.wait(250);
-      this.audio.playCry(mon.dexId, true);
-      await this.animation.playFaint(this.spriteEl(side));
+      for (const pos of positions(this.format())) {
+        const slot: Slot = { side, pos };
+        const mon = this.monAt(slot);
+        const key = slotKey(slot);
+        if (!mon || mon.currentHp > 0 || this.faintDone[key]) continue;
+        this.faintDone[key] = true;
+        this.setCharge(slot, null); // a fainted Pokémon drops any charge
+        this.log.set(`${mon.name} wurde besiegt!`);
+        await this.wait(250);
+        this.audio.playCry(mon.dexId, true);
+        await this.animation.playFaint(this.spriteEl(slot));
+      }
     }
   }
 
@@ -475,147 +739,203 @@ export class BattlePage implements OnDestroy {
     this.router.navigate(['/elite-four'], { queryParams: { resume: 1 } });
   }
 
-  // --- turns ----------------------------------------------------------
+  // --- command phase ------------------------------------------------------
+
+  /** Next player position (after `after`) that needs a command this turn. */
+  private nextCommandPos(after: number): SlotPos | null {
+    for (const pos of positions(this.format())) {
+      if (pos <= after) continue;
+      const slot: Slot = { side: 'player', pos };
+      if (this.alive(slot) && !this.chargeOf(slot)) return pos;
+    }
+    return null;
+  }
+
+  /**
+   * Start collecting the player's commands for a new turn (or auto-run locked
+   * turns). `announce` puts "Was wird X tun?" in the log; after a normal round
+   * the last result line stays readable instead (doubles shows whose turn it is
+   * above the menu).
+   */
+  private async beginCommandPhase(announce = false): Promise<void> {
+    this.commands.set([]);
+    this.commandHistory.set([]);
+    this.pendingMove.set(null);
+    const first = this.nextCommandPos(-1);
+    if (first === null) {
+      // Every living player Pokémon is locked into a charge / recharge turn.
+      await this.wait(650);
+      await this.executeTurn();
+      return;
+    }
+    this.actingPos.set(first);
+    this.menuState.set('main');
+    if (announce) this.log.set(`Was wird ${this.player().name} tun?`);
+    this.isAnimating.set(false);
+  }
+
+  private canCommand(): boolean {
+    return this.phase() === 'fight' && !this.isAnimating() && this.replacingPos() === null;
+  }
 
   async useMove(move: Move): Promise<void> {
-    if (this.phase() !== 'fight' || this.isAnimating() || this.isActiveFainted()) return;
-    if (this.charge().player) return; // locked into finishing a two-turn move
+    if (!this.canCommand()) return;
 
-    const key = this.ppKey(move.showdownId);
+    const key = `${this.activePlayerIndex()}:${move.showdownId}`;
     const remaining = this.movePp()[key] ?? this.damageCalc.maxPp(move);
     if (remaining <= 0) {
       this.log.set(`${move.name} hat keine AP mehr übrig!`);
       return;
     }
-    // PP is spent when the move starts (the charge turn), not on release.
-    this.movePp.update((m) => ({ ...m, [key]: (m[key] ?? remaining) - 1 }));
+    const user: Slot = { side: 'player', pos: this.actingPos() };
+    if (needsTargetChoice(move, user, this.field())) {
+      this.pendingMove.set(move);
+      this.menuState.set('target');
+      this.logBeforeTarget = this.log();
+      this.log.set(`Welches Ziel soll ${this.player().name} angreifen?`);
+      return;
+    }
+    await this.commit({ kind: 'move', move, target: null });
+  }
 
-    await this.runRound(move);
+  /** The log line the target question replaced, restored when the menu closes. */
+  private logBeforeTarget = '';
+
+  async chooseTarget(slot: Slot): Promise<void> {
+    const move = this.pendingMove();
+    if (!move || !this.canCommand()) return;
+    this.pendingMove.set(null);
+    this.log.set(this.logBeforeTarget);
+    await this.commit({ kind: 'move', move, target: slot });
+  }
+
+  /** Record the acting Pokémon's command; ask the next one or start the turn. */
+  private async commit(cmd: Command): Promise<void> {
+    const pos = this.actingPos();
+    this.commands.update((c) => {
+      const next = [...c];
+      next[pos] = cmd;
+      return next;
+    });
+    this.commandHistory.update((h) => [...h, pos]);
+    const next = this.nextCommandPos(pos);
+    if (next !== null) {
+      this.actingPos.set(next);
+      this.menuState.set('main');
+      return;
+    }
+    await this.executeTurn();
+  }
+
+  /** Doubles: take back the previous Pokémon's command. */
+  undoCommand(): void {
+    const hist = this.commandHistory();
+    if (!hist.length || !this.canCommand()) return;
+    const pos = hist[hist.length - 1];
+    this.commandHistory.set(hist.slice(0, -1));
+    this.commands.update((c) => c.map((cmd, i) => (i === pos ? null : cmd)));
+    this.pendingMove.set(null);
+    this.actingPos.set(pos);
+    this.menuState.set('main');
+  }
+
+  // --- turns ----------------------------------------------------------
+
+  /** The NPC's move for the Pokémon in `slot`. */
+  private npcAction(slot: Slot): TurnAction {
+    const idx = this.partyIdxAt(slot);
+    const user = this.monAt(slot)!;
+    const ally = livingAlly(slot, this.field());
+    const choice = chooseNpcMove({
+      calc: this.damageCalc,
+      field: this.field(),
+      slot,
+      user,
+      moves: this.movesFor('opponent', idx),
+      monAt: (s) => this.monAt(s),
+      allyMoves: ally ? this.movesFor('opponent', this.partyIdxAt(ally)) : [],
+      protectStreak: this.protectStreak[this.streakKey(slot)] ?? 0
+    });
+    return this.moveAction(slot, choice.move, choice.target);
+  }
+
+  private moveAction(slot: Slot, move: Move, target: Slot | null): TurnAction {
+    return {
+      slot,
+      partyIdx: this.partyIdxAt(slot),
+      kind: 'move',
+      move,
+      target,
+      priority: this.damageCalc.movePriority(move),
+      speed: this.damageCalc.effectiveSpeed(this.monAt(slot)!)
+    };
   }
 
   /**
-   * One round: both sides act (player's move given, NPC picks or completes its
-   * own charge), in priority/Speed order, then {@link finishRound}. A Pokémon
-   * locked into a two-turn move re-enters here automatically to release it.
+   * One round: collect every active Pokémon's action (player commands, NPC
+   * picks, locked charge / recharge turns), run them in turn order, then
+   * {@link finishRound}.
    */
-  private async runRound(playerMove: Move): Promise<void> {
+  private async executeTurn(): Promise<void> {
     this.isAnimating.set(true);
     this.menuState.set('main');
+    this.pendingMove.set(null);
+    this.clearTurnVolatiles();
 
-    const npcMove = this.charge().opponent?.move ?? this.pickNpcMove();
-    const order: ['player' | 'opponent', Move][] = this.playerActsFirst(playerMove, npcMove)
-      ? [
-          ['player', playerMove],
-          ['opponent', npcMove]
-        ]
-      : [
-          ['opponent', npcMove],
-          ['player', playerMove]
-        ];
+    const actions: TurnAction[] = [];
+    const cmds = this.commands();
+    for (const side of ['player', 'opponent'] as const) {
+      for (const pos of positions(this.format())) {
+        const slot: Slot = { side, pos };
+        if (!this.alive(slot)) continue;
+        const locked = this.chargeOf(slot);
+        if (locked) {
+          actions.push(this.moveAction(slot, locked.move, locked.target ?? null));
+          continue;
+        }
+        if (side === 'opponent') {
+          actions.push(this.npcAction(slot));
+          continue;
+        }
+        const cmd = cmds[pos];
+        if (!cmd) continue;
+        if (cmd.kind === 'switch') {
+          actions.push({
+            slot,
+            partyIdx: this.partyIdxAt(slot),
+            kind: 'switch',
+            switchTo: cmd.to,
+            priority: 0,
+            speed: this.damageCalc.effectiveSpeed(this.monAt(slot)!)
+          });
+        } else {
+          // PP is spent when the move is committed (the charge turn), not on release.
+          const key = `${this.partyIdxAt(slot)}:${cmd.move.showdownId}`;
+          const remaining = this.movePp()[key] ?? this.damageCalc.maxPp(cmd.move);
+          this.movePp.update((m) => ({ ...m, [key]: remaining - 1 }));
+          actions.push(this.moveAction(slot, cmd.move, cmd.target));
+        }
+      }
+    }
+    this.commands.set([]);
+    this.commandHistory.set([]);
 
-    for (let i = 0; i < order.length; i++) {
-      const [actor, mv] = order[i];
-      const actorMon = actor === 'player' ? this.player() : this.opponent();
-      if (actorMon.currentHp <= 0) continue; // KO'd by the faster Pokémon this turn
+    let first = true;
+    for (const a of orderActions(actions)) {
       if (this.battleDecided()) break;
-      if (i > 0) await this.wait(550);
-      await this.performMove(mv, actor);
+      if (this.partyIdxAt(a.slot) !== a.partyIdx || !this.alive(a.slot)) continue; // KO'd or switched out
+      if (!first) await this.wait(550);
+      first = false;
+      if (a.kind === 'switch') {
+        await this.switchSlot(a.slot, a.switchTo!);
+      } else {
+        await this.performMove(a.move!, a.slot, a.target ?? null);
+      }
+      this.moved.add(slotKey(a.slot));
       await this.settleFaints();
     }
 
     await this.finishRound();
-  }
-
-  /**
-   * The NPC's move choice for its active Pokémon: score every move by expected
-   * power against the player's current Pokémon (STAB + type effectiveness) and
-   * usually take the best, with a small chance of a free pick so it isn't
-   * perfectly predictable.
-   */
-  private pickNpcMove(): Move {
-    const set = this.opponentMovesets()[this.activeOpponentIndex()] ?? [];
-    const moves = set.length ? set : this.fallbackOpponentMoves();
-    const target = this.player();
-    const scored = moves.map((m) => ({ m, s: this.scoreNpcMove(m, target) }));
-    const best = Math.max(...scored.map((x) => x.s));
-
-    if (best <= 0 || Math.random() < 0.15) {
-      return moves[Math.floor(Math.random() * moves.length)];
-    }
-    const top = scored.filter((x) => x.s >= best * 0.85).map((x) => x.m);
-    return top[Math.floor(Math.random() * top.length)];
-  }
-
-  /**
-   * Rough "how useful is this move right now" for the NPC AI. Damaging moves
-   * score as base power x STAB x type-effectiveness vs `target`; status moves
-   * score low so they stay situational rather than spammed.
-   */
-  private scoreNpcMove(move: Move, target: BattlePokemon, user: BattlePokemon = this.opponent()): number {
-    if (this.damageCalc.isStatusMove(move)) return 12 * this.damageCalc.accuracy(move);
-    const bp = this.damageCalc.basePower(move);
-    if (bp <= 0) return 25; // fixed / variable damage (Seismic Toss, Night Shade, …)
-    const eff = this.damageCalc.effectiveness(move, target); // 0, .25, .5, 1, 2, 4
-    if (eff === 0) return 0;
-    const stab = user.types.includes(move.type.toLowerCase()) ? 1.5 : 1;
-    // Expected damage: fold in hit chance so the AI prefers reliable moves.
-    return bp * stab * eff * this.damageCalc.hitChance(move, user, target);
-  }
-
-  /** Index of the healthy reserve with the best matchup vs the player's active
-   *  Pokémon, or -1 when the NPC has nobody left to send in. */
-  private pickOpponentSwitchIn(): number {
-    const team = this.opponentTeam();
-    const target = this.player();
-    let bestIdx = -1;
-    let best = -Infinity;
-    for (let i = 0; i < team.length; i++) {
-      if (i === this.activeOpponentIndex() || team[i].currentHp <= 0) continue;
-      const set = this.opponentMovesets()[i] ?? [];
-      const score = set.reduce((mx, mv) => Math.max(mx, this.scoreNpcMove(mv, target, team[i])), 0);
-      if (score > best) {
-        best = score;
-        bestIdx = i;
-      }
-    }
-    return bestIdx;
-  }
-
-  /** If the NPC's active fainted and it still has a healthy Pokémon, send in the
-   *  best matchup against the player's current Pokémon. */
-  private async replaceFaintedOpponent(): Promise<void> {
-    if (this.opponent().currentHp > 0) return;
-    const next = this.pickOpponentSwitchIn();
-    if (next < 0) return; // whole party is down - checkEnd() ends the battle
-
-    await this.wait(600);
-    this.charge.update((c) => ({ ...c, opponent: null }));
-    this.activeOpponentIndex.set(next);
-    this.faintDone.opponent = false;
-
-    const oppEl = this.oppSpriteRef.nativeElement;
-    oppEl.getAnimations?.().forEach((a) => a.cancel());
-    oppEl.style.opacity = '0';
-    oppEl.style.transform = '';
-    oppEl.style.filter = '';
-    await this.wait(60);
-    this.log.set(`${this.npcName()} schickt ${this.opponent().name} in den Kampf!`);
-    await this.animation.playSendOut(oppEl, this.fxRef.nativeElement, this.fieldRef.nativeElement, 'opponent');
-    await this.wait(120);
-    this.audio.playCry(this.opponent().dexId);
-    await this.wait(250);
-  }
-
-  /** True when the player's chosen move resolves before the NPC's. */
-  private playerActsFirst(playerMove: Move, npcMove: Move): boolean {
-    const pPrio = this.damageCalc.movePriority(playerMove);
-    const nPrio = this.damageCalc.movePriority(npcMove);
-    if (pPrio !== nPrio) return pPrio > nPrio;
-
-    const pSpe = this.damageCalc.effectiveSpeed(this.player());
-    const nSpe = this.damageCalc.effectiveSpeed(this.opponent());
-    if (pSpe !== nSpe) return pSpe > nSpe;
-    return Math.random() < 0.5;
   }
 
   private battleDecided(): boolean {
@@ -625,15 +945,13 @@ export class BattlePage implements OnDestroy {
     );
   }
 
-  private refsFor(side: 'player' | 'opponent') {
-    const playerEl = this.playerSpriteRef.nativeElement;
-    const oppEl = this.oppSpriteRef.nativeElement;
+  private refsFor(user: Slot, target: Slot) {
     return {
       fieldEl: this.fieldRef.nativeElement,
       fxEl: this.fxRef.nativeElement,
       screenFxEl: this.screenFxRef.nativeElement,
-      launchEl: side === 'player' ? playerEl : oppEl,
-      targetEl: side === 'player' ? oppEl : playerEl
+      launchEl: this.spriteEl(user),
+      targetEl: this.spriteEl(target)
     };
   }
 
@@ -656,45 +974,17 @@ export class BattlePage implements OnDestroy {
     return messages[move.showdownId] ?? `${name} lädt ${move.name} auf!`;
   }
 
-  /** The NPC's active Pokémon takes its turn (used after a player switch). */
-  private async npcTurn(): Promise<void> {
-    await this.wait(550);
-    await this.performMove(this.pickNpcMove(), 'opponent');
-  }
-
-  /**
-   * Runs the NPC's turn (unless the player's active just fainted) and settles
-   * the round. Used when the player's action was a switch, so the NPC always
-   * moves second.
-   */
-  private async resolveRound(): Promise<void> {
-    if (!this.isActiveFainted() && this.opponent().currentHp > 0) {
-      await this.npcTurn();
-    }
-    await this.finishRound();
-  }
-
-  /** End-of-turn status damage, then win / loss / hand control back to the player. */
+  /** End-of-turn status damage, then win / loss / replacements / the next turn. */
   private async finishRound(): Promise<void> {
     await this.settleFaints();
-    await this.replaceFaintedOpponent();
     if (await this.checkEnd()) return;
 
     await this.applyResiduals();
     await this.settleFaints();
-    await this.replaceFaintedOpponent();
     if (await this.checkEnd()) return;
 
-    // The player's Pokémon is mid two-turn move: release it automatically.
-    const pending = this.charge().player;
-    if (pending && !this.isActiveFainted()) {
-      await this.wait(650);
-      await this.runRound(pending.move);
-      return;
-    }
-
-    this.isAnimating.set(false);
-    this.menuState.set('main');
+    await this.replaceFaintedOpponents();
+    await this.startReplacements();
   }
 
   private async checkEnd(): Promise<boolean> {
@@ -711,34 +1001,123 @@ export class BattlePage implements OnDestroy {
     return false;
   }
 
-  /** End-of-turn burn / poison / toxic damage on both active Pokémon. */
+  /** End-of-turn burn / poison / toxic damage on every active Pokémon, fastest first. */
   private async applyResiduals(): Promise<void> {
-    for (const side of ['player', 'opponent'] as const) {
-      const mon = side === 'player' ? this.player() : this.opponent();
-      if (mon.currentHp <= 0 || !mon.status.major) continue;
+    const slots = [...livingSlots('player', this.field()), ...livingSlots('opponent', this.field())].sort(
+      (a, b) => this.damageCalc.effectiveSpeed(this.monAt(b)!) - this.damageCalc.effectiveSpeed(this.monAt(a)!)
+    );
+    for (const slot of slots) {
+      const mon = this.monAt(slot);
+      if (!mon || mon.currentHp <= 0 || !mon.status.major) continue;
       const r = this.status.residual(mon);
-      this.patchActive(side, { status: r.status });
+      this.patchSlot(slot, { status: r.status });
       if (r.damage > 0) {
-        this.applyHp(side, -r.damage);
+        this.applyHp(slot, -r.damage);
         if (r.message) this.log.set(r.message);
         await this.wait(800);
       }
     }
   }
 
+  // --- switching ------------------------------------------------------
+
+  /** Party indices of healthy Pokémon on the bench of `side`. */
+  private bench(side: Side): number[] {
+    const active = this.activeOf(side);
+    return this.teamOf(side)
+      .map((p, i) => (p.currentHp > 0 && !active.includes(i) ? i : -1))
+      .filter((i) => i >= 0);
+  }
+
+  /** The NPC sends in its best matchup for every fainted position. */
+  private async replaceFaintedOpponents(): Promise<void> {
+    for (const pos of positions(this.format())) {
+      const slot: Slot = { side: 'opponent', pos };
+      if (this.alive(slot)) continue;
+      const foes = livingSlots('player', this.field()).map((s) => this.monAt(s)!);
+      const next = pickSwitchIn(
+        this.damageCalc,
+        this.opponentTeam(),
+        this.opponentMovesets(),
+        foes.length ? foes : [this.player()],
+        new Set(this.activeOpponent())
+      );
+      if (next < 0) continue; // nobody left - the position stays empty
+      await this.wait(600);
+      this.setCharge(slot, null);
+      await this.sendIn(slot, next);
+    }
+  }
+
+  /** Ask the player to refill fainted positions, one at a time; then start the next turn. */
+  private async startReplacements(afterSendIn = false): Promise<void> {
+    const bench = this.bench('player');
+    const pos = positions(this.format()).find((p) => !this.alive({ side: 'player', pos: p }));
+    if (pos === undefined || !bench.length) {
+      this.replacingPos.set(null);
+      await this.beginCommandPhase(afterSendIn);
+      return;
+    }
+    this.replacingPos.set(pos);
+    this.menuState.set('pokemon');
+    this.log.set('Welches Pokémon soll in den Kampf?');
+    this.isAnimating.set(false);
+  }
+
+  /** Bring a fresh Pokémon into a slot whose occupant fainted (no recall). */
+  private async sendIn(slot: Slot, partyIdx: number): Promise<void> {
+    this.setActive(slot.side, slot.pos, partyIdx);
+    this.faintDone[slotKey(slot)] = false;
+    const el = this.spriteEl(slot);
+    el.getAnimations?.().forEach((a) => a.cancel());
+    el.style.opacity = '0';
+    el.style.transform = '';
+    el.style.filter = '';
+    await this.wait(60); // let the sprite src rebind before it grows in
+    const mon = this.monAt(slot)!;
+    this.log.set(slot.side === 'player' ? `Los, ${mon.name}!` : `${this.npcName()} schickt ${mon.name} in den Kampf!`);
+    await this.animation.playSendOut(el, this.fxRef.nativeElement, this.fieldRef.nativeElement, slot.side);
+    await this.wait(120);
+    this.audio.playCry(mon.dexId);
+    await this.wait(250);
+  }
+
+  /** A voluntary switch during a turn: recall the current Pokémon, send in `to`. */
+  private async switchSlot(slot: Slot, to: number): Promise<void> {
+    const out = this.monAt(slot);
+    if (!out || this.teamOf(slot.side)[to]?.currentHp <= 0 || this.activeOf(slot.side).includes(to)) return;
+    // Switching out clears volatiles: confusion ends, the toxic counter resets,
+    // all stat stages are lost, and a two-turn move is cancelled.
+    this.patchSlot(slot, {
+      status: { ...out.status, confusionTurns: 0, toxicTurns: out.status.major === 'tox' ? 1 : 0 },
+      boosts: freshBoosts()
+    });
+    this.protectStreak[this.streakKey(slot)] = 0;
+    this.setCharge(slot, null);
+    this.log.set(`${out.name}, komm zurück!`);
+    await this.animation.playRecall(this.spriteEl(slot), this.fxRef.nativeElement, this.fieldRef.nativeElement, slot.side);
+    await this.sendIn(slot, to);
+  }
+
+  // --- moves ------------------------------------------------------------
+
   /**
-   * Plays one move in whichever direction the acting side implies: the
-   * player casts left -> right (player -> opponent), the NPC casts
-   * right -> left (opponent -> player). Same animation, mirrored.
+   * Plays one move from `user`. Protection / support moves (Protect, Wide
+   * Guard, Helping Hand, Follow Me) set up this turn's volatiles; everything
+   * else resolves its targets now (retargeting and redirection included) and
+   * hits each one: Protect / guard check, accuracy, damage (0.75× when it hits
+   * several targets, 1.5× after Helping Hand), status and stat changes.
    */
-  private async performMove(move: Move, side: 'player' | 'opponent'): Promise<void> {
-    const foeSide = side === 'player' ? 'opponent' : 'player';
-    const attacker = side === 'player' ? this.player() : this.opponent();
-    const defender = side === 'player' ? this.opponent() : this.player();
+  private async performMove(move: Move, user: Slot, chosen: Slot | null): Promise<void> {
+    const side = user.side;
+    const attacker = this.monAt(user)!;
+    const me = () => this.monAt(user)!;
+    const id = move.showdownId;
+    const myCharge = this.chargeOf(user);
 
     // --- recharge turn: a move like Hyper Beam forces its user to sit out ---
-    if (this.charge()[side]?.recharge) {
-      this.charge.update((c) => ({ ...c, [side]: null }));
+    if (myCharge?.recharge) {
+      this.setCharge(user, null);
       this.log.set(`${attacker.name} muss sich von der Attacke erholen!`);
       await this.wait(900);
       return;
@@ -746,155 +1125,201 @@ export class BattlePage implements OnDestroy {
 
     // --- status gate: sleep / freeze / paralysis / confusion may stop the move ---
     const pre = this.status.resolvePreMove(attacker);
-    this.patchActive(side, { status: pre.status });
+    this.patchSlot(user, { status: pre.status });
     if (pre.message) {
       this.log.set(pre.message);
       await this.wait(950);
     }
     if (pre.confusionSelfHit) {
-      this.applyHp(side, -this.damageCalc.confusionSelfDamage(attacker));
+      this.applyHp(user, -this.damageCalc.confusionSelfDamage(attacker));
       return;
     }
     if (!pre.canAct) return;
 
-    const myCharge = this.charge()[side];
-    const foeCharge = this.charge()[foeSide];
+    // Any move other than a protection move resets the consecutive-use counter.
+    const streakKey = this.streakKey(user);
+    if (!PROTECT_MOVES.has(id)) this.protectStreak[streakKey] = 0;
+
+    if (PROTECT_MOVES.has(id) || SIDE_GUARD_MOVES.has(id) || id === 'helpinghand' || REDIRECT_MOVES.has(id)) {
+      await this.performSupportMove(move, user, streakKey);
+      return;
+    }
 
     // --- two-turn move, turn 1: start charging, deal nothing ---
     if (this.damageCalc.isChargeMove(move) && !myCharge) {
       const semiInvuln = this.damageCalc.isSemiInvulnMove(move);
-      this.charge.update((c) => ({ ...c, [side]: { move, semiInvuln } }));
+      this.setCharge(user, { move, semiInvuln, target: chosen });
       this.log.set(this.chargeMessage(attacker.name, move));
-      this.audio.playMove(move.showdownId);
-      await this.animation.playMove(move, this.refsFor(side), 'charge');
+      this.audio.playMove(id);
+      const foe = livingFoes(user, this.field())[0] ?? user;
+      await this.animation.playMove(move, this.refsFor(user, foe), 'charge');
       await this.wait(350);
-      return;
-    }
-
-    // --- the target is off the field (Fly / Dig / …): the attack whiffs ---
-    if (foeCharge?.semiInvuln) {
-      this.log.set(`${attacker.name} setzt ${move.name} ein...`);
-      this.audio.playMove(move.showdownId);
-      await this.wait(650);
-      this.log.set(`Doch ${defender.name} ist nicht zu sehen!`);
-      await this.wait(700);
-      this.queueRecharge(side, move); // Hyper Beam still exhausts its user
       return;
     }
 
     // --- two-turn move, turn 2: release (skip the charge visual, then hit) ---
     let phase: 'release' | undefined;
-    if (myCharge && myCharge.move.showdownId === move.showdownId) {
-      this.charge.update((c) => ({ ...c, [side]: null }));
+    let aim = chosen;
+    if (myCharge && myCharge.move.showdownId === id) {
+      this.setCharge(user, null);
       phase = 'release';
+      aim = myCharge.target ?? chosen;
     }
 
-    this.log.set(`${attacker.name} setzt ${move.name} ein...`);
-    this.audio.playMove(move.showdownId);
+    const field = this.field();
+    const res = resolveTargets(move, user, aim, field);
+    if (res.kind === 'self') {
+      await this.performSelfMove(move, user, phase);
+      return;
+    }
+    const targets = applyRedirection(
+      res.targets,
+      move,
+      user,
+      attacker.types,
+      this.redirector[otherSide(side)],
+      field
+    );
 
-    // --- accuracy check: base accuracy vs the accuracy/evasion stage gap ---
-    if (!this.damageCalc.rollHit(move, attacker, defender)) {
-      await this.wait(480);
-      await this.animation.playDodge(this.spriteEl(foeSide));
-      const crash = this.damageCalc.crashDamage(move, attacker); // Jump Kick / Hi Jump Kick
-      if (crash > 0) {
-        this.applyHp(side, -crash);
-        this.log.set(`Die Attacke von ${attacker.name} ging daneben! ${attacker.name} verletzt sich dabei selbst!`);
-      } else {
-        this.log.set(`Die Attacke von ${attacker.name} ging daneben!`);
-      }
+    this.log.set(`${attacker.name} setzt ${move.name} ein...`);
+    this.audio.playMove(id);
+
+    if (!targets.length) {
       await this.wait(650);
-      this.queueRecharge(side, move); // a missed Hyper Beam still exhausts its user (Gen 4+)
+      this.log.set('Aber es misslang!');
+      await this.wait(700);
+      this.queueRecharge(user, move);
       return;
     }
 
-    await this.animation.playMove(move, this.refsFor(side), phase);
-
-    // Drain and recoil scale with HP actually lost, so cap the roll at the
-    // defender's current HP (overkilling a weak target costs less recoil).
-    const rawDamage = this.damageCalc.calculateDamage(attacker, defender, move);
-    const dealt = Math.min(rawDamage, defender.currentHp);
-    if (dealt > 0) {
-      this.applyHp(foeSide, -dealt);
-      this.audio.playHit(this.damageCalc.effectiveness(move, defender));
+    // --- per-target gates: off the field, Protect, Wide / Quick Guard, accuracy ---
+    const spread = targets.length > 1;
+    const hits: Slot[] = [];
+    let missed = 0;
+    for (const t of targets) {
+      const tm = this.monAt(t)!;
+      if (this.chargeOf(t)?.semiInvuln) {
+        await this.wait(650);
+        this.log.set(`Doch ${tm.name} ist nicht zu sehen!`);
+        await this.wait(700);
+        continue;
+      }
+      if (await this.blockedByProtection(move, user, t)) continue;
+      if (!this.damageCalc.rollHit(move, me(), tm)) {
+        await this.wait(480);
+        await this.animation.playDodge(this.spriteEl(t));
+        this.log.set(spread ? `${tm.name} weicht aus!` : `Die Attacke von ${attacker.name} ging daneben!`);
+        await this.wait(650);
+        missed++;
+        continue;
+      }
+      hits.push(t);
     }
 
-    const recovery = this.damageCalc.calculateRecovery(move, attacker, dealt);
-    if (recovery.amount > 0) this.applyHp(side, recovery.amount);
+    if (!hits.length) {
+      const crash = missed ? this.damageCalc.crashDamage(move, me()) : 0; // Jump Kick / Hi Jump Kick
+      if (crash > 0) {
+        this.applyHp(user, -crash);
+        this.log.set(`Die Attacke von ${attacker.name} ging daneben! ${attacker.name} verletzt sich dabei selbst!`);
+        await this.wait(650);
+      }
+      this.queueRecharge(user, move); // a missed / blocked Hyper Beam still exhausts its user (Gen 4+)
+      return;
+    }
 
-    const recoil = this.damageCalc.calculateSelfDamage(move, attacker, dealt);
-    if (recoil.amount > 0) this.applyHp(side, -recoil.amount);
+    await this.animation.playMove(move, this.refsFor(user, hits[0]), phase);
+    for (const t of hits.slice(1)) await this.animation.playHitFlash(this.spriteEl(t), typeColor(move.type));
 
-    // --- status infliction / thaw on the defender ---
-    let statusMsg: string | null = null;
-    const defenderNow = foeSide === 'opponent' ? this.opponent() : this.player();
-    if (defenderNow.currentHp > 0) {
-      if (defenderNow.status.major === 'frz' && dealt > 0 && this.status.isFireMove(move)) {
-        this.patchActive(foeSide, { status: { ...defenderNow.status, major: null } });
-        statusMsg = `${defenderNow.name} ist aufgetaut!`;
-      } else {
-        const inflicted = this.status.rollInfliction(move, defenderNow, dealt);
-        if (inflicted) {
-          this.patchActive(foeSide, { status: this.status.applyInfliction(defenderNow, inflicted) });
-          statusMsg = this.status.inflictionMessage(defenderNow.name, inflicted);
+    // --- damage, status and stat changes per target ---
+    const helped = this.helpingHand.has(slotKey(user));
+    const results: { slot: Slot; dealt: number; statusMsg: string | null }[] = [];
+    const statLogs: string[] = [];
+    let totalDealt = 0;
+    let userChangesDone = false;
+
+    for (const t of hits) {
+      const defender = this.monAt(t)!;
+      // Drain and recoil scale with HP actually lost, so cap the roll at the
+      // defender's current HP (overkilling a weak target costs less recoil).
+      const raw = this.damageCalc.calculateDamage(me(), defender, move, { spread, helpingHand: helped });
+      const dealt = Math.min(raw, defender.currentHp);
+      if (dealt > 0) {
+        this.applyHp(t, -dealt);
+        this.audio.playHit(this.damageCalc.effectiveness(move, defender));
+      }
+      totalDealt += dealt;
+
+      // --- status infliction / thaw on the target ---
+      let statusMsg: string | null = null;
+      const now = this.monAt(t)!;
+      if (now.currentHp > 0) {
+        if (now.status.major === 'frz' && dealt > 0 && this.status.isFireMove(move)) {
+          this.patchSlot(t, { status: { ...now.status, major: null } });
+          statusMsg = `${now.name} ist aufgetaut!`;
+        } else {
+          const inflicted = this.status.rollInfliction(move, now, dealt);
+          if (inflicted) {
+            this.patchSlot(t, { status: this.status.applyInfliction(now, inflicted) });
+            statusMsg = this.status.inflictionMessage(now.name, inflicted);
+          }
         }
       }
+
+      // --- stat-stage changes (Growl, Crunch's chance, Overheat's own drop …) ---
+      const sc = this.statChange.resolve(move, now.types, dealt);
+      if (!userChangesDone && Object.keys(sc.toUser).length) {
+        const res2 = this.statChange.apply(me().boosts, sc.toUser);
+        this.patchSlot(user, { boosts: res2.boosts });
+        for (const ch of res2.changes) statLogs.push(this.statChangeMessage(me().name, ch));
+        userChangesDone = true;
+      }
+      const tgt = this.monAt(t)!;
+      if (tgt.currentHp > 0 && Object.keys(sc.toTarget).length) {
+        const res2 = this.statChange.apply(tgt.boosts, sc.toTarget);
+        this.patchSlot(t, { boosts: res2.boosts });
+        for (const ch of res2.changes) statLogs.push(this.statChangeMessage(tgt.name, ch));
+      }
+      results.push({ slot: t, dealt, statusMsg });
     }
 
-    // Rest also puts the user to sleep for two turns.
-    if (move.showdownId === 'rest' && recovery.amount > 0) {
-      const rester = side === 'player' ? this.player() : this.opponent();
-      this.patchActive(side, {
-        status: { ...rester.status, major: 'slp', sleepTurns: 3, toxicTurns: 0 }
-      });
-    }
+    const recovery = this.damageCalc.calculateRecovery(move, me(), totalDealt);
+    if (recovery.amount > 0) this.applyHp(user, recovery.amount);
+    const recoil = this.damageCalc.calculateSelfDamage(move, me(), totalDealt);
+    if (recoil.amount > 0) this.applyHp(user, -recoil.amount);
 
-    // --- stat-stage changes (Swords Dance, Growl, Overheat's own drop, Crunch's chance …) ---
-    const statLogs: string[] = [];
-    const sc = this.statChange.resolve(move, defenderNow.types, dealt);
-    if (Object.keys(sc.toUser).length) {
-      const user = side === 'player' ? this.player() : this.opponent();
-      const res = this.statChange.apply(user.boosts, sc.toUser);
-      this.patchActive(side, { boosts: res.boosts });
-      for (const ch of res.changes) statLogs.push(this.statChangeMessage(user.name, ch));
-    }
-    if (defenderNow.currentHp > 0 && Object.keys(sc.toTarget).length) {
-      const tgt = foeSide === 'opponent' ? this.opponent() : this.player();
-      const res = this.statChange.apply(tgt.boosts, sc.toTarget);
-      this.patchActive(foeSide, { boosts: res.boosts });
-      for (const ch of res.changes) statLogs.push(this.statChangeMessage(tgt.name, ch));
-    }
+    // --- one log line per target ---
+    const lines = results.map((r) => {
+      const foe = this.monAt(r.slot)!;
+      let line: string;
+      if (foe.currentHp <= 0) {
+        line = `${foe.name} wurde besiegt!`;
+      } else if (recovery.kind === 'drain' && recovery.amount > 0) {
+        line = `${move.name} trifft ${foe.name}! ${me().name} saugt Energie ab.`;
+      } else if (r.dealt > 0) {
+        line = `${move.name} trifft ${foe.name}!`;
+      } else if (r.statusMsg) {
+        return r.statusMsg;
+      } else if (statLogs.length > 0) {
+        line = statLogs.shift() as string; // a pure stat move - lead with the first change
+      } else {
+        line = `${move.name} zeigt keine Wirkung …`;
+      }
+      return r.statusMsg ? `${line} ${r.statusMsg}` : line;
+    });
+    let line = lines.join(' ');
 
-    const foe = foeSide === 'opponent' ? this.opponent() : this.player();
-    const me = side === 'player' ? this.player() : this.opponent();
-
-    let line: string;
-    if (foe.currentHp <= 0) {
-      line = `${foe.name} wurde besiegt!`;
-    } else if (recovery.kind === 'drain' && recovery.amount > 0) {
-      line = `${move.name} trifft ${foe.name}! ${me.name} saugt Energie ab.`;
-    } else if (recovery.kind === 'selfHeal' && recovery.amount > 0) {
-      line = `${me.name} füllt seine KP auf!`;
-    } else if (recovery.kind === 'selfHeal') {
-      line = 'Aber es misslang!';
-    } else if (dealt > 0) {
-      line = `${move.name} trifft ${foe.name}!`;
-    } else if (statLogs.length > 0) {
-      line = statLogs.shift() as string; // a pure stat move - lead with the first change
-    } else {
-      line = `${move.name} zeigt keine Wirkung …`;
-    }
-
-    if (recoil.kind === 'selfKo' && foe.currentHp > 0) {
-      line = `${me.name} setzt alles auf eine Karte!`;
+    const anyAlive = results.some((r) => this.alive(r.slot));
+    if (recoil.kind === 'selfKo' && anyAlive) {
+      line = `${me().name} setzt alles auf eine Karte!`;
     } else if (recoil.kind === 'recoil') {
       line +=
-        me.currentHp <= 0
-          ? ` ${me.name} bricht durch den Rückstoß zusammen.`
-          : ` ${me.name} nimmt Rückstoß-Schaden.`;
+        me().currentHp <= 0
+          ? ` ${me().name} bricht durch den Rückstoß zusammen.`
+          : ` ${me().name} nimmt Rückstoß-Schaden.`;
     }
-    if (statusMsg) line += ` ${statusMsg}`;
     this.log.set(line);
+    // A multi-target summary needs a beat to be read before faint messages replace it.
+    if (results.length > 1) await this.wait(900);
 
     for (const msg of statLogs) {
       await this.wait(850);
@@ -902,18 +1327,154 @@ export class BattlePage implements OnDestroy {
     }
 
     // Hyper Beam & co.: lock the user into a recharge turn (unless it just fainted).
-    const userNow = side === 'player' ? this.player() : this.opponent();
-    if (userNow.currentHp > 0) this.queueRecharge(side, move);
+    if (me().currentHp > 0) this.queueRecharge(user, move);
   }
 
   /**
-   * If `move` is a recharge move (Hyper Beam …), park it on the acting side so
-   * {@link finishRound} plays out the mandatory rest turn next round. Cleared
-   * when the Pokémon faints ({@link settleFaints}) or switches out.
+   * Protect / Detect / King's Shield on the target, or Wide / Quick Guard on its
+   * side, stop `move`. Plays the block and returns true when it's stopped.
    */
-  private queueRecharge(side: 'player' | 'opponent', move: Move): void {
+  private async blockedByProtection(move: Move, user: Slot, t: Slot): Promise<boolean> {
+    const tm = this.monAt(t)!;
+    const prot = this.protectedSlots.get(slotKey(t));
+    const guard = this.sideGuards[t.side];
+    let msg: string | null = null;
+
+    if (prot && t.side !== user.side && protectBlocks(prot, move)) {
+      msg = `${tm.name} hat sich geschützt!`;
+      if (prot === 'kingsshield' && isContactMove(move)) {
+        const atk = this.monAt(user)!;
+        const res = this.statChange.apply(atk.boosts, { atk: -1 });
+        this.patchSlot(user, { boosts: res.boosts });
+        for (const ch of res.changes) msg += ` ${this.statChangeMessage(atk.name, ch)}`;
+      }
+    } else if (guard.wide && isSpreadMove(move) && protectBlocks('wideguard', move)) {
+      msg = `Rundumschutz hat ${tm.name} geschützt!`;
+    } else if (
+      guard.quick &&
+      t.side !== user.side &&
+      this.damageCalc.movePriority(move) > 0 &&
+      protectBlocks('quickguard', move)
+    ) {
+      msg = `Rapidschutz hat ${tm.name} geschützt!`;
+    }
+    if (!msg) return false;
+
+    await this.wait(400);
+    await this.animation.playShield(this.spriteEl(t), this.fxRef.nativeElement, this.fieldRef.nativeElement);
+    this.log.set(msg);
+    await this.wait(700);
+    return true;
+  }
+
+  /** Protect family, Wide / Quick Guard, Helping Hand, Follow Me / Rage Powder. */
+  private async performSupportMove(move: Move, user: Slot, streakKey: string): Promise<void> {
+    const id = move.showdownId;
+    const name = this.monAt(user)!.name;
+    const fx = this.fxRef.nativeElement;
+    const fieldEl = this.fieldRef.nativeElement;
+    this.log.set(`${name} setzt ${move.name} ein...`);
+    this.audio.playMove(id);
+
+    const fail = async () => {
+      await this.wait(500);
+      this.log.set('Aber es misslang!');
+      await this.wait(700);
+    };
+
+    if (PROTECT_MOVES.has(id)) {
+      const streak = this.protectStreak[streakKey] ?? 0;
+      if (Math.random() >= protectSuccessChance(streak)) {
+        this.protectStreak[streakKey] = 0;
+        return fail();
+      }
+      this.protectStreak[streakKey] = streak + 1;
+      this.protectedSlots.set(slotKey(user), id);
+      await this.animation.playShield(this.spriteEl(user), fx, fieldEl, id === 'kingsshield' ? '#c9b458' : '#7fd3ff');
+      this.log.set(`${name} schützt sich selbst!`);
+      await this.wait(700);
+      return;
+    }
+
+    if (SIDE_GUARD_MOVES.has(id)) {
+      const wide = id === 'wideguard';
+      if (wide) this.sideGuards[user.side].wide = true;
+      else this.sideGuards[user.side].quick = true;
+      await Promise.all(
+        livingSlots(user.side, this.field()).map((s) =>
+          this.animation.playShield(this.spriteEl(s), fx, fieldEl, wide ? '#b98a4b' : '#e0703c')
+        )
+      );
+      const team = user.side === 'player' ? 'dein Team' : 'das gegnerische Team';
+      this.log.set(`${move.name} schützt ${team}!`);
+      await this.wait(700);
+      return;
+    }
+
+    if (id === 'helpinghand') {
+      const ally = livingAlly(user, this.field());
+      if (!ally || this.moved.has(slotKey(ally))) return fail();
+      this.helpingHand.add(slotKey(ally));
+      await this.animation.playMove(move, this.refsFor(user, ally));
+      this.log.set(`${name} möchte ${this.monAt(ally)!.name} helfen!`);
+      await this.wait(700);
+      return;
+    }
+
+    // Follow Me / Rage Powder: only meaningful with a partner to shield.
+    if (!this.isDoubles()) return fail();
+    this.redirector[user.side] = { slot: user, kind: id === 'ragepowder' ? 'ragepowder' : 'followme' };
+    await this.animation.playMove(move, this.refsFor(user, user));
+    this.log.set(`${name} zieht alle Aufmerksamkeit auf sich!`);
+    await this.wait(700);
+  }
+
+  /** Moves that only affect the user or the field (Swords Dance, Recover, Rest, Spikes …). */
+  private async performSelfMove(move: Move, user: Slot, phase: 'release' | undefined): Promise<void> {
+    const me = () => this.monAt(user)!;
+    this.log.set(`${me().name} setzt ${move.name} ein...`);
+    this.audio.playMove(move.showdownId);
+    const foe = livingFoes(user, this.field())[0] ?? user;
+    await this.animation.playMove(move, this.refsFor(user, foe), phase);
+
+    const recovery = this.damageCalc.calculateRecovery(move, me(), 0);
+    if (recovery.amount > 0) this.applyHp(user, recovery.amount);
+
+    // Rest also puts the user to sleep for two turns.
+    if (move.showdownId === 'rest' && recovery.amount > 0) {
+      this.patchSlot(user, { status: { ...me().status, major: 'slp', sleepTurns: 3, toxicTurns: 0 } });
+    }
+
+    const statLogs: string[] = [];
+    const sc = this.statChange.resolve(move, me().types, 0);
+    if (Object.keys(sc.toUser).length) {
+      const res = this.statChange.apply(me().boosts, sc.toUser);
+      this.patchSlot(user, { boosts: res.boosts });
+      for (const ch of res.changes) statLogs.push(this.statChangeMessage(me().name, ch));
+    }
+
+    let line: string;
+    if (recovery.kind === 'selfHeal' && recovery.amount > 0) line = `${me().name} füllt seine KP auf!`;
+    else if (recovery.kind === 'selfHeal') line = 'Aber es misslang!';
+    else if (statLogs.length) line = statLogs.shift() as string;
+    else line = `${move.name} zeigt keine Wirkung …`;
+    this.log.set(line);
+
+    for (const msg of statLogs) {
+      await this.wait(850);
+      this.log.set(msg);
+    }
+    this.queueRecharge(user, move);
+  }
+
+  /**
+   * If `move` is a recharge move (Hyper Beam …), park it on the acting slot so
+   * the next round plays out the mandatory rest turn. Cleared when the Pokémon
+   * faints ({@link settleFaints}) or switches out.
+   */
+  private queueRecharge(slot: Slot, move: Move): void {
     if (!this.damageCalc.needsRecharge(move)) return;
-    this.charge.update((c) => ({ ...c, [side]: { move, semiInvuln: false, recharge: true } }));
+    this.setCharge(slot, { move, semiInvuln: false, recharge: true });
   }
 
   private statChangeMessage(name: string, ch: StatChange): string {
@@ -952,29 +1513,14 @@ export class BattlePage implements OnDestroy {
       .map((stat) => ({ stat, stage: mon.boosts[stat] }));
   }
 
-  /** Shallow-merge a patch onto one side's active Pokémon. */
-  private patchActive(side: 'player' | 'opponent', patch: Partial<BattlePokemon>): void {
-    if (side === 'opponent') {
-      const idx = this.activeOpponentIndex();
-      this.opponentTeam.update((team) => team.map((p, i) => (i === idx ? { ...p, ...patch } : p)));
-      return;
-    }
-    const idx = this.activePlayerIndex();
-    this.playerTeam.update((team) => team.map((p, i) => (i === idx ? { ...p, ...patch } : p)));
-  }
-
-  /** Add (heal) or subtract (damage) HP on one side's active Pokémon, clamped. */
-  private applyHp(side: 'player' | 'opponent', delta: number): void {
-    const mon = side === 'player' ? this.player() : this.opponent();
-    this.patchActive(side, { currentHp: Math.max(0, Math.min(mon.maxHp, mon.currentHp + delta)) });
-  }
-
   private wait(ms: number): Promise<void> {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
+  // --- menus ------------------------------------------------------------
+
   openFightMenu(): void {
-    if (this.phase() !== 'fight' || this.isAnimating() || this.isActiveFainted()) return;
+    if (!this.canCommand()) return;
     this.menuState.set('fight');
   }
 
@@ -994,57 +1540,49 @@ export class BattlePage implements OnDestroy {
   }
 
   backToMain(): void {
+    if (this.menuState() === 'target') {
+      this.pendingMove.set(null);
+      this.menuState.set('fight');
+      this.log.set(this.logBeforeTarget);
+      return;
+    }
+    if (this.replacingPos() !== null) return; // a forced replacement can't be skipped
     this.menuState.set('main');
   }
 
+  /** True while the acting Pokémon can't act (only a forced replacement is possible). */
   isActiveFainted(): boolean {
-    return this.player().currentHp <= 0;
+    return this.replacingPos() !== null;
+  }
+
+  isPartyActive(index: number): boolean {
+    return this.activePlayer().includes(index);
   }
 
   canSwitchTo(index: number): boolean {
-    return index !== this.activePlayerIndex() && this.playerTeam()[index].currentHp > 0;
+    const mon = this.playerTeam()[index];
+    if (!mon || mon.currentHp <= 0 || this.activePlayer().includes(index)) return false;
+    if (this.replacingPos() !== null) return true;
+    // Not already picked to come in by the partner's command this turn.
+    return !this.commands().some((c) => c?.kind === 'switch' && c.to === index);
   }
 
   async switchPokemon(index: number): Promise<void> {
     if (this.isAnimating() || !this.canSwitchTo(index)) return;
 
-    // Replacing a fainted Pokémon is free; a voluntary switch uses the round.
-    const forced = this.isActiveFainted();
-    this.isAnimating.set(true);
-    this.menuState.set('main');
-    this.charge.update((c) => ({ ...c, player: null })); // switching cancels a two-turn move
-
-    const fx = this.fxRef.nativeElement;
-    const field = this.fieldRef.nativeElement;
-    const spriteEl = this.playerSpriteRef.nativeElement;
-
-    if (!forced) {
-      // Switching out clears volatiles: confusion ends, the toxic counter resets,
-      // and all stat stages are lost.
-      const out = this.player();
-      this.patchActive('player', {
-        status: { ...out.status, confusionTurns: 0, toxicTurns: out.status.major === 'tox' ? 1 : 0 },
-        boosts: freshBoosts()
-      });
-      this.log.set(`${out.name}, komm zurück!`);
-      await this.animation.playRecall(spriteEl, fx, field, 'player');
-    }
-
-    this.activePlayerIndex.set(index);
-    this.faintDone.player = false;
-    await this.wait(60); // let the sprite src rebind before it grows in
-    this.log.set(`Los, ${this.player().name}!`);
-    await this.animation.playSendOut(spriteEl, fx, field, 'player');
-    await this.wait(120);
-    this.audio.playCry(this.player().dexId);
-
-    if (forced) {
-      this.isAnimating.set(false);
+    const pos = this.replacingPos();
+    if (pos !== null) {
+      // Refill a fainted position (free, doesn't use a turn).
+      this.isAnimating.set(true);
+      this.menuState.set('main');
+      this.replacingPos.set(null);
+      await this.sendIn({ side: 'player', pos }, index);
+      await this.startReplacements(true);
       return;
     }
 
-    await this.wait(250);
-    await this.resolveRound();
+    if (!this.canCommand()) return;
+    await this.commit({ kind: 'switch', to: index });
   }
 
   hpPercent(pokemon: BattlePokemon): number {

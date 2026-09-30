@@ -12,7 +12,13 @@
           <figcaption>{{ npcName() }}</figcaption>
         </figure>
       </div>
-      <p class="trainer-text">Herausforderer {{ npcName() }} fordert dich heraus!</p>
+      <p class="trainer-text">
+        @if (isDoubles()) {
+          {{ npcName() }} fordert dich zu einem Doppelkampf heraus!
+        } @else {
+          Herausforderer {{ npcName() }} fordert dich heraus!
+        }
+      </p>
       <button type="button" class="trainer-cta" (click)="beginFight(); $event.stopPropagation()">
         Los geht's!
       </button>
@@ -45,9 +51,13 @@
     </div>
   }
 
-  <div class="field" #field>
-    <div class="platform opponent-platform"></div>
-    <div class="platform player-platform"></div>
+  <div class="field" #field [class.doubles]="isDoubles()">
+    <div class="platform opponent-platform pos0"></div>
+    <div class="platform player-platform pos0"></div>
+    @if (isDoubles()) {
+      <div class="platform opponent-platform pos1"></div>
+      <div class="platform player-platform pos1"></div>
+    }
 
     <div class="party-indicator opp">
       @for (e of opponentEmblems(); track $index) {
@@ -60,78 +70,94 @@
       }
     </div>
 
-    <div class="hud opponent-hud">
-      <div class="name">
-        <span class="mon-label">{{ opponent().name }}</span>
-        <span class="mon-lv">Lv. {{ level }}</span>
-        @if (opponent().status.major; as st) {
-          <span
-            class="status-badge"
-            [style.background]="statusMeta[st].bg"
-            [style.color]="statusMeta[st].fg"
-            [title]="statusMeta[st].label"
-            >{{ statusMeta[st].short }}</span
-          >
-        }
-        @if (opponent().status.confusionTurns > 0) {
-          <span class="status-badge cnf" title="Verwirrung">CNF</span>
-        }
-      </div>
-      <div class="hp-track">
-        <div class="hp-fill" [style.width.%]="hpPercent(opponent())" [style.background]="hpColor(opponent())"></div>
-      </div>
-      @if (boostChips(opponent()).length) {
-        <div class="boost-row">
-          @for (c of boostChips(opponent()); track c.stat) {
+    @for (v of opponentSlotViews(); track v.key) {
+      <div class="hud opponent-hud pos{{ v.slot.pos }}" [class.acting]="v.acting" [class.down]="v.mon.currentHp <= 0">
+        <div class="name">
+          <span class="mon-label">{{ v.mon.name }}</span>
+          <span class="mon-lv">Lv. {{ level }}</span>
+          @if (v.mon.status.major; as st) {
             <span
-              class="boost-chip"
-              [class.up]="c.stage > 0"
-              [class.down]="c.stage < 0"
-              [title]="statMeta[c.stat].label"
-              >{{ statMeta[c.stat].short }} {{ c.stage > 0 ? '+' : '' }}{{ c.stage }}</span
+              class="status-badge"
+              [style.background]="statusMeta[st].bg"
+              [style.color]="statusMeta[st].fg"
+              [title]="statusMeta[st].label"
+              >{{ statusMeta[st].short }}</span
             >
           }
+          @if (v.mon.status.confusionTurns > 0) {
+            <span class="status-badge cnf" title="Verwirrung">CNF</span>
+          }
         </div>
-      }
-    </div>
-    <img #oppSprite class="sprite opponent-sprite" [src]="opponentSpriteSrc()" [alt]="opponent().name" />
+        <div class="hp-track">
+          <div class="hp-fill" [style.width.%]="hpPercent(v.mon)" [style.background]="hpColor(v.mon)"></div>
+        </div>
+        @if (boostChips(v.mon).length) {
+          <div class="boost-row">
+            @for (c of boostChips(v.mon); track c.stat) {
+              <span
+                class="boost-chip"
+                [class.up]="c.stage > 0"
+                [class.down]="c.stage < 0"
+                [title]="statMeta[c.stat].label"
+                >{{ statMeta[c.stat].short }} {{ c.stage > 0 ? '+' : '' }}{{ c.stage }}</span
+              >
+            }
+          </div>
+        }
+      </div>
+      <img
+        class="sprite opponent-sprite pos{{ v.slot.pos }}"
+        [class.acting]="v.acting"
+        [attr.data-slot]="v.key"
+        [src]="spriteSrc(v)"
+        [alt]="v.mon.name"
+      />
+    }
 
-    <div class="hud player-hud">
-      <div class="name">
-        <span class="mon-label">{{ player().name }}</span>
-        <span class="mon-lv">Lv. {{ level }}</span>
-        @if (player().status.major; as st) {
-          <span
-            class="status-badge"
-            [style.background]="statusMeta[st].bg"
-            [style.color]="statusMeta[st].fg"
-            [title]="statusMeta[st].label"
-            >{{ statusMeta[st].short }}</span
-          >
-        }
-        @if (player().status.confusionTurns > 0) {
-          <span class="status-badge cnf" title="Verwirrung">CNF</span>
-        }
-      </div>
-      <div class="hp-track">
-        <div class="hp-fill" [style.width.%]="hpPercent(player())" [style.background]="hpColor(player())"></div>
-        <span class="hp-text">{{ player().currentHp }} / {{ player().maxHp }} HP</span>
-      </div>
-      @if (boostChips(player()).length) {
-        <div class="boost-row">
-          @for (c of boostChips(player()); track c.stat) {
+    @for (v of playerSlotViews(); track v.key) {
+      <div class="hud player-hud pos{{ v.slot.pos }}" [class.acting]="v.acting" [class.down]="v.mon.currentHp <= 0">
+        <div class="name">
+          <span class="mon-label">{{ v.mon.name }}</span>
+          <span class="mon-lv">Lv. {{ level }}</span>
+          @if (v.mon.status.major; as st) {
             <span
-              class="boost-chip"
-              [class.up]="c.stage > 0"
-              [class.down]="c.stage < 0"
-              [title]="statMeta[c.stat].label"
-              >{{ statMeta[c.stat].short }} {{ c.stage > 0 ? '+' : '' }}{{ c.stage }}</span
+              class="status-badge"
+              [style.background]="statusMeta[st].bg"
+              [style.color]="statusMeta[st].fg"
+              [title]="statusMeta[st].label"
+              >{{ statusMeta[st].short }}</span
             >
           }
+          @if (v.mon.status.confusionTurns > 0) {
+            <span class="status-badge cnf" title="Verwirrung">CNF</span>
+          }
         </div>
-      }
-    </div>
-    <img #playerSprite class="sprite player-sprite" [src]="playerSpriteSrc()" [alt]="player().name" />
+        <div class="hp-track">
+          <div class="hp-fill" [style.width.%]="hpPercent(v.mon)" [style.background]="hpColor(v.mon)"></div>
+          <span class="hp-text">{{ v.mon.currentHp }} / {{ v.mon.maxHp }} HP</span>
+        </div>
+        @if (boostChips(v.mon).length) {
+          <div class="boost-row">
+            @for (c of boostChips(v.mon); track c.stat) {
+              <span
+                class="boost-chip"
+                [class.up]="c.stage > 0"
+                [class.down]="c.stage < 0"
+                [title]="statMeta[c.stat].label"
+                >{{ statMeta[c.stat].short }} {{ c.stage > 0 ? '+' : '' }}{{ c.stage }}</span
+              >
+            }
+          </div>
+        }
+      </div>
+      <img
+        class="sprite player-sprite pos{{ v.slot.pos }}"
+        [class.acting]="v.acting"
+        [attr.data-slot]="v.key"
+        [src]="spriteSrc(v)"
+        [alt]="v.mon.name"
+      />
+    }
 
     <div #fx class="fx-layer"></div>
     <div #screenFx class="screen-fx-layer"></div>
@@ -149,10 +175,18 @@
   </div>
 
   <p class="battle-log">{{ log() }}</p>
+  @if (commandPrompt(); as prompt) {
+    <p class="command-prompt">{{ prompt }}</p>
+  }
 
   <div class="action-panel">
     @switch (menuState()) {
       @case ('main') {
+        @if (undoTarget(); as prev) {
+          <button type="button" class="undo-btn" [disabled]="isAnimating()" (click)="undoCommand()">
+            ‹ Zurück zu {{ prev.name }}
+          </button>
+        }
         <div class="menu-grid">
           <button type="button" class="menu-btn" [disabled]="isAnimating() || isActiveFainted()" (click)="openFightMenu()">
             <span class="menu-title">KAMPF</span>
@@ -186,17 +220,47 @@
               >
                 <span class="move-btn-name">{{ mv.move.name }}</span>
                 <span class="move-btn-pp">AP {{ mv.cur }} / {{ mv.max }}</span>
-                <span
-                  class="move-btn-hint"
-                  [class.strong]="mv.hint.kind === 'strong'"
-                  [class.weak]="mv.hint.kind === 'weak'"
-                  [class.immune]="mv.hint.kind === 'immune'"
-                  [class.status]="mv.hint.kind === 'status'"
-                  >{{ mv.hint.label }}</span
-                >
+                @if (mv.hints.length === 1) {
+                  <span class="move-btn-hint" [class]="mv.hints[0].kind">{{ mv.hints[0].label }}</span>
+                } @else {
+                  <span class="move-btn-hints">
+                    @for (h of mv.hints; track $index) {
+                      <span class="move-btn-hint mini" [class]="h.kind" [title]="h.foe + ': ' + h.label"
+                        >{{ h.foe }}: {{ h.short }}</span
+                      >
+                    }
+                  </span>
+                }
               </button>
             } @empty {
               <p class="move-empty-note">{{ player().name }} kennt keine Attacken.</p>
+            }
+          </div>
+          <button type="button" class="back-btn" [disabled]="isAnimating()" (click)="backToMain()">Zurück</button>
+        </div>
+      }
+      @case ('target') {
+        <div class="submenu">
+          <div class="party-list">
+            @for (t of targetOptions(); track t.key) {
+              <button
+                type="button"
+                class="party-entry target-entry"
+                [class.ally]="t.ally"
+                [disabled]="isAnimating()"
+                (click)="chooseTarget(t.slot)"
+              >
+                <img [src]="partySpriteSrc(t.mon)" [alt]="t.mon.name" class="party-sprite" />
+                <span class="party-name">
+                  {{ t.mon.name }}
+                  @if (t.ally) {
+                    <span class="target-tag">Partner</span>
+                  }
+                </span>
+                <div class="party-hp-track">
+                  <div class="party-hp-fill" [style.width.%]="hpPercent(t.mon)" [style.background]="hpColor(t.mon)"></div>
+                </div>
+              </button>
             }
           </div>
           <button type="button" class="back-btn" [disabled]="isAnimating()" (click)="backToMain()">Zurück</button>
@@ -209,7 +273,7 @@
               <button
                 type="button"
                 class="party-entry"
-                [class.active]="i === activePlayerIndex()"
+                [class.active]="isPartyActive(i)"
                 [class.fainted]="pokemon.currentHp <= 0"
                 [disabled]="isAnimating() || !canSwitchTo(i)"
                 (click)="switchPokemon(i)"
@@ -232,7 +296,9 @@
               </button>
             }
           </div>
-          <button type="button" class="back-btn" (click)="backToMain()">Zurück</button>
+          @if (replacingPos() === null) {
+            <button type="button" class="back-btn" (click)="backToMain()">Zurück</button>
+          }
         </div>
       }
     }

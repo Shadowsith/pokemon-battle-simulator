@@ -1,6 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { MajorStatus } from '../models/pokemon.model';
 import { EliteFourMember, eliteFourRegion } from '../models/elite-four.model';
+import type { BattleFormat } from '../battle/battle-format';
 
 const SAVE_KEY = 'pbs.eliteFourRun';
 
@@ -14,6 +15,8 @@ export interface RunCarry {
 
 export interface EliteFourRun {
   regionId: string;
+  /** Every fight of the run is played in this format. */
+  format: BattleFormat;
   /** Index of the next member to fight. */
   index: number;
   status: 'active' | 'won' | 'lost';
@@ -63,10 +66,10 @@ export class EliteFourRunService {
 
   // --- run lifecycle ------------------------------------------------
 
-  start(regionId: string): void {
+  start(regionId: string, format: BattleFormat = 'singles'): void {
     const region = eliteFourRegion(regionId);
     if (!region || !region.available || !region.members.length) return;
-    this._run.set({ regionId, index: 0, status: 'active', lostTo: null, carry: null });
+    this._run.set({ regionId, format, index: 0, status: 'active', lostTo: null, carry: null });
     this.persist();
   }
 
@@ -131,6 +134,7 @@ function sanitize(v: unknown): EliteFourRun | null {
   const index = typeof r['index'] === 'number' ? r['index'] : 0;
   return {
     regionId: region.id,
+    format: r['format'] === 'doubles' ? 'doubles' : 'singles',
     index: Math.max(0, Math.min(region.members.length - 1, Math.round(index))),
     status,
     lostTo: typeof r['lostTo'] === 'string' ? r['lostTo'] : null,

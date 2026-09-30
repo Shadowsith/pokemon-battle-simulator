@@ -22,6 +22,14 @@ const SEMI_INVULN = new Set(['fly', 'dig', 'bounce', 'dive', 'skydrop', 'shadowf
 export type Recovery = { amount: number; kind: 'drain' | 'selfHeal' | 'none' };
 export type SelfDamage = { amount: number; kind: 'recoil' | 'selfKo' | 'none' };
 
+/** Doubles damage modifiers for one hit. */
+export interface DamageMods {
+  /** The move hits more than one target this turn (0.75×). */
+  spread?: boolean;
+  /** The user's partner used Helping Hand on it this turn (1.5× power). */
+  helpingHand?: boolean;
+}
+
 /**
  * Standard Pokémon stat formula (neutral nature, no EVs, max IVs) - identical to
  * @pkmn/sim's own `spreadModify`, so a level-100 result matches the simulator.
@@ -170,7 +178,13 @@ export class DamageCalcService {
     return spe;
   }
 
-  calculateDamage(attacker: BattlePokemon, defender: BattlePokemon, move: Move): number {
+  calculateDamage(
+    attacker: BattlePokemon,
+    defender: BattlePokemon,
+    move: Move,
+    mods: DamageMods = {},
+    randomFactor = (85 + Math.floor(Math.random() * 16)) / 100
+  ): number {
     const moveData = Dex.moves.get(move.showdownId);
     if (!moveData?.exists || !moveData.basePower) return 0;
 
@@ -191,13 +205,13 @@ export class DamageCalcService {
     const stab = attackerSpecies.types.includes(moveData.type) ? 1.5 : 1;
     const typeMod = Dex.getEffectiveness(moveData.type, defenderSpecies.types);
     const effectiveness = Math.pow(2, typeMod);
-    const randomFactor = (85 + Math.floor(Math.random() * 16)) / 100;
     // A burned attacker's physical moves deal half.
     const burn = attacker.status.major === 'brn' && isPhysical ? 0.5 : 1;
+    const power = Math.floor(moveData.basePower * (mods.helpingHand ? 1.5 : 1));
+    const spread = mods.spread ? 0.75 : 1;
 
-    const rawDamage =
-      (((2 * LEVEL) / 5 + 2) * moveData.basePower * (attackStat / defenseStat)) / 50 + 2;
-    return Math.max(1, Math.floor(rawDamage * stab * effectiveness * randomFactor * burn));
+    const rawDamage = (((2 * LEVEL) / 5 + 2) * power * (attackStat / defenseStat)) / 50 + 2;
+    return Math.max(1, Math.floor(rawDamage * spread * stab * effectiveness * randomFactor * burn));
   }
 
   /**

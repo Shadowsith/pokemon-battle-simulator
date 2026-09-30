@@ -48,6 +48,16 @@ describe('EliteFourRunService', () => {
     expect(svc.currentMember()?.name).toBe('Thymelot');
   });
 
+  it('remembers the run format (singles by default) across reloads', () => {
+    svc.start('kanto');
+    expect(svc.run()?.format).toBe('singles');
+    svc.start('kanto', 'doubles');
+    expect(svc.run()?.format).toBe('doubles');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({});
+    expect(TestBed.inject(EliteFourRunService).run()?.format).toBe('doubles');
+  });
+
   it('uses only moves the battle engine knows', () => {
     const known = new Set(MOVE_LIBRARY.map((m) => m.showdownId));
     const unknown = ELITE_FOUR_REGIONS.flatMap((r) =>

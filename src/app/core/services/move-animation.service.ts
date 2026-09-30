@@ -728,6 +728,29 @@ export class MoveAnimationService {
     );
   }
 
+  /** Protect / Detect / King's Shield: a translucent bubble pops up around the Pokémon. */
+  async playShield(spriteEl: HTMLElement, fxEl: HTMLElement, fieldEl: HTMLElement, color = '#7fd3ff'): Promise<void> {
+    const at = this.centerOf(spriteEl, fieldEl);
+    const size = Math.max(spriteEl.getBoundingClientRect().height, 60) * 1.15;
+    const bubble = document.createElement('div');
+    bubble.style.cssText = `position:absolute;left:${at.x - size / 2}px;top:${at.y - size / 2}px;width:${size}px;height:${size}px;border-radius:50%;border:3px solid ${color};background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),${color}33 60%,transparent 75%);pointer-events:none`;
+    fxEl.appendChild(bubble);
+    await this.anim(bubble, [
+      { transform: 'scale(.4)', opacity: 0 },
+      { transform: 'scale(1.05)', opacity: 1, offset: 0.35 },
+      { transform: 'scale(1)', opacity: 0.9, offset: 0.7 },
+      { transform: 'scale(1.1)', opacity: 0 }
+    ], { duration: 620, easing: 'ease-out' });
+    bubble.remove();
+  }
+
+  /** A short hit flash + shake for the extra targets of a spread move. */
+  async playHitFlash(spriteEl: HTMLElement, color = '#ffffff'): Promise<void> {
+    this.flash(spriteEl, color, 0.7);
+    this.shake(spriteEl, 5);
+    await this.wait(260);
+  }
+
   /** The classic faint: the Pokémon drops below its platform and fades out. */
   async playFaint(spriteEl: HTMLElement): Promise<void> {
     spriteEl.getAnimations?.().forEach((a) => a.cancel());

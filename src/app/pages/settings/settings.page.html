@@ -44,7 +44,10 @@
 
   <section class="setting">
     <h2>Zufallskämpfe</h2>
-    <p class="hint">Ob der zufällige NPC-Gegner legendäre Pokémon einsetzen darf.</p>
+    <p class="hint">
+      Ob der zufällige NPC-Gegner legendäre Pokémon einsetzen darf und ob ein Zufallskampf auch
+      als Doppelkampf (2 gegen 2) starten kann.
+    </p>
     <label class="check-row">
       <input
         type="checkbox"
@@ -52,6 +55,14 @@
         (change)="onAllowLegendaries($event)"
       />
       <span>Legendäre Pokémon erlauben</span>
+    </label>
+    <label class="check-row">
+      <input
+        type="checkbox"
+        [checked]="allowDoubleBattles()"
+        (change)="onAllowDoubleBattles($event)"
+      />
+      <span>Doppelkämpfe erlauben (50 % Chance)</span>
     </label>
   </section>
 

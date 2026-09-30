@@ -1,3 +1,4 @@
+import type { BattleFormat } from '../battle/battle-format';
 import type { NpcTeamOptions } from '../services/npc-team.service';
 import { POKEMON_TYPES } from './pokemon.model';
 import { MAX_TEAM_SIZE, type TeamPokemon } from './team.model';
@@ -6,6 +7,8 @@ import { MAX_TEAM_SIZE, type TeamPokemon } from './team.model';
 export type OpponentMode = 'random' | 'team';
 
 export interface CustomBattleConfig {
+  /** Singles or doubles (2 vs 2). Doubles needs at least 2 opponents. */
+  format: BattleFormat;
   /** 1..6 — number of opponent slots (team mode) / roll size (random mode). */
   opponentCount: number;
   mode: OpponentMode;
@@ -36,6 +39,7 @@ export interface SavedCustomBattle {
 
 export function defaultCustomBattleConfig(): CustomBattleConfig {
   return {
+    format: 'singles',
     opponentCount: 3,
     mode: 'random',
     team: [],
@@ -48,16 +52,19 @@ export function defaultCustomBattleConfig(): CustomBattleConfig {
 }
 
 /**
- * Normalises a config: clamps `opponentCount` to 1..6, trims `team` and
+ * Normalises a config: clamps `opponentCount` to 1..6 (2..6 for doubles), trims `team` and
  * `distinctTypes` to that count, and enforces that the two type modes are
  * mutually exclusive (single type wins).
  */
 export function clampConfig(c: CustomBattleConfig): CustomBattleConfig {
-  const opponentCount = Math.max(1, Math.min(MAX_TEAM_SIZE, Math.round(c.opponentCount || 1)));
+  const format: BattleFormat = c.format === 'doubles' ? 'doubles' : 'singles';
+  const minCount = format === 'doubles' ? 2 : 1;
+  const opponentCount = Math.max(minCount, Math.min(MAX_TEAM_SIZE, Math.round(c.opponentCount || 1)));
   const forceSingleType = c.forceSingleType;
   const forceDistinctTypes = forceSingleType ? false : c.forceDistinctTypes;
   return {
     ...c,
+    format,
     opponentCount,
     team: c.team.slice(0, opponentCount),
     forceSingleType,

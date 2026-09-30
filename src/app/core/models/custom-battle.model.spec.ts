@@ -60,4 +60,13 @@ describe('custom-battle.model', () => {
       guaranteedTypes: ['Fire', 'Electric']
     });
   });
+
+  it('defaults to singles and needs at least two opponents for doubles', () => {
+    expect(defaultCustomBattleConfig().format).toBe('singles');
+    const d = clampConfig({ ...defaultCustomBattleConfig(), format: 'doubles', opponentCount: 1 });
+    expect(d.format).toBe('doubles');
+    expect(d.opponentCount).toBe(2);
+    const bogus = clampConfig({ ...defaultCustomBattleConfig(), format: 'triples' as never });
+    expect(bogus.format).toBe('singles');
+  });
 });

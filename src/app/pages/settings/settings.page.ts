@@ -25,6 +25,7 @@ export class SettingsPage {
   readonly volumePin = (value: number): string => `${Math.round(value)}%`;
 
   readonly allowLegendaries = this.settings.allowLegendaries;
+  readonly allowDoubleBattles = this.settings.allowDoubleBattles;
 
   choose(id: string): void {
     this.settings.setTrainerAvatar(id);
@@ -42,6 +43,10 @@ export class SettingsPage {
 
   onAllowLegendaries(ev: Event): void {
     this.settings.setAllowLegendaries((ev.target as HTMLInputElement).checked);
+  }
+
+  onAllowDoubleBattles(ev: Event): void {
+    this.settings.setAllowDoubleBattles((ev.target as HTMLInputElement).checked);
   }
 
   private rangeValue(ev: Event): number | null {

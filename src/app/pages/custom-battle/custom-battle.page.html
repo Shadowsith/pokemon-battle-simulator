@@ -30,11 +30,45 @@
     </div>
   </section>
 
+  <!-- ---------- format ---------- -->
+  <section class="cb-section">
+    <span class="cb-label">Kampfart</span>
+    <div class="cb-segment">
+      <button
+        type="button"
+        class="seg-btn"
+        [class.active]="config().format === 'singles'"
+        (click)="setFormat('singles')"
+      >
+        Einzelkampf
+      </button>
+      <button
+        type="button"
+        class="seg-btn"
+        [class.active]="config().format === 'doubles'"
+        [disabled]="!canDouble()"
+        (click)="setFormat('doubles')"
+      >
+        Doppelkampf (2 vs 2)
+      </button>
+    </div>
+    @if (!canDouble()) {
+      <p class="cb-hint">Für Doppelkämpfe braucht dein aktives Team mindestens 2 Pokémon.</p>
+    }
+  </section>
+
   <!-- ---------- opponent count ---------- -->
   <section class="cb-section">
     <span class="cb-label">Anzahl gegnerischer Pokémon</span>
     <div class="cb-stepper">
-      <button type="button" class="cb-btn" [disabled]="config().opponentCount <= 1" (click)="stepCount(-1)">−</button>
+      <button
+        type="button"
+        class="cb-btn"
+        [disabled]="config().opponentCount <= (config().format === 'doubles' ? 2 : 1)"
+        (click)="stepCount(-1)"
+      >
+        −
+      </button>
       <span class="cb-count">{{ config().opponentCount }}</span>
       <button type="button" class="cb-btn" [disabled]="config().opponentCount >= 6" (click)="stepCount(1)">+</button>
     </div>

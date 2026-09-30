@@ -5,6 +5,7 @@ import { trainerAvatarPath } from '../../core/models/trainer.model';
 import { ELITE_FOUR_REGIONS, EliteFourMember, eliteFourRegion } from '../../core/models/elite-four.model';
 import { EliteFourRunService } from '../../core/services/elite-four-run.service';
 import { TeamService } from '../../core/services/team.service';
+import type { BattleFormat } from '../../core/battle/battle-format';
 
 type MemberState = 'beaten' | 'next' | 'lost' | 'upcoming';
 
@@ -25,6 +26,9 @@ export class EliteFourPage {
 
   readonly view = signal<'config' | 'run'>(this.e4.run() ? 'run' : 'config');
   readonly selectedRegionId = signal<string>('kanto');
+  readonly selectedFormat = signal<BattleFormat>('singles');
+  /** Doubles needs at least two Pokémon in the player's active team. */
+  readonly canDouble = computed(() => (this.teamService.activeTeam()?.pokemon.length ?? 0) >= 2);
 
   readonly run = this.e4.run;
   readonly runRegion = this.e4.region;
@@ -53,9 +57,15 @@ export class EliteFourPage {
     if (r?.available) this.selectedRegionId.set(id);
   }
 
+  setFormat(format: BattleFormat): void {
+    if (format === 'doubles' && !this.canDouble()) return;
+    this.selectedFormat.set(format);
+  }
+
   startRun(): void {
     if (!this.teamService.activeReady() || !this.selectedRegion()?.available) return;
-    this.e4.start(this.selectedRegionId());
+    const format = this.selectedFormat() === 'doubles' && this.canDouble() ? 'doubles' : 'singles';
+    this.e4.start(this.selectedRegionId(), format);
     this.view.set('run');
   }
 
@@ -69,7 +79,7 @@ export class EliteFourPage {
   }
 
   restartRun(): void {
-    this.e4.start(this.run()?.regionId ?? this.selectedRegionId());
+    this.e4.start(this.run()?.regionId ?? this.selectedRegionId(), this.run()?.format ?? this.selectedFormat());
   }
 
   newRun(): void {

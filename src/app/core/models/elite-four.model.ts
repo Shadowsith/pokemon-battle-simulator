@@ -690,7 +690,8 @@ const EINALL: EliteFourRegion = {
 /**
  * Kalos Top Four, Pokémon X / Y. The Kalos Top Four have no rematch teams, so
  * these are the only sets: four Pokémon each. Held items and abilities aren't
- * modelled, so Aegislash stays in one form (King's Shield acts as a plain protect).
+ * modelled, so Aegislash stays in Shield Forme; King's Shield blocks attacks and
+ * lowers a contact attacker's Attack.
  */
 const KALOS: EliteFourRegion = {
   id: 'kalos',

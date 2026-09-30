@@ -93,6 +93,7 @@ function sanitize(v: unknown): SavedCustomBattle | null {
   const c = (s['config'] ?? {}) as Record<string, unknown>;
   const base = defaultCustomBattleConfig();
   const config = clampConfig({
+    format: c['format'] === 'doubles' ? 'doubles' : 'singles',
     opponentCount: typeof c['opponentCount'] === 'number' ? c['opponentCount'] : base.opponentCount,
     mode: c['mode'] === 'team' ? 'team' : 'random',
     team: Array.isArray(c['team'])

@@ -73,4 +73,13 @@ describe('Gen 8 battle mechanics', () => {
       expect(calc.effectiveness(move('dragonclaw'), mon(700))).toBe(0); // Sylveon
     });
   });
+
+  it('spread moves deal 0.75× and Helping Hand boosts power by 1.5×', () => {
+    const atk = mon(9); // Blastoise
+    const def = mon(6); // Charizard
+    const surf = move('surf');
+    const base = calc.calculateDamage(atk, def, surf, {}, 1);
+    expect(calc.calculateDamage(atk, def, surf, { spread: true }, 1) / base).toBeCloseTo(0.75, 1);
+    expect(calc.calculateDamage(atk, def, surf, { helpingHand: true }, 1) / base).toBeCloseTo(1.5, 1);
+  });
 });

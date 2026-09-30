@@ -19,6 +19,7 @@ import {
 import { DexDataService } from '../../core/services/dex-data.service';
 import { TeamService } from '../../core/services/team.service';
 import { CustomBattleService } from '../../core/services/custom-battle.service';
+import type { BattleFormat } from '../../core/battle/battle-format';
 
 type Picker = { kind: 'species' } | { kind: 'move'; pokeIndex: number; slot: number };
 
@@ -123,6 +124,14 @@ export class CustomBattlePage {
 
   stepCount(delta: number): void {
     this.setCount(this.config().opponentCount + delta);
+  }
+
+  /** Doubles needs at least two Pokémon in the player's active team. */
+  readonly canDouble = computed(() => (this.teamService.activeTeam()?.pokemon.length ?? 0) >= 2);
+
+  setFormat(format: BattleFormat): void {
+    if (format === 'doubles' && !this.canDouble()) return;
+    this.patch((c) => ({ ...c, format }));
   }
 
   setMode(mode: OpponentMode): void {

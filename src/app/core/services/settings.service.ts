@@ -5,6 +5,7 @@ const TRAINER_AVATAR_KEY = 'pbs.settings.trainerAvatar';
 const VOLUME_KEY = 'pbs.settings.volume';
 const MUSIC_VOLUME_KEY = 'pbs.settings.musicVolume';
 const ALLOW_LEGENDARIES_KEY = 'pbs.settings.allowLegendaries';
+const ALLOW_DOUBLES_KEY = 'pbs.settings.allowDoubles';
 const DEFAULT_VOLUME = 0.5;
 
 /**
@@ -18,6 +19,7 @@ export class SettingsService {
   private readonly _volume = signal<number>(this.loadVolume(VOLUME_KEY));
   private readonly _musicVolume = signal<number>(this.loadVolume(MUSIC_VOLUME_KEY));
   private readonly _allowLegendaries = signal<boolean>(this.loadFlag(ALLOW_LEGENDARIES_KEY, true));
+  private readonly _allowDoubleBattles = signal<boolean>(this.loadFlag(ALLOW_DOUBLES_KEY, true));
 
   /** Showdown sprite id of the player's chosen trainer avatar. */
   readonly trainerAvatar = this._trainerAvatar.asReadonly();
@@ -31,10 +33,22 @@ export class SettingsService {
   /** Whether the random NPC opponent may field Legendary / Mythical Pokémon. */
   readonly allowLegendaries = this._allowLegendaries.asReadonly();
 
+  /** Whether a random battle may roll a double battle (50 % chance). */
+  readonly allowDoubleBattles = this._allowDoubleBattles.asReadonly();
+
   setAllowLegendaries(value: boolean): void {
     this._allowLegendaries.set(value);
+    this.persistFlag(ALLOW_LEGENDARIES_KEY, value);
+  }
+
+  setAllowDoubleBattles(value: boolean): void {
+    this._allowDoubleBattles.set(value);
+    this.persistFlag(ALLOW_DOUBLES_KEY, value);
+  }
+
+  private persistFlag(key: string, value: boolean): void {
     try {
-      localStorage.setItem(ALLOW_LEGENDARIES_KEY, value ? '1' : '0');
+      localStorage.setItem(key, value ? '1' : '0');
     } catch {
       /* storage unavailable - keep the choice in memory for this session */
     }

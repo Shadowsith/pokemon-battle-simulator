@@ -560,3 +560,180 @@
   flex-wrap: wrap;
   justify-content: center;
 }
+
+/* --- double battles ---------------------------------------------------
+   Same 640 × 300 coordinate system as singles: the opponent pair stands
+   back-right with its HUDs top-left, the player pair front-left with its
+   HUDs bottom-right. */
+
+.field.doubles {
+  .party-indicator.opp {
+    left: 20px;
+  }
+
+  .opponent-platform {
+    width: 100px;
+    height: 20px;
+
+    &.pos0 {
+      left: 380px;
+      top: 138px;
+    }
+
+    &.pos1 {
+      left: 500px;
+      top: 150px;
+    }
+  }
+
+  .player-platform {
+    width: 115px;
+    height: 24px;
+
+    &.pos0 {
+      left: 30px;
+      top: 212px;
+    }
+
+    &.pos1 {
+      left: 180px;
+      top: 226px;
+    }
+  }
+
+  .opponent-sprite {
+    height: 80px;
+    max-width: 120px;
+
+    &.pos0 {
+      left: 390px;
+      bottom: 152px;
+    }
+
+    &.pos1 {
+      left: 510px;
+      bottom: 140px;
+    }
+  }
+
+  .player-sprite {
+    height: 106px;
+    max-width: 150px;
+
+    &.pos0 {
+      left: 32px;
+      bottom: 72px;
+    }
+
+    &.pos1 {
+      left: 182px;
+      bottom: 58px;
+    }
+  }
+
+  .hud {
+    width: 160px;
+
+    .name {
+      font-size: 11px;
+    }
+
+    .hp-track {
+      height: 12px;
+    }
+  }
+
+  .opponent-hud {
+    left: 20px;
+
+    &.pos0 {
+      top: 18px;
+    }
+
+    &.pos1 {
+      top: 70px;
+    }
+  }
+
+  .player-hud {
+    left: 460px;
+
+    &.pos0 {
+      top: 186px;
+    }
+
+    &.pos1 {
+      top: 240px;
+    }
+  }
+}
+
+.hud.acting {
+  border-radius: 6px;
+  box-shadow: 0 0 0 2px #f2c94c;
+  background: rgba(242, 201, 76, 0.12);
+}
+
+.hud.down {
+  opacity: 0.45;
+}
+
+.sprite.acting {
+  filter: drop-shadow(0 0 5px #f2c94c);
+}
+
+.undo-btn {
+  align-self: flex-start;
+  margin-bottom: 6px;
+  padding: 4px 10px;
+  border: 1px solid #d6d6d6;
+  border-radius: 6px;
+  background: #fff;
+  color: #444;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.move-btn-hints {
+  position: absolute;
+  top: 50%;
+  right: 9px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+
+  .move-btn-hint.mini {
+    position: static;
+    transform: none;
+    font-size: 8px;
+    padding: 1px 5px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.target-tag {
+  margin-left: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: #e8eefc;
+  color: #2b4f86;
+}
+
+.command-prompt {
+  margin: -4px 16px 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #9a7412;
+}

@@ -140,6 +140,11 @@
     background: #3c6cb4;
     color: #fff;
   }
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
 }
 
 .check-row {

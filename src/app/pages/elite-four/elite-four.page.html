@@ -42,6 +42,29 @@
       }
     }
 
+    <div class="ef-format" role="radiogroup" aria-label="Kampfart">
+      <button
+        type="button"
+        class="format-btn"
+        [class.active]="selectedFormat() === 'singles'"
+        (click)="setFormat('singles')"
+      >
+        Einzelkampf
+      </button>
+      <button
+        type="button"
+        class="format-btn"
+        [class.active]="selectedFormat() === 'doubles'"
+        [disabled]="!canDouble()"
+        (click)="setFormat('doubles')"
+      >
+        Doppelkampf (2 vs 2)
+      </button>
+    </div>
+    @if (!canDouble()) {
+      <p class="ef-hint">Für Doppelkämpfe braucht dein aktives Team mindestens 2 Pokémon.</p>
+    }
+
     <div class="ef-actions">
       <ion-button
         expand="block"
@@ -56,7 +79,11 @@
     </div>
   } @else {
     @if (run(); as r) {
-      <h2 class="ef-region-title">{{ runRegion()?.label }}</h2>
+      <h2 class="ef-region-title">
+        {{ runRegion()?.label }}@if (r.format === 'doubles') {
+          <span class="format-tag">Doppel</span>
+        }
+      </h2>
 
       <ol class="member-track">
         @for (row of memberRows(); track row.member.trainerId + row.member.name; let i = $index) {
