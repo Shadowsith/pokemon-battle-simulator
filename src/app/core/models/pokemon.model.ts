@@ -43,6 +43,10 @@ export interface BattlePokemon {
   types: string[];
   status: StatusState;
   boosts: Boosts;
+  /** Held item id (item.model.ts); null / missing when none or used up. */
+  item?: string | null;
+  /** The opponent's item is shown once it has triggered. */
+  itemRevealed?: boolean;
 }
 
 /** Badge presentation per status: short code, background, text colour, full name. */

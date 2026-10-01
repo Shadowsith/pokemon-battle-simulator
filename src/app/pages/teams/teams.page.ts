@@ -9,6 +9,9 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { IonContent } from '@ionic/angular/standalone';
+import { ItemIconComponent } from '../../shared/item-icon/item-icon.component';
+import { ItemPickerComponent } from '../../shared/item-picker/item-picker.component';
+import { heldItem } from '../../core/models/item.model';
 import { frontSpritePath, germanTypeLabel, typeColor } from '../../core/models/pokemon.model';
 import {
   ImportedTeam,
@@ -41,7 +44,7 @@ interface ImportRow {
 @Component({
   selector: 'app-teams',
   standalone: true,
-  imports: [IonContent, RouterLink],
+  imports: [IonContent, RouterLink, ItemIconComponent, ItemPickerComponent],
   templateUrl: './teams.page.html',
   styleUrl: './teams.page.scss'
 })
@@ -66,6 +69,9 @@ export class TeamsPage implements OnDestroy {
   });
 
   readonly picker = signal<Picker | null>(null);
+  /** Team slot whose held item is being chosen, or null. */
+  readonly itemPickerIndex = signal<number | null>(null);
+  readonly heldItem = heldItem;
   readonly search = signal('');
   private readonly legalMoveIds = signal<string[]>([]);
 
@@ -328,6 +334,16 @@ export class TeamsPage implements OnDestroy {
     if (p?.kind !== 'move') return;
     this.teamService.setMove(this.tid(), p.pokeIndex, p.slot, moveId);
     this.closePicker();
+  }
+
+  openItemPicker(index: number): void {
+    this.itemPickerIndex.set(index);
+  }
+
+  pickItem(itemId: string | null): void {
+    const index = this.itemPickerIndex();
+    if (index !== null) this.teamService.setItem(this.tid(), index, itemId);
+    this.itemPickerIndex.set(null);
   }
 
   removePokemon(index: number): void {

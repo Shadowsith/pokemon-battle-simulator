@@ -7,7 +7,7 @@ import type { GymLeader, RunRegion } from './trainer-run.model';
  * Kanto uses the first Schwarz 2 / Weiß 2 team of each leader — the PWT
  * "Kanto-Arenaleiterturnier" (source: pokewiki.de, each leader's page). That
  * tournament fields Janina (not Koga) for Fuchsania City and Giovanni for
- * Vertania City. Six Pokémon each; held items and abilities aren't modelled.
+ * Vertania City. Six Pokémon each, holding their PWT items; abilities aren't modelled.
  */
 const KANTO: RunRegion<GymLeader> = {
   id: 'kanto',
@@ -24,27 +24,33 @@ const KANTO: RunRegion<GymLeader> = {
       team: [
         {
           speciesNum: 95, speciesId: 'onix', name: 'Onix', types: ['Rock', 'Ground'],
-          moves: ['sandtomb', 'protect', 'stealthrock', 'sandstorm']
+          moves: ['sandtomb', 'protect', 'stealthrock', 'sandstorm'],
+          item: 'salacberry'
         },
         {
           speciesNum: 76, speciesId: 'golem', name: 'Geowaz', types: ['Rock', 'Ground'],
-          moves: ['stoneedge', 'earthquake', 'suckerpunch', 'irondefense']
+          moves: ['stoneedge', 'earthquake', 'suckerpunch', 'irondefense'],
+          item: 'darkgem'
         },
         {
           speciesNum: 141, speciesId: 'kabutops', name: 'Kabutops', types: ['Rock', 'Water'],
-          moves: ['stoneedge', 'aquajet', 'superpower', 'swordsdance']
+          moves: ['stoneedge', 'aquajet', 'superpower', 'swordsdance'],
+          item: 'liechiberry'
         },
         {
           speciesNum: 139, speciesId: 'omastar', name: 'Amoroso', types: ['Rock', 'Water'],
-          moves: ['hydropump', 'ancientpower', 'earthpower', 'icebeam']
+          moves: ['hydropump', 'ancientpower', 'earthpower', 'icebeam'],
+          item: 'rindoberry'
         },
         {
           speciesNum: 142, speciesId: 'aerodactyl', name: 'Aerodactyl', types: ['Rock', 'Flying'],
-          moves: ['rockslide', 'earthquake', 'thunderfang', 'tailwind']
+          moves: ['rockslide', 'earthquake', 'thunderfang', 'tailwind'],
+          item: 'chartiberry'
         },
         {
           speciesNum: 369, speciesId: 'relicanth', name: 'Relicanth', types: ['Water', 'Rock'],
-          moves: ['rockslide', 'waterfall', 'rockpolish', 'yawn']
+          moves: ['rockslide', 'waterfall', 'rockpolish', 'yawn'],
+          item: 'rockgem'
         }
       ]
     },
@@ -57,27 +63,33 @@ const KANTO: RunRegion<GymLeader> = {
       team: [
         {
           speciesNum: 121, speciesId: 'starmie', name: 'Starmie', types: ['Water', 'Psychic'],
-          moves: ['hydropump', 'psychic', 'thunderbolt', 'icebeam']
+          moves: ['hydropump', 'psychic', 'thunderbolt', 'icebeam'],
+          item: 'petayaberry'
         },
         {
           speciesNum: 55, speciesId: 'golduck', name: 'Entoron', types: ['Water'],
-          moves: ['aquajet', 'blizzard', 'focusblast', 'honeclaws']
+          moves: ['aquajet', 'blizzard', 'focusblast', 'honeclaws'],
+          item: 'watergem'
         },
         {
           speciesNum: 119, speciesId: 'seaking', name: 'Golking', types: ['Water'],
-          moves: ['waterfall', 'megahorn', 'poisonjab', 'agility']
+          moves: ['waterfall', 'megahorn', 'poisonjab', 'agility'],
+          item: 'wacanberry'
         },
         {
           speciesNum: 131, speciesId: 'lapras', name: 'Lapras', types: ['Water', 'Ice'],
-          moves: ['hydropump', 'icebeam', 'thunderbolt', 'confuseray']
+          moves: ['hydropump', 'icebeam', 'thunderbolt', 'confuseray'],
+          item: 'ganlonberry'
         },
         {
           speciesNum: 80, speciesId: 'slowbro', name: 'Lahmus', types: ['Water', 'Psychic'],
-          moves: ['scald', 'psyshock', 'slackoff', 'yawn']
+          moves: ['scald', 'psyshock', 'slackoff', 'yawn'],
+          item: 'apicotberry'
         },
         {
           speciesNum: 9, speciesId: 'blastoise', name: 'Turtok', types: ['Water'],
-          moves: ['hydropump', 'irontail', 'avalanche', 'irondefense']
+          moves: ['hydropump', 'irontail', 'avalanche', 'irondefense'],
+          item: 'salacberry'
         }
       ]
     },
@@ -90,27 +102,33 @@ const KANTO: RunRegion<GymLeader> = {
       team: [
         {
           speciesNum: 26, speciesId: 'raichu', name: 'Raichu', types: ['Electric'],
-          moves: ['thunderbolt', 'focusblast', 'signalbeam', 'thunderwave']
+          moves: ['thunderbolt', 'focusblast', 'signalbeam', 'thunderwave'],
+          item: 'electricgem'
         },
         {
           speciesNum: 101, speciesId: 'electrode', name: 'Lektrobal', types: ['Electric'],
-          moves: ['raindance', 'thunder', 'mirrorcoat', 'magnetrise']
+          moves: ['raindance', 'thunder', 'mirrorcoat', 'magnetrise'],
+          item: 'lumberry'
         },
         {
           speciesNum: 462, speciesId: 'magnezone', name: 'Magnezone', types: ['Electric', 'Steel'],
-          moves: ['discharge', 'flashcannon', 'signalbeam', 'barrier']
+          moves: ['discharge', 'flashcannon', 'signalbeam', 'barrier'],
+          item: 'airballoon'
         },
         {
           speciesNum: 466, speciesId: 'electivire', name: 'Elevoltek', types: ['Electric'],
-          moves: ['wildcharge', 'lowkick', 'rocktomb', 'firepunch']
+          moves: ['wildcharge', 'lowkick', 'rocktomb', 'firepunch'],
+          item: 'liechiberry'
         },
         {
           speciesNum: 135, speciesId: 'jolteon', name: 'Blitza', types: ['Electric'],
-          moves: ['thunder', 'shadowball', 'signalbeam', 'raindance']
+          moves: ['thunder', 'shadowball', 'signalbeam', 'raindance'],
+          item: 'shucaberry'
         },
         {
           speciesNum: 181, speciesId: 'ampharos', name: 'Ampharos', types: ['Electric'],
-          moves: ['discharge', 'powergem', 'charge', 'cottonguard']
+          moves: ['discharge', 'powergem', 'charge', 'cottonguard'],
+          item: 'petayaberry'
         }
       ]
     },
@@ -123,27 +141,33 @@ const KANTO: RunRegion<GymLeader> = {
       team: [
         {
           speciesNum: 45, speciesId: 'vileplume', name: 'Giflor', types: ['Grass', 'Poison'],
-          moves: ['petaldance', 'sleeppowder', 'moonlight', 'sunnyday']
+          moves: ['petaldance', 'sleeppowder', 'moonlight', 'sunnyday'],
+          item: 'grassgem'
         },
         {
           speciesNum: 3, speciesId: 'venusaur', name: 'Bisaflor', types: ['Grass', 'Poison'],
-          moves: ['petaldance', 'toxic', 'lightscreen', 'synthesis']
+          moves: ['petaldance', 'toxic', 'lightscreen', 'synthesis'],
+          item: 'sitrusberry'
         },
         {
           speciesNum: 71, speciesId: 'victreebel', name: 'Sarzenia', types: ['Grass', 'Poison'],
-          moves: ['leafblade', 'suckerpunch', 'swordsdance', 'reflect']
+          moves: ['leafblade', 'suckerpunch', 'swordsdance', 'reflect'],
+          item: 'salacberry'
         },
         {
           speciesNum: 103, speciesId: 'exeggutor', name: 'Kokowei', types: ['Grass', 'Psychic'],
-          moves: ['solarbeam', 'psyshock', 'hypnosis', 'sunnyday']
+          moves: ['solarbeam', 'psyshock', 'hypnosis', 'sunnyday'],
+          item: 'tangaberry'
         },
         {
           speciesNum: 465, speciesId: 'tangrowth', name: 'Tangoloss', types: ['Grass'],
-          moves: ['powerwhip', 'earthquake', 'rockslide', 'swordsdance']
+          moves: ['powerwhip', 'earthquake', 'rockslide', 'swordsdance'],
+          item: 'liechiberry'
         },
         {
           speciesNum: 182, speciesId: 'bellossom', name: 'Blubella', types: ['Grass'],
-          moves: ['leafblade', 'drainpunch', 'swordsdance', 'sunnyday']
+          moves: ['leafblade', 'drainpunch', 'swordsdance', 'sunnyday'],
+          item: 'fightinggem'
         }
       ]
     },
@@ -156,27 +180,33 @@ const KANTO: RunRegion<GymLeader> = {
       team: [
         {
           speciesNum: 49, speciesId: 'venomoth', name: 'Omot', types: ['Bug', 'Poison'],
-          moves: ['sludgebomb', 'bugbuzz', 'gigadrain', 'quiverdance']
+          moves: ['sludgebomb', 'bugbuzz', 'gigadrain', 'quiverdance'],
+          item: 'petayaberry'
         },
         {
           speciesNum: 110, speciesId: 'weezing', name: 'Smogmog', types: ['Poison'],
-          moves: ['sludgebomb', 'fireblast', 'shadowball', 'painsplit']
+          moves: ['sludgebomb', 'fireblast', 'shadowball', 'painsplit'],
+          item: 'firegem'
         },
         {
           speciesNum: 168, speciesId: 'ariados', name: 'Ariados', types: ['Bug', 'Poison'],
-          moves: ['poisonjab', 'strugglebug', 'electroweb', 'suckerpunch']
+          moves: ['poisonjab', 'strugglebug', 'electroweb', 'suckerpunch'],
+          item: 'payapaberry'
         },
         {
           speciesNum: 169, speciesId: 'crobat', name: 'Iksbat', types: ['Poison', 'Flying'],
-          moves: ['toxic', 'superfang', 'heatwave', 'tailwind']
+          moves: ['toxic', 'superfang', 'heatwave', 'tailwind'],
+          item: 'sitrusberry'
         },
         {
           speciesNum: 24, speciesId: 'arbok', name: 'Arbok', types: ['Poison'],
-          moves: ['gunkshot', 'suckerpunch', 'coil', 'dragontail']
+          moves: ['gunkshot', 'suckerpunch', 'coil', 'dragontail'],
+          item: 'shucaberry'
         },
         {
           speciesNum: 73, speciesId: 'tentacruel', name: 'Tentoxa', types: ['Water', 'Poison'],
-          moves: ['toxicspikes', 'scald', 'gigadrain', 'barrier']
+          moves: ['toxicspikes', 'scald', 'gigadrain', 'barrier'],
+          item: 'apicotberry'
         }
       ]
     },
@@ -189,27 +219,33 @@ const KANTO: RunRegion<GymLeader> = {
       team: [
         {
           speciesNum: 65, speciesId: 'alakazam', name: 'Simsala', types: ['Psychic'],
-          moves: ['psyshock', 'shadowball', 'focusblast', 'chargebeam']
+          moves: ['psyshock', 'shadowball', 'focusblast', 'chargebeam'],
+          item: 'colburberry'
         },
         {
           speciesNum: 97, speciesId: 'hypno', name: 'Hypno', types: ['Psychic'],
-          moves: ['dreameater', 'shadowball', 'hypnosis', 'calmmind']
+          moves: ['dreameater', 'shadowball', 'hypnosis', 'calmmind'],
+          item: 'sitrusberry'
         },
         {
           speciesNum: 122, speciesId: 'mrmime', name: 'Pantimos', types: ['Psychic', 'Fairy'],
-          moves: ['psychic', 'chargebeam', 'lightscreen', 'reflect']
+          moves: ['psychic', 'chargebeam', 'lightscreen', 'reflect'],
+          item: 'kasibberry'
         },
         {
           speciesNum: 199, speciesId: 'slowking', name: 'Laschoking', types: ['Water', 'Psychic'],
-          moves: ['psyshock', 'icebeam', 'slackoff', 'calmmind']
+          moves: ['psyshock', 'icebeam', 'slackoff', 'calmmind'],
+          item: 'ganlonberry'
         },
         {
           speciesNum: 196, speciesId: 'espeon', name: 'Psiana', types: ['Psychic'],
-          moves: ['psyshock', 'shadowball', 'yawn', 'reflect']
+          moves: ['psyshock', 'shadowball', 'yawn', 'reflect'],
+          item: 'petayaberry'
         },
         {
           speciesNum: 124, speciesId: 'jynx', name: 'Rossana', types: ['Ice', 'Psychic'],
-          moves: ['dreameater', 'frostbreath', 'energyball', 'lovelykiss']
+          moves: ['dreameater', 'frostbreath', 'energyball', 'lovelykiss'],
+          item: 'salacberry'
         }
       ]
     },
@@ -222,27 +258,33 @@ const KANTO: RunRegion<GymLeader> = {
       team: [
         {
           speciesNum: 59, speciesId: 'arcanine', name: 'Arkani', types: ['Fire'],
-          moves: ['flareblitz', 'wildcharge', 'closecombat', 'extremespeed']
+          moves: ['flareblitz', 'wildcharge', 'closecombat', 'extremespeed'],
+          item: 'liechiberry'
         },
         {
           speciesNum: 38, speciesId: 'ninetales', name: 'Vulnona', types: ['Fire'],
-          moves: ['heatwave', 'energyball', 'hypnosis', 'nastyplot']
+          moves: ['heatwave', 'energyball', 'hypnosis', 'nastyplot'],
+          item: 'chartiberry'
         },
         {
           speciesNum: 6, speciesId: 'charizard', name: 'Glurak', types: ['Fire', 'Flying'],
-          moves: ['inferno', 'dragonrush', 'focusblast', 'honeclaws']
+          moves: ['inferno', 'dragonrush', 'focusblast', 'honeclaws'],
+          item: 'dragongem'
         },
         {
           speciesNum: 467, speciesId: 'magmortar', name: 'Magbrant', types: ['Fire'],
-          moves: ['fireblast', 'psychic', 'thunderbolt', 'focusblast']
+          moves: ['fireblast', 'psychic', 'thunderbolt', 'focusblast'],
+          item: 'petayaberry'
         },
         {
           speciesNum: 136, speciesId: 'flareon', name: 'Flamara', types: ['Fire'],
-          moves: ['flamecharge', 'superpower', 'flail', 'yawn']
+          moves: ['flamecharge', 'superpower', 'flail', 'yawn'],
+          item: 'salacberry'
         },
         {
           speciesNum: 78, speciesId: 'rapidash', name: 'Gallopa', types: ['Fire'],
-          moves: ['flareblitz', 'megahorn', 'wildcharge', 'hypnosis']
+          moves: ['flareblitz', 'megahorn', 'wildcharge', 'hypnosis'],
+          item: 'shucaberry'
         }
       ]
     },
@@ -255,27 +297,33 @@ const KANTO: RunRegion<GymLeader> = {
       team: [
         {
           speciesNum: 464, speciesId: 'rhyperior', name: 'Rihornior', types: ['Ground', 'Rock'],
-          moves: ['drillrun', 'stoneedge', 'megahorn', 'hammerarm']
+          moves: ['drillrun', 'stoneedge', 'megahorn', 'hammerarm'],
+          item: 'liechiberry'
         },
         {
           speciesNum: 76, speciesId: 'golem', name: 'Geowaz', types: ['Rock', 'Ground'],
-          moves: ['earthquake', 'stealthrock', 'rockblast', 'roar']
+          moves: ['earthquake', 'stealthrock', 'rockblast', 'roar'],
+          item: 'rindoberry'
         },
         {
           speciesNum: 105, speciesId: 'marowak', name: 'Knogga', types: ['Ground'],
-          moves: ['bonemerang', 'stoneedge', 'outrage', 'thunderpunch']
+          moves: ['bonemerang', 'stoneedge', 'outrage', 'thunderpunch'],
+          item: 'yacheberry'
         },
         {
           speciesNum: 28, speciesId: 'sandslash', name: 'Sandamer', types: ['Ground'],
-          moves: ['earthquake', 'rockslide', 'brickbreak', 'sandstorm']
+          moves: ['earthquake', 'rockslide', 'brickbreak', 'sandstorm'],
+          item: 'salacberry'
         },
         {
           speciesNum: 34, speciesId: 'nidoking', name: 'Nidoking', types: ['Poison', 'Ground'],
-          moves: ['earthpower', 'sludgewave', 'megahorn', 'blizzard']
+          moves: ['earthpower', 'sludgewave', 'megahorn', 'blizzard'],
+          item: 'shucaberry'
         },
         {
           speciesNum: 31, speciesId: 'nidoqueen', name: 'Nidoqueen', types: ['Poison', 'Ground'],
-          moves: ['earthpower', 'poisonjab', 'superpower', 'thunder']
+          moves: ['earthpower', 'poisonjab', 'superpower', 'thunder'],
+          item: 'passhoberry'
         }
       ]
     }

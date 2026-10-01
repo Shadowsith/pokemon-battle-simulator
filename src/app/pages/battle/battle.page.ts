@@ -47,7 +47,22 @@ import {
   targetChoices
 } from '../../core/battle/battle-format';
 import { chooseNpcMove, pickSwitchIn } from '../../core/battle/npc-ai';
+import {
+  balloonPops,
+  berryCheck,
+  blocksStatusMoves,
+  defenseMods,
+  focusSashCap,
+  hasPowerHerb,
+  isChoiceItem,
+  lifeOrbRecoil,
+  offenseMods,
+  residualItem,
+  retaliation,
+  shellBellHeal
+} from '../../core/battle/item-effects';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
+import { ItemIconComponent } from '../../shared/item-icon/item-icon.component';
 import { CustomBattleService } from '../../core/services/custom-battle.service';
 import { CustomBattleConfig, configToNpcOptions } from '../../core/models/custom-battle.model';
 import { EliteFourRunService } from '../../core/services/elite-four-run.service';
@@ -109,7 +124,7 @@ interface MoveHint {
 @Component({
   selector: 'app-battle',
   standalone: true,
-  imports: [IonContent, IonButton],
+  imports: [IonContent, IonButton, ItemIconComponent],
   templateUrl: './battle.page.html',
   styleUrl: './battle.page.scss'
 })
@@ -227,6 +242,9 @@ export class BattlePage implements OnDestroy {
   /** Successful protection moves in a row, keyed "<side>:<party index>". */
   private protectStreak: Record<string, number> = {};
 
+  /** Choice Band / Specs / Scarf: the move each holder is locked into, keyed "<side>:<party index>". */
+  private readonly choiceLocks = signal<Record<string, string>>({});
+
   // --- per-turn volatiles (cleared at the start of each round) ---
   private protectedSlots = new Map<string, string>();
   private sideGuards: Record<Side, { wide: boolean; quick: boolean }> = this.freshGuards();
@@ -242,12 +260,25 @@ export class BattlePage implements OnDestroy {
     const foes = livingFoes(user, this.field())
       .map((s) => this.monAt(s))
       .filter((m): m is BattlePokemon => !!m);
+    const holder = this.playerTeam()[idx];
     return this.activeMoves().map((move) => {
       const max = this.damageCalc.maxPp(move);
       const key = `${idx}:${move.showdownId}`;
-      return { move, max, cur: pp[key] ?? max, hints: this.moveHints(move, foes) };
+      const locked = holder ? this.itemLockReason('player', idx, holder, move) : null;
+      return { move, max, cur: pp[key] ?? max, hints: this.moveHints(move, foes), locked };
     });
   });
+
+  /**
+   * Why a held item forbids `move` right now: a Choice item locked into another
+   * move, or an Assault Vest blocking status moves. null when it's allowed.
+   */
+  private itemLockReason(side: Side, partyIdx: number, mon: BattlePokemon, move: Move): string | null {
+    const lock = this.choiceLocks()[`${side}:${partyIdx}`];
+    if (lock && lock !== move.showdownId && isChoiceItem(mon)) return 'Wahl-Item';
+    if (blocksStatusMoves(mon) && this.damageCalc.isStatusMove(move)) return 'Offensivweste';
+    return null;
+  }
 
   /** Target buttons for the pending single-target move. */
   readonly targetOptions = computed(() => {
@@ -595,7 +626,9 @@ export class BattlePage implements OnDestroy {
             currentHp: maxHp,
             types: r.types.map((t) => t.toLowerCase()),
             status: freshStatus(),
-            boosts: freshBoosts()
+            boosts: freshBoosts(),
+            item: r.item,
+            itemRevealed: false
           };
         })
       );
@@ -676,6 +709,7 @@ export class BattlePage implements OnDestroy {
     this.applyRunCarry();
     this.charge.set({});
     this.protectStreak = {};
+    this.choiceLocks.set({});
     this.clearTurnVolatiles();
     this.commands.set([]);
     this.commandHistory.set([]);
@@ -804,6 +838,11 @@ export class BattlePage implements OnDestroy {
       this.log.set(`${move.name} hat keine AP mehr übrig!`);
       return;
     }
+    const blocked = this.itemLockReason('player', this.activePlayerIndex(), this.player(), move);
+    if (blocked) {
+      this.log.set(`${this.player().name} kann ${move.name} wegen ${blocked} nicht einsetzen!`);
+      return;
+    }
     const user: Slot = { side: 'player', pos: this.actingPos() };
     if (needsTargetChoice(move, user, this.field())) {
       this.pendingMove.set(move);
@@ -863,12 +902,14 @@ export class BattlePage implements OnDestroy {
     const idx = this.partyIdxAt(slot);
     const user = this.monAt(slot)!;
     const ally = livingAlly(slot, this.field());
+    const known = this.movesFor('opponent', idx);
+    const allowed = known.filter((m) => !this.itemLockReason('opponent', idx, user, m));
     const choice = chooseNpcMove({
       calc: this.damageCalc,
       field: this.field(),
       slot,
       user,
-      moves: this.movesFor('opponent', idx),
+      moves: allowed.length ? allowed : known,
       monAt: (s) => this.monAt(s),
       allyMoves: ally ? this.movesFor('opponent', this.partyIdxAt(ally)) : [],
       protectStreak: this.protectStreak[this.streakKey(slot)] ?? 0
@@ -1025,14 +1066,26 @@ export class BattlePage implements OnDestroy {
     );
     for (const slot of slots) {
       const mon = this.monAt(slot);
-      if (!mon || mon.currentHp <= 0 || !mon.status.major) continue;
-      const r = this.status.residual(mon);
-      this.patchSlot(slot, { status: r.status });
-      if (r.damage > 0) {
-        this.applyHp(slot, -r.damage);
-        if (r.message) this.log.set(r.message);
+      if (!mon || mon.currentHp <= 0) continue;
+      if (mon.status.major) {
+        const r = this.status.residual(mon);
+        this.patchSlot(slot, { status: r.status });
+        if (r.damage > 0) {
+          this.applyHp(slot, -r.damage);
+          if (r.message) this.log.set(r.message);
+          await this.wait(800);
+        }
+      }
+      // Leftovers / Black Sludge.
+      const now = this.monAt(slot);
+      const item = now ? residualItem(now) : null;
+      if (item) {
+        this.applyHp(slot, item.delta);
+        this.patchSlot(slot, { itemRevealed: true });
+        this.log.set(item.message);
         await this.wait(800);
       }
+      await this.runBerryChecks([slot]);
     }
   }
 
@@ -1110,6 +1163,7 @@ export class BattlePage implements OnDestroy {
       boosts: freshBoosts()
     });
     this.protectStreak[this.streakKey(slot)] = 0;
+    this.clearChoiceLock(slot);
     this.setCharge(slot, null);
     this.log.set(`${out.name}, komm zurück!`);
     await this.animation.playRecall(this.spriteEl(slot), this.fxRef.nativeElement, this.fieldRef.nativeElement, slot.side);
@@ -1149,9 +1203,16 @@ export class BattlePage implements OnDestroy {
     }
     if (pre.confusionSelfHit) {
       this.applyHp(user, -this.damageCalc.confusionSelfDamage(attacker));
+      await this.runBerryChecks([user]);
       return;
     }
     if (!pre.canAct) return;
+
+    // A Choice item locks its holder into the first move it uses.
+    const lockKey = this.streakKey(user);
+    if (isChoiceItem(attacker) && !this.choiceLocks()[lockKey]) {
+      this.choiceLocks.update((l) => ({ ...l, [lockKey]: id }));
+    }
 
     // Any move other than a protection move resets the consecutive-use counter.
     const streakKey = this.streakKey(user);
@@ -1162,8 +1223,15 @@ export class BattlePage implements OnDestroy {
       return;
     }
 
-    // --- two-turn move, turn 1: start charging, deal nothing ---
-    if (this.damageCalc.isChargeMove(move) && !myCharge) {
+    // --- two-turn move, turn 1: start charging, deal nothing (Power Herb skips it) ---
+    let phase: 'release' | undefined;
+    let aim = chosen;
+    if (this.damageCalc.isChargeMove(move) && !myCharge && hasPowerHerb(attacker)) {
+      this.consumeItem(user);
+      this.log.set(`${attacker.name} ist dank Energiekraut sofort bereit!`);
+      await this.wait(800);
+      phase = 'release';
+    } else if (this.damageCalc.isChargeMove(move) && !myCharge) {
       const semiInvuln = this.damageCalc.isSemiInvulnMove(move);
       this.setCharge(user, { move, semiInvuln, target: chosen });
       this.log.set(this.chargeMessage(attacker.name, move));
@@ -1175,8 +1243,6 @@ export class BattlePage implements OnDestroy {
     }
 
     // --- two-turn move, turn 2: release (skip the charge visual, then hit) ---
-    let phase: 'release' | undefined;
-    let aim = chosen;
     if (myCharge && myCharge.move.showdownId === id) {
       this.setCharge(user, null);
       phase = 'release';
@@ -1222,6 +1288,13 @@ export class BattlePage implements OnDestroy {
         continue;
       }
       if (await this.blockedByProtection(move, user, t)) continue;
+      if (defenseMods(tm, move, this.damageCalc.effectiveness(move, tm)).immune) {
+        this.patchSlot(t, { itemRevealed: true });
+        await this.wait(500);
+        this.log.set(`${tm.name} schwebt dank Luftballon über der Attacke!`);
+        await this.wait(750);
+        continue;
+      }
       if (!this.damageCalc.rollHit(move, me(), tm)) {
         await this.wait(480);
         await this.animation.playDodge(this.spriteEl(t));
@@ -1239,6 +1312,7 @@ export class BattlePage implements OnDestroy {
         this.applyHp(user, -crash);
         this.log.set(`Die Attacke von ${attacker.name} ging daneben! ${attacker.name} verletzt sich dabei selbst!`);
         await this.wait(650);
+        await this.runBerryChecks([user]);
       }
       this.queueRecharge(user, move); // a missed / blocked Hyper Beam still exhausts its user (Gen 4+)
       return;
@@ -1251,20 +1325,62 @@ export class BattlePage implements OnDestroy {
     const helped = this.helpingHand.has(slotKey(user));
     const results: { slot: Slot; dealt: number; statusMsg: string | null }[] = [];
     const statLogs: string[] = [];
+    const itemLogs: string[] = [];
     let totalDealt = 0;
     let userChangesDone = false;
 
+    // A gem boosts the whole move (every target) and is used up afterwards.
+    const gem = offenseMods(me(), move, 1).gem;
+    if (gem) {
+      this.log.set(`Das ${gem.name} verstärkt ${move.name}!`);
+      await this.wait(750);
+    }
+    let lifeOrb = false;
+
     for (const t of hits) {
       const defender = this.monAt(t)!;
+      const eff = this.damageCalc.effectiveness(move, defender);
+      const om = offenseMods(me(), move, eff);
+      const dm = defenseMods(defender, move, eff);
+      lifeOrb ||= om.lifeOrb;
       // Drain and recoil scale with HP actually lost, so cap the roll at the
       // defender's current HP (overkilling a weak target costs less recoil).
-      const raw = this.damageCalc.calculateDamage(me(), defender, move, { spread, helpingHand: helped });
-      const dealt = Math.min(raw, defender.currentHp);
+      const raw = this.damageCalc.calculateDamage(me(), defender, move, {
+        spread,
+        helpingHand: helped,
+        powerMult: om.powerMult,
+        atkStatMult: om.atkStatMult,
+        defStatMult: dm.defStatMult,
+        finalMult: om.finalMult * dm.finalMult
+      });
+      const sash = focusSashCap(defender, raw);
+      const dealt = Math.min(sash.damage, defender.currentHp);
       if (dealt > 0) {
         this.applyHp(t, -dealt);
-        this.audio.playHit(this.damageCalc.effectiveness(move, defender));
+        this.audio.playHit(eff);
       }
       totalDealt += dealt;
+
+      // --- defender items reacting to the hit ---
+      if (dm.berry && dealt > 0) {
+        this.consumeItem(t);
+        itemLogs.push(`${defender.name} isst seine ${dm.berry.name} und schwächt den Treffer ab!`);
+      }
+      if (sash.used) {
+        this.consumeItem(t);
+        itemLogs.push(`${defender.name} hält dank Fokusgurt durch!`);
+      }
+      if (balloonPops(defender, dealt) && this.monAt(t)!.item === 'airballoon') {
+        this.consumeItem(t);
+        itemLogs.push(`Der Luftballon von ${defender.name} ist geplatzt!`);
+      }
+      const hurt = retaliation(me(), defender, move, dealt);
+      if (hurt) {
+        this.applyHp(user, -hurt.damage);
+        if (hurt.consumed) this.consumeItem(t);
+        else this.patchSlot(t, { itemRevealed: true });
+        itemLogs.push(hurt.message);
+      }
 
       // --- status infliction / thaw on the target ---
       let statusMsg: string | null = null;
@@ -1304,6 +1420,22 @@ export class BattlePage implements OnDestroy {
     const recoil = this.damageCalc.calculateSelfDamage(move, me(), totalDealt);
     if (recoil.amount > 0) this.applyHp(user, -recoil.amount);
 
+    // --- attacker items after the move ---
+    if (gem && totalDealt > 0) this.consumeItem(user);
+    if (totalDealt > 0 && me().currentHp > 0) {
+      const bell = shellBellHeal(me(), totalDealt);
+      if (bell > 0 && me().currentHp < me().maxHp) {
+        this.applyHp(user, bell);
+        this.patchSlot(user, { itemRevealed: true });
+        itemLogs.push(`${me().name} füllt mit der Muschelglocke etwas KP auf.`);
+      }
+      if (lifeOrb) {
+        this.applyHp(user, -lifeOrbRecoil(me()));
+        this.patchSlot(user, { itemRevealed: true });
+        itemLogs.push(`${me().name} wird durch den Leben-Orb geschwächt.`);
+      }
+    }
+
     // --- one log line per target ---
     const lines = results.map((r) => {
       const foe = this.monAt(r.slot)!;
@@ -1338,13 +1470,41 @@ export class BattlePage implements OnDestroy {
     // A multi-target summary needs a beat to be read before faint messages replace it.
     if (results.length > 1) await this.wait(900);
 
-    for (const msg of statLogs) {
+    const followUps = [...statLogs, ...itemLogs];
+    for (const msg of followUps) {
       await this.wait(850);
       this.log.set(msg);
     }
+    // Let the last follow-up be read before a faint message replaces it.
+    if (followUps.length) await this.wait(850);
+    await this.runBerryChecks([...hits, user]);
 
     // Hyper Beam & co.: lock the user into a recharge turn (unless it just fainted).
     if (me().currentHp > 0) this.queueRecharge(user, move);
+  }
+
+  private clearChoiceLock(slot: Slot): void {
+    const key = this.streakKey(slot);
+    this.choiceLocks.update(({ [key]: _gone, ...rest }) => rest);
+  }
+
+  /** The Pokémon in `slot` uses up its item (berry eaten, gem spent …). */
+  private consumeItem(slot: Slot): void {
+    this.patchSlot(slot, { item: null, itemRevealed: true });
+  }
+
+  /** Let berries / White Herb react to HP, status or stat changes, one log line each. */
+  private async runBerryChecks(slots: Slot[]): Promise<void> {
+    for (const slot of slots) {
+      const mon = this.monAt(slot);
+      if (!mon || mon.currentHp <= 0) continue;
+      const trigger = berryCheck(mon);
+      if (!trigger) continue;
+      this.patchSlot(slot, trigger.patch);
+      await this.wait(700);
+      this.log.set(trigger.message);
+      await this.wait(850);
+    }
   }
 
   /**
@@ -1481,6 +1641,7 @@ export class BattlePage implements OnDestroy {
       await this.wait(850);
       this.log.set(msg);
     }
+    await this.runBerryChecks([user]); // Rest + Chesto Berry, Curse + White Herb …
     this.queueRecharge(user, move);
   }
 

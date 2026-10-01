@@ -1,5 +1,6 @@
 import { GYM_REGIONS, gymRegion } from './gym-leader.model';
 import { MOVE_LIBRARY } from './move.model';
+import { heldItem } from './item.model';
 
 describe('gym-leader.model', () => {
   const kanto = gymRegion('kanto')!;
@@ -24,6 +25,17 @@ describe('gym-leader.model', () => {
         expect(mon.moves.filter((id) => !known.has(id))).withContext(`${leader.name} ${mon.name}`).toEqual([]);
       }
     }
+  });
+
+  it('gives every gym Pokémon its PWT held item', () => {
+    for (const leader of kanto.members) {
+      for (const mon of leader.team) {
+        expect(heldItem(mon.item)).withContext(`${leader.name} ${mon.name} ${mon.item}`).toBeDefined();
+      }
+    }
+    expect(kanto.members[0].team.map((m) => m.item)).toEqual([
+      'salacberry', 'darkgem', 'liechiberry', 'rindoberry', 'chartiberry', 'rockgem'
+    ]);
   });
 
   it('uses trainer sprites that ship with the app', () => {

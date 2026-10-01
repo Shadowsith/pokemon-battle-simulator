@@ -494,3 +494,35 @@
   color: #999;
   font-size: 13px;
 }
+
+/* --- held item slot (same as the Team-Builder) ---------------------- */
+
+.item-slot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+  padding: 4px 8px;
+  border: 1px dashed #d6d6d6;
+  border-radius: 8px;
+  background: #fafafa;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  text-align: left;
+
+  &.set {
+    border-style: solid;
+    background: #fff;
+  }
+}
+
+.item-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.item-empty {
+  color: #888;
+}

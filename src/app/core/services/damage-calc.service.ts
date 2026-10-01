@@ -3,6 +3,7 @@ import { Dex, StatsTable } from '@pkmn/sim';
 import { BattlePokemon } from '../models/pokemon.model';
 import { Move } from '../models/move.model';
 import { accuracyStageMultiplier, stageMultiplier } from './stat-change.service';
+import { accuracyMult, speedMult } from '../battle/item-effects';
 
 /** Every Pokémon in this simulator is level 100. */
 const LEVEL = 100;
@@ -28,6 +29,11 @@ export interface DamageMods {
   spread?: boolean;
   /** The user's partner used Helping Hand on it this turn (1.5× power). */
   helpingHand?: boolean;
+  /** Held-item multipliers (item-effects.ts); all default to 1. */
+  powerMult?: number;
+  atkStatMult?: number;
+  defStatMult?: number;
+  finalMult?: number;
 }
 
 /**
@@ -113,7 +119,8 @@ export class DamageCalcService {
     const acc = Dex.moves.get(move.showdownId)?.accuracy;
     if (typeof acc !== 'number') return 1;
     const stage = attacker.boosts.accuracy - defender.boosts.evasion;
-    return Math.max(0, Math.min(1, (acc / 100) * accuracyStageMultiplier(stage)));
+    const item = accuracyMult(attacker, defender); // Wide Lens / Bright Powder
+    return Math.max(0, Math.min(1, (acc / 100) * accuracyStageMultiplier(stage) * item));
   }
 
   /** Roll {@link hitChance}: `true` when the move lands this time. */
@@ -173,7 +180,7 @@ export class DamageCalcService {
   effectiveSpeed(mon: BattlePokemon): number {
     const species = this.lookupSpecies(mon.dexId);
     if (!species) return 0;
-    let spe = calcStat(species.baseStats['spe'], false) * stageMultiplier(mon.boosts.spe);
+    let spe = calcStat(species.baseStats['spe'], false) * stageMultiplier(mon.boosts.spe) * speedMult(mon);
     if (mon.status.major === 'par') spe *= 0.5;
     return spe;
   }
@@ -198,20 +205,28 @@ export class DamageCalcService {
     const atkKey = isPhysical ? 'atk' : 'spa';
     const defKey = isPhysical ? 'def' : 'spd';
     const attackStat =
-      calcStat(attackerSpecies.baseStats[atkKey], false) * stageMultiplier(attacker.boosts[atkKey]);
+      calcStat(attackerSpecies.baseStats[atkKey], false) *
+      stageMultiplier(attacker.boosts[atkKey]) *
+      (mods.atkStatMult ?? 1);
     const defenseStat =
-      calcStat(defenderSpecies.baseStats[defKey], false) * stageMultiplier(defender.boosts[defKey]);
+      calcStat(defenderSpecies.baseStats[defKey], false) *
+      stageMultiplier(defender.boosts[defKey]) *
+      (mods.defStatMult ?? 1);
 
     const stab = attackerSpecies.types.includes(moveData.type) ? 1.5 : 1;
     const typeMod = Dex.getEffectiveness(moveData.type, defenderSpecies.types);
     const effectiveness = Math.pow(2, typeMod);
     // A burned attacker's physical moves deal half.
     const burn = attacker.status.major === 'brn' && isPhysical ? 0.5 : 1;
-    const power = Math.floor(moveData.basePower * (mods.helpingHand ? 1.5 : 1));
+    const power = Math.floor(moveData.basePower * (mods.helpingHand ? 1.5 : 1) * (mods.powerMult ?? 1));
     const spread = mods.spread ? 0.75 : 1;
+    const itemFinal = mods.finalMult ?? 1;
 
     const rawDamage = (((2 * LEVEL) / 5 + 2) * power * (attackStat / defenseStat)) / 50 + 2;
-    return Math.max(1, Math.floor(rawDamage * spread * stab * effectiveness * randomFactor * burn));
+    return Math.max(
+      1,
+      Math.floor(rawDamage * spread * stab * effectiveness * randomFactor * burn * itemFinal)
+    );
   }
 
   /**

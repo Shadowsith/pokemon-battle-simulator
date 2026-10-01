@@ -204,6 +204,14 @@
                   </button>
                 }
               </div>
+              <button type="button" class="item-slot" [class.set]="mon.item" (click)="itemPickerIndex.set(i)">
+                @if (heldItem(mon.item); as it) {
+                  <app-item-icon [itemId]="it.id" />
+                  <span class="item-name">{{ it.name }}</span>
+                } @else {
+                  <span class="item-empty">+ Item</span>
+                }
+              </button>
             </article>
           } @else {
             <button type="button" class="mon-add" (click)="openSpeciesPicker()">
@@ -266,6 +274,14 @@
   </div>
 
   <!-- ---------- species / move picker ---------- -->
+  @if (itemPickerIndex() !== null) {
+    <app-item-picker
+      [current]="config().team[itemPickerIndex()!]?.item"
+      (picked)="pickItem($event)"
+      (closed)="itemPickerIndex.set(null)"
+    />
+  }
+
   @if (picker(); as p) {
     <div class="picker-overlay" (click)="closePicker()">
       <div class="picker" (click)="$event.stopPropagation()">

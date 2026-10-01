@@ -10,6 +10,7 @@ import {
   livingFoes,
   moveTarget
 } from './battle-format';
+import { itemScoreMult } from './item-effects';
 
 /** The slice of DamageCalcService the AI scores with (kept small so it can be stubbed). */
 export interface AiCalc {
@@ -22,8 +23,8 @@ export interface AiCalc {
 
 /**
  * Rough "how useful is this move against `target`" for the NPC. Damaging moves
- * score as base power × STAB × type effectiveness × hit chance; status moves
- * score low so they stay situational rather than spammed.
+ * score as base power × STAB × type effectiveness × hit chance × held-item boost;
+ * status moves score low so they stay situational rather than spammed.
  */
 export function scoreMove(calc: AiCalc, move: Move, user: BattlePokemon, target: BattlePokemon): number {
   if (calc.isStatusMove(move)) return 12 * calc.accuracy(move);
@@ -32,7 +33,7 @@ export function scoreMove(calc: AiCalc, move: Move, user: BattlePokemon, target:
   const eff = calc.effectiveness(move, target); // 0, .25, .5, 1, 2, 4
   if (eff === 0) return 0;
   const stab = user.types.includes(move.type.toLowerCase()) ? 1.5 : 1;
-  return bp * stab * eff * calc.hitChance(move, user, target);
+  return bp * stab * eff * calc.hitChance(move, user, target) * itemScoreMult(user, move);
 }
 
 export interface NpcContext {

@@ -1,0 +1,43 @@
+<div class="picker-overlay" (click)="close()">
+  <div class="picker" (click)="$event.stopPropagation()">
+    <div class="picker-bar">
+      <input
+        class="picker-search"
+        type="text"
+        placeholder="Item suchen…"
+        [value]="search()"
+        (input)="search.set($any($event.target).value)"
+      />
+      <button type="button" class="picker-close" (click)="close()">Fertig</button>
+    </div>
+
+    <div class="item-tabs" role="tablist">
+      <button type="button" class="tab" [class.on]="category() === 'all'" (click)="category.set('all')">Alle</button>
+      @for (c of categories; track c.id) {
+        <button type="button" class="tab" [class.on]="category() === c.id" (click)="category.set(c.id)">
+          {{ c.label }}
+        </button>
+      }
+    </div>
+
+    <div class="picker-list">
+      <button type="button" class="pick-row clear" (click)="pick(null)">
+        <span class="pick-main"><span class="pick-name">— Kein Item</span></span>
+      </button>
+      @for (it of items(); track it.id) {
+        <button type="button" class="pick-row" [class.current]="it.id === current()" (click)="pick(it.id)">
+          <app-item-icon [itemId]="it.id" />
+          <span class="pick-main">
+            <span class="pick-name">{{ it.name }}</span>
+            <span class="pick-sub">{{ it.desc }}</span>
+          </span>
+          @if (it.id === current()) {
+            <span class="pick-tag">gewählt</span>
+          }
+        </button>
+      } @empty {
+        <p class="picker-empty">Kein Item gefunden.</p>
+      }
+    </div>
+  </div>
+</div>

@@ -1,0 +1,137 @@
+/* Same bottom-sheet look as the Team-Builder's species / move picker. */
+
+.picker-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.picker {
+  width: 100%;
+  max-width: 560px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
+}
+
+.picker-bar {
+  display: flex;
+  gap: 8px;
+  padding: 12px;
+  border-bottom: 1px solid #eee;
+}
+
+.picker-search {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid #d6d6d6;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 14px;
+}
+
+.picker-close {
+  border: none;
+  background: #2b2f38;
+  color: #fff;
+  border-radius: 8px;
+  padding: 0 16px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.item-tabs {
+  display: flex;
+  gap: 6px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+  overflow-x: auto;
+
+  .tab {
+    flex: none;
+    padding: 5px 11px;
+    border: 1px solid #d6d6d6;
+    border-radius: 999px;
+    background: #fff;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    color: #555;
+    cursor: pointer;
+
+    &.on {
+      background: #3c6cb4;
+      border-color: #3c6cb4;
+      color: #fff;
+    }
+  }
+}
+
+.picker-list {
+  overflow-y: auto;
+  padding: 6px;
+}
+
+.pick-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+
+  &:hover {
+    background: #f2f5fa;
+  }
+
+  &.current {
+    background: #eef3fb;
+  }
+
+  &.clear {
+    color: #d5443b;
+  }
+}
+
+.pick-main {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.pick-name {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.pick-sub {
+  font-size: 11px;
+  color: #777;
+}
+
+.pick-tag {
+  font-size: 10px;
+  color: #4a6da8;
+  font-weight: 700;
+}
+
+.picker-empty {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+  font-size: 13px;
+}

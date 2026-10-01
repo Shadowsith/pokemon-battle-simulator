@@ -77,6 +77,9 @@
         <div class="name">
           <span class="mon-label">{{ v.mon.name }}</span>
           <span class="mon-lv">Lv. {{ level }}</span>
+          @if (v.mon.item && (v.slot.side === 'player' || v.mon.itemRevealed)) {
+            <app-item-icon class="hud-item" [itemId]="v.mon.item" />
+          }
           @if (v.mon.status.major; as st) {
             <span
               class="status-badge"
@@ -121,6 +124,9 @@
         <div class="name">
           <span class="mon-label">{{ v.mon.name }}</span>
           <span class="mon-lv">Lv. {{ level }}</span>
+          @if (v.mon.item && (v.slot.side === 'player' || v.mon.itemRevealed)) {
+            <app-item-icon class="hud-item" [itemId]="v.mon.item" />
+          }
           @if (v.mon.status.major; as st) {
             <span
               class="status-badge"
@@ -215,14 +221,16 @@
               <button
                 type="button"
                 class="move-btn"
-                [class.depleted]="mv.cur === 0"
+                [class.depleted]="mv.cur === 0 || !!mv.locked"
                 [style.background]="moveGradient(mv.move.type)"
-                [disabled]="isAnimating() || mv.cur === 0"
+                [disabled]="isAnimating() || mv.cur === 0 || !!mv.locked"
                 (click)="useMove(mv.move)"
               >
                 <span class="move-btn-name">{{ mv.move.name }}</span>
                 <span class="move-btn-pp">AP {{ mv.cur }} / {{ mv.max }}</span>
-                @if (mv.hints.length === 1) {
+                @if (mv.locked) {
+                  <span class="move-btn-hint immune">{{ mv.locked }}</span>
+                } @else if (mv.hints.length === 1) {
                   <span class="move-btn-hint" [class]="mv.hints[0].kind">{{ mv.hints[0].label }}</span>
                 } @else {
                   <span class="move-btn-hints">
@@ -283,6 +291,9 @@
                 <img [src]="partySpriteSrc(pokemon)" [alt]="pokemon.name" class="party-sprite" />
                 <span class="party-name">
                   {{ pokemon.name }}
+                  @if (pokemon.item) {
+                    <app-item-icon [itemId]="pokemon.item" />
+                  }
                   @if (pokemon.status.major; as st) {
                     <span
                       class="status-badge"

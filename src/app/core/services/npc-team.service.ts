@@ -5,6 +5,7 @@ import { germanSpeciesName } from '../models/species-names.de';
 import { DamageCalcService } from './damage-calc.service';
 import { DexDataService } from './dex-data.service';
 import { SettingsService } from './settings.service';
+import { pickNpcItem } from '../battle/npc-items';
 
 /** One rolled NPC Pokémon: species identity plus a ready-to-use moveset. */
 export interface NpcPokemon {
@@ -13,6 +14,8 @@ export interface NpcPokemon {
   /** Gen 5 type names, capitalised (e.g. "Fire"). */
   types: string[];
   moves: Move[];
+  /** Held item id (item.model.ts), or null. */
+  item: string | null;
 }
 
 /** Primary-type constraints for a constrained roll (Custom Battle mode). */
@@ -95,7 +98,11 @@ export class NpcTeamService {
       const legal = await this.dex.legalMoves(s.id);
       const moves = this.buildMoveset(s, legal, moveInfo);
       if (!moves) return false;
-      team.push({ dexId: s.num, name: germanSpeciesName(s.num, s.name), types: s.types, moves });
+      const item = pickNpcItem(
+        { types: s.types, stats: this.damageCalc.statLine(s.num), moves },
+        new Set(team.map((m) => m.item).filter((i): i is string => !!i))
+      );
+      team.push({ dexId: s.num, name: germanSpeciesName(s.num, s.name), types: s.types, moves, item });
       usedTypes.add(primaryType(s));
       return true;
     };

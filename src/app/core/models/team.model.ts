@@ -1,4 +1,5 @@
 import { germanSpeciesName } from './species-names.de';
+import { knownItemId } from './item.model';
 
 export const MAX_TEAM_SIZE = 6;
 export const MOVES_PER_POKEMON = 4;
@@ -10,6 +11,8 @@ export interface TeamPokemon {
   name: string;
   types: string[];
   moves: string[];
+  /** Held item id (item.model.ts), or null / missing for none. */
+  item?: string | null;
 }
 
 /** A named, saved team. The player can keep several and pick one as active. */
@@ -61,7 +64,8 @@ export function sanitizeMon(p: unknown): TeamPokemon | null {
       ? (m['moves'] as unknown[])
           .filter((x): x is string => typeof x === 'string')
           .slice(0, MOVES_PER_POKEMON)
-      : []
+      : [],
+    item: knownItemId(m['item'])
   };
 }
 

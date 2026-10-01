@@ -10,6 +10,7 @@ import {
   sanitizeMon,
   sanitizeTeam
 } from '../models/team.model';
+import { knownItemId } from '../models/item.model';
 import { germanSpeciesName } from '../models/species-names.de';
 
 const TEAMS_KEY = 'pbs.teams';
@@ -212,6 +213,13 @@ export class TeamService {
         }
         return { ...p, moves: moves.filter(Boolean).slice(0, MOVES_PER_POKEMON) };
       })
+    );
+  }
+
+  /** Give the Pokémon at `pokeIndex` a held item (null removes it). */
+  setItem(teamId: string, pokeIndex: number, itemId: string | null): void {
+    this.updatePokemon(teamId, (pk) =>
+      pk.map((p, i) => (i === pokeIndex ? { ...p, item: knownItemId(itemId) } : p))
     );
   }
 

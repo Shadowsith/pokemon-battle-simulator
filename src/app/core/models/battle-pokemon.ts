@@ -6,6 +6,7 @@ export interface SpeciesSlot {
   speciesNum: number;
   name: string;
   types: string[];
+  item?: string | null;
 }
 
 /**
@@ -24,6 +25,8 @@ export function toBattlePokemon(slot: SpeciesSlot, hpStat: (dexId: number) => nu
     currentHp: maxHp,
     types: slot.types.map((t) => t.toLowerCase()),
     status: freshStatus(),
+    item: slot.item ?? null,
+    itemRevealed: false,
     boosts: freshBoosts()
   };
 }

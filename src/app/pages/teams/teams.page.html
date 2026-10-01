@@ -88,6 +88,14 @@
               </button>
             }
           </div>
+          <button type="button" class="item-slot" [class.set]="mon.item" (click)="openItemPicker(i)">
+            @if (heldItem(mon.item); as it) {
+              <app-item-icon [itemId]="it.id" />
+              <span class="item-name">{{ it.name }}</span>
+            } @else {
+              <span class="item-empty">+ Item</span>
+            }
+          </button>
         </article>
       }
 
@@ -308,6 +316,14 @@
         </div>
       </div>
     </div>
+  }
+
+  @if (itemPickerIndex() !== null && editingTeam(); as team) {
+    <app-item-picker
+      [current]="team.pokemon[itemPickerIndex()!]?.item"
+      (picked)="pickItem($event)"
+      (closed)="itemPickerIndex.set(null)"
+    />
   }
 
   @if (picker(); as p) {

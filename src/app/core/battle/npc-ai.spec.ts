@@ -86,4 +86,13 @@ describe('NPC AI', () => {
     expect(pickSwitchIn(calc, team, sets, [mon(76, ['rock', 'ground'])], new Set([0]))).toBe(1);
     expect(pickSwitchIn(calc, team, sets, [mon(76, ['rock', 'ground'])], new Set([0, 1, 2]))).toBe(-1);
   });
+
+  it('a Magnet holder prefers its Electric move over an equally strong neutral one', () => {
+    const pika = { ...mon(26, ['electric']), item: 'magnet' }; // Raichu
+    const mons = { o0: pika, p0: mon(143, ['normal']) };
+    const picks = new Set(
+      Array.from({ length: 10 }, () => chooseNpcMove(ctx(mons, 'singles', O0, ['thunderbolt', 'icebeam'])).move.showdownId)
+    );
+    expect([...picks]).toEqual(['thunderbolt']);
+  });
 });

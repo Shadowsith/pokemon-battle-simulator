@@ -14,6 +14,8 @@ export interface RunMon {
   types: string[];
   /** @pkmn/sim move ids; resolved against MOVE_LIBRARY. */
   moves: string[];
+  /** Held item id (item.model.ts). */
+  item?: string | null;
 }
 
 /** One trainer of a run, fought in list order. */

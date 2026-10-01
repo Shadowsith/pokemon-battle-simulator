@@ -19,6 +19,9 @@ import {
 import { DexDataService } from '../../core/services/dex-data.service';
 import { TeamService } from '../../core/services/team.service';
 import { CustomBattleService } from '../../core/services/custom-battle.service';
+import { heldItem, knownItemId } from '../../core/models/item.model';
+import { ItemIconComponent } from '../../shared/item-icon/item-icon.component';
+import { ItemPickerComponent } from '../../shared/item-picker/item-picker.component';
 import type { BattleFormat } from '../../core/battle/battle-format';
 
 type Picker = { kind: 'species' } | { kind: 'move'; pokeIndex: number; slot: number };
@@ -26,7 +29,7 @@ type Picker = { kind: 'species' } | { kind: 'move'; pokeIndex: number; slot: num
 @Component({
   selector: 'app-custom-battle',
   standalone: true,
-  imports: [IonContent, IonButton, RouterLink],
+  imports: [IonContent, IonButton, RouterLink, ItemIconComponent, ItemPickerComponent],
   templateUrl: './custom-battle.page.html',
   styleUrl: './custom-battle.page.scss'
 })
@@ -52,6 +55,9 @@ export class CustomBattlePage {
   readonly movesById = signal<Record<string, MoveInfo>>({});
 
   readonly picker = signal<Picker | null>(null);
+  /** Opponent slot whose held item is being chosen, or null. */
+  readonly itemPickerIndex = signal<number | null>(null);
+  readonly heldItem = heldItem;
   readonly search = signal('');
   private readonly legalMoveIds = signal<string[]>([]);
 
@@ -194,7 +200,8 @@ export class CustomBattlePage {
         speciesId: p.speciesId,
         name: p.name,
         types: [...p.types],
-        moves: [...p.moves]
+        moves: [...p.moves],
+        item: p.item ?? null
       }))
     }));
   }
@@ -256,6 +263,17 @@ export class CustomBattlePage {
       })
     }));
     this.closePicker();
+  }
+
+  pickItem(itemId: string | null): void {
+    const index = this.itemPickerIndex();
+    if (index !== null) {
+      this.patch((c) => ({
+        ...c,
+        team: c.team.map((mon, i) => (i === index ? { ...mon, item: knownItemId(itemId) } : mon))
+      }));
+    }
+    this.itemPickerIndex.set(null);
   }
 
   removeMon(index: number): void {

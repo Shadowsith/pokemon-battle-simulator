@@ -6,6 +6,7 @@ import {
   defaultCustomBattleConfig
 } from '../models/custom-battle.model';
 import { MAX_TEAM_SIZE, MOVES_PER_POKEMON, TeamPokemon } from '../models/team.model';
+import { knownItemId } from '../models/item.model';
 
 const STORE_KEY = 'pbs.customBattles';
 
@@ -123,7 +124,8 @@ function sanitizeMon(v: unknown): TeamPokemon | null {
       : [],
     moves: Array.isArray(m['moves'])
       ? (m['moves'] as unknown[]).filter((x): x is string => typeof x === 'string').slice(0, MOVES_PER_POKEMON)
-      : []
+      : [],
+    item: knownItemId(m['item'])
   };
 }
 

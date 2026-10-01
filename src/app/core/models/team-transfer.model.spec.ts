@@ -52,6 +52,22 @@ describe('team transfer', () => {
     expect(parseImportFile(JSON.stringify(file)).error).toBe('Die Datei enthält keine gültigen Teams.');
   });
 
+  it('keeps known held items through export / import and drops unknown ones', () => {
+    const withItems: SavedTeam[] = [
+      {
+        id: 'a',
+        name: 'Items',
+        pokemon: [
+          { ...mon(9, 'blastoise', ['surf']), item: 'watergem' },
+          { ...mon(25, 'pikachu', ['thunderbolt']), item: 'notanitem' }
+        ]
+      }
+    ];
+    const [t] = parseImportFile(JSON.stringify(buildExportFile(withItems))).teams;
+    expect(t.pokemon[0].item).toBe('watergem');
+    expect(t.pokemon[1].item).toBeNull();
+  });
+
   it('sanitizes oversized teams and movesets and drops garbage entries', () => {
     const big = {
       name: 'Zu groß',
