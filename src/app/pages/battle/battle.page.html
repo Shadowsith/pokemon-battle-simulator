@@ -13,7 +13,9 @@
         </figure>
       </div>
       <p class="trainer-text">
-        @if (isDoubles()) {
+        @if (gymTitle) {
+          {{ gymTitle }} {{ npcName() }} fordert dich{{ isDoubles() ? ' zu einem Doppelkampf' : '' }} heraus!
+        } @else if (isDoubles()) {
           {{ npcName() }} fordert dich zu einem Doppelkampf heraus!
         } @else {
           Herausforderer {{ npcName() }} fordert dich heraus!
@@ -41,8 +43,8 @@
         {{ outcome() === 'win' ? 'Du hast gewonnen!' : 'Du wurdest besiegt!' }}
       </h2>
       <div class="trainer-actions">
-        @if (inEliteFourBattle) {
-          <ion-button (click)="eliteFourContinue()">Weiter</ion-button>
+        @if (inChallengeBattle) {
+          <ion-button (click)="challengeContinue()">Weiter</ion-button>
         } @else {
           <ion-button (click)="resetBattle()">Nochmal</ion-button>
           <ion-button fill="outline" (click)="toTeamSelect()">Zur Auswahl</ion-button>
@@ -304,7 +306,7 @@
     }
   </div>
 
-  @if (!inEliteFourBattle) {
+  @if (!inChallengeBattle) {
     <ion-button size="small" fill="clear" class="reset-btn" (click)="resetBattle()">Reset</ion-button>
   }
 </ion-content>

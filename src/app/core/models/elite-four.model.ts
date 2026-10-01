@@ -5,33 +5,13 @@
  * this simulator, so only the species + movesets are honoured, not the levels.
  */
 
-/** One opponent Pokémon; same shape as TeamPokemon. */
-export interface EliteFourMon {
-  speciesNum: number;
-  speciesId: string;
-  name: string;
-  /** Capitalised Gen-5 type names ("Water"). */
-  types: string[];
-  /** @pkmn/sim move ids; resolved against MOVE_LIBRARY. */
-  moves: string[];
-}
+import type { RunMember, RunMon, RunRegion } from './trainer-run.model';
 
-export interface EliteFourMember {
-  /** Trainer sprite id (assets/trainers/<id>.png). */
-  trainerId: string;
-  name: string;
-  title: string;
-  team: EliteFourMon[];
-}
-
-export interface EliteFourRegion {
-  id: string;
-  gen: number;
-  label: string;
-  /** false → shown in the picker but not playable yet. */
-  available: boolean;
-  members: EliteFourMember[];
-}
+/** One opponent Pokémon; see {@link RunMon}. */
+export type EliteFourMon = RunMon;
+/** One Top-Vier member; see {@link RunMember}. */
+export type EliteFourMember = RunMember;
+export type EliteFourRegion = RunRegion;
 
 const KANTO: EliteFourRegion = {
   id: 'kanto',

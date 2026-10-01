@@ -50,8 +50,10 @@ import { chooseNpcMove, pickSwitchIn } from '../../core/battle/npc-ai';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
 import { CustomBattleService } from '../../core/services/custom-battle.service';
 import { CustomBattleConfig, configToNpcOptions } from '../../core/models/custom-battle.model';
-import { EliteFourRunService, RunCarry } from '../../core/services/elite-four-run.service';
-import { EliteFourMember } from '../../core/models/elite-four.model';
+import { EliteFourRunService } from '../../core/services/elite-four-run.service';
+import { GymRunService } from '../../core/services/gym-run.service';
+import { RunCarry, TrainerRunService } from '../../core/services/trainer-run.service';
+import type { GymLeader, RunMember } from '../../core/models/trainer-run.model';
 import { AudioService } from '../../core/services/audio.service';
 import { DamageCalcService } from '../../core/services/damage-calc.service';
 import { SettingsService } from '../../core/services/settings.service';
@@ -128,14 +130,27 @@ export class BattlePage implements OnDestroy {
   private readonly npcTeam = inject(NpcTeamService);
   private readonly customBattleSvc = inject(CustomBattleService);
   private readonly e4Svc = inject(EliteFourRunService);
+  private readonly gymSvc = inject(GymRunService);
 
   /** Set when this battle was launched from the Custom Battle config page. */
   private readonly customBattle: CustomBattleConfig | null = this.customBattleSvc.take();
   readonly inCustomBattle = this.customBattle !== null;
 
-  /** Set when this battle is one leg of a Top 4 Run. */
-  private readonly e4Battle: EliteFourMember | null = this.e4Svc.takePending();
-  readonly inEliteFourBattle = this.e4Battle !== null;
+  /** Set when this battle is one leg of a run (Top-Vier or Arenaleiter). */
+  private readonly challenge: { svc: TrainerRunService; member: RunMember } | null = this.takeChallenge();
+  readonly inChallengeBattle = this.challenge !== null;
+  /** "Arenaleiter" / "Arenaleiterin" for a gym leader's VS intro, else null. */
+  readonly gymTitle = (this.challenge?.member as GymLeader | undefined)?.badge
+    ? this.challenge!.member.title.split(' ')[0]
+    : null;
+
+  private takeChallenge(): { svc: TrainerRunService; member: RunMember } | null {
+    for (const svc of [this.e4Svc, this.gymSvc] as TrainerRunService[]) {
+      const member = svc.takePending();
+      if (member) return { svc, member };
+    }
+    return null;
+  }
 
   /** Every Pokémon in this simulator battles at level 100. */
   readonly level = this.damageCalc.level;
@@ -484,7 +499,7 @@ export class BattlePage implements OnDestroy {
   private pickFormat(): BattleFormat {
     if (this.playerTeam().length < 2) return 'singles';
     if (this.customBattle) return this.customBattle.format;
-    if (this.e4Battle) return this.e4Svc.run()?.format ?? 'singles';
+    if (this.challenge) return this.challenge.svc.run()?.format ?? 'singles';
     return this.settings.allowDoubleBattles() && Math.random() < 0.5 ? 'doubles' : 'singles';
   }
 
@@ -515,11 +530,12 @@ export class BattlePage implements OnDestroy {
       return;
     }
 
-    if (this.e4Battle) {
-      this.setOpponentMons(this.e4Battle.team);
+    if (this.challenge) {
+      const member = this.challenge.member;
+      this.setOpponentMons(member.team);
       this.opponentRoll = Promise.resolve();
-      this.npcAvatarId.set(this.e4Battle.trainerId);
-      this.npcNameOverride.set(this.e4Battle.name);
+      this.npcAvatarId.set(member.trainerId);
+      this.npcNameOverride.set(member.name);
       this.introTimer = setTimeout(() => this.beginFight(), 2400);
       return;
     }
@@ -657,7 +673,7 @@ export class BattlePage implements OnDestroy {
     this.playerTeam.set(this.derivePlayerTeam());
     this.activePlayer.set(this.initialActive(this.playerTeam().length));
     this.movePp.set({});
-    this.applyEliteFourCarry();
+    this.applyRunCarry();
     this.charge.set({});
     this.protectStreak = {};
     this.clearTurnVolatiles();
@@ -704,12 +720,12 @@ export class BattlePage implements OnDestroy {
   }
 
   /**
-   * Top 4 Run leg: in a fresh (full-HP) team, restore the spent PP and lingering
+   * Run leg: in a fresh (full-HP) team, restore the spent PP and lingering
    * major status carried over from the previous won fight.
    */
-  private applyEliteFourCarry(): void {
-    if (!this.e4Battle) return;
-    const carry = this.e4Svc.run()?.carry;
+  private applyRunCarry(): void {
+    if (!this.challenge) return;
+    const carry = this.challenge.svc.run()?.carry;
     if (!carry) return;
     this.playerTeam.update((team) =>
       team.map((p, i) =>
@@ -719,7 +735,7 @@ export class BattlePage implements OnDestroy {
     this.movePp.set({ ...carry.pp });
   }
 
-  /** Snapshot the player team's status + PP for the next leg of a Top 4 Run. */
+  /** Snapshot the player team's status + PP for the next leg of a run. */
   private snapshotRunCarry(): RunCarry {
     return {
       status: this.playerTeam().map((p) =>
@@ -731,12 +747,13 @@ export class BattlePage implements OnDestroy {
     };
   }
 
-  /** Top 4 Run leg over: report the outcome and hand back to the run screen. */
-  eliteFourContinue(): void {
-    if (!this.e4Battle) return;
+  /** Run leg over: report the outcome and hand back to that mode's run screen. */
+  challengeContinue(): void {
+    if (!this.challenge) return;
+    const { svc } = this.challenge;
     const won = this.outcome() === 'win';
-    this.e4Svc.recordOutcome(won, won ? this.snapshotRunCarry() : null);
-    this.router.navigate(['/elite-four'], { queryParams: { resume: 1 } });
+    svc.recordOutcome(won, won ? this.snapshotRunCarry() : null);
+    this.router.navigate([svc.route], { queryParams: { resume: 1 } });
   }
 
   // --- command phase ------------------------------------------------------

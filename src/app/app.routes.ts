@@ -22,6 +22,13 @@ export const routes: Routes = [
   },
   {
     path: 'elite-four',
+    data: { challenge: 'elite-four' },
+    loadComponent: () =>
+      import('./pages/elite-four/elite-four.page').then((m) => m.EliteFourPage)
+  },
+  {
+    path: 'gym-challenge',
+    data: { challenge: 'gyms' },
     loadComponent: () =>
       import('./pages/elite-four/elite-four.page').then((m) => m.EliteFourPage)
   },
