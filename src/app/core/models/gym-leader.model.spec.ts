@@ -6,6 +6,7 @@ describe('gym-leader.model', () => {
   const kanto = gymRegion('kanto')!;
   const johto = gymRegion('johto')!;
   const hoenn = gymRegion('hoenn')!;
+  const sinnoh = gymRegion('sinnoh')!;
   const available = GYM_REGIONS.filter((r) => r.available);
 
   it('runs the 8 Kanto gym leaders of the PWT Kanto tournament in canonical order', () => {
@@ -105,7 +106,33 @@ describe('gym-leader.model', () => {
     ]);
   });
 
+  it('runs the 8 Sinnoh gym leaders of the PWT Sinnoh tournament in canonical order', () => {
+    expect(sinnoh.available).toBe(true);
+    expect(sinnoh.members.map((m) => m.name)).toEqual([
+      'Veit', 'Silvana', 'Hilda', 'Wellenbrecher Marinus', 'Lamina', 'Adam', 'Frida', 'Volkner'
+    ]);
+    expect(sinnoh.members.map((m) => m.badge)).toEqual([
+      'Kohleorden', 'Waldorden', 'Bergorden', 'Fennorden',
+      'Reliktorden', 'Minenorden', 'Firnorden', 'Lichtorden'
+    ]);
+    expect(sinnoh.members.map((m) => m.trainerId)).toEqual([
+      'roark', 'gardenia', 'maylene', 'crasherwake', 'fantina', 'byron', 'candice', 'volkner'
+    ]);
+  });
+
+  it('gives every Sinnoh Pokémon its PWT held item', () => {
+    for (const leader of sinnoh.members) {
+      for (const mon of leader.team) {
+        expect(heldItem(mon.item)).withContext(`${leader.name} ${mon.name} ${mon.item}`).toBeDefined();
+      }
+    }
+    expect(sinnoh.members[0].team.map((m) => m.item)).toEqual([
+      'salacberry', 'chopleberry', 'liechiberry', 'rindoberry', 'passhoberry', 'rindoberry'
+    ]);
+    expect(sinnoh.members[5].team[3].item).withContext('Adam Magnezone (Luftballon)').toBe('airballoon');
+  });
+
   it('lists the other regions as not yet playable', () => {
-    expect(GYM_REGIONS.filter((r) => !['kanto', 'johto', 'hoenn'].includes(r.id)).every((r) => !r.available && !r.members.length)).toBe(true);
+    expect(GYM_REGIONS.filter((r) => !['kanto', 'johto', 'hoenn', 'sinnoh'].includes(r.id)).every((r) => !r.available && !r.members.length)).toBe(true);
   });
 });

@@ -21,7 +21,7 @@ describe('GymRunService', () => {
   });
 
   it('ignores regions that are not playable yet', () => {
-    svc.start('sinnoh');
+    svc.start('einall');
     expect(svc.hasRun()).toBe(false);
   });
 
