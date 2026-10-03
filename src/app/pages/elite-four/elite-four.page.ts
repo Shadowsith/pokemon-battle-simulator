@@ -89,7 +89,7 @@ export class EliteFourPage {
   readonly badgeCount = computed(() => {
     const rows = this.memberRows();
     if (!rows.some((r) => r.badge)) return null;
-    return { earned: rows.filter((r) => r.badge && r.state === 'beaten').length, total: rows.length };
+    return { earned: rows.filter((r) => r.badge && r.state === 'beaten').length, total: rows.filter((r) => r.badge).length };
   });
 
   private findRegion(id: string): RunRegion | undefined {
@@ -144,6 +144,7 @@ export class EliteFourPage {
   }
 }
 
+/** The gym leader whose badge this row shows; null for Top-Vier members and shared-badge partners. */
 function asGymLeader(member: RunMember): GymLeader | null {
-  return 'badge' in member ? (member as GymLeader) : null;
+  return 'badge' in member && !(member as GymLeader).sharedBadge ? (member as GymLeader) : null;
 }

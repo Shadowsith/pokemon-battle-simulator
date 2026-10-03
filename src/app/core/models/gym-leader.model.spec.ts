@@ -5,6 +5,7 @@ import { heldItem } from './item.model';
 describe('gym-leader.model', () => {
   const kanto = gymRegion('kanto')!;
   const johto = gymRegion('johto')!;
+  const hoenn = gymRegion('hoenn')!;
   const available = GYM_REGIONS.filter((r) => r.available);
 
   it('runs the 8 Kanto gym leaders of the PWT Kanto tournament in canonical order', () => {
@@ -70,9 +71,41 @@ describe('gym-leader.model', () => {
     expect(johto.members[0].team.map((m) => m.item)).toEqual([
       'sitrusberry', undefined, undefined, undefined, undefined, undefined
     ]);
+    expect(johto.members[2].team[5].item).withContext('Bianka Miltank (Prunusbeere)').toBe('lumberry');
+  });
+
+  it('runs the Hoenn gym leaders of the PWT Hoenn tournament in canonical order', () => {
+    expect(hoenn.available).toBe(true);
+    expect(hoenn.members.map((m) => m.name)).toEqual([
+      'Felizia', 'Kamillo', 'Walter', 'Flavia', 'Norman', 'Wibke', 'Ben', 'Svenja', 'Juan'
+    ]);
+    expect(hoenn.members.map((m) => m.badge)).toEqual([
+      'Steinorden', 'Knöchelorden', 'Dynamo-Orden', 'Hitzeorden', 'Balanceorden',
+      'Federorden', 'Mentalorden', 'Mentalorden', 'Schauerorden'
+    ]);
+    expect(hoenn.members.map((m) => m.trainerId)).toEqual([
+      'roxanne-gen3', 'brawly-gen3', 'wattson-gen3', 'flannery-gen3', 'norman-gen3',
+      'winona-gen3', 'tateandliza-gen3', 'tateandliza-gen3', 'juan-gen3'
+    ]);
+  });
+
+  it('has Ben share the Mentalorden with Svenja, so Hoenn still awards 8 badges', () => {
+    expect(hoenn.members.filter((m) => m.sharedBadge).map((m) => m.name)).toEqual(['Ben']);
+    expect(hoenn.members.filter((m) => !m.sharedBadge).length).toBe(8);
+  });
+
+  it('gives every Hoenn Pokémon its PWT held item', () => {
+    for (const leader of hoenn.members) {
+      for (const mon of leader.team) {
+        expect(heldItem(mon.item)).withContext(`${leader.name} ${mon.name} ${mon.item}`).toBeDefined();
+      }
+    }
+    expect(hoenn.members[0].team.map((m) => m.item)).toEqual([
+      'shucaberry', 'liechiberry', 'sitrusberry', 'chopleberry', 'rindoberry', 'salacberry'
+    ]);
   });
 
   it('lists the other regions as not yet playable', () => {
-    expect(GYM_REGIONS.filter((r) => r.id !== 'kanto' && r.id !== 'johto').every((r) => !r.available && !r.members.length)).toBe(true);
+    expect(GYM_REGIONS.filter((r) => !['kanto', 'johto', 'hoenn'].includes(r.id)).every((r) => !r.available && !r.members.length)).toBe(true);
   });
 });

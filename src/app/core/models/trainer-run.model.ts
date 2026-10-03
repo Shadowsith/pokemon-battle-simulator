@@ -33,6 +33,11 @@ export interface GymLeader extends RunMember {
   badge: string;
   /** The leader's speciality type ("Rock"); colours the badge chip. */
   type: string;
+  /**
+   * Shares the badge with the next member (Ben → Svenja): fought as a gym leader,
+   * but the badge is only counted and shown on the partner.
+   */
+  sharedBadge?: boolean;
 }
 
 export interface RunRegion<M extends RunMember = RunMember> {
