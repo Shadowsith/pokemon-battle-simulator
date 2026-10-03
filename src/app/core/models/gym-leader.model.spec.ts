@@ -8,6 +8,7 @@ describe('gym-leader.model', () => {
   const hoenn = gymRegion('hoenn')!;
   const sinnoh = gymRegion('sinnoh')!;
   const einall = gymRegion('einall')!;
+  const kalos = gymRegion('kalos')!;
   const available = GYM_REGIONS.filter((r) => r.available);
 
   it('runs the 8 Kanto gym leaders of the PWT Kanto tournament in canonical order', () => {
@@ -21,13 +22,15 @@ describe('gym-leader.model', () => {
     ]);
   });
 
-  it('gives every leader six Pokémon with four known moves', () => {
+  it('gives every leader four known moves per Pokémon, and six Pokémon up to Einall', () => {
     const known = new Set(MOVE_LIBRARY.map((m) => m.showdownId));
-    for (const leader of available.flatMap((r) => r.members)) {
-      expect(leader.team.length).withContext(leader.name).toBe(6);
-      for (const mon of leader.team) {
-        expect(mon.moves.length).withContext(`${leader.name} ${mon.name}`).toBe(4);
-        expect(mon.moves.filter((id) => !known.has(id))).withContext(`${leader.name} ${mon.name}`).toEqual([]);
+    for (const region of available) {
+      for (const leader of region.members) {
+        if (region.gen < 6) expect(leader.team.length).withContext(leader.name).toBe(6);
+        for (const mon of leader.team) {
+          expect(mon.moves.length).withContext(`${leader.name} ${mon.name}`).toBe(4);
+          expect(mon.moves.filter((id) => !known.has(id))).withContext(`${leader.name} ${mon.name}`).toEqual([]);
+        }
       }
     }
   });
@@ -158,7 +161,27 @@ describe('gym-leader.model', () => {
     ]);
   });
 
-  it('lists the other regions as not yet playable', () => {
-    expect(GYM_REGIONS.filter((r) => !['kanto', 'johto', 'hoenn', 'sinnoh', 'einall'].includes(r.id)).every((r) => !r.available && !r.members.length)).toBe(true);
+  it('runs the 8 Kalos gym leaders with their Kampfschloss Pokémon in canonical order', () => {
+    expect(kalos.available).toBe(true);
+    expect(kalos.members.map((m) => m.name)).toEqual([
+      'Viola', 'Lino', 'Connie', 'Amaro', 'Citro', 'Valerie', 'Astrid', 'Galantho'
+    ]);
+    expect(kalos.members.map((m) => m.badge)).toEqual([
+      'Krabbelorden', 'Wallorden', 'Rauforden', 'Blattorden',
+      'Ampere-Orden', 'Feenorden', 'Psi-Orden', 'Eisbergorden'
+    ]);
+    expect(kalos.members.map((m) => m.trainerId)).toEqual([
+      'viola', 'grant', 'korrina', 'ramos', 'clemont', 'valerie', 'olympia', 'wulfric'
+    ]);
+    expect(kalos.members.map((m) => m.team.length)).toEqual([2, 2, 3, 3, 3, 2, 3, 3]);
+  });
+
+  it('gives no Kalos Pokémon a held item (the Kampfschloss has none)', () => {
+    expect(kalos.members.flatMap((m) => m.team).every((mon) => mon.item === undefined)).toBe(true);
+  });
+
+  it('makes every region playable', () => {
+    expect(GYM_REGIONS.map((r) => r.id)).toEqual(['kanto', 'johto', 'hoenn', 'sinnoh', 'einall', 'kalos']);
+    expect(GYM_REGIONS.every((r) => r.available && r.members.length > 0)).toBe(true);
   });
 });

@@ -20,8 +20,8 @@ describe('GymRunService', () => {
     expect(svc.route).toBe('/gym-challenge');
   });
 
-  it('ignores regions that are not playable yet', () => {
-    svc.start('kalos');
+  it('ignores unknown regions', () => {
+    svc.start('galar');
     expect(svc.hasRun()).toBe(false);
   });
 

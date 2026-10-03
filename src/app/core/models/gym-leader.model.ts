@@ -2,7 +2,7 @@ import type { GymLeader, RunRegion } from './trainer-run.model';
 
 /**
  * Arenaleiter rosters for the "Arenaleiter-Herausforderung" run mode. One region
- * per generation; Kanto, Johto, Hoenn, Sinnoh and Einall are authored so far.
+ * per generation, Kanto through Kalos.
  *
  * Kanto uses the first Schwarz 2 / Weiß 2 team of each leader — the PWT
  * "Kanto-Arenaleiterturnier" (source: pokewiki.de, each leader's page). That
@@ -1643,10 +1643,180 @@ const EINALL: RunRegion<GymLeader> = {
   ]
 };
 
-/** A region whose gym leaders aren't authored yet: listed, but not playable. */
-function upcoming(id: string, gen: number, label: string): RunRegion<GymLeader> {
-  return { id, gen, label, available: false, members: [] };
-}
+/**
+ * Kalos has no PWT, so it uses each leader's X / Y Kampfschloss teams (source:
+ * pokewiki.de, each leader's page), in badge-case order. A leader fields only two
+ * Pokémon per Kampfschloss battle, so each team here is every species they field
+ * across all ranks, with the moveset of its highest-level entry — two or three
+ * Pokémon each, until a later pass fills them up to six. Kampfschloss Pokémon hold
+ * no items; Connie's Lucario carries Lucarionit there, but Mega Evolution isn't
+ * modelled. Astrid's Psiaugon is female, which shares typing and stats with the
+ * male form. Abilities aren't modelled.
+ */
+const KALOS: RunRegion<GymLeader> = {
+  id: 'kalos',
+  gen: 6,
+  label: 'Kalos (Gen 6)',
+  available: true,
+  members: [
+    {
+      trainerId: 'viola',
+      name: 'Viola',
+      title: 'Arenaleiterin von Nouvaria City',
+      badge: 'Krabbelorden',
+      type: 'Bug',
+      team: [
+        {
+          speciesNum: 284, speciesId: 'masquerain', name: 'Maskeregen', types: ['Bug', 'Flying'],
+          moves: ['quiverdance', 'airslash', 'bugbuzz', 'whirlwind']
+        },
+        {
+          speciesNum: 666, speciesId: 'vivillon', name: 'Vivillon', types: ['Bug', 'Flying'],
+          moves: ['safeguard', 'quiverdance', 'powder', 'hurricane']
+        }
+      ]
+    },
+    {
+      trainerId: 'grant',
+      name: 'Lino',
+      title: 'Arenaleiter von Relievera City',
+      badge: 'Wallorden',
+      type: 'Rock',
+      team: [
+        {
+          speciesNum: 699, speciesId: 'aurorus', name: 'Amagarga', types: ['Rock', 'Ice'],
+          moves: ['encore', 'lightscreen', 'icebeam', 'hyperbeam']
+        },
+        {
+          speciesNum: 697, speciesId: 'tyrantrum', name: 'Monargoras', types: ['Rock', 'Dragon'],
+          moves: ['earthquake', 'horndrill', 'headsmash', 'rockslide']
+        }
+      ]
+    },
+    {
+      trainerId: 'korrina',
+      name: 'Connie',
+      title: 'Arenaleiterin von Yantara City',
+      badge: 'Rauforden',
+      type: 'Fighting',
+      team: [
+        {
+          speciesNum: 701, speciesId: 'hawlucha', name: 'Resladero', types: ['Fighting', 'Flying'],
+          moves: ['highjumpkick', 'skyattack', 'skydrop', 'swordsdance']
+        },
+        {
+          speciesNum: 68, speciesId: 'machamp', name: 'Machomei', types: ['Fighting'],
+          moves: ['dynamicpunch', 'scaryface', 'wakeupslap', 'crosschop']
+        },
+        {
+          speciesNum: 448, speciesId: 'lucario', name: 'Lucario', types: ['Fighting', 'Steel'],
+          moves: ['healpulse', 'dragonpulse', 'extremespeed', 'closecombat']
+        }
+      ]
+    },
+    {
+      trainerId: 'ramos',
+      name: 'Amaro',
+      title: 'Arenaleiter von Tempera City',
+      badge: 'Blattorden',
+      type: 'Grass',
+      team: [
+        {
+          speciesNum: 189, speciesId: 'jumpluff', name: 'Papungha', types: ['Grass', 'Flying'],
+          moves: ['worryseed', 'cottonspore', 'gigadrain', 'uturn']
+        },
+        {
+          speciesNum: 673, speciesId: 'gogoat', name: 'Chevrumm', types: ['Grass'],
+          moves: ['earthquake', 'leafblade', 'aerialace', 'milkdrink']
+        },
+        {
+          speciesNum: 71, speciesId: 'victreebel', name: 'Sarzenia', types: ['Grass', 'Poison'],
+          moves: ['leaftornado', 'razorleaf', 'leafstorm', 'leafblade']
+        }
+      ]
+    },
+    {
+      trainerId: 'clemont',
+      name: 'Citro',
+      title: 'Arenaleiter von Illumina City',
+      badge: 'Ampere-Orden',
+      type: 'Electric',
+      team: [
+        {
+          speciesNum: 82, speciesId: 'magneton', name: 'Magneton', types: ['Electric', 'Steel'],
+          moves: ['discharge', 'lockon', 'flashcannon', 'screech']
+        },
+        {
+          speciesNum: 695, speciesId: 'heliolisk', name: 'Elezard', types: ['Electric', 'Normal'],
+          moves: ['thunder', 'quickattack', 'paraboliccharge', 'charge']
+        },
+        {
+          speciesNum: 462, speciesId: 'magnezone', name: 'Magnezone', types: ['Electric', 'Steel'],
+          moves: ['discharge', 'lockon', 'magnetrise', 'gyroball']
+        }
+      ]
+    },
+    {
+      trainerId: 'valerie',
+      name: 'Valerie',
+      title: 'Arenaleiterin von Romantia City',
+      badge: 'Feenorden',
+      type: 'Fairy',
+      team: [
+        {
+          speciesNum: 303, speciesId: 'mawile', name: 'Flunkifer', types: ['Steel', 'Fairy'],
+          moves: ['playrough', 'ironhead', 'spitup', 'swallow']
+        },
+        {
+          speciesNum: 700, speciesId: 'sylveon', name: 'Feelinara', types: ['Fairy'],
+          moves: ['moonblast', 'lightscreen', 'lastresort', 'psychup']
+        }
+      ]
+    },
+    {
+      trainerId: 'olympia',
+      name: 'Astrid',
+      title: 'Arenaleiterin von Fluxia City',
+      badge: 'Psi-Orden',
+      type: 'Psychic',
+      team: [
+        {
+          speciesNum: 561, speciesId: 'sigilyph', name: 'Symvolara', types: ['Psychic', 'Flying'],
+          moves: ['psychic', 'airslash', 'skyattack', 'cosmicpower']
+        },
+        {
+          speciesNum: 678, speciesId: 'meowstic', name: 'Psiaugon', types: ['Psychic'],
+          moves: ['signalbeam', 'suckerpunch', 'futuresight', 'storedpower']
+        },
+        {
+          speciesNum: 199, speciesId: 'slowking', name: 'Laschoking', types: ['Water', 'Psychic'],
+          moves: ['psychic', 'trumpcard', 'psychup', 'healpulse']
+        }
+      ]
+    },
+    {
+      trainerId: 'wulfric',
+      name: 'Galantho',
+      title: 'Arenaleiter von Fractalia City',
+      badge: 'Eisbergorden',
+      type: 'Ice',
+      team: [
+        {
+          speciesNum: 615, speciesId: 'cryogonal', name: 'Frigometri', types: ['Ice'],
+          moves: ['recover', 'nightslash', 'solarbeam', 'confuseray']
+        },
+        {
+          speciesNum: 713, speciesId: 'avalugg', name: 'Arktilas', types: ['Ice'],
+          moves: ['recover', 'doubleedge', 'skullbash', 'crunch']
+        },
+        {
+          speciesNum: 460, speciesId: 'abomasnow', name: 'Rexblisar', types: ['Grass', 'Ice'],
+          moves: ['ingrain', 'woodhammer', 'blizzard', 'sheercold']
+        }
+      ]
+    }
+  ]
+};
 
 export const GYM_REGIONS: RunRegion<GymLeader>[] = [
   KANTO,
@@ -1654,7 +1824,7 @@ export const GYM_REGIONS: RunRegion<GymLeader>[] = [
   HOENN,
   SINNOH,
   EINALL,
-  upcoming('kalos', 6, 'Kalos (Gen 6)')
+  KALOS
 ];
 
 export function gymRegion(id: string): RunRegion<GymLeader> | undefined {
