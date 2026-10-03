@@ -4,6 +4,8 @@ import { heldItem } from './item.model';
 
 describe('gym-leader.model', () => {
   const kanto = gymRegion('kanto')!;
+  const johto = gymRegion('johto')!;
+  const available = GYM_REGIONS.filter((r) => r.available);
 
   it('runs the 8 Kanto gym leaders of the PWT Kanto tournament in canonical order', () => {
     expect(kanto.available).toBe(true);
@@ -18,7 +20,7 @@ describe('gym-leader.model', () => {
 
   it('gives every leader six Pokémon with four known moves', () => {
     const known = new Set(MOVE_LIBRARY.map((m) => m.showdownId));
-    for (const leader of kanto.members) {
+    for (const leader of available.flatMap((r) => r.members)) {
       expect(leader.team.length).withContext(leader.name).toBe(6);
       for (const mon of leader.team) {
         expect(mon.moves.length).withContext(`${leader.name} ${mon.name}`).toBe(4);
@@ -45,7 +47,32 @@ describe('gym-leader.model', () => {
     ]);
   });
 
+  it('runs the 8 Johto gym leaders with their HGSS Kampf-Dojo teams in canonical order', () => {
+    expect(johto.available).toBe(true);
+    expect(johto.members.map((m) => m.name)).toEqual([
+      'Falk', 'Kai', 'Bianka', 'Jens', 'Hartwig', 'Jasmin', 'Norbert', 'Sandra'
+    ]);
+    expect(johto.members.map((m) => m.badge)).toEqual([
+      'Flügelorden', 'Insektorden', 'Basisorden', 'Phantomorden',
+      'Faustorden', 'Stahlorden', 'Eisorden', 'Drachenorden'
+    ]);
+    expect(johto.members.map((m) => m.trainerId)).toEqual([
+      'falkner', 'bugsy', 'whitney', 'morty', 'chuck', 'jasmine', 'pryce', 'clair'
+    ]);
+  });
+
+  it('gives Johto Pokémon only the items they hold in the Dojo', () => {
+    for (const leader of johto.members) {
+      for (const mon of leader.team.filter((m) => m.item)) {
+        expect(heldItem(mon.item)).withContext(`${leader.name} ${mon.name} ${mon.item}`).toBeDefined();
+      }
+    }
+    expect(johto.members[0].team.map((m) => m.item)).toEqual([
+      'sitrusberry', undefined, undefined, undefined, undefined, undefined
+    ]);
+  });
+
   it('lists the other regions as not yet playable', () => {
-    expect(GYM_REGIONS.filter((r) => r.id !== 'kanto').every((r) => !r.available && !r.members.length)).toBe(true);
+    expect(GYM_REGIONS.filter((r) => r.id !== 'kanto' && r.id !== 'johto').every((r) => !r.available && !r.members.length)).toBe(true);
   });
 });
