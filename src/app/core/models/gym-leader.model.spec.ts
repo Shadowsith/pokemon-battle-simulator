@@ -7,6 +7,7 @@ describe('gym-leader.model', () => {
   const johto = gymRegion('johto')!;
   const hoenn = gymRegion('hoenn')!;
   const sinnoh = gymRegion('sinnoh')!;
+  const einall = gymRegion('einall')!;
   const available = GYM_REGIONS.filter((r) => r.available);
 
   it('runs the 8 Kanto gym leaders of the PWT Kanto tournament in canonical order', () => {
@@ -132,7 +133,32 @@ describe('gym-leader.model', () => {
     expect(sinnoh.members[5].team[3].item).withContext('Adam Magnezone (Luftballon)').toBe('airballoon');
   });
 
+  it('runs the 8 Einall gym leaders of the PWT Einall tournament in canonical order', () => {
+    expect(einall.available).toBe(true);
+    expect(einall.members.map((m) => m.name)).toEqual([
+      'Maik', 'Aloe', 'Artie', 'Kamilla', 'Turner', 'Géraldine', 'Sandro', 'Lysander'
+    ]);
+    expect(einall.members.map((m) => m.badge)).toEqual([
+      'Triorden', 'Grundorden', 'Käferorden', 'Voltorden',
+      'Seismo-Orden', 'Jetorden', 'Eiszapforden', 'Legendenorden'
+    ]);
+    expect(einall.members.map((m) => m.trainerId)).toEqual([
+      'chili', 'lenora', 'burgh', 'elesa', 'clay', 'skyla', 'brycen', 'drayden'
+    ]);
+  });
+
+  it('gives every Einall Pokémon its PWT held item', () => {
+    for (const leader of einall.members) {
+      for (const mon of leader.team) {
+        expect(heldItem(mon.item)).withContext(`${leader.name} ${mon.name} ${mon.item}`).toBeDefined();
+      }
+    }
+    expect(einall.members[0].team.map((m) => m.item)).toEqual([
+      'firegem', 'passhoberry', 'salacberry', 'fightinggem', 'dragongem', 'petayaberry'
+    ]);
+  });
+
   it('lists the other regions as not yet playable', () => {
-    expect(GYM_REGIONS.filter((r) => !['kanto', 'johto', 'hoenn', 'sinnoh'].includes(r.id)).every((r) => !r.available && !r.members.length)).toBe(true);
+    expect(GYM_REGIONS.filter((r) => !['kanto', 'johto', 'hoenn', 'sinnoh', 'einall'].includes(r.id)).every((r) => !r.available && !r.members.length)).toBe(true);
   });
 });
