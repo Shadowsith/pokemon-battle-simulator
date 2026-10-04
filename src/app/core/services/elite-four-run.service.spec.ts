@@ -38,12 +38,15 @@ describe('EliteFourRunService', () => {
     }
   });
 
-  it('wires Kalos (X / Y) with four Pokémon per member', () => {
+  it('wires Kalos (X / Y) with six Pokémon per member, the X / Y ace last', () => {
     const kalos = eliteFourRegion('kalos')!;
     expect(kalos.available).toBe(true);
     expect(kalos.members.map((m) => m.name)).toEqual(['Thymelot', 'Pachira', 'Dracena', 'Narcisse']);
-    expect(kalos.members.every((m) => m.team.length === 4)).toBe(true);
+    expect(kalos.members.every((m) => m.team.length === 6)).toBe(true);
     expect(kalos.members.flatMap((m) => m.team).every((p) => p.moves.length === 4)).toBe(true);
+    expect(kalos.members.map((m) => m.team[5].speciesId)).toEqual(['aegislash', 'talonflame', 'noivern', 'barbaracle']);
+    const species = kalos.members.flatMap((m) => m.team.map((p) => p.speciesId));
+    expect(new Set(species).size).withContext('no species twice in the Kalos Top Four').toBe(species.length);
     svc.start('kalos');
     expect(svc.currentMember()?.name).toBe('Thymelot');
   });

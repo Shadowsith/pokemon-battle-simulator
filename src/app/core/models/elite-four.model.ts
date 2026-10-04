@@ -668,10 +668,11 @@ const EINALL: EliteFourRegion = {
 };
 
 /**
- * Kalos Top Four, Pokémon X / Y. The Kalos Top Four have no rematch teams, so
- * these are the only sets: four Pokémon each. Held items and abilities aren't
- * modelled, so Aegislash stays in Shield Forme; King's Shield blocks attacks and
- * lowers a contact attacker's Attack.
+ * Kalos Top Four, Pokémon X / Y. The Kalos Top Four have no rematch teams, and
+ * their X / Y sets have only four Pokémon each; that core stays (ace last), and
+ * each member gets two more as described in docs/kalos-elite-four-teams-concept.md.
+ * Held items and abilities aren't modelled, so Aegislash stays in Shield Forme;
+ * King's Shield blocks attacks and lowers a contact attacker's Attack.
  */
 const KALOS: EliteFourRegion = {
   id: 'kalos',
@@ -697,6 +698,14 @@ const KALOS: EliteFourRegion = {
           moves: ['bulletpunch', 'xscissor', 'ironhead', 'nightslash']
         },
         {
+          speciesNum: 625, speciesId: 'bisharp', name: 'Caesurio', types: ['Dark', 'Steel'],
+          moves: ['ironhead', 'nightslash', 'suckerpunch', 'swordsdance']
+        },
+        {
+          speciesNum: 227, speciesId: 'skarmory', name: 'Panzaeron', types: ['Steel', 'Flying'],
+          moves: ['bravebird', 'ironhead', 'roost', 'stealthrock']
+        },
+        {
           speciesNum: 681, speciesId: 'aegislash', name: 'Durengard', types: ['Steel', 'Ghost'],
           moves: ['kingsshield', 'sacredsword', 'shadowclaw', 'ironhead']
         }
@@ -718,6 +727,14 @@ const KALOS: EliteFourRegion = {
         {
           speciesNum: 609, speciesId: 'chandelure', name: 'Skelabra', types: ['Ghost', 'Fire'],
           moves: ['flamethrower', 'shadowball', 'confuseray', 'confide']
+        },
+        {
+          speciesNum: 229, speciesId: 'houndoom', name: 'Hundemon', types: ['Dark', 'Fire'],
+          moves: ['flamethrower', 'darkpulse', 'sludgebomb', 'nastyplot']
+        },
+        {
+          speciesNum: 6, speciesId: 'charizard', name: 'Glurak', types: ['Fire', 'Flying'],
+          moves: ['flamethrower', 'airslash', 'dragonpulse', 'focusblast']
         },
         {
           speciesNum: 663, speciesId: 'talonflame', name: 'Fiaro', types: ['Fire', 'Flying'],
@@ -743,6 +760,14 @@ const KALOS: EliteFourRegion = {
           moves: ['dragontail', 'revenge', 'retaliate', 'chipaway']
         },
         {
+          speciesNum: 706, speciesId: 'goodra', name: 'Viscogon', types: ['Dragon'],
+          moves: ['dragonpulse', 'fireblast', 'thunderbolt', 'icebeam']
+        },
+        {
+          speciesNum: 149, speciesId: 'dragonite', name: 'Dragoran', types: ['Dragon', 'Flying'],
+          moves: ['outrage', 'extremespeed', 'earthquake', 'dragondance']
+        },
+        {
           speciesNum: 715, speciesId: 'noivern', name: 'UHaFnir', types: ['Flying', 'Dragon'],
           moves: ['airslash', 'dragonpulse', 'flamethrower', 'superfang']
         }
@@ -764,6 +789,14 @@ const KALOS: EliteFourRegion = {
         {
           speciesNum: 121, speciesId: 'starmie', name: 'Starmie', types: ['Water', 'Psychic'],
           moves: ['dazzlinggleam', 'psychic', 'surf', 'lightscreen']
+        },
+        {
+          speciesNum: 658, speciesId: 'greninja', name: 'Quajutsu', types: ['Water', 'Dark'],
+          moves: ['surf', 'darkpulse', 'icebeam', 'uturn']
+        },
+        {
+          speciesNum: 350, speciesId: 'milotic', name: 'Milotic', types: ['Water'],
+          moves: ['scald', 'icebeam', 'recover', 'coil']
         },
         {
           speciesNum: 689, speciesId: 'barbaracle', name: 'Thanathora', types: ['Rock', 'Water'],
