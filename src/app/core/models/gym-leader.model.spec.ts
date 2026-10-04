@@ -22,15 +22,13 @@ describe('gym-leader.model', () => {
     ]);
   });
 
-  it('gives every leader four known moves per Pokémon, and six Pokémon up to Einall', () => {
+  it('gives every leader six Pokémon with four known moves', () => {
     const known = new Set(MOVE_LIBRARY.map((m) => m.showdownId));
-    for (const region of available) {
-      for (const leader of region.members) {
-        if (region.gen < 6) expect(leader.team.length).withContext(leader.name).toBe(6);
-        for (const mon of leader.team) {
-          expect(mon.moves.length).withContext(`${leader.name} ${mon.name}`).toBe(4);
-          expect(mon.moves.filter((id) => !known.has(id))).withContext(`${leader.name} ${mon.name}`).toEqual([]);
-        }
+    for (const leader of available.flatMap((r) => r.members)) {
+      expect(leader.team.length).withContext(leader.name).toBe(6);
+      for (const mon of leader.team) {
+        expect(mon.moves.length).withContext(`${leader.name} ${mon.name}`).toBe(4);
+        expect(mon.moves.filter((id) => !known.has(id))).withContext(`${leader.name} ${mon.name}`).toEqual([]);
       }
     }
   });
@@ -173,11 +171,23 @@ describe('gym-leader.model', () => {
     expect(kalos.members.map((m) => m.trainerId)).toEqual([
       'viola', 'grant', 'korrina', 'ramos', 'clemont', 'valerie', 'olympia', 'wulfric'
     ]);
-    expect(kalos.members.map((m) => m.team.length)).toEqual([2, 2, 3, 3, 3, 2, 3, 3]);
   });
 
-  it('gives no Kalos Pokémon a held item (the Kampfschloss has none)', () => {
-    expect(kalos.members.flatMap((m) => m.team).every((mon) => mon.item === undefined)).toBe(true);
+  it('fills the Kalos teams with as many Gen 6 Pokémon as their type allows', () => {
+    expect(kalos.members.map((m) => m.team.filter((mon) => mon.speciesNum >= 650).length)).toEqual([
+      1, 4, 3, 3, 2, 4, 3, 1
+    ]);
+    const species = kalos.members.flatMap((m) => m.team.map((mon) => mon.speciesId));
+    expect(new Set(species).size).withContext('no species twice among the Kalos leaders').toBe(species.length);
+  });
+
+  it('gives every Kalos Pokémon a Gen 6-era held item (no type gems)', () => {
+    for (const leader of kalos.members) {
+      for (const mon of leader.team) {
+        expect(heldItem(mon.item)).withContext(`${leader.name} ${mon.name} ${mon.item}`).toBeDefined();
+        expect(mon.item!.endsWith('gem') && mon.item !== 'normalgem').withContext(`${leader.name} ${mon.name}`).toBe(false);
+      }
+    }
   });
 
   it('makes every region playable', () => {
