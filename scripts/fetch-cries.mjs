@@ -1,11 +1,12 @@
-// Downloads Pokémon cries from the PokeAPI/cries project (the "legacy" set,
-// i.e. the classic Gen 1-5 style cries) and converts them to mp3 via ffmpeg,
-// for national dex numbers 1-721 (Gen 1 through Gen 6).
+// Downloads Pokémon cries from the PokeAPI/cries project and converts them to
+// mp3 via ffmpeg, for national dex numbers 1-721 (Gen 1 through Gen 6).
+// Prefers the "legacy" set (classic Gen 1-5 style cries) and falls back to the
+// "latest" set for Pokémon without a legacy cry (Gen 6).
 //
 // Requires ffmpeg on PATH.
-// Run with: node scripts/fetch-cries.mjs
+// Run with: node scripts/fetch-cries.mjs [firstDexId]
 //
-// Source: https://github.com/PokeAPI/cries (cries/pokemon/legacy)
+// Source: https://github.com/PokeAPI/cries (cries/pokemon/legacy, cries/pokemon/latest)
 
 import { mkdir, writeFile, rm } from 'node:fs/promises';
 import path from 'node:path';
@@ -15,8 +16,12 @@ import os from 'node:os';
 
 const execFileAsync = promisify(execFile);
 
+const FIRST_DEX_ID = Number(process.argv[2] ?? 1);
 const LAST_DEX_ID = 721;
-const BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/legacy';
+const BASE_URLS = [
+  'https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/legacy',
+  'https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest',
+];
 const OUT_DIR = path.resolve('public/assets/sounds/cries');
 const TMP_DIR = path.join(os.tmpdir(), 'pkmn-cries-ogg');
 const CONCURRENCY = 6;
@@ -28,7 +33,14 @@ async function ensureDirs() {
 }
 
 async function downloadOgg(dexId) {
-  const url = `${BASE_URL}/${dexId}.ogg`;
+  for (const baseUrl of BASE_URLS) {
+    const buffer = await downloadFrom(`${baseUrl}/${dexId}.ogg`);
+    if (buffer) return buffer;
+  }
+  return null;
+}
+
+async function downloadFrom(url) {
   for (let attempt = 1; attempt <= RETRIES; attempt++) {
     try {
       const res = await fetch(url);
@@ -76,7 +88,8 @@ async function main() {
   let missing = 0;
   let done = 0;
 
-  const dexIds = Array.from({ length: LAST_DEX_ID }, (_, i) => i + 1);
+  const total = LAST_DEX_ID - FIRST_DEX_ID + 1;
+  const dexIds = Array.from({ length: total }, (_, i) => i + FIRST_DEX_ID);
 
   await runPool(dexIds, async (dexId) => {
     try {
@@ -92,7 +105,7 @@ async function main() {
     }
 
     done++;
-    if (done % 50 === 0) console.log(`Progress: ${done}/${LAST_DEX_ID}`);
+    if (done % 50 === 0) console.log(`Progress: ${done}/${total}`);
   });
 
   await rm(TMP_DIR, { recursive: true, force: true });
