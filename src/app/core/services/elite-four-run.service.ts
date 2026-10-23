@@ -9,6 +9,7 @@ export type EliteFourRun = TrainerRun;
 @Injectable({ providedIn: 'root' })
 export class EliteFourRunService extends TrainerRunService<EliteFourMember> {
   readonly route = '/elite-four';
+  readonly musicTheme = 'elite4' as const;
 
   protected storageKey(): string {
     return 'pbs.eliteFourRun';

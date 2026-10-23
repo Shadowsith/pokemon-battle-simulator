@@ -7,6 +7,7 @@ import { TrainerRunService } from './trainer-run.service';
 @Injectable({ providedIn: 'root' })
 export class GymRunService extends TrainerRunService<GymLeader> {
   readonly route = '/gym-challenge';
+  readonly musicTheme = 'arena' as const;
 
   protected storageKey(): string {
     return 'pbs.gymRun';

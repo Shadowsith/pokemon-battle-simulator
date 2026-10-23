@@ -2,6 +2,7 @@ import { computed, signal } from '@angular/core';
 import { MajorStatus } from '../models/pokemon.model';
 import type { RunMember, RunRegion } from '../models/trainer-run.model';
 import type { BattleFormat } from '../battle/battle-format';
+import type { BattleMusicTheme } from './audio.service';
 
 /** Battle state that survives between fights of a run (HP is always restored). */
 export interface RunCarry {
@@ -37,6 +38,8 @@ export abstract class TrainerRunService<M extends RunMember = RunMember> {
   protected abstract lookupRegion(id: string): RunRegion<M> | undefined;
   /** Page that shows this mode's run (the battle screen returns here). */
   abstract readonly route: string;
+  /** Music theme for this mode's fights (assets/sounds/music/<theme>_gen<N>.mp3). */
+  abstract readonly musicTheme: BattleMusicTheme;
 
   private readonly _run = signal<TrainerRun | null>(this.load());
   readonly run = this._run.asReadonly();

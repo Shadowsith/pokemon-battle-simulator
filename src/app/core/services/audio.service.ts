@@ -2,7 +2,10 @@ import { Injectable, effect, inject } from '@angular/core';
 import { SettingsService } from './settings.service';
 
 /** Battle themes under assets/sounds/music/; one is picked at random per battle. */
-const BATTLE_TRACKS = ['battle_gen1', 'battle_gen2', 'battle_gen3', 'battle_gen4', 'battle_gen5'];
+const BATTLE_TRACKS = ['battle_gen1', 'battle_gen2', 'battle_gen3', 'battle_gen4', 'battle_gen5', 'battle_gen6'];
+
+/** Special-fight music: arena_gen<N>.mp3 (gym leaders), elite4_gen<N>.mp3 (Elite Four). */
+export type BattleMusicTheme = 'arena' | 'elite4';
 
 /**
  * Plays move / cry / misc sound files under assets/sounds/. Move files are
@@ -28,16 +31,35 @@ export class AudioService {
     });
   }
 
-  /** Start a random battle theme on loop, replacing any track already playing. */
-  startBattleMusic(): void {
+  /**
+   * Start a battle theme on loop, replacing any track already playing.
+   * With a `theme` (gym leader / Elite Four fight) the generation's
+   * `<theme>_gen<N>` track is tried first, then `battle_gen<N>`, then a random
+   * battle theme - each step only taken if the previous file fails to load.
+   * Without one, a random battle theme plays.
+   */
+  startBattleMusic(special?: { theme: BattleMusicTheme; gen: number }): void {
     this.stopBattleMusic();
-    const track = BATTLE_TRACKS[Math.floor(Math.random() * BATTLE_TRACKS.length)];
+    const random = BATTLE_TRACKS[Math.floor(Math.random() * BATTLE_TRACKS.length)];
+    const tracks = special
+      ? [`${special.theme}_gen${special.gen}`, `battle_gen${special.gen}`, random]
+      : [random];
+    this.playMusic(tracks);
+  }
+
+  /** Loop the first track of `tracks` that loads, moving on when a file is missing. */
+  private playMusic(tracks: string[]): void {
+    const [track, ...rest] = tracks;
+    if (!track) return;
     const audio = new Audio(`assets/sounds/music/${track}.mp3`);
     audio.loop = true;
     audio.volume = this.settings.musicVolume();
+    audio.addEventListener('error', () => {
+      if (this.music === audio) this.playMusic(rest);
+    });
     this.music = audio;
     audio.play().catch(() => {
-      /* autoplay blocked before a user gesture - ignore */
+      /* autoplay blocked or file missing - a missing file is handled by the error listener */
     });
   }
 

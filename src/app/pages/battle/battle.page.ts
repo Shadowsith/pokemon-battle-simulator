@@ -542,7 +542,11 @@ export class BattlePage implements OnDestroy {
     this.outcome.set(null);
     this.log.set('');
     this.phase.set('intro');
-    this.audio.startBattleMusic(); // one random looped battle theme per battle
+    // Gym leader / Elite Four fights get their generation's theme; others a random one.
+    const challengeGen = this.challenge?.svc.region()?.gen;
+    this.audio.startBattleMusic(
+      this.challenge && challengeGen ? { theme: this.challenge.svc.musicTheme, gen: challengeGen } : undefined,
+    );
 
     if (this.customBattle) {
       const cfg = this.customBattle;
