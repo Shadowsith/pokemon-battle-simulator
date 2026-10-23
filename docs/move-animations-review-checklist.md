@@ -1,0 +1,666 @@
+# Checklist: move animation review (Gen 1–6)
+
+**Goal:** watch the current animation of every move once and tick it off when it looks right. 621 moves in total.
+
+## How the animations work
+`MoveAnimationService.buildVisual()` in [move-animation.service.ts](../src/app/core/services/move-animation.service.ts) derives each animation from the move's @pkmn/sim data. Nothing is hand-made per move. The **style** column below is the delivery the code currently picks:
+
+| Style | Look | Moves |
+|---|---|---|
+| `melee` | caster lunges and hits the target | 173 |
+| `projectile` | particle stream flies to the target | 133 |
+| `lob` | orb flies in an arc | 20 |
+| `beam` | straight beam from caster to target | 17 |
+| `pulse` | rings travel to the target | 5 |
+| `sonic` | sound waves | 11 |
+| `field` | hits the whole target side | 36 |
+| `powder` | powder cloud drifts onto the target | 5 |
+| `selfAura` | aura around the caster (buffs, heals) | 121 |
+| `targetAura` | aura around the target (status moves) | 96 |
+| `weather` | screen-wide weather effect | 4 |
+
+Type sets the colour and particle shape. Base power sets the size. Multi-hit, priority, two-turn, drain and recoil add extra motion.
+
+## Review notes
+- Use the Debug-Kampf (debug mode) to try moves quickly.
+- If a move looks wrong, add a short note after the entry, e.g. `— ❌ should be a beam, not a lob`.
+- **Reviewed** = watched at least once, as attacker on both sides.
+
+## Gen 1 (165)
+
+- [ ] **Absorb** / Absorber — `absorb` · Grass · Special · `projectile`
+- [ ] **Acid** / Säure — `acid` · Poison · Special · `field`
+- [ ] **Acid Armor** / Säurepanzer — `acidarmor` · Poison · Status · `selfAura`
+- [ ] **Agility** / Agilität — `agility` · Psychic · Status · `selfAura`
+- [ ] **Amnesia** / Amnesie — `amnesia` · Psychic · Status · `selfAura`
+- [ ] **Aurora Beam** / Aurorastrahl — `aurorabeam` · Ice · Special · `projectile`
+- [ ] **Barrage** / Stakkato — `barrage` · Normal · Physical · `lob`
+- [ ] **Barrier** / Barriere — `barrier` · Psychic · Status · `selfAura`
+- [ ] **Bide** / Geduld — `bide` · Normal · Physical · `selfAura`
+- [ ] **Bind** / Klammergriff — `bind` · Normal · Physical · `melee`
+- [ ] **Bite** / Biss — `bite` · Dark · Physical · `melee`
+- [ ] **Blizzard** / Blizzard — `blizzard` · Ice · Special · `field`
+- [ ] **Body Slam** / Bodyslam — `bodyslam` · Normal · Physical · `melee`
+- [ ] **Bone Club** / Knochenkeule — `boneclub` · Ground · Physical · `projectile`
+- [ ] **Bonemerang** / Knochmerang — `bonemerang` · Ground · Physical · `projectile`
+- [ ] **Bubble** / Blubber — `bubble` · Water · Special · `field`
+- [ ] **Bubble Beam** / Blubbstrahl — `bubblebeam` · Water · Special · `projectile`
+- [ ] **Clamp** / Schnapper — `clamp` · Water · Physical · `melee`
+- [ ] **Comet Punch** / Kometenhieb — `cometpunch` · Normal · Physical · `melee`
+- [ ] **Confuse Ray** / Konfusstrahl — `confuseray` · Ghost · Status · `targetAura`
+- [ ] **Confusion** / Konfusion — `confusion` · Psychic · Special · `projectile`
+- [ ] **Constrict** / Umklammerung — `constrict` · Normal · Physical · `melee`
+- [ ] **Conversion** / Umwandlung — `conversion` · Normal · Status · `selfAura`
+- [ ] **Counter** / Konter — `counter` · Fighting · Physical · `melee`
+- [ ] **Crabhammer** / Krabbhammer — `crabhammer` · Water · Physical · `melee`
+- [ ] **Cut** / Zerschneider — `cut` · Normal · Physical · `melee`
+- [ ] **Defense Curl** / Einigler — `defensecurl` · Normal · Status · `selfAura`
+- [ ] **Dig** / Schaufler — `dig` · Ground · Physical · `beam`
+- [ ] **Disable** / Aussetzer — `disable` · Normal · Status · `targetAura`
+- [ ] **Dizzy Punch** / Irrschlag — `dizzypunch` · Normal · Physical · `melee`
+- [ ] **Double Kick** / Doppelkick — `doublekick` · Fighting · Physical · `melee`
+- [ ] **Double Slap** / Duplexhieb — `doubleslap` · Normal · Physical · `melee`
+- [ ] **Double Team** / Doppelteam — `doubleteam` · Normal · Status · `selfAura`
+- [ ] **Double-Edge** / Risikotackle — `doubleedge` · Normal · Physical · `melee`
+- [ ] **Dragon Rage** / Drachenwut — `dragonrage` · Dragon · Special · `projectile`
+- [ ] **Dream Eater** / Traumfresser — `dreameater` · Psychic · Special · `projectile`
+- [ ] **Drill Peck** / Bohrschnabel — `drillpeck` · Flying · Physical · `melee`
+- [ ] **Earthquake** / Erdbeben — `earthquake` · Ground · Physical · `field`
+- [ ] **Egg Bomb** / Eierbombe — `eggbomb` · Normal · Physical · `lob`
+- [ ] **Ember** / Glut — `ember` · Fire · Special · `projectile`
+- [ ] **Explosion** / Explosion — `explosion` · Normal · Physical · `field`
+- [ ] **Fire Blast** / Feuersturm — `fireblast` · Fire · Special · `projectile`
+- [ ] **Fire Punch** / Feuerschlag — `firepunch` · Fire · Physical · `melee`
+- [ ] **Fire Spin** / Feuerwirbel — `firespin` · Fire · Special · `projectile`
+- [ ] **Fissure** / Geofissur — `fissure` · Ground · Physical · `projectile`
+- [ ] **Flamethrower** / Flammenwurf — `flamethrower` · Fire · Special · `projectile`
+- [ ] **Flash** / Blitz — `flash` · Normal · Status · `selfAura`
+- [ ] **Fly** / Fliegen — `fly` · Flying · Physical · `beam`
+- [ ] **Focus Energy** / Energiefokus — `focusenergy` · Normal · Status · `selfAura`
+- [ ] **Fury Attack** / Furienschlag — `furyattack` · Normal · Physical · `melee`
+- [ ] **Fury Swipes** / Kratzfurie — `furyswipes` · Normal · Physical · `melee`
+- [ ] **Glare** / Schlangenblick — `glare` · Normal · Status · `targetAura`
+- [ ] **Growl** / Heuler — `growl` · Normal · Status · `selfAura`
+- [ ] **Growth** / Wachstum — `growth` · Normal · Status · `selfAura`
+- [ ] **Guillotine** / Guillotine — `guillotine` · Normal · Physical · `melee`
+- [ ] **Gust** / Windstoß — `gust` · Flying · Special · `projectile`
+- [ ] **Harden** / Härtner — `harden` · Normal · Status · `selfAura`
+- [ ] **Haze** / Dunkelnebel — `haze` · Ice · Status · `targetAura`
+- [ ] **Headbutt** / Kopfnuss — `headbutt` · Normal · Physical · `melee`
+- [ ] **High Jump Kick** / Turmkick — `highjumpkick` · Fighting · Physical · `melee`
+- [ ] **Horn Attack** / Hornattacke — `hornattack` · Normal · Physical · `melee`
+- [ ] **Horn Drill** / Hornbohrer — `horndrill` · Normal · Physical · `melee`
+- [ ] **Hydro Pump** / Hydropumpe — `hydropump` · Water · Special · `projectile`
+- [ ] **Hyper Beam** / Hyperstrahl — `hyperbeam` · Normal · Special · `projectile`
+- [ ] **Hyper Fang** / Hyperzahn — `hyperfang` · Normal · Physical · `melee`
+- [ ] **Hypnosis** / Hypnose — `hypnosis` · Psychic · Status · `targetAura`
+- [ ] **Ice Beam** / Eisstrahl — `icebeam` · Ice · Special · `projectile`
+- [ ] **Ice Punch** / Eishieb — `icepunch` · Ice · Physical · `melee`
+- [ ] **Jump Kick** / Sprungkick — `jumpkick` · Fighting · Physical · `melee`
+- [ ] **Karate Chop** / Karateschlag — `karatechop` · Fighting · Physical · `melee`
+- [ ] **Kinesis** / Psykraft — `kinesis` · Psychic · Status · `selfAura`
+- [ ] **Leech Life** / Blutsauger — `leechlife` · Bug · Physical · `melee`
+- [ ] **Leech Seed** / Egelsamen — `leechseed` · Grass · Status · `targetAura`
+- [ ] **Leer** / Silberblick — `leer` · Normal · Status · `selfAura`
+- [ ] **Lick** / Schlecker — `lick` · Ghost · Physical · `melee`
+- [ ] **Light Screen** / Lichtschild — `lightscreen` · Psychic · Status · `selfAura`
+- [ ] **Lovely Kiss** / Todeskuss — `lovelykiss` · Normal · Status · `targetAura`
+- [ ] **Low Kick** / Fußkick — `lowkick` · Fighting · Physical · `melee`
+- [ ] **Meditate** / Meditation — `meditate` · Psychic · Status · `selfAura`
+- [ ] **Mega Drain** / Megasauger — `megadrain` · Grass · Special · `projectile`
+- [ ] **Mega Kick** / Megakick — `megakick` · Normal · Physical · `melee`
+- [ ] **Mega Punch** / Megahieb — `megapunch` · Normal · Physical · `melee`
+- [ ] **Metronome** / Metronom — `metronome` · Normal · Status · `selfAura`
+- [ ] **Mimic** / Mimikry — `mimic` · Normal · Status · `targetAura`
+- [ ] **Minimize** / Komprimator — `minimize` · Normal · Status · `selfAura`
+- [ ] **Mirror Move** / Spiegeltrick — `mirrormove` · Flying · Status · `targetAura`
+- [ ] **Mist** / Weißnebel — `mist` · Ice · Status · `selfAura`
+- [ ] **Night Shade** / Nachtnebel — `nightshade` · Ghost · Special · `projectile`
+- [ ] **Pay Day** / Zahltag — `payday` · Normal · Physical · `projectile`
+- [ ] **Peck** / Pikser — `peck` · Flying · Physical · `melee`
+- [ ] **Petal Dance** / Blättertanz — `petaldance` · Grass · Special · `projectile`
+- [ ] **Pin Missile** / Nadelrakete — `pinmissile` · Bug · Physical · `projectile`
+- [ ] **Poison Gas** / Giftwolke — `poisongas` · Poison · Status · `targetAura`
+- [ ] **Poison Powder** / Giftpuder — `poisonpowder` · Poison · Status · `powder`
+- [ ] **Poison Sting** / Giftstachel — `poisonsting` · Poison · Physical · `projectile`
+- [ ] **Pound** / Klaps — `pound` · Normal · Physical · `melee`
+- [ ] **Psybeam** / Psystrahl — `psybeam` · Psychic · Special · `projectile`
+- [ ] **Psychic** / Psychokinese — `psychic` · Psychic · Special · `projectile`
+- [ ] **Psywave** / Psywelle — `psywave` · Psychic · Special · `projectile`
+- [ ] **Quick Attack** / Ruckzuckhieb — `quickattack` · Normal · Physical · `melee`
+- [ ] **Rage** / Raserei — `rage` · Normal · Physical · `melee`
+- [ ] **Razor Leaf** / Rasierblatt — `razorleaf` · Grass · Physical · `field`
+- [ ] **Razor Wind** / Klingensturm — `razorwind` · Normal · Special · `beam`
+- [ ] **Recover** / Genesung — `recover` · Normal · Status · `selfAura`
+- [ ] **Reflect** / Reflektor — `reflect` · Psychic · Status · `selfAura`
+- [ ] **Rest** / Erholung — `rest` · Psychic · Status · `selfAura`
+- [ ] **Roar** / Brüller — `roar` · Normal · Status · `targetAura`
+- [ ] **Rock Slide** / Steinhagel — `rockslide` · Rock · Physical · `field`
+- [ ] **Rock Throw** / Steinwurf — `rockthrow` · Rock · Physical · `projectile`
+- [ ] **Rolling Kick** / Fegekick — `rollingkick` · Fighting · Physical · `melee`
+- [ ] **Sand Attack** / Sandwirbel — `sandattack` · Ground · Status · `selfAura`
+- [ ] **Scratch** / Kratzer — `scratch` · Normal · Physical · `melee`
+- [ ] **Screech** / Kreideschrei — `screech` · Normal · Status · `selfAura`
+- [ ] **Seismic Toss** / Geowurf — `seismictoss` · Fighting · Physical · `melee`
+- [ ] **Self-Destruct** / Finale — `selfdestruct` · Normal · Physical · `field`
+- [ ] **Sharpen** / Schärfer — `sharpen` · Normal · Status · `selfAura`
+- [ ] **Sing** / Gesang — `sing` · Normal · Status · `targetAura`
+- [ ] **Skull Bash** / Schädelwumme — `skullbash` · Normal · Physical · `beam`
+- [ ] **Sky Attack** / Himmelsfeger — `skyattack` · Flying · Physical · `beam`
+- [ ] **Slam** / Slam — `slam` · Normal · Physical · `melee`
+- [ ] **Slash** / Schlitzer — `slash` · Normal · Physical · `melee`
+- [ ] **Sleep Powder** / Schlafpuder — `sleeppowder` · Grass · Status · `powder`
+- [ ] **Sludge** / Schlammbad — `sludge` · Poison · Special · `projectile`
+- [ ] **Smog** / Smog — `smog` · Poison · Special · `projectile`
+- [ ] **Smokescreen** / Rauchwolke — `smokescreen` · Normal · Status · `selfAura`
+- [ ] **Soft-Boiled** / Weichei — `softboiled` · Normal · Status · `selfAura`
+- [ ] **Solar Beam** / Solarstrahl — `solarbeam` · Grass · Special · `beam`
+- [ ] **Sonic Boom** / Ultraschall — `sonicboom` · Normal · Special · `projectile`
+- [ ] **Spike Cannon** / Dornkanone — `spikecannon` · Normal · Physical · `beam`
+- [ ] **Splash** / Platscher — `splash` · Normal · Status · `selfAura`
+- [ ] **Spore** / Pilzspore — `spore` · Grass · Status · `powder`
+- [ ] **Stomp** / Stampfer — `stomp` · Normal · Physical · `melee`
+- [ ] **Strength** / Stärke — `strength` · Normal · Physical · `melee`
+- [ ] **String Shot** / Fadenschuss — `stringshot` · Bug · Status · `selfAura`
+- [ ] **Struggle** / Verzweifler — `struggle` · Normal · Physical · `melee`
+- [ ] **Stun Spore** / Stachelspore — `stunspore` · Grass · Status · `powder`
+- [ ] **Submission** / Überroller — `submission` · Fighting · Physical · `melee`
+- [ ] **Substitute** / Delegator — `substitute` · Normal · Status · `selfAura`
+- [ ] **Super Fang** / Superzahn — `superfang` · Normal · Physical · `melee`
+- [ ] **Supersonic** / Superschall — `supersonic` · Normal · Status · `targetAura`
+- [ ] **Surf** / Surfer — `surf` · Water · Special · `field`
+- [ ] **Swift** / Sternschauer — `swift` · Normal · Special · `field`
+- [ ] **Swords Dance** / Schwerttanz — `swordsdance` · Normal · Status · `selfAura`
+- [ ] **Tackle** / Tackle — `tackle` · Normal · Physical · `melee`
+- [ ] **Tail Whip** / Rutenschlag — `tailwhip` · Normal · Status · `selfAura`
+- [ ] **Take Down** / Bodycheck — `takedown` · Normal · Physical · `melee`
+- [ ] **Teleport** / Teleport — `teleport` · Psychic · Status · `selfAura`
+- [ ] **Thrash** / Fuchtler — `thrash` · Normal · Physical · `melee`
+- [ ] **Thunder** / Donner — `thunder` · Electric · Special · `projectile`
+- [ ] **Thunder Punch** / Donnerschlag — `thunderpunch` · Electric · Physical · `melee`
+- [ ] **Thunder Shock** / Donnerschock — `thundershock` · Electric · Special · `projectile`
+- [ ] **Thunder Wave** / Donnerwelle — `thunderwave` · Electric · Status · `targetAura`
+- [ ] **Thunderbolt** / Donnerblitz — `thunderbolt` · Electric · Special · `projectile`
+- [ ] **Toxic** / Toxin — `toxic` · Poison · Status · `targetAura`
+- [ ] **Transform** / Wandler — `transform` · Normal · Status · `targetAura`
+- [ ] **Tri Attack** / Triplette — `triattack` · Normal · Special · `projectile`
+- [ ] **Twineedle** / Duonadel — `twineedle` · Bug · Physical · `projectile`
+- [ ] **Vine Whip** / Rankenhieb — `vinewhip` · Grass · Physical · `melee`
+- [ ] **Vise Grip** / Klammer — `visegrip` · Normal · Physical · `melee`
+- [ ] **Water Gun** / Aquaknarre — `watergun` · Water · Special · `projectile`
+- [ ] **Waterfall** / Kaskade — `waterfall` · Water · Physical · `melee`
+- [ ] **Whirlwind** / Wirbelwind — `whirlwind` · Normal · Status · `targetAura`
+- [ ] **Wing Attack** / Flügelschlag — `wingattack` · Flying · Physical · `melee`
+- [ ] **Withdraw** / Panzerschutz — `withdraw` · Water · Status · `selfAura`
+- [ ] **Wrap** / Wickel — `wrap` · Normal · Physical · `melee`
+
+## Gen 2 (86)
+
+- [ ] **Aeroblast** / Luftstoß — `aeroblast` · Flying · Special · `projectile`
+- [ ] **Ancient Power** / Antik-Kraft — `ancientpower` · Rock · Special · `projectile`
+- [ ] **Attract** / Anziehung — `attract` · Normal · Status · `targetAura`
+- [ ] **Baton Pass** / Stafette — `batonpass` · Normal · Status · `selfAura`
+- [ ] **Beat Up** / Prügler — `beatup` · Dark · Physical · `projectile`
+- [ ] **Belly Drum** / Bauchtrommel — `bellydrum` · Normal · Status · `selfAura`
+- [ ] **Bone Rush** / Knochenhatz — `bonerush` · Ground · Physical · `projectile`
+- [ ] **Charm** / Charme — `charm` · Fairy · Status · `selfAura`
+- [ ] **Conversion 2** / Umwandlung2 — `conversion2` · Normal · Status · `targetAura`
+- [ ] **Cotton Spore** / Baumwollsaat — `cottonspore` · Grass · Status · `selfAura`
+- [ ] **Cross Chop** / Kreuzhieb — `crosschop` · Fighting · Physical · `melee`
+- [ ] **Crunch** / Knirscher — `crunch` · Dark · Physical · `melee`
+- [ ] **Curse** / Fluch — `curse` · Ghost · Status · `targetAura`
+- [ ] **Destiny Bond** / Abgangsbund — `destinybond` · Ghost · Status · `selfAura`
+- [ ] **Detect** / Scanner — `detect` · Fighting · Status · `selfAura`
+- [ ] **Dragon Breath** / Feuerodem — `dragonbreath` · Dragon · Special · `projectile`
+- [ ] **Dynamic Punch** / Wuchtschlag — `dynamicpunch` · Fighting · Physical · `melee`
+- [ ] **Encore** / Zugabe — `encore` · Normal · Status · `targetAura`
+- [ ] **Endure** / Ausdauer — `endure` · Normal · Status · `selfAura`
+- [ ] **Extreme Speed** / Turbotempo — `extremespeed` · Normal · Physical · `melee`
+- [ ] **False Swipe** / Trugschlag — `falseswipe` · Normal · Physical · `melee`
+- [ ] **Feint Attack** / Finte — `feintattack` · Dark · Physical · `melee`
+- [ ] **Flail** / Dreschflegel — `flail` · Normal · Physical · `melee`
+- [ ] **Flame Wheel** / Flammenrad — `flamewheel` · Fire · Physical · `melee`
+- [ ] **Foresight** / Scharfblick — `foresight` · Normal · Status · `targetAura`
+- [ ] **Frustration** / Frustration — `frustration` · Normal · Physical · `melee`
+- [ ] **Fury Cutter** / Zornklinge — `furycutter` · Bug · Physical · `melee`
+- [ ] **Future Sight** / Seher — `futuresight` · Psychic · Special · `projectile`
+- [ ] **Giga Drain** / Gigasauger — `gigadrain` · Grass · Special · `projectile`
+- [ ] **Heal Bell** / Vitalglocke — `healbell` · Normal · Status · `targetAura`
+- [ ] **Hidden Power** / Kraftreserve — `hiddenpower` · Normal · Special · `projectile`
+- [ ] **Icy Wind** / Eissturm — `icywind` · Ice · Special · `field`
+- [ ] **Iron Tail** / Eisenschweif — `irontail` · Steel · Physical · `melee`
+- [ ] **Lock-On** / Zielschuss — `lockon` · Normal · Status · `targetAura`
+- [ ] **Mach Punch** / Tempohieb — `machpunch` · Fighting · Physical · `melee`
+- [ ] **Magnitude** / Intensität — `magnitude` · Ground · Physical · `field`
+- [ ] **Mean Look** / Horrorblick — `meanlook` · Normal · Status · `targetAura`
+- [ ] **Megahorn** / Vielender — `megahorn` · Bug · Physical · `melee`
+- [ ] **Metal Claw** / Metallklaue — `metalclaw` · Steel · Physical · `melee`
+- [ ] **Milk Drink** / Milchgetränk — `milkdrink` · Normal · Status · `selfAura`
+- [ ] **Mind Reader** / Willensleser — `mindreader` · Normal · Status · `targetAura`
+- [ ] **Mirror Coat** / Spiegelcape — `mirrorcoat` · Psychic · Special · `projectile`
+- [ ] **Moonlight** / Mondschein — `moonlight` · Fairy · Status · `selfAura`
+- [ ] **Morning Sun** / Morgengrauen — `morningsun` · Normal · Status · `selfAura`
+- [ ] **Mud-Slap** / Lehmschelle — `mudslap` · Ground · Special · `projectile`
+- [ ] **Nightmare** / Nachtmahr — `nightmare` · Ghost · Status · `targetAura`
+- [ ] **Octazooka** / Octazooka — `octazooka` · Water · Special · `lob`
+- [ ] **Outrage** / Wutanfall — `outrage` · Dragon · Physical · `melee`
+- [ ] **Pain Split** / Leidteiler — `painsplit` · Normal · Status · `targetAura`
+- [ ] **Perish Song** / Abgesang — `perishsong` · Normal · Status · `targetAura`
+- [ ] **Powder Snow** / Pulverschnee — `powdersnow` · Ice · Special · `field`
+- [ ] **Present** / Geschenk — `present` · Normal · Physical · `projectile`
+- [ ] **Protect** / Schutzschild — `protect` · Normal · Status · `selfAura`
+- [ ] **Psych Up** / Psycho-Plus — `psychup` · Normal · Status · `targetAura`
+- [ ] **Pursuit** / Verfolgung — `pursuit` · Dark · Physical · `melee`
+- [ ] **Rain Dance** / Regentanz — `raindance` · Water · Status · `weather`
+- [ ] **Rapid Spin** / Turbodreher — `rapidspin` · Normal · Physical · `melee`
+- [ ] **Return** / Rückkehr — `return` · Normal · Physical · `melee`
+- [ ] **Reversal** / Gegenschlag — `reversal` · Fighting · Physical · `melee`
+- [ ] **Rock Smash** / Zertrümmerer — `rocksmash` · Fighting · Physical · `melee`
+- [ ] **Rollout** / Walzer — `rollout` · Rock · Physical · `melee`
+- [ ] **Sacred Fire** / Läuterfeuer — `sacredfire` · Fire · Physical · `projectile`
+- [ ] **Safeguard** / Bodyguard — `safeguard` · Normal · Status · `selfAura`
+- [ ] **Sandstorm** / Sandsturm — `sandstorm` · Rock · Status · `weather`
+- [ ] **Scary Face** / Grimasse — `scaryface` · Normal · Status · `selfAura`
+- [ ] **Shadow Ball** / Spukball — `shadowball` · Ghost · Special · `lob`
+- [ ] **Sketch** / Nachahmer — `sketch` · Normal · Status · `targetAura`
+- [ ] **Sleep Talk** / Schlafrede — `sleeptalk` · Normal · Status · `selfAura`
+- [ ] **Sludge Bomb** / Matschbombe — `sludgebomb` · Poison · Special · `lob`
+- [ ] **Snore** / Schnarcher — `snore` · Normal · Special · `sonic`
+- [ ] **Spark** / Funkensprung — `spark` · Electric · Physical · `melee`
+- [ ] **Spider Web** / Spinnennetz — `spiderweb` · Bug · Status · `targetAura`
+- [ ] **Spikes** / Stachler — `spikes` · Ground · Status · `targetAura`
+- [ ] **Spite** / Groll — `spite` · Ghost · Status · `targetAura`
+- [ ] **Steel Wing** / Stahlflügel — `steelwing` · Steel · Physical · `melee`
+- [ ] **Sunny Day** / Sonnentag — `sunnyday` · Fire · Status · `weather`
+- [ ] **Swagger** / Angeberei — `swagger` · Normal · Status · `selfAura`
+- [ ] **Sweet Kiss** / Bitterkuss — `sweetkiss` · Fairy · Status · `targetAura`
+- [ ] **Sweet Scent** / Lockduft — `sweetscent` · Normal · Status · `selfAura`
+- [ ] **Synthesis** / Synthese — `synthesis` · Grass · Status · `selfAura`
+- [ ] **Thief** / Raub — `thief` · Dark · Physical · `melee`
+- [ ] **Triple Kick** / Dreifachkick — `triplekick` · Fighting · Physical · `melee`
+- [ ] **Twister** / Windhose — `twister` · Dragon · Special · `field`
+- [ ] **Vital Throw** / Überwurf — `vitalthrow` · Fighting · Physical · `melee`
+- [ ] **Whirlpool** / Whirlpool — `whirlpool` · Water · Special · `projectile`
+- [ ] **Zap Cannon** / Blitzkanone — `zapcannon` · Electric · Special · `beam`
+
+## Gen 3 (103)
+
+- [ ] **Aerial Ace** / Aero-Ass — `aerialace` · Flying · Physical · `melee`
+- [ ] **Air Cutter** / Windschnitt — `aircutter` · Flying · Special · `field`
+- [ ] **Arm Thrust** / Armstoß — `armthrust` · Fighting · Physical · `melee`
+- [ ] **Aromatherapy** / Aromakur — `aromatherapy` · Grass · Status · `targetAura`
+- [ ] **Assist** / Zuschuss — `assist` · Normal · Status · `selfAura`
+- [ ] **Astonish** / Erstauner — `astonish` · Ghost · Physical · `melee`
+- [ ] **Blast Burn** / Lohekanonade — `blastburn` · Fire · Special · `projectile`
+- [ ] **Blaze Kick** / Feuerfeger — `blazekick` · Fire · Physical · `melee`
+- [ ] **Block** / Rückentzug — `block` · Normal · Status · `targetAura`
+- [ ] **Bounce** / Sprungfeder — `bounce` · Flying · Physical · `beam`
+- [ ] **Brick Break** / Durchbruch — `brickbreak` · Fighting · Physical · `melee`
+- [ ] **Bulk Up** / Protzer — `bulkup` · Fighting · Status · `selfAura`
+- [ ] **Bullet Seed** / Kugelsaat — `bulletseed` · Grass · Physical · `lob`
+- [ ] **Calm Mind** / Gedankengut — `calmmind` · Psychic · Status · `selfAura`
+- [ ] **Camouflage** / Tarnung — `camouflage` · Normal · Status · `selfAura`
+- [ ] **Charge** / Ladevorgang — `charge` · Electric · Status · `selfAura`
+- [ ] **Cosmic Power** / Kosmik-Kraft — `cosmicpower` · Psychic · Status · `selfAura`
+- [ ] **Covet** / Bezirzer — `covet` · Normal · Physical · `melee`
+- [ ] **Crush Claw** / Zermalmklaue — `crushclaw` · Normal · Physical · `melee`
+- [ ] **Dive** / Taucher — `dive` · Water · Physical · `beam`
+- [ ] **Doom Desire** / Kismetwunsch — `doomdesire` · Steel · Special · `projectile`
+- [ ] **Dragon Claw** / Drachenklaue — `dragonclaw` · Dragon · Physical · `melee`
+- [ ] **Dragon Dance** / Drachentanz — `dragondance` · Dragon · Status · `selfAura`
+- [ ] **Endeavor** / Notsituation — `endeavor` · Normal · Physical · `melee`
+- [ ] **Eruption** / Eruption — `eruption` · Fire · Special · `field`
+- [ ] **Extrasensory** / Sondersensor — `extrasensory` · Psychic · Special · `projectile`
+- [ ] **Facade** / Fassade — `facade` · Normal · Physical · `melee`
+- [ ] **Fake Out** / Mogelhieb — `fakeout` · Normal · Physical · `melee`
+- [ ] **Fake Tears** / Trugträne — `faketears` · Dark · Status · `selfAura`
+- [ ] **Feather Dance** / Daunenreigen — `featherdance` · Flying · Status · `selfAura`
+- [ ] **Flatter** / Schmeichler — `flatter` · Dark · Status · `selfAura`
+- [ ] **Focus Punch** / Power-Punch — `focuspunch` · Fighting · Physical · `melee`
+- [ ] **Follow Me** / Spotlight — `followme` · Normal · Status · `selfAura`
+- [ ] **Frenzy Plant** / Flora-Statue — `frenzyplant` · Grass · Special · `projectile`
+- [ ] **Grass Whistle** / Grasflöte — `grasswhistle` · Grass · Status · `targetAura`
+- [ ] **Grudge** / Nachspiel — `grudge` · Ghost · Status · `selfAura`
+- [ ] **Hail** / Hagelsturm — `hail` · Ice · Status · `weather`
+- [ ] **Heat Wave** / Hitzewelle — `heatwave` · Fire · Special · `field`
+- [ ] **Helping Hand** / Rechte Hand — `helpinghand` · Normal · Status · `targetAura`
+- [ ] **Howl** / Jauler — `howl` · Normal · Status · `selfAura`
+- [ ] **Hydro Cannon** / Aquahaubitze — `hydrocannon` · Water · Special · `beam`
+- [ ] **Hyper Voice** / Schallwelle — `hypervoice` · Normal · Special · `sonic`
+- [ ] **Ice Ball** / Frostbeule — `iceball` · Ice · Physical · `lob`
+- [ ] **Icicle Spear** / Eisspeer — `iciclespear` · Ice · Physical · `projectile`
+- [ ] **Imprison** / Begrenzer — `imprison` · Psychic · Status · `selfAura`
+- [ ] **Ingrain** / Verwurzler — `ingrain` · Grass · Status · `selfAura`
+- [ ] **Iron Defense** / Eisenabwehr — `irondefense` · Steel · Status · `selfAura`
+- [ ] **Knock Off** / Abschlag — `knockoff` · Dark · Physical · `melee`
+- [ ] **Leaf Blade** / Laubklinge — `leafblade` · Grass · Physical · `melee`
+- [ ] **Luster Purge** / Scheinwerfer — `lusterpurge` · Psychic · Special · `projectile`
+- [ ] **Magic Coat** / Magiemantel — `magiccoat` · Psychic · Status · `selfAura`
+- [ ] **Magical Leaf** / Zauberblatt — `magicalleaf` · Grass · Special · `projectile`
+- [ ] **Memento** / Memento-Mori — `memento` · Dark · Status · `selfAura`
+- [ ] **Metal Sound** / Metallsound — `metalsound` · Steel · Status · `selfAura`
+- [ ] **Meteor Mash** / Sternenhieb — `meteormash` · Steel · Physical · `melee`
+- [ ] **Mist Ball** / Nebelball — `mistball` · Psychic · Special · `lob`
+- [ ] **Mud Shot** / Lehmschuss — `mudshot` · Ground · Special · `projectile`
+- [ ] **Mud Sport** / Lehmsuhler — `mudsport` · Ground · Status · `targetAura`
+- [ ] **Muddy Water** / Lehmbrühe — `muddywater` · Water · Special · `field`
+- [ ] **Nature Power** / Natur-Kraft — `naturepower` · Normal · Status · `targetAura`
+- [ ] **Needle Arm** / Nietenranke — `needlearm` · Grass · Physical · `melee`
+- [ ] **Odor Sleuth** / Schnüffler — `odorsleuth` · Normal · Status · `targetAura`
+- [ ] **Overheat** / Hitzekoller — `overheat` · Fire · Special · `projectile`
+- [ ] **Poison Fang** / Giftzahn — `poisonfang` · Poison · Physical · `melee`
+- [ ] **Poison Tail** / Giftschweif — `poisontail` · Poison · Physical · `melee`
+- [ ] **Psycho Boost** / Psyschub — `psychoboost` · Psychic · Special · `projectile`
+- [ ] **Recycle** / Aufbereitung — `recycle` · Normal · Status · `selfAura`
+- [ ] **Refresh** / Heilung — `refresh` · Normal · Status · `selfAura`
+- [ ] **Revenge** / Vergeltung — `revenge` · Fighting · Physical · `melee`
+- [ ] **Rock Blast** / Felswurf — `rockblast` · Rock · Physical · `lob`
+- [ ] **Rock Tomb** / Felsgrab — `rocktomb` · Rock · Physical · `projectile`
+- [ ] **Role Play** / Rollenspiel — `roleplay` · Psychic · Status · `targetAura`
+- [ ] **Sand Tomb** / Sandgrab — `sandtomb` · Ground · Physical · `projectile`
+- [ ] **Secret Power** / Geheimpower — `secretpower` · Normal · Physical · `projectile`
+- [ ] **Shadow Punch** / Finsterfaust — `shadowpunch` · Ghost · Physical · `melee`
+- [ ] **Sheer Cold** / Eiseskälte — `sheercold` · Ice · Special · `projectile`
+- [ ] **Shock Wave** / Schockwelle — `shockwave` · Electric · Special · `projectile`
+- [ ] **Signal Beam** / Ampelleuchte — `signalbeam` · Bug · Special · `projectile`
+- [ ] **Silver Wind** / Silberhauch — `silverwind` · Bug · Special · `projectile`
+- [ ] **Skill Swap** / Fähigkeitstausch — `skillswap` · Psychic · Status · `targetAura`
+- [ ] **Sky Uppercut** / Himmelhieb — `skyuppercut` · Fighting · Physical · `melee`
+- [ ] **Slack Off** / Tagedieb — `slackoff` · Normal · Status · `selfAura`
+- [ ] **Smelling Salts** / Riechsalz — `smellingsalts` · Normal · Physical · `melee`
+- [ ] **Snatch** / Übernahme — `snatch` · Dark · Status · `selfAura`
+- [ ] **Spit Up** / Entfessler — `spitup` · Normal · Special · `projectile`
+- [ ] **Stockpile** / Horter — `stockpile` · Normal · Status · `selfAura`
+- [ ] **Superpower** / Kraftkoloss — `superpower` · Fighting · Physical · `melee`
+- [ ] **Swallow** / Verzehrer — `swallow` · Normal · Status · `selfAura`
+- [ ] **Tail Glow** / Schweifglanz — `tailglow` · Bug · Status · `selfAura`
+- [ ] **Taunt** / Verhöhner — `taunt` · Dark · Status · `targetAura`
+- [ ] **Teeter Dance** / Taumeltanz — `teeterdance` · Normal · Status · `targetAura`
+- [ ] **Tickle** / Spaßkanone — `tickle` · Normal · Status · `selfAura`
+- [ ] **Torment** / Folterknecht — `torment` · Dark · Status · `targetAura`
+- [ ] **Trick** / Trickbetrug — `trick` · Psychic · Status · `targetAura`
+- [ ] **Uproar** / Aufruhr — `uproar` · Normal · Special · `sonic`
+- [ ] **Volt Tackle** / Volttackle — `volttackle` · Electric · Physical · `melee`
+- [ ] **Water Pulse** / Aquawelle — `waterpulse` · Water · Special · `pulse`
+- [ ] **Water Sport** / Nassmacher — `watersport` · Water · Status · `targetAura`
+- [ ] **Water Spout** / Fontränen — `waterspout` · Water · Special · `field`
+- [ ] **Weather Ball** / Meteorologe — `weatherball` · Normal · Special · `lob`
+- [ ] **Will-O-Wisp** / Irrlicht — `willowisp` · Fire · Status · `targetAura`
+- [ ] **Wish** / Wunschtraum — `wish` · Normal · Status · `selfAura`
+- [ ] **Yawn** / Gähner — `yawn` · Normal · Status · `targetAura`
+
+## Gen 4 (113)
+
+- [ ] **Acupressure** / Akupressur — `acupressure` · Normal · Status · `targetAura`
+- [ ] **Air Slash** / Luftschnitt — `airslash` · Flying · Special · `projectile`
+- [ ] **Aqua Jet** / Wasserdüse — `aquajet` · Water · Physical · `melee`
+- [ ] **Aqua Ring** / Wasserring — `aquaring` · Water · Status · `selfAura`
+- [ ] **Aqua Tail** / Nassschweif — `aquatail` · Water · Physical · `melee`
+- [ ] **Assurance** / Gewissheit — `assurance` · Dark · Physical · `melee`
+- [ ] **Attack Order** / Schlagbefehl — `attackorder` · Bug · Physical · `projectile`
+- [ ] **Aura Sphere** / Aurasphäre — `aurasphere` · Fighting · Special · `pulse`
+- [ ] **Avalanche** / Lawine — `avalanche` · Ice · Physical · `melee`
+- [ ] **Brave Bird** / Sturzflug — `bravebird` · Flying · Physical · `melee`
+- [ ] **Brine** / Lake — `brine` · Water · Special · `projectile`
+- [ ] **Bug Bite** / Käferbiss — `bugbite` · Bug · Physical · `melee`
+- [ ] **Bug Buzz** / Käfergebrumm — `bugbuzz` · Bug · Special · `sonic`
+- [ ] **Bullet Punch** / Patronenhieb — `bulletpunch` · Steel · Physical · `melee`
+- [ ] **Captivate** / Liebreiz — `captivate` · Normal · Status · `selfAura`
+- [ ] **Charge Beam** / Ladestrahl — `chargebeam` · Electric · Special · `projectile`
+- [ ] **Chatter** / Geschwätz — `chatter` · Flying · Special · `sonic`
+- [ ] **Close Combat** / Nahkampf — `closecombat` · Fighting · Physical · `melee`
+- [ ] **Copycat** / Imitator — `copycat` · Normal · Status · `selfAura`
+- [ ] **Cross Poison** / Giftstreich — `crosspoison` · Poison · Physical · `melee`
+- [ ] **Crush Grip** / Quetschgriff — `crushgrip` · Normal · Physical · `melee`
+- [ ] **Dark Pulse** / Finsteraura — `darkpulse` · Dark · Special · `pulse`
+- [ ] **Dark Void** / Schlummerort — `darkvoid` · Dark · Status · `targetAura`
+- [ ] **Defend Order** / Blockbefehl — `defendorder` · Bug · Status · `selfAura`
+- [ ] **Defog** / Auflockern — `defog` · Flying · Status · `targetAura`
+- [ ] **Discharge** / Ladungsstoß — `discharge` · Electric · Special · `field`
+- [ ] **Double Hit** / Doppelschlag — `doublehit` · Normal · Physical · `melee`
+- [ ] **Draco Meteor** / Draco Meteor — `dracometeor` · Dragon · Special · `projectile`
+- [ ] **Dragon Pulse** / Drachenpuls — `dragonpulse` · Dragon · Special · `pulse`
+- [ ] **Dragon Rush** / Drachenstoß — `dragonrush` · Dragon · Physical · `melee`
+- [ ] **Drain Punch** / Ableithieb — `drainpunch` · Fighting · Physical · `melee`
+- [ ] **Earth Power** / Erdkräfte — `earthpower` · Ground · Special · `projectile`
+- [ ] **Embargo** / Itemsperre — `embargo` · Dark · Status · `targetAura`
+- [ ] **Energy Ball** / Energieball — `energyball` · Grass · Special · `lob`
+- [ ] **Feint** / Offenlegung — `feint` · Normal · Physical · `projectile`
+- [ ] **Fire Fang** / Feuerzahn — `firefang` · Fire · Physical · `melee`
+- [ ] **Flare Blitz** / Flammenblitz — `flareblitz` · Fire · Physical · `melee`
+- [ ] **Flash Cannon** / Lichtkanone — `flashcannon` · Steel · Special · `beam`
+- [ ] **Fling** / Schleuder — `fling` · Dark · Physical · `projectile`
+- [ ] **Focus Blast** / Fokusstoß — `focusblast` · Fighting · Special · `lob`
+- [ ] **Force Palm** / Kraftwelle — `forcepalm` · Fighting · Physical · `melee`
+- [ ] **Gastro Acid** / Magensäfte — `gastroacid` · Poison · Status · `targetAura`
+- [ ] **Giga Impact** / Gigastoß — `gigaimpact` · Normal · Physical · `melee`
+- [ ] **Grass Knot** / Strauchler — `grassknot` · Grass · Special · `projectile`
+- [ ] **Gravity** / Erdanziehung — `gravity` · Psychic · Status · `targetAura`
+- [ ] **Guard Swap** / Schutztausch — `guardswap` · Psychic · Status · `targetAura`
+- [ ] **Gunk Shot** / Mülltreffer — `gunkshot` · Poison · Physical · `projectile`
+- [ ] **Gyro Ball** / Gyroball — `gyroball` · Steel · Physical · `lob`
+- [ ] **Hammer Arm** / Hammerarm — `hammerarm` · Fighting · Physical · `melee`
+- [ ] **Head Smash** / Kopfstoß — `headsmash` · Rock · Physical · `melee`
+- [ ] **Heal Block** / Heilblockade — `healblock` · Psychic · Status · `targetAura`
+- [ ] **Heal Order** / Heilbefehl — `healorder` · Bug · Status · `selfAura`
+- [ ] **Healing Wish** / Heilopfer — `healingwish` · Psychic · Status · `selfAura`
+- [ ] **Heart Swap** / Statustausch — `heartswap` · Psychic · Status · `targetAura`
+- [ ] **Ice Fang** / Eiszahn — `icefang` · Ice · Physical · `melee`
+- [ ] **Ice Shard** / Eissplitter — `iceshard` · Ice · Physical · `projectile`
+- [ ] **Iron Head** / Eisenschädel — `ironhead` · Steel · Physical · `melee`
+- [ ] **Judgment** / Urteilskraft — `judgment` · Normal · Special · `projectile`
+- [ ] **Last Resort** / Zuflucht — `lastresort` · Normal · Physical · `melee`
+- [ ] **Lava Plume** / Flammensturm — `lavaplume` · Fire · Special · `field`
+- [ ] **Leaf Storm** / Blättersturm — `leafstorm` · Grass · Special · `projectile`
+- [ ] **Lucky Chant** / Beschwörung — `luckychant` · Normal · Status · `selfAura`
+- [ ] **Lunar Dance** / Lunartanz — `lunardance` · Psychic · Status · `selfAura`
+- [ ] **Magma Storm** / Lavasturm — `magmastorm` · Fire · Special · `projectile`
+- [ ] **Magnet Bomb** / Magnetbombe — `magnetbomb` · Steel · Physical · `lob`
+- [ ] **Magnet Rise** / Magnetflug — `magnetrise` · Electric · Status · `selfAura`
+- [ ] **Me First** / Egotrip — `mefirst` · Normal · Status · `targetAura`
+- [ ] **Metal Burst** / Metallstoß — `metalburst` · Steel · Physical · `projectile`
+- [ ] **Miracle Eye** / Wunderauge — `miracleeye` · Psychic · Status · `targetAura`
+- [ ] **Mirror Shot** / Spiegelsalve — `mirrorshot` · Steel · Special · `projectile`
+- [ ] **Mud Bomb** / Schlammbombe — `mudbomb` · Ground · Special · `lob`
+- [ ] **Nasty Plot** / Ränkeschmied — `nastyplot` · Dark · Status · `selfAura`
+- [ ] **Natural Gift** / Beerenkräfte — `naturalgift` · Normal · Physical · `projectile`
+- [ ] **Night Slash** / Nachthieb — `nightslash` · Dark · Physical · `melee`
+- [ ] **Ominous Wind** / Unheilböen — `ominouswind` · Ghost · Special · `projectile`
+- [ ] **Payback** / Gegenstoß — `payback` · Dark · Physical · `melee`
+- [ ] **Pluck** / Pflücker — `pluck` · Flying · Physical · `melee`
+- [ ] **Poison Jab** / Gifthieb — `poisonjab` · Poison · Physical · `melee`
+- [ ] **Power Gem** / Juwelenkraft — `powergem` · Rock · Special · `projectile`
+- [ ] **Power Swap** / Krafttausch — `powerswap` · Psychic · Status · `targetAura`
+- [ ] **Power Trick** / Krafttrick — `powertrick` · Psychic · Status · `selfAura`
+- [ ] **Power Whip** / Blattgeißel — `powerwhip` · Grass · Physical · `melee`
+- [ ] **Psycho Cut** / Psychoklinge — `psychocut` · Psychic · Physical · `projectile`
+- [ ] **Psycho Shift** / Psybann — `psychoshift` · Psychic · Status · `targetAura`
+- [ ] **Punishment** / Strafattacke — `punishment` · Dark · Physical · `melee`
+- [ ] **Roar of Time** / Zeitenlärm — `roaroftime` · Dragon · Special · `projectile`
+- [ ] **Rock Climb** / Kraxler — `rockclimb` · Normal · Physical · `melee`
+- [ ] **Rock Polish** / Steinpolitur — `rockpolish` · Rock · Status · `selfAura`
+- [ ] **Rock Wrecker** / Felswerfer — `rockwrecker` · Rock · Physical · `lob`
+- [ ] **Roost** / Ruheort — `roost` · Flying · Status · `selfAura`
+- [ ] **Seed Bomb** / Samenbomben — `seedbomb` · Grass · Physical · `lob`
+- [ ] **Seed Flare** / Schocksamen — `seedflare` · Grass · Special · `projectile`
+- [ ] **Shadow Claw** / Dunkelklaue — `shadowclaw` · Ghost · Physical · `melee`
+- [ ] **Shadow Force** / Schemenkraft — `shadowforce` · Ghost · Physical · `beam`
+- [ ] **Shadow Sneak** / Schattenstoß — `shadowsneak` · Ghost · Physical · `melee`
+- [ ] **Spacial Rend** / Raumschlag — `spacialrend` · Dragon · Special · `projectile`
+- [ ] **Stealth Rock** / Tarnsteine — `stealthrock` · Rock · Status · `targetAura`
+- [ ] **Stone Edge** / Steinkante — `stoneedge` · Rock · Physical · `projectile`
+- [ ] **Sucker Punch** / Tiefschlag — `suckerpunch` · Dark · Physical · `melee`
+- [ ] **Switcheroo** / Wechseldich — `switcheroo` · Dark · Status · `targetAura`
+- [ ] **Tailwind** / Rückenwind — `tailwind` · Flying · Status · `selfAura`
+- [ ] **Thunder Fang** / Donnerzahn — `thunderfang` · Electric · Physical · `melee`
+- [ ] **Toxic Spikes** / Giftspitzen — `toxicspikes` · Poison · Status · `targetAura`
+- [ ] **Trick Room** / Bizarroraum — `trickroom` · Psychic · Status · `targetAura`
+- [ ] **Trump Card** / Trumpfkarte — `trumpcard` · Normal · Special · `projectile`
+- [ ] **U-turn** / Kehrtwende — `uturn` · Bug · Physical · `melee`
+- [ ] **Vacuum Wave** / Vakuumwelle — `vacuumwave` · Fighting · Special · `projectile`
+- [ ] **Wake-Up Slap** / Weckruf — `wakeupslap` · Fighting · Physical · `melee`
+- [ ] **Wood Hammer** / Holzhammer — `woodhammer` · Grass · Physical · `melee`
+- [ ] **Worry Seed** / Sorgensamen — `worryseed` · Grass · Status · `targetAura`
+- [ ] **Wring Out** / Auswringen — `wringout` · Normal · Special · `projectile`
+- [ ] **X-Scissor** / Kreuzschere — `xscissor` · Bug · Physical · `melee`
+- [ ] **Zen Headbutt** / Zen-Kopfstoß — `zenheadbutt` · Psychic · Physical · `melee`
+
+## Gen 5 (92)
+
+- [ ] **Acid Spray** / Säurespeier — `acidspray` · Poison · Special · `lob`
+- [ ] **Acrobatics** / Akrobatik — `acrobatics` · Flying · Physical · `melee`
+- [ ] **After You** / Galanterie — `afteryou` · Normal · Status · `targetAura`
+- [ ] **Ally Switch** / Seitentausch — `allyswitch` · Psychic · Status · `selfAura`
+- [ ] **Autotomize** / Autotomie — `autotomize` · Steel · Status · `selfAura`
+- [ ] **Bestow** / Offerte — `bestow` · Normal · Status · `targetAura`
+- [ ] **Blue Flare** / Blauflammen — `blueflare` · Fire · Special · `projectile`
+- [ ] **Bolt Strike** / Blitzschlag — `boltstrike` · Electric · Physical · `melee`
+- [ ] **Bulldoze** / Dampfwalze — `bulldoze` · Ground · Physical · `field`
+- [ ] **Chip Away** / Zermürben — `chipaway` · Normal · Physical · `melee`
+- [ ] **Circle Throw** / Überkopfwurf — `circlethrow` · Fighting · Physical · `melee`
+- [ ] **Clear Smog** / Klärsmog — `clearsmog` · Poison · Special · `projectile`
+- [ ] **Coil** / Einrollen — `coil` · Poison · Status · `selfAura`
+- [ ] **Cotton Guard** / Watteschild — `cottonguard` · Grass · Status · `selfAura`
+- [ ] **Dragon Tail** / Drachenrute — `dragontail` · Dragon · Physical · `melee`
+- [ ] **Drill Run** / Schlagbohrer — `drillrun` · Ground · Physical · `melee`
+- [ ] **Dual Chop** / Doppelhieb — `dualchop` · Dragon · Physical · `melee`
+- [ ] **Echoed Voice** / Widerhall — `echoedvoice` · Normal · Special · `sonic`
+- [ ] **Electro Ball** / Elektroball — `electroball` · Electric · Special · `lob`
+- [ ] **Electroweb** / Elektronetz — `electroweb` · Electric · Special · `field`
+- [ ] **Entrainment** / Zwango — `entrainment` · Normal · Status · `targetAura`
+- [ ] **Fiery Dance** / Feuerreigen — `fierydance` · Fire · Special · `projectile`
+- [ ] **Final Gambit** / Wagemut — `finalgambit` · Fighting · Special · `projectile`
+- [ ] **Fire Pledge** / Feuersäulen — `firepledge` · Fire · Special · `projectile`
+- [ ] **Flame Burst** / Funkenflug — `flameburst` · Fire · Special · `projectile`
+- [ ] **Flame Charge** / Nitroladung — `flamecharge` · Fire · Physical · `melee`
+- [ ] **Foul Play** / Schmarotzer — `foulplay` · Dark · Physical · `melee`
+- [ ] **Freeze Shock** / Frostvolt — `freezeshock` · Ice · Physical · `beam`
+- [ ] **Frost Breath** / Eisesodem — `frostbreath` · Ice · Special · `projectile`
+- [ ] **Fusion Bolt** / Kreuzdonner — `fusionbolt` · Electric · Physical · `projectile`
+- [ ] **Fusion Flare** / Kreuzflamme — `fusionflare` · Fire · Special · `projectile`
+- [ ] **Gear Grind** / Klikkdiskus — `geargrind` · Steel · Physical · `melee`
+- [ ] **Glaciate** / Eiszeit — `glaciate` · Ice · Special · `field`
+- [ ] **Grass Pledge** / Pflanzensäulen — `grasspledge` · Grass · Special · `projectile`
+- [ ] **Guard Split** / Schutzteiler — `guardsplit` · Psychic · Status · `targetAura`
+- [ ] **Head Charge** / Steinschädel — `headcharge` · Normal · Physical · `melee`
+- [ ] **Heal Pulse** / Heilwoge — `healpulse` · Psychic · Status · `selfAura`
+- [ ] **Heart Stamp** / Herzstempel — `heartstamp` · Psychic · Physical · `melee`
+- [ ] **Heat Crash** / Brandstempel — `heatcrash` · Fire · Physical · `melee`
+- [ ] **Heavy Slam** / Rammboss — `heavyslam` · Steel · Physical · `melee`
+- [ ] **Hex** / Bürde — `hex` · Ghost · Special · `projectile`
+- [ ] **Hone Claws** / Klauenwetzer — `honeclaws` · Dark · Status · `selfAura`
+- [ ] **Horn Leech** / Holzgeweih — `hornleech` · Grass · Physical · `melee`
+- [ ] **Hurricane** / Orkan — `hurricane` · Flying · Special · `projectile`
+- [ ] **Ice Burn** / Frosthauch — `iceburn` · Ice · Special · `beam`
+- [ ] **Icicle Crash** / Eiszapfhagel — `iciclecrash` · Ice · Physical · `projectile`
+- [ ] **Incinerate** / Einäschern — `incinerate` · Fire · Special · `field`
+- [ ] **Inferno** / Inferno — `inferno` · Fire · Special · `projectile`
+- [ ] **Leaf Tornado** / Grasmixer — `leaftornado` · Grass · Special · `projectile`
+- [ ] **Low Sweep** / Fußtritt — `lowsweep` · Fighting · Physical · `melee`
+- [ ] **Magic Room** / Magieraum — `magicroom` · Psychic · Status · `targetAura`
+- [ ] **Night Daze** / Nachtflut — `nightdaze` · Dark · Special · `projectile`
+- [ ] **Power Split** / Kraftteiler — `powersplit` · Psychic · Status · `targetAura`
+- [ ] **Psyshock** / Psychoschock — `psyshock` · Psychic · Special · `projectile`
+- [ ] **Psystrike** / Psychostoß — `psystrike` · Psychic · Special · `projectile`
+- [ ] **Quash** / Verzögerung — `quash` · Dark · Status · `targetAura`
+- [ ] **Quick Guard** / Rapidschutz — `quickguard` · Fighting · Status · `selfAura`
+- [ ] **Quiver Dance** / Falterreigen — `quiverdance` · Bug · Status · `selfAura`
+- [ ] **Rage Powder** / Wutpulver — `ragepowder` · Bug · Status · `selfAura`
+- [ ] **Razor Shell** / Kalkklinge — `razorshell` · Water · Physical · `melee`
+- [ ] **Reflect Type** / Typenspiegel — `reflecttype` · Normal · Status · `targetAura`
+- [ ] **Relic Song** / Urgesang — `relicsong` · Normal · Special · `sonic`
+- [ ] **Retaliate** / Heimzahlung — `retaliate` · Normal · Physical · `melee`
+- [ ] **Round** / Kanon — `round` · Normal · Special · `sonic`
+- [ ] **Sacred Sword** / Sanctoklinge — `sacredsword` · Fighting · Physical · `melee`
+- [ ] **Scald** / Siedewasser — `scald` · Water · Special · `projectile`
+- [ ] **Searing Shot** / Flammenball — `searingshot` · Fire · Special · `lob`
+- [ ] **Secret Sword** / Mystoschwert — `secretsword` · Fighting · Special · `projectile`
+- [ ] **Shell Smash** / Hausbruch — `shellsmash` · Normal · Status · `selfAura`
+- [ ] **Shift Gear** / Gangwechsel — `shiftgear` · Steel · Status · `selfAura`
+- [ ] **Simple Beam** / Wankelstrahl — `simplebeam` · Normal · Status · `targetAura`
+- [ ] **Sky Drop** / Freier Fall — `skydrop` · Flying · Physical · `beam`
+- [ ] **Sludge Wave** / Schlammwoge — `sludgewave` · Poison · Special · `field`
+- [ ] **Smack Down** / Katapult — `smackdown` · Rock · Physical · `projectile`
+- [ ] **Snarl** / Standpauke — `snarl` · Dark · Special · `sonic`
+- [ ] **Soak** / Überflutung — `soak` · Water · Status · `targetAura`
+- [ ] **Steamroller** / Quetschwalze — `steamroller` · Bug · Physical · `melee`
+- [ ] **Stored Power** / Kraftvorrat — `storedpower` · Psychic · Special · `projectile`
+- [ ] **Storm Throw** / Bergsturm — `stormthrow` · Fighting · Physical · `melee`
+- [ ] **Struggle Bug** / Käfertrutz — `strugglebug` · Bug · Special · `field`
+- [ ] **Synchronoise** / Synchrolärm — `synchronoise` · Psychic · Special · `field`
+- [ ] **Tail Slap** / Kehrschelle — `tailslap` · Normal · Physical · `melee`
+- [ ] **Techno Blast** / Techblaster — `technoblast` · Normal · Special · `projectile`
+- [ ] **Telekinesis** / Telekinese — `telekinesis` · Psychic · Status · `targetAura`
+- [ ] **V-create** / V-Generator — `vcreate` · Fire · Physical · `melee`
+- [ ] **Venoshock** / Giftschock — `venoshock` · Poison · Special · `projectile`
+- [ ] **Volt Switch** / Voltwechsel — `voltswitch` · Electric · Special · `projectile`
+- [ ] **Water Pledge** / Wassersäulen — `waterpledge` · Water · Special · `projectile`
+- [ ] **Wide Guard** / Rundumschutz — `wideguard` · Rock · Status · `selfAura`
+- [ ] **Wild Charge** / Stromstoß — `wildcharge` · Electric · Physical · `melee`
+- [ ] **Wonder Room** / Wunderraum — `wonderroom` · Psychic · Status · `targetAura`
+- [ ] **Work Up** / Kraftschub — `workup` · Normal · Status · `selfAura`
+
+## Gen 6 (62)
+
+- [ ] **Aromatic Mist** / Duftwolke — `aromaticmist` · Fairy · Status · `selfAura`
+- [ ] **Baby-Doll Eyes** / Kulleraugen — `babydolleyes` · Fairy · Status · `selfAura`
+- [ ] **Belch** / Rülpser — `belch` · Poison · Special · `projectile`
+- [ ] **Boomburst** / Überschallknall — `boomburst` · Normal · Special · `sonic`
+- [ ] **Celebrate** / Ehrentag — `celebrate` · Normal · Status · `selfAura`
+- [ ] **Confide** / Vertrauenssache — `confide` · Normal · Status · `selfAura`
+- [ ] **Crafty Shield** / Trickschutz — `craftyshield` · Fairy · Status · `selfAura`
+- [ ] **Dazzling Gleam** / Zauberschein — `dazzlinggleam` · Fairy · Special · `field`
+- [ ] **Diamond Storm** / Diamantsturm — `diamondstorm` · Rock · Physical · `field`
+- [ ] **Disarming Voice** / Säuselstimme — `disarmingvoice` · Fairy · Special · `sonic`
+- [ ] **Dragon Ascent** / Zenitstürmer — `dragonascent` · Flying · Physical · `melee`
+- [ ] **Draining Kiss** / Diebeskuss — `drainingkiss` · Fairy · Special · `projectile`
+- [ ] **Eerie Impulse** / Mystowellen — `eerieimpulse` · Electric · Status · `selfAura`
+- [ ] **Electric Terrain** / Elektrofeld — `electricterrain` · Electric · Status · `targetAura`
+- [ ] **Electrify** / Elektrifizierung — `electrify` · Electric · Status · `targetAura`
+- [ ] **Fairy Lock** / Feenschloss — `fairylock` · Fairy · Status · `targetAura`
+- [ ] **Fairy Wind** / Feenbrise — `fairywind` · Fairy · Special · `projectile`
+- [ ] **Fell Stinger** / Stachelfinale — `fellstinger` · Bug · Physical · `melee`
+- [ ] **Flower Shield** / Floraschutz — `flowershield` · Fairy · Status · `targetAura`
+- [ ] **Flying Press** / Flying Press — `flyingpress` · Fighting · Physical · `melee`
+- [ ] **Forest's Curse** / Waldesfluch — `forestscurse` · Grass · Status · `targetAura`
+- [ ] **Freeze-Dry** / Gefriertrockner — `freezedry` · Ice · Special · `projectile`
+- [ ] **Geomancy** / Geokontrolle — `geomancy` · Fairy · Status · `selfAura`
+- [ ] **Grassy Terrain** / Grasfeld — `grassyterrain` · Grass · Status · `targetAura`
+- [ ] **Happy Hour** / Goldene Zeiten — `happyhour` · Normal · Status · `selfAura`
+- [ ] **Hold Back** / Zurückhaltung — `holdback` · Normal · Physical · `melee`
+- [ ] **Hold Hands** / Händchenhalten — `holdhands` · Normal · Status · `targetAura`
+- [ ] **Hyperspace Fury** / Dimensionswahn — `hyperspacefury` · Dark · Physical · `projectile`
+- [ ] **Hyperspace Hole** / Dimensionsloch — `hyperspacehole` · Psychic · Special · `projectile`
+- [ ] **Infestation** / Plage — `infestation` · Bug · Special · `projectile`
+- [ ] **Ion Deluge** / Plasmaschauer — `iondeluge` · Electric · Status · `targetAura`
+- [ ] **King's Shield** / Königsschild — `kingsshield` · Steel · Status · `selfAura`
+- [ ] **Land's Wrath** / Bodengewalt — `landswrath` · Ground · Physical · `field`
+- [ ] **Light of Ruin** / Lux Calamitatis — `lightofruin` · Fairy · Special · `projectile`
+- [ ] **Magnetic Flux** / Magnetregler — `magneticflux` · Electric · Status · `selfAura`
+- [ ] **Mat Block** / Tatami-Schild — `matblock` · Fighting · Status · `selfAura`
+- [ ] **Misty Terrain** / Nebelfeld — `mistyterrain` · Fairy · Status · `targetAura`
+- [ ] **Moonblast** / Mondgewalt — `moonblast` · Fairy · Special · `projectile`
+- [ ] **Mystical Fire** / Magieflamme — `mysticalfire` · Fire · Special · `projectile`
+- [ ] **Noble Roar** / Kampfgebrüll — `nobleroar` · Normal · Status · `selfAura`
+- [ ] **Nuzzle** / Wangenrubbler — `nuzzle` · Electric · Physical · `melee`
+- [ ] **Oblivion Wing** / Unheilsschwingen — `oblivionwing` · Flying · Special · `projectile`
+- [ ] **Origin Pulse** / Ursprungswoge — `originpulse` · Water · Special · `pulse`
+- [ ] **Parabolic Charge** / Parabolladung — `paraboliccharge` · Electric · Special · `field`
+- [ ] **Parting Shot** / Abgangstirade — `partingshot` · Dark · Status · `targetAura`
+- [ ] **Petal Blizzard** / Blütenwirbel — `petalblizzard` · Grass · Physical · `field`
+- [ ] **Phantom Force** / Phantomkraft — `phantomforce` · Ghost · Physical · `beam`
+- [ ] **Play Nice** / Kameradschaft — `playnice` · Normal · Status · `selfAura`
+- [ ] **Play Rough** / Knuddler — `playrough` · Fairy · Physical · `melee`
+- [ ] **Powder** / Pulverschleuder — `powder` · Bug · Status · `powder`
+- [ ] **Power-Up Punch** / Steigerungshieb — `poweruppunch` · Fighting · Physical · `melee`
+- [ ] **Precipice Blades** / Abgrundsklinge — `precipiceblades` · Ground · Physical · `field`
+- [ ] **Rototiller** / Pflüger — `rototiller` · Ground · Status · `targetAura`
+- [ ] **Spiky Shield** / Schutzstacheln — `spikyshield` · Grass · Status · `selfAura`
+- [ ] **Steam Eruption** / Dampfschwall — `steameruption` · Water · Special · `projectile`
+- [ ] **Sticky Web** / Klebenetz — `stickyweb` · Bug · Status · `targetAura`
+- [ ] **Thousand Arrows** / Tausend Pfeile — `thousandarrows` · Ground · Physical · `field`
+- [ ] **Thousand Waves** / Tausend Wellen — `thousandwaves` · Ground · Physical · `field`
+- [ ] **Topsy-Turvy** / Invertigo — `topsyturvy` · Dark · Status · `targetAura`
+- [ ] **Trick-or-Treat** / Halloween — `trickortreat` · Ghost · Status · `targetAura`
+- [ ] **Venom Drench** / Giftfalle — `venomdrench` · Poison · Status · `targetAura`
+- [ ] **Water Shuriken** / Wasser-Shuriken — `watershuriken` · Water · Special · `projectile`
