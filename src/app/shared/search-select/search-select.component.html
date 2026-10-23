@@ -1,0 +1,39 @@
+<div class="search-select">
+  <input
+    #box
+    type="text"
+    class="search-input"
+    role="combobox"
+    aria-autocomplete="list"
+    [attr.aria-expanded]="open()"
+    [placeholder]="selectedLabel() || placeholder()"
+    [value]="open() ? query() : selectedLabel()"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    (input)="onInput(box.value)"
+    (keydown)="onKeydown($event)"
+  />
+  @if (open()) {
+    <ul class="search-list" role="listbox">
+      @for (opt of matches(); track opt.id; let i = $index) {
+        <!-- mousedown (not click) fires before the input's blur closes the list -->
+        <li
+          role="option"
+          class="search-option"
+          [class.active]="i === highlight()"
+          [class.selected]="opt.id === value()"
+          [attr.aria-selected]="opt.id === value()"
+          (mousedown)="$event.preventDefault(); pick(opt, box)"
+          (mouseenter)="highlight.set(i)"
+        >
+          <span class="label">{{ opt.label }}</span>
+          @if (opt.hint) {
+            <span class="hint" [style.background]="opt.color ?? null" [class.chip]="!!opt.color">{{ opt.hint }}</span>
+          }
+        </li>
+      } @empty {
+        <li class="search-empty">Keine Treffer</li>
+      }
+    </ul>
+  }
+</div>

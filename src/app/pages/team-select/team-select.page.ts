@@ -46,6 +46,10 @@ export class TeamSelectPage {
     this.router.navigateByUrl('/teams');
   }
 
+  goToDebugBattle(): void {
+    this.router.navigateByUrl('/debug-battle');
+  }
+
   goToSettings(): void {
     this.router.navigateByUrl('/settings');
   }

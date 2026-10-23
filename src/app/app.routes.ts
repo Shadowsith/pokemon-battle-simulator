@@ -38,6 +38,12 @@ export const routes: Routes = [
       import('./pages/battle/battle.page').then((m) => m.BattlePage)
   },
   {
+    path: 'debug-battle',
+    data: { debug: true },
+    loadComponent: () =>
+      import('./pages/battle/battle.page').then((m) => m.BattlePage)
+  },
+  {
     path: 'settings',
     loadComponent: () =>
       import('./pages/settings/settings.page').then((m) => m.SettingsPage)

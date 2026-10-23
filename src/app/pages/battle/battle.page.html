@@ -188,6 +188,19 @@
   }
 
   <div class="action-panel">
+    @if (debug) {
+      <app-debug-panel
+        [player]="player()"
+        [opponent]="opponent()"
+        [busy]="isAnimating() || phase() !== 'fight'"
+        (useMove)="debugUseMove($event)"
+        (setPokemon)="debugSetPokemon($event)"
+        (setItem)="debugSetItem($event)"
+        (playMusic)="debugPlayMusic($event)"
+        (reset)="debugReset()"
+        (leave)="toTeamSelect()"
+      />
+    } @else {
     @switch (menuState()) {
       @case ('main') {
         @if (undoTarget(); as prev) {
@@ -315,9 +328,10 @@
         </div>
       }
     }
+    }
   </div>
 
-  @if (!inChallengeBattle) {
+  @if (!inChallengeBattle && !debug) {
     <ion-button size="small" fill="clear" class="reset-btn" (click)="resetBattle()">Reset</ion-button>
   }
 </ion-content>

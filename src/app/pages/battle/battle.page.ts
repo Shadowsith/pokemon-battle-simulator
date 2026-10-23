@@ -1,5 +1,5 @@
 import { Component, ElementRef, OnDestroy, ViewChild, computed, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonContent, IonButton } from '@ionic/angular/standalone';
 import { MOVE_LIBRARY, Move } from '../../core/models/move.model';
 import {
@@ -18,7 +18,7 @@ import {
   trainerAvatarPath,
   trainerLabel
 } from '../../core/models/trainer.model';
-import { isBattleReady } from '../../core/models/team.model';
+import { SpeciesInfo, isBattleReady } from '../../core/models/team.model';
 import { toBattlePokemon } from '../../core/models/battle-pokemon';
 import {
   BattleFormat,
@@ -61,9 +61,11 @@ import {
   retaliation,
   shellBellHeal
 } from '../../core/battle/item-effects';
+import { heldItem } from '../../core/models/item.model';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
 import { ItemIconComponent } from '../../shared/item-icon/item-icon.component';
 import { CustomBattleService } from '../../core/services/custom-battle.service';
+import { DebugPanelComponent } from './debug-panel/debug-panel.component';
 import { CustomBattleConfig, configToNpcOptions } from '../../core/models/custom-battle.model';
 import { EliteFourRunService } from '../../core/services/elite-four-run.service';
 import { GymRunService } from '../../core/services/gym-run.service';
@@ -124,7 +126,7 @@ interface MoveHint {
 @Component({
   selector: 'app-battle',
   standalone: true,
-  imports: [IonContent, IonButton, ItemIconComponent],
+  imports: [IonContent, IonButton, ItemIconComponent, DebugPanelComponent],
   templateUrl: './battle.page.html',
   styleUrl: './battle.page.scss'
 })
@@ -146,6 +148,12 @@ export class BattlePage implements OnDestroy {
   private readonly customBattleSvc = inject(CustomBattleService);
   private readonly e4Svc = inject(EliteFourRunService);
   private readonly gymSvc = inject(GymRunService);
+
+  /**
+   * Debug-Kampf (route data `debug`): singles, one dummy per side, the debug
+   * panel instead of the battle menu, and Pokémon that can't faint.
+   */
+  readonly debug = inject(ActivatedRoute).snapshot.data['debug'] === true;
 
   /** Set when this battle was launched from the Custom Battle config page. */
   private readonly customBattle: CustomBattleConfig | null = this.customBattleSvc.take();
@@ -492,7 +500,9 @@ export class BattlePage implements OnDestroy {
   private applyHp(slot: Slot, delta: number): void {
     const mon = this.monAt(slot);
     if (!mon) return;
-    this.patchSlot(slot, { currentHp: Math.max(0, Math.min(mon.maxHp, mon.currentHp + delta)) });
+    const hp = Math.max(0, Math.min(mon.maxHp, mon.currentHp + delta));
+    // Debug-Kampf: nobody faints - a knock-out restores full HP instead.
+    this.patchSlot(slot, { currentHp: this.debug && hp === 0 ? mon.maxHp : hp });
   }
 
   private spriteEl(slot: Slot): HTMLElement {
@@ -528,7 +538,7 @@ export class BattlePage implements OnDestroy {
 
   /** Singles or doubles for this battle. Doubles needs 2+ Pokémon in the player's team. */
   private pickFormat(): BattleFormat {
-    if (this.playerTeam().length < 2) return 'singles';
+    if (this.debug || this.playerTeam().length < 2) return 'singles';
     if (this.customBattle) return this.customBattle.format;
     if (this.challenge) return this.challenge.svc.run()?.format ?? 'singles';
     return this.settings.allowDoubleBattles() && Math.random() < 0.5 ? 'doubles' : 'singles';
@@ -547,6 +557,16 @@ export class BattlePage implements OnDestroy {
     this.audio.startBattleMusic(
       this.challenge && challengeGen ? { theme: this.challenge.svc.musicTheme, gen: challengeGen } : undefined,
     );
+
+    if (this.debug) {
+      this.playerTeam.set([this.derivePlayerTeam()[0]]);
+      this.activePlayer.set([0]);
+      this.opponentTeam.set([this.makeGlurak()]);
+      this.activeOpponent.set([0]);
+      this.opponentRoll = null;
+      this.introTimer = setTimeout(() => this.beginFight(), 0); // no VS intro, straight to send-out
+      return;
+    }
 
     if (this.customBattle) {
       const cfg = this.customBattle;
@@ -1683,6 +1703,102 @@ export class BattlePage implements OnDestroy {
   }
 
   /** Type-coloured gradient for a move button (yellow for Electric, blue for Water …). */
+  // --- Debug-Kampf (driven by the debug panel; singles, position 0 only) ---
+
+  private debugSlot(side: Side): Slot {
+    return { side, pos: 0 };
+  }
+
+  private debugReady(): boolean {
+    return this.debug && this.phase() === 'fight' && !this.isAnimating();
+  }
+
+  /**
+   * One move from `side`. Without battle logic only its animation and sound
+   * play (a charge move shows both turns); with logic it resolves fully via
+   * {@link performMove}. A pending charge / recharge turn takes precedence,
+   * just as in a real turn.
+   */
+  async debugUseMove(e: { side: Side; move: Move; logic: boolean }): Promise<void> {
+    if (!this.debugReady()) return;
+    const user = this.debugSlot(e.side);
+    const foe = this.debugSlot(otherSide(e.side));
+    this.isAnimating.set(true);
+    try {
+      if (e.logic) {
+        // Each side acting once makes a turn: Protect, Helping Hand … end when a side acts again.
+        if (this.moved.has(slotKey(user))) this.clearTurnVolatiles();
+        await this.performMove(this.chargeOf(user)?.move ?? e.move, user, foe);
+        this.moved.add(slotKey(user));
+      } else {
+        this.log.set(`${this.monAt(user)!.name} setzt ${e.move.name} ein...`);
+        this.audio.playMove(e.move.showdownId);
+        const refs = this.refsFor(user, foe);
+        if (this.damageCalc.isChargeMove(e.move)) {
+          await this.animation.playMove(e.move, refs, 'charge');
+          await this.wait(500);
+          await this.animation.playMove(e.move, refs, 'release');
+        } else {
+          await this.animation.playMove(e.move, refs);
+        }
+      }
+    } finally {
+      this.isAnimating.set(false);
+    }
+  }
+
+  /** Put a fresh `species` in the bench slot, then switch it in with the normal recall / send-out. */
+  async debugSetPokemon(e: { side: Side; species: SpeciesInfo }): Promise<void> {
+    if (!this.debugReady()) return;
+    const slot = this.debugSlot(e.side);
+    const bench = this.partyIdxAt(slot) === 0 ? 1 : 0;
+    const mon = toBattlePokemon(
+      { speciesNum: e.species.num, name: e.species.name, types: e.species.types },
+      (dexId) => this.damageCalc.hpStat(dexId)
+    );
+    const put = (team: BattlePokemon[]) => {
+      const next = [...team];
+      next[bench] = mon;
+      return next;
+    };
+    if (e.side === 'player') this.playerTeam.update(put);
+    else this.opponentTeam.update(put);
+
+    this.isAnimating.set(true);
+    try {
+      await this.switchSlot(slot, bench);
+    } finally {
+      this.isAnimating.set(false);
+    }
+  }
+
+  debugSetItem(e: { side: Side; item: string | null }): void {
+    if (!this.debug) return;
+    const slot = this.debugSlot(e.side);
+    this.patchSlot(slot, { item: e.item, itemRevealed: true });
+    this.clearChoiceLock(slot);
+    const mon = this.monAt(slot)!;
+    this.log.set(e.item ? `${mon.name} trägt jetzt ${heldItem(e.item)?.name ?? e.item}.` : `${mon.name} trägt kein Item.`);
+  }
+
+  /** Full HP, no status / stat changes / charge / Choice lock on both sides. */
+  debugReset(): void {
+    if (!this.debugReady()) return;
+    for (const side of ['player', 'opponent'] as const) {
+      const slot = this.debugSlot(side);
+      this.patchSlot(slot, { currentHp: this.monAt(slot)!.maxHp, status: freshStatus(), boosts: freshBoosts() });
+    }
+    this.charge.set({});
+    this.choiceLocks.set({});
+    this.protectStreak = {};
+    this.clearTurnVolatiles();
+    this.log.set('Beide Pokémon wurden zurückgesetzt.');
+  }
+
+  debugPlayMusic(track: string): void {
+    this.audio.playMusicTrack(track);
+  }
+
   moveGradient(type: string): string {
     const c = typeColor(type);
     return `linear-gradient(140deg, ${c} 0%, ${shadeHex(c, -40)} 100%)`;

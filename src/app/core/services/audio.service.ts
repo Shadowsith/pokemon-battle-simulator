@@ -1,11 +1,20 @@
 import { Injectable, effect, inject } from '@angular/core';
 import { SettingsService } from './settings.service';
 
-/** Battle themes under assets/sounds/music/; one is picked at random per battle. */
-const BATTLE_TRACKS = ['battle_gen1', 'battle_gen2', 'battle_gen3', 'battle_gen4', 'battle_gen5', 'battle_gen6'];
-
 /** Special-fight music: arena_gen<N>.mp3 (gym leaders), elite4_gen<N>.mp3 (Elite Four). */
 export type BattleMusicTheme = 'arena' | 'elite4';
+
+const MUSIC_GENS = [1, 2, 3, 4, 5, 6];
+
+/** Battle themes under assets/sounds/music/; one is picked at random per normal battle. */
+const BATTLE_TRACKS = MUSIC_GENS.map((g) => `battle_gen${g}`);
+
+/** Every track under assets/sounds/music/ (the browser can't list the folder). */
+export const MUSIC_TRACKS: readonly string[] = [
+  ...BATTLE_TRACKS,
+  ...MUSIC_GENS.map((g) => `arena_gen${g}`),
+  ...MUSIC_GENS.map((g) => `elite4_gen${g}`)
+];
 
 /**
  * Plays move / cry / misc sound files under assets/sounds/. Move files are
@@ -45,6 +54,12 @@ export class AudioService {
       ? [`${special.theme}_gen${special.gen}`, `battle_gen${special.gen}`, random]
       : [random];
     this.playMusic(tracks);
+  }
+
+  /** Loop one specific track (a {@link MUSIC_TRACKS} name), replacing any track already playing. */
+  playMusicTrack(track: string): void {
+    this.stopBattleMusic();
+    this.playMusic([track]);
   }
 
   /** Loop the first track of `tracks` that loads, moving on when a file is missing. */

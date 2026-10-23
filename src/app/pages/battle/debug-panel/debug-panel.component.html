@@ -1,0 +1,66 @@
+<div class="debug-panel">
+  <div class="debug-sides">
+    @for (s of sides; track s.side) {
+      @let mon = monOf(s.side);
+      <section class="debug-side">
+        <h3>{{ s.label }} <small>{{ mon.name }} · {{ mon.currentHp }}/{{ mon.maxHp }} KP</small></h3>
+
+        <label class="field-label">Pokémon</label>
+        <div class="row">
+          <app-search-select
+            [options]="speciesOptions()"
+            [value]="speciesId()[s.side]"
+            placeholder="Pokémon suchen …"
+            (selected)="pickSpecies(s.side, $event)"
+          />
+          <button type="button" class="dbg-btn" [disabled]="busy() || !speciesId()[s.side]" (click)="swapIn(s.side)">
+            Einwechseln
+          </button>
+        </div>
+
+        <label class="field-label">Attacke</label>
+        <div class="row">
+          <app-search-select
+            [options]="moveOptions"
+            [value]="moveId()[s.side]"
+            placeholder="Attacke suchen …"
+            (selected)="pickMove(s.side, $event)"
+          />
+          <button type="button" class="dbg-btn primary" [disabled]="busy()" (click)="attack(s.side)">Angriff</button>
+        </div>
+
+        <label class="field-label">Item</label>
+        <button type="button" class="dbg-btn item-btn" [disabled]="busy()" (click)="itemPickerFor.set(s.side)">
+          <app-item-icon [itemId]="mon.item" />
+          <span>{{ itemName(s.side) }}</span>
+        </button>
+      </section>
+    }
+  </div>
+
+  <div class="debug-global">
+    <label class="check">
+      <input type="checkbox" [checked]="useLogic()" (change)="useLogic.set($any($event.target).checked)" />
+      Kampflogik nutzen
+    </label>
+
+    <label class="music">
+      Musik
+      <select [value]="music()" (change)="pickMusic($any($event.target).value)">
+        <option value="">— wählen —</option>
+        @for (t of musicTracks; track t) {
+          <option [value]="t">{{ t }}</option>
+        }
+      </select>
+    </label>
+
+    <div class="row">
+      <button type="button" class="dbg-btn" [disabled]="busy()" (click)="reset.emit()">Zurücksetzen</button>
+      <button type="button" class="dbg-btn leave" (click)="leave.emit()">Debug verlassen</button>
+    </div>
+  </div>
+</div>
+
+@if (itemPickerFor(); as side) {
+  <app-item-picker [current]="monOf(side).item" (picked)="pickItem($event)" (closed)="itemPickerFor.set(null)" />
+}
