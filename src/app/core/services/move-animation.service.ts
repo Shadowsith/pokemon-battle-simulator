@@ -184,6 +184,23 @@ export class MoveAnimationService {
       await this.chargeUp(refs, launch, v);
     }
 
+    const custom = this.customAnims[move.showdownId];
+    await (custom ? custom(refs, launch, target, v) : this.playDelivery(refs, launch, target, v));
+  }
+
+  /** Hand-made animations that replace the derived one for specific moves (by @pkmn/sim id). */
+  private readonly customAnims: Record<
+    string,
+    (refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) => Promise<void>
+  > = {
+    ember: (refs, _launch, _target, v) => this.playGroundFlame(refs, v),
+    firespin: async (refs, launch, target, v) => {
+      await this.playDelivery(refs, launch, target, v);
+      await this.playVortex(refs, v);
+    }
+  };
+
+  private playDelivery(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual): Promise<void> {
     switch (v.delivery) {
       case 'weather':
         return this.playWeather(refs, v);
@@ -591,6 +608,110 @@ export class MoveAnimationService {
     }
   }
 
+  /**
+   * A ring of flames that ignites at the target's feet and spirals up around
+   * it. Flames on the back half of the ring are smaller and dimmer, so the
+   * ring reads as circling the sprite rather than sitting on top of it.
+   */
+  private async playVortex(refs: BattleStageRefs, v: MoveVisual) {
+    const { fxEl, fieldEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const ground = this.footOf(targetEl, fieldEl);
+    const rx = Math.max(r.width * 0.55, 34);
+    const ry = rx * 0.3;
+    const rise = Math.max(r.height * 1.1, 70);
+    const spin = v.dir * Math.PI * 2.5;
+    const colors = [v.color, '#FFD25A', '#FF5A1F'];
+
+    // Glowing scorch ring on the ground where the vortex starts.
+    const base = document.createElement('div');
+    base.style.cssText = `position:absolute;width:${rx * 2}px;height:${ry * 2}px;border-radius:50%;border:3px solid ${v.color};box-shadow:0 0 14px ${v.color},inset 0 0 12px ${v.color};background:radial-gradient(ellipse,${v.color}55,transparent 70%)`;
+    place(base, ground);
+    fxEl.appendChild(base);
+    this.anim(base, [
+      { transform: 'scale(.3)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.25 },
+      { transform: 'scale(1.05)', opacity: 0.8, offset: 0.75 },
+      { transform: 'scale(1.1)', opacity: 0 }
+    ], { duration: 1500, easing: 'ease-out' }).then(() => base.remove());
+
+    // Three stacked rings of flames, each spinning upwards a little later.
+    const waves = 3;
+    const perWave = 14;
+    const dur = 1100;
+    const steps = 12;
+    for (let w = 0; w < waves; w++) {
+      for (let i = 0; i < perWave; i++) {
+        const a0 = (Math.PI * 2 * i) / perWave + w * 0.4;
+        const size = 14 + v.power * 10 + Math.random() * 6;
+        const flame = document.createElement('div');
+        const c = colors[(i + w) % colors.length];
+        flame.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;border-radius:50% 0 50% 50%;background:radial-gradient(circle at 60% 40%,#fff,${c} 45%,${c}00 80%);filter:drop-shadow(0 0 4px ${c})`;
+        place(flame, ground);
+        fxEl.appendChild(flame);
+        const frames: Keyframe[] = [];
+        for (let k = 0; k <= steps; k++) {
+          const t = k / steps;
+          const a = a0 + spin * t;
+          const front = Math.sin(a) > 0;
+          const x = Math.cos(a) * rx * (1 - t * 0.25);
+          const y = Math.sin(a) * ry - t * rise;
+          const scale = (1 - t * 0.55) * (front ? 1 : 0.7);
+          const fade = Math.min(1, t * 6, (1 - t) * 3);
+          frames.push({
+            transform: `translate(${x}px,${y}px) rotate(-45deg) scale(${scale})`,
+            opacity: fade * (front ? 1 : 0.55)
+          });
+        }
+        this.anim(flame, frames, { duration: dur, easing: 'linear', delay: w * 180 }).then(() => flame.remove());
+      }
+    }
+
+    // The target flickers while it is engulfed.
+    for (let i = 0; i < 4; i++) setTimeout(() => this.flash(targetEl, v.color, 0.45), 200 + i * 280);
+    await this.wait(dur + (waves - 1) * 180);
+  }
+
+  /** A single small flame that flares up at the target's feet and flickers out (Ember). */
+  private async playGroundFlame(refs: BattleStageRefs, v: MoveVisual) {
+    const { fxEl, fieldEl, targetEl } = refs;
+    const w = Math.min(Math.max(targetEl.getBoundingClientRect().width * 0.28, 22), 36);
+    const foot = this.footOf(targetEl, fieldEl);
+
+    // Outer flame with a yellow-white core; the square tear is rotated so its tip points up.
+    const flame = document.createElement('div');
+    flame.style.cssText = `position:absolute;width:${w}px;height:${w * 1.5}px;pointer-events:none;transform-origin:50% 100%`;
+    for (const [scale, from, to] of [
+      [1, '#FFB13C', v.color],
+      [0.55, '#fff', '#FFD25A']
+    ] as const) {
+      const s = w * 0.8 * scale;
+      const tear = document.createElement('div');
+      tear.style.cssText = `position:absolute;left:${(w - s) / 2}px;bottom:${s * 0.15}px;width:${s}px;height:${s}px;border-radius:50% 0 50% 50%;transform:rotate(-45deg);background:radial-gradient(circle at 40% 60%,${from},${to} 70%);filter:drop-shadow(0 0 5px ${v.color})`;
+      flame.appendChild(tear);
+    }
+    flame.style.left = `${foot.x - w / 2}px`;
+    flame.style.top = `${foot.y - w * 1.5}px`;
+    fxEl.appendChild(flame);
+
+    const flicker: Keyframe[] = [{ transform: 'scale(.2,.1)', opacity: 0 }];
+    const n = 8;
+    for (let k = 1; k <= n; k++) {
+      flicker.push({
+        transform: `scale(${1 + (k % 2 ? 0.08 : -0.06)},${1 + (k % 2 ? -0.1 : 0.14)}) skewX(${k % 2 ? 4 : -4}deg)`,
+        opacity: 1,
+        offset: 0.12 + (k / n) * 0.7
+      });
+    }
+    flicker.push({ transform: 'translateY(-10px) scale(.4,.6)', opacity: 0 });
+    const done = this.anim(flame, flicker, { duration: 900, easing: 'ease-in-out' }).then(() => flame.remove());
+
+    await this.wait(200);
+    this.flash(targetEl, v.color, 0.35);
+    this.shake(targetEl, 3);
+    await done;
+  }
+
   // --- particle helpers ------------------------------------------------
 
   private glyph(v: MoveVisual, size: number): HTMLElement {
@@ -914,6 +1035,13 @@ export class MoveAnimationService {
     const r = el.getBoundingClientRect();
     const f = fieldEl.getBoundingClientRect();
     return { x: r.left - f.left + r.width / 2, y: r.top - f.top + r.height / 2 };
+  }
+
+  /** Bottom-centre of a sprite (where it stands), in field coordinates. */
+  private footOf(el: HTMLElement, fieldEl: HTMLElement): Point {
+    const r = el.getBoundingClientRect();
+    const f = fieldEl.getBoundingClientRect();
+    return { x: r.left - f.left + r.width / 2, y: r.bottom - f.top - 6 };
   }
 
   private flash(el: HTMLElement, color: string, intensity = 0.5): void {

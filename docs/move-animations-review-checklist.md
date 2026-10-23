@@ -67,11 +67,11 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [ ] **Drill Peck** / Bohrschnabel — `drillpeck` · Flying · Physical · `melee`
 - [ ] **Earthquake** / Erdbeben — `earthquake` · Ground · Physical · `field`
 - [ ] **Egg Bomb** / Eierbombe — `eggbomb` · Normal · Physical · `lob`
-- [ ] **Ember** / Glut — `ember` · Fire · Special · `projectile`
+- [ ] **Ember** / Glut — `ember` · Fire · Special · single ground flame (custom, needs review)
 - [ ] **Explosion** / Explosion — `explosion` · Normal · Physical · `field`
 - [ ] **Fire Blast** / Feuersturm — `fireblast` · Fire · Special · `projectile`
 - [ ] **Fire Punch** / Feuerschlag — `firepunch` · Fire · Physical · `melee`
-- [ ] **Fire Spin** / Feuerwirbel — `firespin` · Fire · Special · `projectile`
+- [ ] **Fire Spin** / Feuerwirbel — `firespin` · Fire · Special · `projectile` + fire vortex (custom, needs review)
 - [ ] **Fissure** / Geofissur — `fissure` · Ground · Physical · `projectile`
 - [ ] **Flamethrower** / Flammenwurf — `flamethrower` · Fire · Special · `projectile`
 - [ ] **Flash** / Blitz — `flash` · Normal · Status · `selfAura`
