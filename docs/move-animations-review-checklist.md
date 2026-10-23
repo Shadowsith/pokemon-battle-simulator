@@ -30,11 +30,11 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 
 - [x] **Absorb** / Absorber — `absorb` · Grass · Special · green energy stars drain to caster (custom, needs review)
 - [x] **Acid** / Säure — `acid` · Poison · Special · purple poison droplet spit (custom, needs review)
-- [x] **Acid Armor** / Säurepanzer — `acidarmor` · Poison · Status · `selfAura`
-- [ ] **Agility** / Agilität — `agility` · Psychic · Status · `selfAura`
-- [ ] **Amnesia** / Amnesie — `amnesia` · Psychic · Status · `selfAura`
-- [ ] **Aurora Beam** / Aurorastrahl — `aurorabeam` · Ice · Special · `projectile`
-- [ ] **Barrage** / Stakkato — `barrage` · Normal · Physical · `lob`
+- [ ] **Acid Armor** / Säurepanzer — `acidarmor` · Poison · Status · `selfAura`
+- [x] **Agility** / Agilität — `agility` · Psychic · Status · blue speed-line backdrop + circling sprite (custom, needs review)
+- [x] **Amnesia** / Amnesie — `amnesia` · Psychic · Status · dim backdrop + "?" cloud puff + orange sparkles (custom, needs review)
+- [x] **Aurora Beam** / Aurorastrahl — `aurorabeam` · Ice · Special · dim backdrop + rainbow ring beam (custom, needs review)
+- [x] **Barrage** / Stakkato — `barrage` · Normal · Physical · large white orb + ground shake (custom, needs review)
 - [ ] **Barrier** / Barriere — `barrier` · Psychic · Status · `selfAura`
 - [ ] **Bide** / Geduld — `bide` · Normal · Physical · `selfAura`
 - [ ] **Bind** / Klammergriff — `bind` · Normal · Physical · `melee`

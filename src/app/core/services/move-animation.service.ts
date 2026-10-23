@@ -146,6 +146,9 @@ const FLECK_COLOR: Record<Exclude<Fleck, null>, string> = {
 /** Two-turn moves where the user leaves the field on turn 1 (Fly, Dig, …). */
 const SEMI_INVULN_ANIM = new Set(['fly', 'dig', 'bounce', 'dive', 'skydrop', 'shadowforce', 'phantomforce']);
 
+/** Darkened battle backdrop for moves that dim the scene (Amnesia, Aurora Beam, …). */
+const DIM_BACKDROP = 'background:radial-gradient(circle at 50% 45%,#2A2A3A,#08080F)';
+
 const WEATHER_COLOR: Record<Exclude<Weather, null>, string> = {
   sun: '#FFB13C',
   rain: '#4C8FD6',
@@ -195,6 +198,10 @@ export class MoveAnimationService {
   > = {
     absorb: (refs, launch, target) => this.playAbsorb(refs, launch, target),
     acid: (refs, launch, target) => this.playAcidSpit(refs, launch, target),
+    agility: (refs, launch) => this.playAgility(refs, launch),
+    amnesia: (refs, launch) => this.playAmnesia(refs, launch),
+    aurorabeam: (refs, launch, target) => this.playAuroraBeam(refs, launch, target),
+    barrage: (refs, launch, target) => this.playBarrage(refs, launch, target),
     ember: (refs, _launch, _target, v) => this.playGroundFlame(refs, v),
     firespin: async (refs, launch, target, v) => {
       await this.playDelivery(refs, launch, target, v);
@@ -836,6 +843,243 @@ export class MoveAnimationService {
         { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist + 8}px) scale(.4)`, opacity: 0 }
       ], { duration: 320, easing: 'ease-out' }).then(() => speck.remove());
     }
+  }
+
+  /**
+   * Agility: the battle backdrop turns into rushing blue speed lines while the
+   * caster zips around a small circle. Only its position moves, so it keeps
+   * facing the opponent.
+   */
+  private async playAgility(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, launchEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const total = 1400;
+    // Agility targets the caster itself, so derive facing from its side of the field.
+    const facing = launch.x < W / 2 ? 1 : -1;
+
+    const bg = this.backdrop(fieldEl, 'background:linear-gradient(180deg,#0B3E9E,#1E8BE8 30%,#57C8FF 50%,#1E8BE8 70%,#0B3E9E)');
+    // Lines rush past opposite to the way the caster faces, as if it is dashing forward.
+    const flow = -facing;
+    for (let i = 0; i < 34; i++) {
+      const line = document.createElement('div');
+      const len = W * (0.2 + Math.random() * 0.45);
+      const thick = 1 + Math.random() * 4;
+      const color = Math.random() < 0.6 ? '#FFFFFF' : '#9BE7FF';
+      line.style.cssText = `position:absolute;left:0;top:${Math.random() * H}px;width:${len}px;height:${thick}px;border-radius:${thick}px;background:linear-gradient(90deg,transparent,${color},transparent);opacity:${0.5 + Math.random() * 0.5}`;
+      bg.appendChild(line);
+      line.animate(
+        [
+          { transform: `translateX(${flow > 0 ? -len : W}px)` },
+          { transform: `translateX(${flow > 0 ? W : -len}px)` }
+        ],
+        { duration: 220 + Math.random() * 300, delay: -Math.random() * 500, iterations: Infinity, easing: 'linear' }
+      );
+    }
+    const bgDone = this.anim(bg, [
+      { opacity: 0 },
+      { opacity: 1, offset: 0.12 },
+      { opacity: 1, offset: 0.85 },
+      { opacity: 0 }
+    ], { duration: total, easing: 'linear' }).then(() => bg.remove());
+
+    // Two quick laps around a small circle that starts and ends at the sprite's spot.
+    const original = launchEl.style.transform;
+    const r = 14;
+    const laps = 2;
+    const steps = 24;
+    const circle: Keyframe[] = [];
+    for (let k = 0; k <= steps; k++) {
+      const a = (k / steps) * Math.PI * 2 * laps;
+      circle.push({ transform: `${original} translate(${r * Math.sin(a) * facing}px,${-r * (1 - Math.cos(a))}px)` });
+    }
+    await this.wait(180);
+    await this.anim(launchEl, circle, { duration: 900, easing: 'ease-in-out' });
+    launchEl.getAnimations?.().forEach((a) => a.cancel());
+    launchEl.style.transform = original;
+    await bgDone;
+  }
+
+  /**
+   * Amnesia: the backdrop dims while a cloud with a "?" forms over the
+   * caster. The cloud puffs away, the backdrop clears, and orange
+   * sparkles drift over the caster.
+   */
+  private async playAmnesia(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = launchEl.getBoundingClientRect();
+    const f = fieldEl.getBoundingClientRect();
+    const head: Point = { x: launch.x, y: r.top - f.top + r.height * 0.15 };
+
+    const dim = this.backdrop(fieldEl, DIM_BACKDROP);
+    const dimIn = this.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // One cloud: overlapping bumps share a fill and a single glow (on the
+    // wrapper), so they read as one shape with the "?" inside it.
+    const cw = Math.max(r.width * 0.8, 72);
+    const ch = cw * 0.62;
+    const cloud = document.createElement('div');
+    cloud.style.cssText = `position:absolute;width:${cw}px;height:${ch}px;pointer-events:none;filter:drop-shadow(0 0 6px #ffffffaa)`;
+    const fill = 'background:radial-gradient(circle at 40% 30%,#fff,#E8ECF5 70%,#D2D8E6)';
+    // [left, top, size] in % of the cloud width / height.
+    for (const [x, y, size] of [
+      [4, 38, 42],
+      [22, 8, 52],
+      [50, 14, 46],
+      [58, 40, 38]
+    ]) {
+      const bump = document.createElement('div');
+      bump.style.cssText = `position:absolute;left:${x}%;top:${y}%;width:${size}%;aspect-ratio:1;border-radius:50%;${fill}`;
+      cloud.appendChild(bump);
+    }
+    const base = document.createElement('div');
+    base.style.cssText = `position:absolute;left:12%;right:12%;bottom:4%;height:42%;border-radius:${ch}px;${fill}`;
+    cloud.appendChild(base);
+    const mark = document.createElement('div');
+    mark.textContent = '?';
+    mark.style.cssText = `position:absolute;left:0;right:0;top:50%;margin-top:-${ch * 0.3}px;height:${ch * 0.6}px;text-align:center;font:bold ${ch * 0.6}px/${ch * 0.6}px sans-serif;color:#6F7894`;
+    cloud.appendChild(mark);
+    place(cloud, head);
+    fxEl.appendChild(cloud);
+
+    this.anim(cloud, [
+      { transform: 'scale(0)', opacity: 0 },
+      { transform: 'scale(1.12)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], { duration: 380, easing: 'ease-out', delay: 150 });
+    // The question mark wobbles while the cloud hangs there.
+    this.anim(mark, [
+      { transform: 'rotate(0deg)' },
+      { transform: 'rotate(-12deg)', offset: 0.25 },
+      { transform: 'rotate(10deg)', offset: 0.75 },
+      { transform: 'rotate(0deg)' }
+    ], { duration: 700, easing: 'ease-in-out', delay: 650 });
+    await dimIn;
+    await this.wait(1200);
+
+    // Puff away: the cloud swells, blurs and fades; the backdrop clears.
+    this.anim(cloud, [
+      { transform: 'scale(1)', opacity: 1, filter: 'drop-shadow(0 0 6px #ffffffaa) blur(0px)' },
+      { transform: 'translateY(-10px) scale(1.6)', opacity: 0, filter: 'drop-shadow(0 0 6px #ffffffaa) blur(6px)' }
+    ], { duration: 450, easing: 'ease-out' }).then(() => cloud.remove());
+    await this.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 420, easing: 'ease-in' });
+    dim.remove();
+
+    // Orange sparkles drift down over the caster.
+    const spread = Math.max(r.width * 0.45, 30);
+    for (let i = 0; i < 16; i++) {
+      const s = 6 + Math.random() * 6;
+      const dot = document.createElement('div');
+      dot.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF3C4,#FFA62B 55%,#FF7A0000);box-shadow:0 0 6px #FFA62B`;
+      place(dot, { x: launch.x + (Math.random() * 2 - 1) * spread, y: head.y + Math.random() * r.height * 0.6 });
+      fxEl.appendChild(dot);
+      this.anim(dot, [
+        { transform: 'translateY(0) scale(0)', opacity: 0 },
+        { transform: 'translateY(6px) scale(1.2)', opacity: 1, offset: 0.35 },
+        { transform: 'translateY(22px) scale(.3)', opacity: 0 }
+      ], { duration: 700, easing: 'ease-out', delay: Math.random() * 500 }).then(() => dot.remove());
+    }
+    this.flash(launchEl, '#FFA62B', 0.3);
+    await this.wait(1200);
+  }
+
+  /**
+   * Aurora Beam: over a darkened backdrop, a tight stream of rainbow rings
+   * flies from the caster to the target, each ring facing along the beam.
+   */
+  private async playAuroraBeam(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    // Unit vector across the beam, for a slight corkscrew wobble.
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len;
+    const ny = dx / len;
+
+    const dim = this.backdrop(fieldEl, DIM_BACKDROP);
+    await this.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    const rings = 34;
+    const gap = 24;
+    const travel = 420;
+    const steps = 6;
+    const flights: Promise<void>[] = [];
+    for (let i = 0; i < rings; i++) {
+      const hue = (i * 37) % 360;
+      const color = `hsl(${hue},100%,62%)`;
+      const ring = document.createElement('div');
+      ring.style.cssText = `position:absolute;width:12px;height:38px;border-radius:50%;pointer-events:none;border:3px solid ${color};box-shadow:0 0 6px ${color},inset 0 0 4px ${color}`;
+      place(ring, launch);
+      fxEl.appendChild(ring);
+      const phase = i * 0.9;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const wob = Math.sin(phase + t * Math.PI * 2) * 5;
+        frames.push({
+          transform: `translate(${dx * t + nx * wob}px,${dy * t + ny * wob}px) rotate(${angle}deg) scale(${0.5 + t * 0.7})`,
+          opacity: t === 0 ? 0 : t === 1 ? 0.2 : 1
+        });
+      }
+      flights.push(
+        this.anim(ring, frames, { duration: travel, easing: 'linear', delay: i * gap }).then(() => {
+          ring.remove();
+          if (i % 4 === 0) this.flash(targetEl, color, 0.45);
+          if (i % 8 === 0) this.shake(targetEl, 3);
+        })
+      );
+    }
+    await Promise.all(flights);
+    this.flash(targetEl, '#9CD6FF', 0.6);
+    await this.wait(200);
+    await this.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in' });
+    dim.remove();
+  }
+
+  /**
+   * Barrage: one large glowing white orb is lobbed at the target; the ground
+   * shakes once it lands.
+   */
+  private async playBarrage(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, fieldEl, targetEl } = refs;
+    const size = 46;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const arc = Math.min(launch.y, target.y) - 70 - launch.y;
+
+    const orb = document.createElement('div');
+    orb.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 38% 32%,#fff,#F3EEFF 45%,#CFC6E6 80%,#B7ADD4);box-shadow:0 0 14px #fff,0 0 28px #E8E0FFaa`;
+    place(orb, launch);
+    fxEl.appendChild(orb);
+    await this.anim(orb, [
+      { transform: 'translate(0,0) scale(.5)', opacity: 0, offset: 0 },
+      { transform: `translate(${dx * 0.12}px,${arc * 0.4}px) scale(.75)`, opacity: 1, offset: 0.12 },
+      { transform: `translate(${dx * 0.5}px,${arc}px) scale(1)`, offset: 0.5 },
+      { transform: `translate(${dx}px,${dy}px) scale(1.1)`, offset: 1 }
+    ], { duration: 620, easing: 'ease-in' });
+
+    // Impact: the orb squashes and bursts into light, the target recoils, then the ground shakes.
+    this.anim(orb, [
+      { transform: `translate(${dx}px,${dy}px) scale(1.1,1.1)`, opacity: 1 },
+      { transform: `translate(${dx}px,${dy}px) scale(1.6,1.2)`, opacity: 0 }
+    ], { duration: 260, easing: 'ease-out' }).then(() => orb.remove());
+    this.flash(targetEl, '#ffffff', 0.7);
+    this.shake(targetEl, 5);
+    await this.wait(120);
+    this.shakeField(fieldEl, 0.6);
+    await this.wait(480);
+  }
+
+  /**
+   * A temporary layer that replaces the battle backdrop. It is inserted as the
+   * field's first child, so it sits behind the platforms, sprites and HUD.
+   */
+  private backdrop(fieldEl: HTMLElement, css: string): HTMLElement {
+    const bg = document.createElement('div');
+    bg.style.cssText = `position:absolute;inset:0;overflow:hidden;pointer-events:none;${css}`;
+    fieldEl.insertBefore(bg, fieldEl.firstChild);
+    return bg;
   }
 
   /** A four-point glowing star used for energy / sparkle effects. */
