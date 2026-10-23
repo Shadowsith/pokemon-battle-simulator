@@ -28,9 +28,9 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 
 ## Gen 1 (165)
 
-- [ ] **Absorb** / Absorber — `absorb` · Grass · Special · `projectile`
-- [ ] **Acid** / Säure — `acid` · Poison · Special · `field`
-- [ ] **Acid Armor** / Säurepanzer — `acidarmor` · Poison · Status · `selfAura`
+- [x] **Absorb** / Absorber — `absorb` · Grass · Special · green energy stars drain to caster (custom, needs review)
+- [x] **Acid** / Säure — `acid` · Poison · Special · purple poison droplet spit (custom, needs review)
+- [x] **Acid Armor** / Säurepanzer — `acidarmor` · Poison · Status · `selfAura`
 - [ ] **Agility** / Agilität — `agility` · Psychic · Status · `selfAura`
 - [ ] **Amnesia** / Amnesie — `amnesia` · Psychic · Status · `selfAura`
 - [ ] **Aurora Beam** / Aurorastrahl — `aurorabeam` · Ice · Special · `projectile`
@@ -67,11 +67,11 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [ ] **Drill Peck** / Bohrschnabel — `drillpeck` · Flying · Physical · `melee`
 - [ ] **Earthquake** / Erdbeben — `earthquake` · Ground · Physical · `field`
 - [ ] **Egg Bomb** / Eierbombe — `eggbomb` · Normal · Physical · `lob`
-- [ ] **Ember** / Glut — `ember` · Fire · Special · single ground flame (custom, needs review)
+- [x] **Ember** / Glut — `ember` · Fire · Special · single ground flame (custom, needs review)
 - [ ] **Explosion** / Explosion — `explosion` · Normal · Physical · `field`
 - [ ] **Fire Blast** / Feuersturm — `fireblast` · Fire · Special · `projectile`
 - [ ] **Fire Punch** / Feuerschlag — `firepunch` · Fire · Physical · `melee`
-- [ ] **Fire Spin** / Feuerwirbel — `firespin` · Fire · Special · `projectile` + fire vortex (custom, needs review)
+- [x] **Fire Spin** / Feuerwirbel — `firespin` · Fire · Special · `projectile` + fire vortex (custom, needs review)
 - [ ] **Fissure** / Geofissur — `fissure` · Ground · Physical · `projectile`
 - [ ] **Flamethrower** / Flammenwurf — `flamethrower` · Fire · Special · `projectile`
 - [ ] **Flash** / Blitz — `flash` · Normal · Status · `selfAura`

@@ -193,6 +193,8 @@ export class MoveAnimationService {
     string,
     (refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) => Promise<void>
   > = {
+    absorb: (refs, launch, target) => this.playAbsorb(refs, launch, target),
+    acid: (refs, launch, target) => this.playAcidSpit(refs, launch, target),
     ember: (refs, _launch, _target, v) => this.playGroundFlame(refs, v),
     firespin: async (refs, launch, target, v) => {
       await this.playDelivery(refs, launch, target, v);
@@ -710,6 +712,141 @@ export class MoveAnimationService {
     this.flash(targetEl, v.color, 0.35);
     this.shake(targetEl, 3);
     await done;
+  }
+
+  /**
+   * Absorb: no projectile. Green energy stars are pulled out of the target and
+   * drift back to the caster along wavy arcs, then sparkle around the caster
+   * to show the HP it gained.
+   */
+  private async playAbsorb(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, targetEl, launchEl } = refs;
+    const green = FLECK_COLOR.statUp;
+    const dx = launch.x - target.x;
+    const dy = launch.y - target.y;
+
+    this.flash(targetEl, green, 0.4);
+    this.shake(targetEl, 3);
+
+    // Stream: stars leave the target in a steady trickle and float to the caster.
+    const count = 22;
+    const travel = 900;
+    const spread = 1100;
+    for (let i = 0; i < count; i++) {
+      const star = this.sparkStar(8 + Math.random() * 7, i % 3 ? green : '#E6FFB0');
+      place(star, { x: target.x + (Math.random() * 40 - 20), y: target.y + (Math.random() * 40 - 20) });
+      fxEl.appendChild(star);
+      const bend = (Math.random() * 2 - 1) * 45;
+      const frames: Keyframe[] = [];
+      const steps = 8;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const ease = t * t * (3 - 2 * t);
+        frames.push({
+          transform: `translate(${dx * ease}px,${dy * ease + Math.sin(t * Math.PI) * bend}px) rotate(${t * 240}deg) scale(${0.4 + Math.sin(t * Math.PI) * 0.8})`,
+          opacity: Math.min(1, t * 5, (1 - t) * 4 + 0.2)
+        });
+      }
+      this.anim(star, frames, { duration: travel, easing: 'linear', delay: (i / count) * spread }).then(() => star.remove());
+    }
+    await this.wait(travel + spread * 0.8);
+
+    // Gain: twinkling stars and a soft green glow around the caster.
+    const r = launchEl.getBoundingClientRect();
+    const rad = Math.max(r.width * 0.45, 28);
+    for (let i = 0; i < 12; i++) {
+      const star = this.sparkStar(9 + Math.random() * 8, i % 2 ? green : '#fff');
+      place(star, {
+        x: launch.x + (Math.random() * 2 - 1) * rad,
+        y: launch.y + (Math.random() * 2 - 1) * rad
+      });
+      fxEl.appendChild(star);
+      this.anim(star, [
+        { transform: 'translateY(0) scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'translateY(-6px) scale(1.2) rotate(90deg)', opacity: 1, offset: 0.4 },
+        { transform: 'translateY(-18px) scale(0) rotate(180deg)', opacity: 0 }
+      ], { duration: 650, easing: 'ease-out', delay: Math.random() * 450 }).then(() => star.remove());
+    }
+    this.flash(launchEl, green, 0.5);
+    setTimeout(() => this.flash(launchEl, green, 0.35), 350);
+    await this.wait(900);
+  }
+
+  /**
+   * Acid: the caster spits a quick volley of dark purple poison droplets that
+   * fly in a shallow arc and splash on the target.
+   */
+  private async playAcidSpit(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const purple = '#5A1F8C';
+    const dark = '#2A0B45';
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const lift = 36 + Math.abs(dx) * 0.08;
+    const drops = 7;
+    const gap = 75;
+    const travel = 440;
+    const steps = 8;
+
+    const landed: Promise<void>[] = [];
+    for (let i = 0; i < drops; i++) {
+      const size = 11 + Math.random() * 7;
+      const drop = document.createElement('div');
+      drop.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#C79BEA,${purple} 45%,${dark});box-shadow:0 0 5px ${purple}`;
+      place(drop, { x: launch.x + (Math.random() * 10 - 5), y: launch.y + (Math.random() * 10 - 5) });
+      fxEl.appendChild(drop);
+      // Each droplet lands a little off-centre so the volley spreads over the target.
+      const hx = dx + (Math.random() * 30 - 15);
+      const hy = dy + (Math.random() * 24 - 12);
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const wobble = k % 2 ? 1.15 : 0.88;
+        frames.push({
+          transform: `translate(${hx * t}px,${hy * t - Math.sin(t * Math.PI) * lift}px) scale(${(0.6 + t * 0.5) * wobble},${(0.6 + t * 0.5) / wobble})`,
+          opacity: t === 0 ? 0 : 1
+        });
+      }
+      landed.push(
+        this.anim(drop, frames, { duration: travel, easing: 'linear', delay: i * gap }).then(() => {
+          drop.remove();
+          this.acidSplash(fxEl, { x: launch.x + hx, y: launch.y + hy }, purple);
+          if (i === 0) this.flash(targetEl, purple, 0.45);
+          if (i % 2 === 0) this.shake(targetEl, 3);
+        })
+      );
+    }
+    await Promise.all(landed);
+    this.flash(targetEl, purple, 0.5);
+    await this.wait(250);
+  }
+
+  /** A few dark purple specks that burst out where a poison droplet hits. */
+  private acidSplash(fxEl: HTMLElement, at: Point, color: string) {
+    for (let i = 0; i < 4; i++) {
+      const s = 4 + Math.random() * 4;
+      const speck = document.createElement('div');
+      speck.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:${color}`;
+      place(speck, at);
+      fxEl.appendChild(speck);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 10 + Math.random() * 14;
+      this.anim(speck, [
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist + 8}px) scale(.4)`, opacity: 0 }
+      ], { duration: 320, easing: 'ease-out' }).then(() => speck.remove());
+    }
+  }
+
+  /** A four-point glowing star used for energy / sparkle effects. */
+  private sparkStar(size: number, color: string): HTMLElement {
+    // The glow sits on a wrapper: clip-path on the same element would cut the drop-shadow off.
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 4px ${color})`;
+    const shape = document.createElement('div');
+    shape.style.cssText = `width:100%;height:100%;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);background:radial-gradient(circle,#fff,${color} 60%)`;
+    el.appendChild(shape);
+    return el;
   }
 
   // --- particle helpers ------------------------------------------------
