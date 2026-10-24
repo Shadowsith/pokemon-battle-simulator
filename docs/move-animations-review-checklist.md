@@ -35,11 +35,11 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [x] **Amnesia** / Amnesie — `amnesia` · Psychic · Status · dim backdrop + "?" cloud puff + orange sparkles (custom, needs review)
 - [x] **Aurora Beam** / Aurorastrahl — `aurorabeam` · Ice · Special · dim backdrop + rainbow ring beam (custom, needs review)
 - [x] **Barrage** / Stakkato — `barrage` · Normal · Physical · large white orb + ground shake (custom, needs review)
-- [ ] **Barrier** / Barriere — `barrier` · Psychic · Status · `selfAura`
-- [ ] **Bide** / Geduld — `bide` · Normal · Physical · `selfAura`
-- [ ] **Bind** / Klammergriff — `bind` · Normal · Physical · `melee`
-- [ ] **Bite** / Biss — `bite` · Dark · Physical · `melee`
-- [ ] **Blizzard** / Blizzard — `blizzard` · Ice · Special · `field`
+- [x] **Barrier** / Barriere — `barrier` · Psychic · Status · sparkling glass panel (custom, needs review)
+- [ ] **Bide** / Geduld — `bide` · Normal · Physical · `selfAura` · wait with impl due to split move with turn pause
+- [x] **Bind** / Klammergriff — `bind` · Normal · Physical · squeezing dark arcs around target (custom, needs review)
+- [x] **Bite** / Biss — `bite` · Dark · Physical · white jaw snaps on target (custom, needs review)
+- [x] **Blizzard** / Blizzard — `blizzard` · Ice · Special · whiteout snowstorm + ice crystals (custom, needs review)
 - [ ] **Body Slam** / Bodyslam — `bodyslam` · Normal · Physical · `melee`
 - [ ] **Bone Club** / Knochenkeule — `boneclub` · Ground · Physical · `projectile`
 - [ ] **Bonemerang** / Knochmerang — `bonemerang` · Ground · Physical · `projectile`

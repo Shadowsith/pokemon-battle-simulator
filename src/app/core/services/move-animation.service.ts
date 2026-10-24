@@ -202,6 +202,10 @@ export class MoveAnimationService {
     amnesia: (refs, launch) => this.playAmnesia(refs, launch),
     aurorabeam: (refs, launch, target) => this.playAuroraBeam(refs, launch, target),
     barrage: (refs, launch, target) => this.playBarrage(refs, launch, target),
+    barrier: (refs, launch) => this.playBarrier(refs, launch),
+    bind: (refs, _launch, target) => this.playBind(refs, target),
+    bite: (refs, _launch, target) => this.playBite(refs, target),
+    blizzard: (refs, launch, target) => this.playBlizzard(refs, launch, target),
     ember: (refs, _launch, _target, v) => this.playGroundFlame(refs, v),
     firespin: async (refs, launch, target, v) => {
       await this.playDelivery(refs, launch, target, v);
@@ -1069,6 +1073,295 @@ export class MoveAnimationService {
     await this.wait(120);
     this.shakeField(fieldEl, 0.6);
     await this.wait(480);
+  }
+
+  /**
+   * Barrier: a flat, glassy panel opens in front of the caster, a sheen of
+   * light sweeps over it, it glows brighter with twinkling sparkles, then fades.
+   */
+  private async playBarrier(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = launchEl.getBoundingClientRect();
+    const w = Math.max(r.width * 0.9, 60);
+    const h = Math.max(r.height * 1.0, 70);
+
+    const panel = document.createElement('div');
+    panel.style.cssText = `position:absolute;width:${w}px;height:${h}px;pointer-events:none;overflow:hidden;border:2px solid #ffffffcc;border-radius:3px;background:linear-gradient(160deg,#E8FFFB66,#9FE9E255 45%,#7FD8D04d);box-shadow:0 0 10px #B8FFF6aa,inset 0 0 14px #ffffff66`;
+    // Diagonal band of light that sweeps across the glass.
+    const sheen = document.createElement('div');
+    sheen.style.cssText = `position:absolute;top:-20%;left:0;width:${w * 0.35}px;height:140%;background:linear-gradient(90deg,transparent,#ffffffcc,transparent);transform:skewX(-20deg)`;
+    panel.appendChild(sheen);
+    place(panel, launch);
+    fxEl.appendChild(panel);
+
+    const total = 1700;
+    const done = this.anim(panel, [
+      { transform: 'scale(1,0.05)', opacity: 0, background: 'linear-gradient(160deg,#E8FFFB66,#9FE9E255 45%,#7FD8D04d)' },
+      { transform: 'scale(1,1)', opacity: 1, offset: 0.15 },
+      { transform: 'scale(1,1)', opacity: 0.85, offset: 0.4, background: 'linear-gradient(160deg,#E8FFFB66,#9FE9E255 45%,#7FD8D04d)' },
+      { transform: 'scale(1.02,1.02)', opacity: 1, offset: 0.6, background: 'linear-gradient(160deg,#D6FFF8bb,#7FE6DCaa 45%,#5CCFC699)' },
+      { transform: 'scale(1,1)', opacity: 0.9, offset: 0.85 },
+      { transform: 'scale(1,1)', opacity: 0 }
+    ], { duration: total, easing: 'ease-in-out' }).then(() => panel.remove());
+    this.anim(sheen, [
+      { transform: `translateX(${-w * 0.5}px) skewX(-20deg)` },
+      { transform: `translateX(${w * 1.2}px) skewX(-20deg)` }
+    ], { duration: 650, easing: 'ease-in-out', delay: 280 });
+
+    // Sparkles twinkle on the glass, mostly near its upper edge and corners.
+    const left = launch.x - w / 2;
+    const top = launch.y - h / 2;
+    for (let i = 0; i < 9; i++) {
+      const star = this.sparkStar(10 + Math.random() * 10, i % 3 ? '#ffffff' : '#C9FFF8');
+      const corner = i < 4;
+      place(star, {
+        x: left + (corner ? (i % 2 ? w * 0.1 : w * 0.9) : Math.random() * w),
+        y: top + (corner ? (i < 2 ? h * 0.1 : h * 0.9) : Math.random() * h * 0.6)
+      });
+      fxEl.appendChild(star);
+      this.anim(star, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1.2) rotate(45deg)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+      ], { duration: 520, easing: 'ease-out', delay: 300 + Math.random() * 900 }).then(() => star.remove());
+    }
+    this.flash(launchEl, '#B8FFF6', 0.3);
+    await done;
+  }
+
+  /**
+   * Bind: nested dark arcs close in on both sides of the target and squeeze
+   * in and out quickly while the target is pressed together.
+   */
+  private async playBind(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const baseW = Math.max(r.width * 0.95, 60);
+    const baseH = Math.max(r.height * 0.8, 50);
+    const squeezes = 6;
+    const beat = 150;
+    const hold = squeezes * beat;
+
+    // Only the left and right borders are coloured, so each ring reads as "( )".
+    const rings: HTMLElement[] = [];
+    for (let i = 0; i < 4; i++) {
+      const w = baseW * (1 + i * 0.14);
+      const h = baseH * (1 - i * 0.06);
+      const ring = document.createElement('div');
+      ring.style.cssText = `position:absolute;width:${w}px;height:${h}px;border-radius:50%;pointer-events:none;border:${3 - i * 0.4}px solid transparent;border-left-color:#1E1A24;border-right-color:#1E1A24;opacity:${0.85 - i * 0.15}`;
+      place(ring, target);
+      fxEl.appendChild(ring);
+      rings.push(ring);
+    }
+
+    // Close in from wide, then pulse: tight - loose - tight ...
+    const frames = (i: number): Keyframe[] => {
+      const out: Keyframe[] = [{ transform: 'scaleX(1.6)', opacity: 0, offset: 0 }];
+      const start = 0.15;
+      for (let k = 0; k <= squeezes * 2; k++) {
+        out.push({
+          transform: `scaleX(${k % 2 ? 1.08 + i * 0.02 : 0.86})`,
+          opacity: 1,
+          offset: start + (k / (squeezes * 2)) * (0.85 - start)
+        });
+      }
+      out.push({ transform: 'scaleX(1.2)', opacity: 0, offset: 1 });
+      return out;
+    };
+    const total = hold / 0.7;
+    const done = rings.map((ring, i) =>
+      this.anim(ring, frames(i), { duration: total, easing: 'ease-in-out', delay: i * 20 }).then(() => ring.remove())
+    );
+
+    // The target gets squeezed in time with the arcs.
+    const original = targetEl.style.transform;
+    const squash: Keyframe[] = [{ transform: original, offset: 0 }];
+    for (let k = 0; k <= squeezes * 2; k++) {
+      squash.push({
+        transform: `${original} scaleX(${k % 2 ? 1 : 0.93})`,
+        offset: 0.15 + (k / (squeezes * 2)) * 0.7
+      });
+    }
+    squash.push({ transform: original, offset: 1 });
+    // A dim flash on every tight squeeze (the even keyframes above).
+    for (let j = 0; j < squeezes; j++) {
+      setTimeout(() => this.flash(targetEl, '#8a7a9a', 0.25), total * (0.15 + (j / squeezes) * 0.7));
+    }
+    await this.anim(targetEl, squash, { duration: total, easing: 'ease-in-out' });
+    targetEl.getAnimations?.().forEach((a) => a.cancel());
+    targetEl.style.transform = original;
+    await Promise.all(done);
+  }
+
+  /**
+   * Bite: a white jaw with sharp teeth opens above and below the target and
+   * snaps shut on it, stopping just before the teeth touch.
+   */
+  private async playBite(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const w = Math.max(r.width * 1.1, 72);
+    const h = w * 0.46;
+    // Tooth tips sit at 45/46 of the glyph height; stop them a few px apart so the halves never touch.
+    const gap = 3;
+    const shut = h * (45 / 46 - 0.5) + gap;
+    const open = shut + Math.max(r.height * 0.22, 16);
+
+    const upper = this.jawGlyph(w, h, false);
+    const lower = this.jawGlyph(w, h, true);
+    place(upper, target);
+    place(lower, target);
+    fxEl.append(upper, lower);
+
+    const move = (el: HTMLElement, sign: number, flip: string): Promise<void> =>
+      this.anim(el, [
+        { transform: `translateY(${sign * (open + 8)}px) ${flip}`, opacity: 0, offset: 0 },
+        { transform: `translateY(${sign * open}px) ${flip}`, opacity: 1, offset: 0.43 },
+        { transform: `translateY(${sign * (open + 4)}px) ${flip}`, opacity: 1, offset: 0.79 },
+        // Must end at offset 1: otherwise the browser adds a final frame at the untransformed spot.
+        { transform: `translateY(${sign * shut}px) ${flip}`, opacity: 1, offset: 1 }
+      ], { duration: 450, easing: 'ease-in' });
+    await Promise.all([move(upper, -1, ''), move(lower, 1, 'scaleY(-1)')]);
+
+    // Snap: flash, shake and a burst of white sparks where the teeth meet.
+    this.flash(targetEl, '#ffffff', 0.6);
+    this.shake(targetEl, 5);
+    for (let i = 0; i < 8; i++) {
+      const star = this.sparkStar(8 + Math.random() * 6, '#FFF6C8');
+      place(star, target);
+      fxEl.appendChild(star);
+      const ang = (Math.PI * 2 * i) / 8;
+      this.anim(star, [
+        { transform: 'translate(0,0) scale(.3)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * w * 0.55}px,${Math.sin(ang) * h * 0.6}px) scale(1)`, opacity: 0 }
+      ], { duration: 320, easing: 'ease-out' }).then(() => star.remove());
+    }
+    await this.wait(220);
+    const release = (el: HTMLElement, sign: number, flip: string): Promise<void> =>
+      this.anim(el, [
+        { transform: `translateY(${sign * shut}px) ${flip}`, opacity: 1 },
+        { transform: `translateY(${sign * (shut + 10)}px) ${flip}`, opacity: 0 }
+      ], { duration: 220, easing: 'ease-out' }).then(() => el.remove());
+    await Promise.all([release(upper, -1, ''), release(lower, 1, 'scaleY(-1)')]);
+  }
+
+  /** One half of a jaw: a white dome with a row of pointed teeth along its lower edge. */
+  private jawGlyph(w: number, h: number, lower: boolean): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('width', `${w}`);
+    svg.setAttribute('height', `${h}`);
+    svg.setAttribute('viewBox', '0 0 100 46');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${h}px;filter:drop-shadow(0 0 3px #fff)`);
+    const id = `jaw-${lower ? 'lo' : 'up'}-${Math.random().toString(36).slice(2, 8)}`;
+    let teeth = '';
+    for (let i = 0; i < 8; i++) {
+      const x = 4 + i * 11.5;
+      teeth += `M${x},30 L${x + 5.75},45 L${x + 11.5},30 `;
+    }
+    svg.innerHTML =
+      `<defs><linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C9CED8"/><stop offset=".55" stop-color="#fff"/><stop offset="1" stop-color="#E9ECF2"/></linearGradient></defs>` +
+      `<path d="M2,30 Q2,2 50,2 Q98,2 98,30 Z" fill="url(#${id})" stroke="#7D8594" stroke-width="1.6"/>` +
+      `<path d="${teeth}Z" fill="#fff" stroke="#7D8594" stroke-width="1.2" stroke-linejoin="round"/>`;
+    return svg;
+  }
+
+  /**
+   * Blizzard: the scene whites out under a snowy backdrop and a light fog,
+   * dense snow and wind gusts blow towards the target, and ice crystals form
+   * on it while it shakes.
+   */
+  private async playBlizzard(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const dir = target.x >= launch.x ? 1 : -1;
+    const total = 2200;
+    const fade: Keyframe[] = [
+      { opacity: 0 },
+      { opacity: 1, offset: 0.12 },
+      { opacity: 1, offset: 0.85 },
+      { opacity: 0 }
+    ];
+
+    const bg = this.backdrop(fieldEl, 'background:linear-gradient(180deg,#C9CCD6,#E9EBF1 45%,#D4D7E0)');
+    const bgDone = this.anim(bg, fade, { duration: total, easing: 'linear' }).then(() => bg.remove());
+
+    // Fog over sprites too, so the whole scene looks snowed in. Snow and gusts live inside it.
+    const storm = document.createElement('div');
+    storm.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    const fog = document.createElement('div');
+    fog.style.cssText = 'position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,#F4F6FA55,#DADDE699)';
+    storm.appendChild(fog);
+    fxEl.appendChild(storm);
+
+    // Snowflakes blow across the field at an angle, wobbling as they go.
+    for (let i = 0; i < 80; i++) {
+      const s = 2 + Math.random() * 6;
+      const flake = document.createElement('div');
+      flake.style.cssText = `position:absolute;left:0;top:0;width:${s}px;height:${s}px;border-radius:50%;background:#fff;box-shadow:0 0 ${s}px #ffffffcc;opacity:${0.6 + Math.random() * 0.4}`;
+      storm.appendChild(flake);
+      const y0 = Math.random() * H * 1.2 - H * 0.3;
+      const drop = H * (0.25 + Math.random() * 0.3);
+      const wob = 6 + Math.random() * 12;
+      const xs = dir > 0 ? [-20, W + 20] : [W + 20, -20];
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 6; k++) {
+        const t = k / 6;
+        frames.push({
+          transform: `translate(${xs[0] + (xs[1] - xs[0]) * t}px,${y0 + drop * t + Math.sin(t * Math.PI * 3) * wob}px)`
+        });
+      }
+      flake.animate(frames, {
+        duration: 700 + Math.random() * 700,
+        delay: -Math.random() * 1400,
+        iterations: Infinity,
+        easing: 'linear'
+      });
+    }
+    // Long faint wind gusts.
+    for (let i = 0; i < 10; i++) {
+      const len = W * (0.25 + Math.random() * 0.35);
+      const gust = document.createElement('div');
+      gust.style.cssText = `position:absolute;left:0;top:${Math.random() * H}px;width:${len}px;height:${2 + Math.random() * 3}px;border-radius:3px;background:linear-gradient(90deg,transparent,#ffffffcc,transparent);transform-origin:left center`;
+      storm.appendChild(gust);
+      gust.animate(
+        [
+          { transform: `translateX(${dir > 0 ? -len : W}px) rotate(${dir * 12}deg)` },
+          { transform: `translateX(${dir > 0 ? W : -len}px) rotate(${dir * 12}deg)` }
+        ],
+        { duration: 450 + Math.random() * 350, delay: -Math.random() * 800, iterations: Infinity, easing: 'linear' }
+      );
+    }
+    const stormDone = this.anim(storm, fade, { duration: total, easing: 'linear' }).then(() => storm.remove());
+
+    // Ice crystals build up on the target while it is battered.
+    const r = targetEl.getBoundingClientRect();
+    const spread = Math.max(r.width * 0.5, 30);
+    for (let i = 0; i < 12; i++) {
+      const s = 10 + Math.random() * 10;
+      const shard = document.createElement('div');
+      shard.style.cssText = `position:absolute;width:${s}px;height:${s * 1.4}px;pointer-events:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:linear-gradient(135deg,#fff,#9CD6FF 60%,#5FA8E0)`;
+      place(shard, {
+        x: target.x + (Math.random() * 2 - 1) * spread,
+        y: target.y + (Math.random() * 2 - 1) * spread * 0.8
+      });
+      fxEl.appendChild(shard);
+      this.anim(shard, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: `scale(1) rotate(${Math.random() * 60 - 30}deg)`, opacity: 1, offset: 0.3 },
+        { transform: `scale(1) rotate(${Math.random() * 60 - 30}deg)`, opacity: 0.9, offset: 0.8 },
+        { transform: 'scale(.6)', opacity: 0 }
+      ], { duration: 900, easing: 'ease-out', delay: 500 + Math.random() * 700 }).then(() => shard.remove());
+    }
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        this.flash(targetEl, '#9CD6FF', 0.5);
+        this.shake(targetEl, 4);
+      }, 450 + i * 300);
+    }
+
+    await Promise.all([bgDone, stormDone]);
   }
 
   /**
