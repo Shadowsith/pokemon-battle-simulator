@@ -69,11 +69,11 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [ ] **Egg Bomb** / Eierbombe — `eggbomb` · Normal · Physical · `lob`
 - [x] **Ember** / Glut — `ember` · Fire · Special · single ground flame (custom, needs review)
 - [ ] **Explosion** / Explosion — `explosion` · Normal · Physical · `field`
-- [ ] **Fire Blast** / Feuersturm — `fireblast` · Fire · Special · `projectile`
+- [x] **Fire Blast** / Feuersturm — `fireblast` · Fire · Special · gather → fireball → five-arm blast on sunburst (custom, needs review)
 - [ ] **Fire Punch** / Feuerschlag — `firepunch` · Fire · Physical · `melee`
 - [x] **Fire Spin** / Feuerwirbel — `firespin` · Fire · Special · `projectile` + fire vortex (custom, needs review)
 - [ ] **Fissure** / Geofissur — `fissure` · Ground · Physical · `projectile`
-- [ ] **Flamethrower** / Flammenwurf — `flamethrower` · Fire · Special · `projectile`
+- [x] **Flamethrower** / Flammenwurf — `flamethrower` · Fire · Special · red-hot backdrop + fire stream + burning target (custom, needs review)
 - [ ] **Flash** / Blitz — `flash` · Normal · Status · `selfAura`
 - [ ] **Fly** / Fliegen — `fly` · Flying · Physical · `beam`
 - [ ] **Focus Energy** / Energiefokus — `focusenergy` · Normal · Status · `selfAura`
@@ -427,7 +427,7 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [ ] **Energy Ball** / Energieball — `energyball` · Grass · Special · `lob`
 - [ ] **Feint** / Offenlegung — `feint` · Normal · Physical · `projectile`
 - [ ] **Fire Fang** / Feuerzahn — `firefang` · Fire · Physical · `melee`
-- [ ] **Flare Blitz** / Flammenblitz — `flareblitz` · Fire · Physical · `melee`
+- [x] **Flare Blitz** / Flammenblitz — `flareblitz` · Fire · Physical · rising flames → dark → red blast on blue (custom, needs review)
 - [ ] **Flash Cannon** / Lichtkanone — `flashcannon` · Steel · Special · `beam`
 - [ ] **Fling** / Schleuder — `fling` · Dark · Physical · `projectile`
 - [ ] **Focus Blast** / Fokusstoß — `focusblast` · Fighting · Special · `lob`
