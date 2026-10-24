@@ -146,8 +146,38 @@ const FLECK_COLOR: Record<Exclude<Fleck, null>, string> = {
 /** Two-turn moves where the user leaves the field on turn 1 (Fly, Dig, …). */
 const SEMI_INVULN_ANIM = new Set(['fly', 'dig', 'bounce', 'dive', 'skydrop', 'shadowforce', 'phantomforce']);
 
+interface BubbleStyle {
+  count: number;
+  /** ms for one bubble to reach the target */
+  travel: number;
+  /** ms between bubble launches */
+  stagger: number;
+  /** max px of up-and-down wobble on the way */
+  wobble: number;
+  /** max px of scatter around the caster at launch */
+  jitter: number;
+}
+
+/** Bubble: a slow, loose drift. */
+const BUBBLE_DRIFT: BubbleStyle = { count: 14, travel: 1150, stagger: 55, wobble: 16, jitter: 12 };
+/** Bubble Beam: more bubbles, fast, in a tight line. */
+const BUBBLE_BEAM: BubbleStyle = { count: 24, travel: 480, stagger: 28, wobble: 3, jitter: 4 };
+
 /** Darkened battle backdrop for moves that dim the scene (Amnesia, Aurora Beam, …). */
 const DIM_BACKDROP = 'background:radial-gradient(circle at 50% 45%,#2A2A3A,#08080F)';
+
+/** Tile of wavy purple / pink bands for the psychedelic Psychic backdrop (60 x 24 px). */
+const PSYCHIC_WAVES =
+  'url("data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="60" height="24" viewBox="0 0 60 24">' +
+      '<rect width="60" height="24" fill="#4A1A7A"/>' +
+      '<path d="M0,6 Q15,0 30,6 T60,6 L60,16 Q45,22 30,16 T0,16 Z" fill="#B23FCF"/>' +
+      '<path d="M0,9 Q15,3 30,9 T60,9" fill="none" stroke="#F28BF0" stroke-width="2"/>' +
+      '<path d="M0,16 Q15,10 30,16 T60,16" fill="none" stroke="#7A2AA8" stroke-width="2.5"/>' +
+      '</svg>'
+  ) +
+  '")';
 
 const WEATHER_COLOR: Record<Exclude<Weather, null>, string> = {
   sun: '#FFB13C',
@@ -206,6 +236,14 @@ export class MoveAnimationService {
     bind: (refs, _launch, target) => this.playBind(refs, target),
     bite: (refs, _launch, target) => this.playBite(refs, target),
     blizzard: (refs, launch, target) => this.playBlizzard(refs, launch, target),
+    boneclub: (refs, launch, target, v) => this.playBoneClub(refs, launch, target, v),
+    bonemerang: (refs, launch, target, v) => this.playBonemerang(refs, launch, target, v),
+    bubble: (refs, launch, target) => this.playBubbles(refs, launch, target, BUBBLE_DRIFT),
+    bubblebeam: (refs, launch, target) => this.playBubbles(refs, launch, target, BUBBLE_BEAM),
+    earthquake: (refs) => this.playEarthquake(refs),
+    darkpulse: (refs, launch, target) => this.playDarkPulse(refs, launch, target),
+    psychic: (refs) => this.playPsychic(refs),
+    thunder: (refs, _launch, target) => this.playThunder(refs, target),
     ember: (refs, _launch, _target, v) => this.playGroundFlame(refs, v),
     firespin: async (refs, launch, target, v) => {
       await this.playDelivery(refs, launch, target, v);
@@ -1362,6 +1400,467 @@ export class MoveAnimationService {
     }
 
     await Promise.all([bgDone, stormDone]);
+  }
+
+  /**
+   * Bone Club: a spinning bone is thrown high and drops onto the target from
+   * above, lands with a hit, then bounces off.
+   */
+  private async playBoneClub(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fxEl } = refs;
+    const bone = this.boneGlyph(46);
+    place(bone, launch);
+    fxEl.appendChild(bone);
+
+    // Quadratic arc: up past the target, then straight down onto its head.
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const apex = { x: dx * 0.85, y: Math.min(0, dy) - 130 };
+    const spin = v.dir * 360 * 3;
+    const steps = 14;
+    const frames: Keyframe[] = [];
+    for (let k = 0; k <= steps; k++) {
+      const t = k / steps;
+      const u = 1 - t;
+      const x = 2 * u * t * apex.x + t * t * dx;
+      const y = 2 * u * t * apex.y + t * t * (dy - 10);
+      frames.push({ transform: `translate(${x}px,${y}px) rotate(${spin * t}deg)`, opacity: t === 0 ? 0 : 1 });
+    }
+    // The last quarter-turn settles upright, as it falls onto the target.
+    frames[steps] = { transform: `translate(${dx}px,${dy - 10}px) rotate(${spin + 90 * v.dir}deg)`, opacity: 1 };
+    await this.anim(bone, frames, { duration: 760, easing: 'ease-in' });
+
+    this.meleeGlyph(fxEl, target, { ...v, meleeStyle: 'hit', color: '#ffffff' });
+    const hit = this.impact(refs, target, v, 0);
+    // Bounce off and fade.
+    this.anim(bone, [
+      { transform: `translate(${dx}px,${dy - 10}px) rotate(${spin + 90 * v.dir}deg)`, opacity: 1 },
+      { transform: `translate(${dx - v.dir * 30}px,${dy - 50}px) rotate(${spin + 90 * v.dir - 200 * v.dir}deg)`, opacity: 0 }
+    ], { duration: 420, easing: 'ease-out' }).then(() => bone.remove());
+    await hit;
+    await this.wait(300);
+  }
+
+  /**
+   * Bonemerang: like Bone Club, but the spinning bone flies out on a curve,
+   * hits the target and curves back to the caster on the other side, like a
+   * boomerang.
+   */
+  private async playBonemerang(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fxEl, launchEl } = refs;
+    const bone = this.boneGlyph(46);
+    place(bone, launch);
+    fxEl.appendChild(bone);
+
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const len = Math.hypot(dx, dy) || 1;
+    // Perpendicular bulge: out along one side of the line, back along the other.
+    const bulge = Math.min(90, len * 0.35);
+    const nx = (-dy / len) * bulge;
+    const ny = (dx / len) * bulge;
+    const out = { x: dx * 0.5 - nx, y: dy * 0.5 - ny };
+    const back = { x: dx * 0.5 + nx, y: dy * 0.5 + ny };
+    const turnsPerLeg = 3;
+
+    // Quadratic Bezier from a to b through control point c, spinning as it goes.
+    const leg = (a: Point, c: Point, b: Point, rot0: number, fadeIn: boolean): Keyframe[] => {
+      const frames: Keyframe[] = [];
+      const steps = 14;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const u = 1 - t;
+        const x = u * u * a.x + 2 * u * t * c.x + t * t * b.x;
+        const y = u * u * a.y + 2 * u * t * c.y + t * t * b.y;
+        frames.push({
+          transform: `translate(${x}px,${y}px) rotate(${rot0 + v.dir * 360 * turnsPerLeg * t}deg)`,
+          opacity: fadeIn && t === 0 ? 0 : 1
+        });
+      }
+      return frames;
+    };
+    const origin = { x: 0, y: 0 };
+    const hitAt = { x: dx, y: dy };
+    const midRot = v.dir * 360 * turnsPerLeg;
+
+    await this.anim(bone, leg(origin, out, hitAt, 0, true), { duration: 560, easing: 'ease-in' });
+    this.meleeGlyph(fxEl, target, { ...v, meleeStyle: 'hit', color: '#ffffff' });
+    const hit = this.impact(refs, target, v, 0);
+    await this.anim(bone, leg(hitAt, back, origin, midRot, false), { duration: 620, easing: 'ease-out' });
+    await hit;
+
+    // Caught: the bone disappears into the caster with a small flash.
+    this.flash(launchEl, '#F6F3EA', 0.35);
+    await this.anim(bone, [
+      { transform: `rotate(${midRot * 2}deg) scale(1)`, opacity: 1 },
+      { transform: `rotate(${midRot * 2 + v.dir * 90}deg) scale(.5)`, opacity: 0 }
+    ], { duration: 160, easing: 'ease-out' });
+    bone.remove();
+  }
+
+  /** A simple cartoon bone (shaft with two round knobs at each end), outlined only on its outside. */
+  private boneGlyph(w: number): HTMLElement {
+    const h = w * 0.3;
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 40 12');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${h}px`);
+    const shapes =
+      '<rect x="5" y="3.6" width="30" height="4.8" rx="1"/>' +
+      '<circle cx="4.5" cy="3.6" r="3.4"/><circle cx="4.5" cy="8.4" r="3.4"/>' +
+      '<circle cx="35.5" cy="3.6" r="3.4"/><circle cx="35.5" cy="8.4" r="3.4"/>';
+    // Outline layer underneath, fill layer on top: overlaps stay seamless.
+    svg.innerHTML =
+      `<g fill="#7E7A70" stroke="#7E7A70" stroke-width="1.6">${shapes}</g>` +
+      `<g fill="#F6F3EA">${shapes}</g>`;
+    return svg;
+  }
+
+  /**
+   * Bubble / Bubble Beam: see-through water bubbles travel to the target,
+   * gather around it, then pop one after another. The style sets how many,
+   * how fast and how loosely they fly (a slow drift or a tight beam).
+   */
+  private async playBubbles(refs: BattleStageRefs, launch: Point, target: Point, style: BubbleStyle) {
+    const { fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const spreadX = Math.max(r.width * 0.45, 28);
+    const spreadY = Math.max(r.height * 0.4, 24);
+    const { count, travel, stagger, wobble, jitter } = style;
+
+    const bubbles: { el: HTMLElement; end: Point; rest: string }[] = [];
+    const arrivals: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const size = 12 + Math.random() * 14;
+      const el = document.createElement('div');
+      el.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;border:1.5px solid #ffffffdd;background:radial-gradient(circle at 30% 28%,#ffffffee 0 14%,transparent 18%),radial-gradient(circle at 50% 50%,#BFE6FF22 55%,#8FD0FF66);box-shadow:inset 0 0 5px #A8DCFF99,0 0 3px #ffffff88`;
+      const start = { x: launch.x + (Math.random() * 2 - 1) * jitter, y: launch.y + (Math.random() * 2 - 1) * jitter };
+      place(el, start);
+      fxEl.appendChild(el);
+      // Each bubble ends up at its own spot around the target.
+      const end = {
+        x: target.x + (Math.random() * 2 - 1) * spreadX,
+        y: target.y + (Math.random() * 2 - 1) * spreadY
+      };
+      const ex = end.x - start.x;
+      const ey = end.y - start.y;
+      bubbles.push({ el, end, rest: `translate(${ex}px,${ey}px)` });
+      const wob = wobble * (0.4 + Math.random() * 0.6);
+      const phase = Math.random() * Math.PI * 2;
+      const frames: Keyframe[] = [];
+      const steps = 10;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const ease = 1 - (1 - t) * (1 - t); // slows down as it arrives
+        frames.push({
+          transform: `translate(${ex * ease}px,${ey * ease + Math.sin(phase + t * Math.PI * 3) * wob * (1 - t)}px) scale(${0.4 + t * 0.6})`,
+          opacity: Math.min(1, t * 5)
+        });
+      }
+      arrivals.push(this.anim(el, frames, { duration: travel, easing: 'linear', delay: i * stagger }));
+    }
+    await Promise.all(arrivals);
+    await this.wait(250);
+
+    // Pop: each bubble swells and vanishes, leaving a few droplets.
+    const pops = bubbles.map(({ el, end, rest }, i) =>
+      this.wait(i * 35 + Math.random() * 60).then(() => {
+        const at = { x: end.x, y: end.y };
+        this.anim(el, [
+          { transform: `${rest} scale(1)`, opacity: 1 },
+          { transform: `${rest} scale(1.6)`, opacity: 0 }
+        ], { duration: 160, easing: 'ease-out' }).then(() => el.remove());
+        for (let d = 0; d < 4; d++) {
+          const drop = document.createElement('div');
+          drop.style.cssText = 'position:absolute;width:3px;height:3px;border-radius:50%;pointer-events:none;background:#D8F0FF';
+          place(drop, at);
+          fxEl.appendChild(drop);
+          const ang = (Math.PI * 2 * d) / 4 + Math.random();
+          this.anim(drop, [
+            { transform: 'translate(0,0)', opacity: 1 },
+            { transform: `translate(${Math.cos(ang) * 10}px,${Math.sin(ang) * 10}px)`, opacity: 0 }
+          ], { duration: 260, easing: 'ease-out' }).then(() => drop.remove());
+        }
+        if (i % 4 === 0) {
+          this.flash(targetEl, '#8FD0FF', 0.35);
+          this.shake(targetEl, 2);
+        }
+      })
+    );
+    await Promise.all(pops);
+    await this.wait(260);
+  }
+
+  /**
+   * Earthquake: the whole field shakes fast left and right (and a little up
+   * and down) while small rocks keep jumping up on both sides of the target.
+   */
+  private async playEarthquake(refs: BattleStageRefs) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const total = 1500;
+
+    // Field shake: quick alternating offsets, strongest in the middle.
+    const beats = 30;
+    const shake: Keyframe[] = [];
+    for (let k = 0; k <= beats; k++) {
+      const t = k / beats;
+      const amp = k === 0 || k === beats ? 0 : 3 + Math.sin(t * Math.PI) * 5;
+      shake.push({ transform: `translate(${k % 2 ? -amp : amp}px,${k % 3 === 0 ? amp * 0.3 : -amp * 0.25}px)` });
+    }
+    const quake = this.anim(fieldEl, shake, { duration: total, easing: 'linear', fill: 'none' });
+
+    // Rocks pop out of the ground left and right of the target.
+    const r = targetEl.getBoundingClientRect();
+    const foot = this.footOf(targetEl, fieldEl);
+    const side = Math.max(r.width * 0.5, 30);
+    const rocks = 16;
+    for (let i = 0; i < rocks; i++) {
+      const dirX = i % 2 ? 1 : -1;
+      const s = 6 + Math.random() * 7;
+      const rock = document.createElement('div');
+      rock.style.cssText = `position:absolute;width:${s}px;height:${s * 0.85}px;pointer-events:none;clip-path:polygon(20% 0,75% 8%,100% 45%,85% 100%,15% 95%,0 40%);background:linear-gradient(135deg,#B08A5A,#6E5232 70%,#4A3622)`;
+      place(rock, { x: foot.x + dirX * (side + Math.random() * side * 0.6), y: foot.y - Math.random() * 8 });
+      fxEl.appendChild(rock);
+      const up = 18 + Math.random() * 26;
+      const drift = dirX * (4 + Math.random() * 10);
+      const spin = (Math.random() * 2 - 1) * 240;
+      this.anim(rock, [
+        { transform: 'translate(0,0) rotate(0deg)', opacity: 0 },
+        { transform: `translate(${drift * 0.5}px,${-up}px) rotate(${spin * 0.5}deg)`, opacity: 1, offset: 0.45 },
+        { transform: `translate(${drift}px,0) rotate(${spin}deg)`, opacity: 1, offset: 0.85 },
+        { transform: `translate(${drift}px,0) rotate(${spin}deg)`, opacity: 0 }
+      ], { duration: 520, easing: 'ease-in-out', delay: 80 + (i / rocks) * (total - 600) }).then(() => rock.remove());
+    }
+
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => this.flash(targetEl, '#C9A24B', 0.4), 200 + i * 320);
+    }
+    await quake;
+  }
+
+  /**
+   * Psychic: the backdrop goes dark, then a moving psychedelic wave pattern
+   * fades in while the target warps and glows.
+   */
+  private async playPsychic(refs: BattleStageRefs) {
+    const { fieldEl, targetEl } = refs;
+
+    const dim = this.backdrop(fieldEl, DIM_BACKDROP);
+    await this.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // Wave layer goes on top of the dim layer, still behind platforms and sprites.
+    const waves = document.createElement('div');
+    waves.style.cssText = `position:absolute;inset:-48px;background-image:${PSYCHIC_WAVES};background-size:60px 24px`;
+    dim.appendChild(waves);
+    waves.animate([{ backgroundPosition: '0 0' }, { backgroundPosition: '60px 24px' }], {
+      duration: 700,
+      iterations: Infinity,
+      easing: 'linear'
+    });
+    // A slow sway makes the whole pattern ripple, not just scroll.
+    waves.animate(
+      [{ transform: 'skewY(0deg) scaleY(1)' }, { transform: 'skewY(4deg) scaleY(1.08)' }, { transform: 'skewY(0deg) scaleY(1)' }],
+      { duration: 900, iterations: Infinity, easing: 'ease-in-out' }
+    );
+    await this.anim(waves, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // The target is warped back and forth and glows.
+    const original = targetEl.style.transform;
+    const warp: Keyframe[] = [];
+    const n = 10;
+    for (let k = 0; k <= n; k++) {
+      const a = k === 0 || k === n ? 0 : (k % 2 ? 1 : -1);
+      warp.push({ transform: `${original} skewX(${a * 10}deg) scale(${1 + a * 0.06},${1 - a * 0.05})` });
+    }
+    for (let i = 0; i < 4; i++) setTimeout(() => this.flash(targetEl, i % 2 ? '#F28BF0' : '#FFE37A', 0.55), i * 260);
+    await this.anim(targetEl, warp, { duration: 1100, easing: 'ease-in-out', fill: 'none' });
+    targetEl.style.transform = original;
+
+    await this.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in' });
+    dim.remove();
+  }
+
+  /**
+   * Dark Pulse: the backdrop turns grey, dark purple rings ripple out over
+   * the ground from the caster's feet while dark sparks fly out around it;
+   * the target is hit as the waves reach it.
+   */
+  private async playDarkPulse(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const purple = '#4B1A63';
+    const grey = this.backdrop(fieldEl, 'background:linear-gradient(180deg,#7C7A80,#A5A3A8 45%,#8A888E)');
+    await this.anim(grey, [{ opacity: 0 }, { opacity: 1 }], { duration: 280, easing: 'ease-out' });
+
+    // Ground layer: above the platforms, below HUD and sprites.
+    const ground = document.createElement('div');
+    ground.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fieldEl.insertBefore(ground, fieldEl.querySelector('.hud') ?? fieldEl.querySelector('.sprite'));
+
+    const foot = this.footOf(launchEl, fieldEl);
+    const reach = Math.hypot(target.x - foot.x, target.y - foot.y) * 1.25;
+    const rings = 5;
+    const ringDur = 1000;
+    const ringGap = 170;
+    for (let i = 0; i < rings; i++) {
+      const ring = document.createElement('div');
+      const w = reach * 2;
+      ring.style.cssText = `position:absolute;width:${w}px;height:${w * 0.3}px;border-radius:50%;border:${5 - i * 0.6}px solid ${purple};box-shadow:0 0 8px ${purple},inset 0 0 8px ${purple}`;
+      place(ring, foot);
+      ground.appendChild(ring);
+      this.anim(ring, [
+        { transform: 'scale(.08)', opacity: 0 },
+        { transform: 'scale(.25)', opacity: 0.9, offset: 0.15 },
+        { transform: 'scale(1)', opacity: 0 }
+      ], { duration: ringDur, easing: 'ease-out', delay: i * ringGap }).then(() => ring.remove());
+    }
+
+    // Dark sparks: short smoky streaks flying out around the caster.
+    const r = launchEl.getBoundingClientRect();
+    const rad = Math.max(r.width * 0.4, 28);
+    for (let i = 0; i < 22; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const len = 10 + Math.random() * 16;
+      const spark = document.createElement('div');
+      spark.style.cssText = `position:absolute;width:${len}px;height:${3 + Math.random() * 3}px;border-radius:3px;pointer-events:none;background:linear-gradient(90deg,transparent,${purple},#8E3FB0);filter:blur(.6px);box-shadow:0 0 6px ${purple}`;
+      const from = { x: launch.x + Math.cos(ang) * rad * 0.6, y: launch.y + Math.sin(ang) * rad * 0.6 };
+      place(spark, from);
+      fxEl.appendChild(spark);
+      const dist = rad * (0.8 + Math.random() * 1.2);
+      const deg = (ang * 180) / Math.PI;
+      this.anim(spark, [
+        { transform: `rotate(${deg}deg) translateX(0) scaleX(.3)`, opacity: 0 },
+        { transform: `rotate(${deg}deg) translateX(${dist * 0.4}px) scaleX(1)`, opacity: 1, offset: 0.3 },
+        { transform: `rotate(${deg}deg) translateX(${dist}px) scaleX(.6)`, opacity: 0 }
+      ], { duration: 520, easing: 'ease-out', delay: Math.random() * (rings * ringGap + 300) }).then(() => spark.remove());
+    }
+    this.flash(launchEl, purple, 0.5);
+
+    // The target is hit when the first wave reaches it, and again as later waves pass.
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        this.flash(targetEl, purple, 0.55);
+        this.shake(targetEl, 4);
+      }, ringDur * 0.45 + i * ringGap * 1.6);
+    }
+
+    await this.wait(ringDur + (rings - 1) * ringGap);
+    ground.remove();
+    await this.anim(grey, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    grey.remove();
+  }
+
+  /**
+   * Thunder: the scene goes dark under a band of storm clouds along the top,
+   * then a jagged yellow bolt strikes the target from the sky, with a ground
+   * glow, sparks and flashes.
+   */
+  private async playThunder(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, screenFxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const yellow = '#F6D33B';
+
+    const sky = this.backdrop(fieldEl, 'background:linear-gradient(180deg,#141418,#24242B 40%,#1A1A20)');
+    // Storm clouds: overlapping soft grey blobs along the top edge, drifting slowly.
+    const clouds = document.createElement('div');
+    clouds.style.cssText = 'position:absolute;left:-10%;right:-10%;top:0;height:28%';
+    for (let i = 0; i < 14; i++) {
+      const cw = W * (0.14 + Math.random() * 0.12);
+      const blob = document.createElement('div');
+      blob.style.cssText = `position:absolute;left:${(i / 14) * 112 - 4}%;top:${-cw * 0.35 + Math.random() * 10}px;width:${cw}px;height:${cw * 0.55}px;border-radius:50%;background:radial-gradient(ellipse at 50% 60%,#4A4A52,#33333A 60%,#2A2A3000);filter:blur(2px)`;
+      clouds.appendChild(blob);
+    }
+    sky.appendChild(clouds);
+    clouds.animate([{ transform: 'translateX(0)' }, { transform: `translateX(${W * 0.04}px)` }], {
+      duration: 2600,
+      easing: 'ease-in-out'
+    });
+    await this.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-out' });
+    await this.wait(350);
+
+    // The bolt: jagged path from the sky to the target's feet, plus two thinner forks.
+    const foot = this.footOf(targetEl, fieldEl);
+    const zigzag = (x0: number, y0: number, x1: number, y1: number, jag: number): string => {
+      const pts: string[] = [];
+      const segs = Math.max(4, Math.round((y1 - y0) / 18));
+      for (let k = 0; k <= segs; k++) {
+        const t = k / segs;
+        const off = k === 0 || k === segs ? 0 : (Math.random() * 2 - 1) * jag;
+        pts.push(`${(x0 + (x1 - x0) * t + off).toFixed(1)},${(y0 + (y1 - y0) * t).toFixed(1)}`);
+      }
+      return pts.join(' ');
+    };
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('width', `${W}`);
+    svg.setAttribute('height', `${H}`);
+    svg.setAttribute('style', `position:absolute;left:0;top:0;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 6px ${yellow}) drop-shadow(0 0 14px ${yellow})`);
+    const main = zigzag(target.x + (Math.random() * 30 - 15), -10, foot.x, foot.y - 4, 14);
+    const forkY = H * 0.25 + Math.random() * H * 0.15;
+    const forks = [
+      zigzag(target.x - 10, forkY, target.x - 40 - Math.random() * 30, forkY + 70, 9),
+      zigzag(target.x + 8, forkY + 30, target.x + 35 + Math.random() * 30, forkY + 95, 9)
+    ];
+    svg.innerHTML =
+      forks.map((f) => `<polyline points="${f}" fill="none" stroke="${yellow}" stroke-width="2.5" stroke-linejoin="bevel"/>`).join('') +
+      `<polyline points="${main}" fill="none" stroke="${yellow}" stroke-width="7" stroke-linejoin="bevel"/>` +
+      `<polyline points="${main}" fill="none" stroke="#FFFBE0" stroke-width="2.5" stroke-linejoin="bevel"/>`;
+    fxEl.appendChild(svg);
+
+    // Ground glow where the bolt lands.
+    const rr = targetEl.getBoundingClientRect();
+    const gw = Math.max(rr.width * 1.3, 80);
+    const glow = document.createElement('div');
+    glow.style.cssText = `position:absolute;width:${gw}px;height:${gw * 0.32}px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,#FFFBE0,#E8F04Acc 35%,#9CD62A55 65%,transparent 75%)`;
+    place(glow, foot);
+    fxEl.insertBefore(glow, svg);
+
+    // Strike - flicker - strike again.
+    const strike = this.anim(svg, [
+      { opacity: 0 },
+      { opacity: 1, offset: 0.05 },
+      { opacity: 0.25, offset: 0.25 },
+      { opacity: 1, offset: 0.35 },
+      { opacity: 0.4, offset: 0.55 },
+      { opacity: 1, offset: 0.65 },
+      { opacity: 0 }
+    ], { duration: 900, easing: 'linear' }).then(() => svg.remove());
+    this.anim(glow, [
+      { transform: 'scale(.3)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.15 },
+      { transform: 'scale(1.1)', opacity: 0.8, offset: 0.7 },
+      { transform: 'scale(1.2)', opacity: 0 }
+    ], { duration: 1100, easing: 'ease-out' }).then(() => glow.remove());
+    this.screenWash(screenFxEl, '#FFF6B088', 60, 140, `${((target.x / W) * 100).toFixed(0)}%`);
+    this.flash(targetEl, yellow, 0.9);
+    this.shake(targetEl, 6);
+    this.shakeField(fieldEl, 0.8);
+    setTimeout(() => {
+      this.flash(targetEl, '#FFFBE0', 0.9);
+      this.shake(targetEl, 5);
+    }, 320);
+
+    // Sparks: glowing yellow-white motes bursting out around the target.
+    const spread = Math.max(rr.width * 0.6, 40);
+    for (let i = 0; i < 20; i++) {
+      const sz = 5 + Math.random() * 7;
+      const mote = document.createElement('div');
+      mote.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff,#F4F47A 50%,#F6D33B00 75%);box-shadow:0 0 8px #F4F47A`;
+      place(mote, { x: target.x + (Math.random() * 2 - 1) * spread * 0.4, y: foot.y - Math.random() * rr.height * 0.6 });
+      fxEl.appendChild(mote);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = spread * (0.5 + Math.random() * 0.7);
+      this.anim(mote, [
+        { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+        { transform: `translate(${Math.cos(ang) * dist * 0.5}px,${Math.sin(ang) * dist * 0.3}px) scale(1.2)`, opacity: 1, offset: 0.3 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist * 0.5}px) scale(.5)`, opacity: 0 }
+      ], { duration: 650 + Math.random() * 350, easing: 'ease-out', delay: Math.random() * 300 }).then(() => mote.remove());
+    }
+
+    await strike;
+    await this.wait(250);
+    await this.anim(sky, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in' });
+    sky.remove();
   }
 
   /**

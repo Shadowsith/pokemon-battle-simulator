@@ -41,10 +41,10 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [x] **Bite** / Biss — `bite` · Dark · Physical · white jaw snaps on target (custom, needs review)
 - [x] **Blizzard** / Blizzard — `blizzard` · Ice · Special · whiteout snowstorm + ice crystals (custom, needs review)
 - [ ] **Body Slam** / Bodyslam — `bodyslam` · Normal · Physical · `melee`
-- [ ] **Bone Club** / Knochenkeule — `boneclub` · Ground · Physical · `projectile`
-- [ ] **Bonemerang** / Knochmerang — `bonemerang` · Ground · Physical · `projectile`
-- [ ] **Bubble** / Blubber — `bubble` · Water · Special · `field`
-- [ ] **Bubble Beam** / Blubbstrahl — `bubblebeam` · Water · Special · `projectile`
+- [x] **Bone Club** / Knochenkeule — `boneclub` · Ground · Physical · spinning thrown bone (custom, needs review)
+- [x] **Bonemerang** / Knochmerang — `bonemerang` · Ground · Physical · spinning bone boomerang (custom, needs review)
+- [x] **Bubble** / Blubber — `bubble` · Water · Special · drifting bubbles pop around target (custom, needs review)
+- [x] **Bubble Beam** / Blubbstrahl — `bubblebeam` · Water · Special · fast bubble stream pops around target (custom, needs review)
 - [ ] **Clamp** / Schnapper — `clamp` · Water · Physical · `melee`
 - [ ] **Comet Punch** / Kometenhieb — `cometpunch` · Normal · Physical · `melee`
 - [ ] **Confuse Ray** / Konfusstrahl — `confuseray` · Ghost · Status · `targetAura`
@@ -65,7 +65,7 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [ ] **Dragon Rage** / Drachenwut — `dragonrage` · Dragon · Special · `projectile`
 - [ ] **Dream Eater** / Traumfresser — `dreameater` · Psychic · Special · `projectile`
 - [ ] **Drill Peck** / Bohrschnabel — `drillpeck` · Flying · Physical · `melee`
-- [ ] **Earthquake** / Erdbeben — `earthquake` · Ground · Physical · `field`
+- [x] **Earthquake** / Erdbeben — `earthquake` · Ground · Physical · field shake + jumping rocks (custom, needs review)
 - [ ] **Egg Bomb** / Eierbombe — `eggbomb` · Normal · Physical · `lob`
 - [x] **Ember** / Glut — `ember` · Fire · Special · single ground flame (custom, needs review)
 - [ ] **Explosion** / Explosion — `explosion` · Normal · Physical · `field`
@@ -125,7 +125,7 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [ ] **Poison Sting** / Giftstachel — `poisonsting` · Poison · Physical · `projectile`
 - [ ] **Pound** / Klaps — `pound` · Normal · Physical · `melee`
 - [ ] **Psybeam** / Psystrahl — `psybeam` · Psychic · Special · `projectile`
-- [ ] **Psychic** / Psychokinese — `psychic` · Psychic · Special · `projectile`
+- [x] **Psychic** / Psychokinese — `psychic` · Psychic · Special · dim + psychedelic wave backdrop + warped target (custom, needs review)
 - [ ] **Psywave** / Psywelle — `psywave` · Psychic · Special · `projectile`
 - [ ] **Quick Attack** / Ruckzuckhieb — `quickattack` · Normal · Physical · `melee`
 - [ ] **Rage** / Raserei — `rage` · Normal · Physical · `melee`
@@ -176,7 +176,7 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [ ] **Take Down** / Bodycheck — `takedown` · Normal · Physical · `melee`
 - [ ] **Teleport** / Teleport — `teleport` · Psychic · Status · `selfAura`
 - [ ] **Thrash** / Fuchtler — `thrash` · Normal · Physical · `melee`
-- [ ] **Thunder** / Donner — `thunder` · Electric · Special · `projectile`
+- [x] **Thunder** / Donner — `thunder` · Electric · Special · dark storm clouds + lightning strike from above (custom, needs review)
 - [ ] **Thunder Punch** / Donnerschlag — `thunderpunch` · Electric · Physical · `melee`
 - [ ] **Thunder Shock** / Donnerschock — `thundershock` · Electric · Special · `projectile`
 - [ ] **Thunder Wave** / Donnerwelle — `thunderwave` · Electric · Status · `targetAura`
@@ -412,7 +412,7 @@ Type sets the colour and particle shape. Base power sets the size. Multi-hit, pr
 - [ ] **Copycat** / Imitator — `copycat` · Normal · Status · `selfAura`
 - [ ] **Cross Poison** / Giftstreich — `crosspoison` · Poison · Physical · `melee`
 - [ ] **Crush Grip** / Quetschgriff — `crushgrip` · Normal · Physical · `melee`
-- [ ] **Dark Pulse** / Finsteraura — `darkpulse` · Dark · Special · `pulse`
+- [x] **Dark Pulse** / Finsteraura — `darkpulse` · Dark · Special · grey backdrop + dark ground waves + sparks (custom, needs review)
 - [ ] **Dark Void** / Schlummerort — `darkvoid` · Dark · Status · `targetAura`
 - [ ] **Defend Order** / Blockbefehl — `defendorder` · Bug · Status · `selfAura`
 - [ ] **Defog** / Auflockern — `defog` · Flying · Status · `targetAura`
