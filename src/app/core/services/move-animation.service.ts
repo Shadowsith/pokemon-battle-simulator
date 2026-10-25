@@ -243,7 +243,11 @@ export class MoveAnimationService {
     bonemerang: (refs, launch, target, v) => this.playBonemerang(refs, launch, target, v),
     bubble: (refs, launch, target) => this.playBubbles(refs, launch, target, BUBBLE_DRIFT),
     bubblebeam: (refs, launch, target) => this.playBubbles(refs, launch, target, BUBBLE_BEAM),
+    crabhammer: (refs, _launch, target) => this.playCrabhammer(refs, target),
     earthquake: (refs) => this.playEarthquake(refs),
+    hydropump: (refs, launch, target) => this.playHydroPump(refs, launch, target),
+    hyperbeam: (refs, launch, target) => this.playHyperBeam(refs, launch, target),
+    icebeam: (refs, launch, target) => this.playIceBeam(refs, launch, target),
     darkpulse: (refs, launch, target) => this.playDarkPulse(refs, launch, target),
     psychic: (refs) => this.playPsychic(refs),
     thunder: (refs, _launch, target) => this.playThunder(refs, target),
@@ -1432,9 +1436,7 @@ export class MoveAnimationService {
     const r = targetEl.getBoundingClientRect();
     const spread = Math.max(r.width * 0.5, 30);
     for (let i = 0; i < 12; i++) {
-      const s = 10 + Math.random() * 10;
-      const shard = document.createElement('div');
-      shard.style.cssText = `position:absolute;width:${s}px;height:${s * 1.4}px;pointer-events:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:linear-gradient(135deg,#fff,#9CD6FF 60%,#5FA8E0)`;
+      const shard = this.iceShard(10 + Math.random() * 10);
       place(shard, {
         x: target.x + (Math.random() * 2 - 1) * spread,
         y: target.y + (Math.random() * 2 - 1) * spread * 0.8
@@ -1455,6 +1457,346 @@ export class MoveAnimationService {
     }
 
     await Promise.all([bgDone, stormDone]);
+  }
+
+  /** A light blue diamond-shaped ice crystal, `s` px wide (Blizzard, Ice Beam). */
+  private iceShard(s: number): HTMLElement {
+    const shard = document.createElement('div');
+    shard.style.cssText = `position:absolute;width:${s}px;height:${s * 1.4}px;pointer-events:none;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);background:linear-gradient(135deg,#fff,#9CD6FF 60%,#5FA8E0)`;
+    return shard;
+  }
+
+  /**
+   * Ice Beam: a light blue beam with a white core shoots from the caster to
+   * the target and flickers while frosty sparkles break off along it. Ice
+   * crystals burst on the target, which turns icy blue.
+   */
+  private async playIceBeam(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const ice = '#9CD6FF';
+    const deep = '#5FA8E0';
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    // Unit vector across the beam, to scatter sparkles off its sides.
+    const nx = -dy / dist;
+    const ny = dx / dist;
+    const thick = 14;
+    const grow = 240;
+    const hold = 950;
+    const fadeOut = 260;
+    const total = grow + hold + fadeOut;
+
+    // Beam: soft light-blue glow around a white core, shooting out from the caster.
+    const beam = document.createElement('div');
+    beam.style.cssText = `position:absolute;left:${launch.x}px;top:${launch.y - thick / 2}px;width:${dist}px;height:${thick}px;pointer-events:none;transform-origin:0 50%;border-radius:${thick}px;background:linear-gradient(180deg,transparent,${ice}bb 22%,#fff 42%,#fff 58%,${ice}bb 78%,transparent);box-shadow:0 0 10px ${ice},0 0 22px ${deep}aa`;
+    fxEl.appendChild(beam);
+    const rot = `rotate(${angle}deg)`;
+    const frames: Keyframe[] = [{ transform: `${rot} scale(0,1)`, opacity: 1, offset: 0 }];
+    const flickers = 10;
+    for (let k = 0; k <= flickers; k++) {
+      frames.push({
+        transform: `${rot} scale(1,${k % 2 ? 0.75 : 1.2})`,
+        opacity: 1,
+        offset: (grow + (k / flickers) * hold) / total
+      });
+    }
+    frames.push({ transform: `${rot} scale(1,.1)`, opacity: 0, offset: 1 });
+    const beamDone = this.anim(beam, frames, { duration: total, easing: 'linear' }).then(() => beam.remove());
+
+    // Glowing flare where the beam hits.
+    const flare = document.createElement('div');
+    flare.style.cssText = `position:absolute;width:44px;height:44px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff,${ice} 45%,transparent 72%)`;
+    place(flare, target);
+    fxEl.appendChild(flare);
+    this.anim(flare, [
+      { transform: 'scale(.3)', opacity: 0 },
+      { transform: 'scale(1.2)', opacity: 1, offset: 0.25 },
+      { transform: 'scale(.9)', opacity: 0.9, offset: 0.5 },
+      { transform: 'scale(1.2)', opacity: 1, offset: 0.75 },
+      { transform: 'scale(.6)', opacity: 0 }
+    ], { duration: hold + fadeOut, easing: 'ease-in-out', delay: grow }).then(() => flare.remove());
+
+    // Frosty sparkles and little crystals break off along the beam and drift away from it.
+    for (let i = 0; i < 28; i++) {
+      const t = Math.random();
+      const side = Math.random() < 0.5 ? -1 : 1;
+      const off = side * (4 + Math.random() * 8);
+      const drift = side * (10 + Math.random() * 18);
+      const p = i % 3 ? this.sparkStar(6 + Math.random() * 7, i % 2 ? '#fff' : ice) : this.iceShard(5 + Math.random() * 5);
+      place(p, { x: launch.x + dx * t + nx * off, y: launch.y + dy * t + ny * off });
+      fxEl.appendChild(p);
+      this.anim(p, [
+        { transform: 'translate(0,0) scale(0) rotate(0deg)', opacity: 0 },
+        { transform: `translate(${nx * drift * 0.4}px,${ny * drift * 0.4}px) scale(1.1) rotate(60deg)`, opacity: 1, offset: 0.35 },
+        { transform: `translate(${nx * drift}px,${ny * drift}px) scale(.2) rotate(140deg)`, opacity: 0 }
+      ], { duration: 480 + Math.random() * 220, easing: 'ease-out', delay: grow * t + Math.random() * hold * 0.8 }).then(() => p.remove());
+    }
+
+    // Impact: the target turns icy blue and ice crystals form on it while it shakes.
+    await this.wait(grow);
+    targetEl.style.filter = `sepia(1) saturate(2.5) hue-rotate(165deg) brightness(1.2) drop-shadow(0 0 6px ${ice})`;
+    const r = targetEl.getBoundingClientRect();
+    const spread = Math.max(r.width * 0.45, 26);
+    for (let i = 0; i < 10; i++) {
+      const shard = this.iceShard(9 + Math.random() * 9);
+      place(shard, {
+        x: target.x + (Math.random() * 2 - 1) * spread,
+        y: target.y + (Math.random() * 2 - 1) * spread * 0.8
+      });
+      fxEl.appendChild(shard);
+      this.anim(shard, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: `scale(1) rotate(${Math.random() * 60 - 30}deg)`, opacity: 1, offset: 0.3 },
+        { transform: `scale(1) rotate(${Math.random() * 60 - 30}deg)`, opacity: 0.9, offset: 0.8 },
+        { transform: 'scale(.6)', opacity: 0 }
+      ], { duration: 800, easing: 'ease-out', delay: Math.random() * (hold - 300) }).then(() => shard.remove());
+    }
+    for (let i = 0; i < 4; i++) setTimeout(() => this.shake(targetEl, 4), i * 240);
+    await beamDone;
+    targetEl.style.filter = '';
+    this.flash(targetEl, ice, 0.5);
+    await this.wait(220);
+  }
+
+  /**
+   * Hydro Pump: the scene goes dark, then a deep blue backdrop with rushing
+   * light streaks fades in. A water beam made of a glowing core and a stream
+   * of swelling water rings blasts the target, then the backdrop fades away.
+   */
+  private async playHydroPump(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const dir = target.x >= launch.x ? 1 : -1;
+    const water = '#7CC8FF';
+
+    // backdrop() inserts at the back, so the blue layer is made first and the dim one ends up behind it.
+    const sea = this.backdrop(fieldEl, 'background:linear-gradient(180deg,#0A2A5E,#14508F 35%,#1D63A8 50%,#14508F 65%,#0A2A5E);opacity:0');
+    for (let i = 0; i < 30; i++) {
+      const len = W * (0.15 + Math.random() * 0.35);
+      const h = 2 + Math.random() * 5;
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;left:0;top:${Math.random() * H}px;width:${len}px;height:${h}px;border-radius:${h}px;background:linear-gradient(90deg,transparent,${Math.random() < 0.5 ? '#5FA8E0' : '#9CD6FF'},transparent);opacity:${0.35 + Math.random() * 0.45}`;
+      sea.appendChild(streak);
+      streak.animate(
+        [
+          { transform: `translateX(${dir > 0 ? -len : W}px)` },
+          { transform: `translateX(${dir > 0 ? W : -len}px)` }
+        ],
+        { duration: 700 + Math.random() * 700, delay: -Math.random() * 1400, iterations: Infinity, easing: 'linear' }
+      );
+    }
+    const dim = this.backdrop(fieldEl, DIM_BACKDROP);
+    await this.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+    await this.wait(150);
+    await this.anim(sea, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, easing: 'ease-in-out' });
+    sea.style.opacity = '1';
+    dim.remove();
+
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const nx = -dy / dist;
+    const ny = dx / dist;
+    const rings = 40;
+    const gap = 24;
+    const travel = 400;
+    const streamTime = rings * gap + travel;
+
+    // Glowing water core under the rings.
+    const thick = 16;
+    const core = document.createElement('div');
+    core.style.cssText = `position:absolute;left:${launch.x}px;top:${launch.y - thick / 2}px;width:${dist}px;height:${thick}px;border-radius:${thick}px;pointer-events:none;transform-origin:0 50%;background:linear-gradient(180deg,transparent,${water}99 30%,#E8F6FFcc 50%,${water}99 70%,transparent);box-shadow:0 0 14px ${water}`;
+    fxEl.appendChild(core);
+    const rot = `rotate(${angle}deg)`;
+    const coreDone = this.anim(core, [
+      { transform: `${rot} scale(0,1)`, opacity: 0.9 },
+      { transform: `${rot} scale(1,1)`, opacity: 0.9, offset: travel / streamTime },
+      { transform: `${rot} scale(1,1.15)`, opacity: 0.9, offset: 0.85 },
+      { transform: `${rot} scale(1,.2)`, opacity: 0 }
+    ], { duration: streamTime, easing: 'linear' }).then(() => core.remove());
+
+    // Water rings stream out, swelling and swirling slightly as they fly.
+    const steps = 6;
+    const flights: Promise<void>[] = [];
+    for (let i = 0; i < rings; i++) {
+      const ring = document.createElement('div');
+      ring.style.cssText = `position:absolute;width:14px;height:40px;border-radius:50%;pointer-events:none;border:2.5px solid #E8F6FFdd;background:radial-gradient(ellipse,transparent 45%,${water}55);box-shadow:0 0 8px ${water},inset 0 0 6px ${water}`;
+      place(ring, launch);
+      fxEl.appendChild(ring);
+      const phase = i * 0.8;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const wob = Math.sin(phase + t * Math.PI * 2) * 4;
+        frames.push({
+          transform: `translate(${dx * t + nx * wob}px,${dy * t + ny * wob}px) rotate(${angle}deg) scale(${0.5 + t * 0.9})`,
+          opacity: t === 0 ? 0 : t === 1 ? 0.15 : 0.85
+        });
+      }
+      flights.push(
+        this.anim(ring, frames, { duration: travel, easing: 'linear', delay: i * gap }).then(() => {
+          ring.remove();
+          if (i % 5 === 0) {
+            this.flash(targetEl, water, 0.45);
+            this.shake(targetEl, 4);
+            this.waterSplash(fxEl, target);
+          }
+        })
+      );
+    }
+    await Promise.all([...flights, coreDone]);
+    this.flash(targetEl, water, 0.6);
+    await this.wait(250);
+
+    await this.anim(sea, [{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: 'ease-in' });
+    sea.remove();
+  }
+
+  /** A handful of water droplets splashing outwards from `at`. */
+  private waterSplash(fxEl: HTMLElement, at: Point) {
+    for (let i = 0; i < 6; i++) {
+      const s = 4 + Math.random() * 4;
+      const drop = document.createElement('div');
+      drop.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#fff,#9CD6FF);box-shadow:0 0 4px #9CD6FF`;
+      place(drop, { x: at.x + (Math.random() * 20 - 10), y: at.y + (Math.random() * 20 - 10) });
+      fxEl.appendChild(drop);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 18 + Math.random() * 22;
+      this.anim(drop, [
+        { transform: 'translate(0,0) scale(1)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist + 10}px) scale(.4)`, opacity: 0 }
+      ], { duration: 380, easing: 'ease-out' }).then(() => drop.remove());
+    }
+  }
+
+  /**
+   * Hyper Beam: the backdrop turns bright green with dark green streaks racing
+   * along the top and bottom edges. A thick golden beam with a spiky glowing
+   * fringe and rolling energy bulges blasts the target, throwing off sparkles.
+   */
+  private async playHyperBeam(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const dir = target.x >= launch.x ? 1 : -1;
+    const gold = '#FFC21A';
+
+    // Backdrop: green field, with streaks scrolling in a band along the top and bottom edges.
+    const bg = this.backdrop(fieldEl, 'background:linear-gradient(180deg,#3E8E1E,#8CC63A 22%,#C9E35A 50%,#8CC63A 78%,#3E8E1E);opacity:0');
+    for (let i = 0; i < 26; i++) {
+      const top = i % 2 === 0;
+      const len = 30 + Math.random() * 70;
+      const h = 4 + Math.random() * 6;
+      const y = top ? Math.random() * H * 0.2 : H * 0.8 + Math.random() * H * 0.2 - h;
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;left:0;top:${y}px;width:${len}px;height:${h}px;border-radius:${h}px;background:${Math.random() < 0.6 ? '#1F6A12' : '#2E8A1A'};opacity:${0.6 + Math.random() * 0.4}`;
+      bg.appendChild(streak);
+      streak.animate(
+        [
+          { transform: `translateX(${dir > 0 ? -len : W}px)` },
+          { transform: `translateX(${dir > 0 ? W : -len}px)` }
+        ],
+        { duration: 500 + Math.random() * 400, delay: -Math.random() * 900, iterations: Infinity, easing: 'linear' }
+      );
+    }
+    // The scene goes dark first; backdrop() inserts at the back, so the dim layer sits behind the green one.
+    const dim = this.backdrop(fieldEl, DIM_BACKDROP);
+    await this.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+    await this.wait(150);
+    await this.anim(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 400, easing: 'ease-in-out' });
+    dim.remove();
+
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const dist = Math.hypot(dx, dy) || 1;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const nx = -dy / dist;
+    const ny = dx / dist;
+    const thick = 40;
+    const len = dist + 30; // reaches a little past the target, as if blasting through it
+    const grow = 220;
+    const hold = 1000;
+    const fadeOut = 280;
+    const total = grow + hold + fadeOut;
+
+    // Beam: a spiky cream fringe (tiled SVG spikes) around a golden core of rolling bulges.
+    const spikes =
+      'url("data:image/svg+xml,' +
+      encodeURIComponent(
+        '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="40" viewBox="0 0 12 40" preserveAspectRatio="none">' +
+          '<path d="M0,20 L1,7 L3,14 L6,1 L8,13 L11,5 L12,20 L11,35 L8,27 L6,39 L3,26 L1,33 Z" fill="#FFF4C8"/>' +
+          '</svg>'
+      ) +
+      '")';
+    const beam = document.createElement('div');
+    beam.style.cssText = `position:absolute;left:${launch.x}px;top:${launch.y - thick / 2}px;width:${len}px;height:${thick}px;pointer-events:none;transform-origin:0 50%;filter:drop-shadow(0 0 6px ${gold})`;
+    const fringe = document.createElement('div');
+    fringe.style.cssText = `position:absolute;inset:0;background:${spikes} 0 0/12px 100% repeat-x`;
+    const core = document.createElement('div');
+    core.style.cssText = `position:absolute;left:0;right:0;top:22%;height:56%;border-radius:${thick}px;background:radial-gradient(ellipse at center,#FFFBE0 0,#FFE066 30%,${gold} 55%,#E89200 72%,transparent 74%) 0 0/26px 100% repeat-x`;
+    beam.append(fringe, core);
+    fxEl.appendChild(beam);
+    // Spikes and bulges roll along the beam towards the target.
+    fringe.animate([{ backgroundPosition: '0 0' }, { backgroundPosition: '36px 0' }], { duration: 160, iterations: Infinity });
+    core.animate([{ backgroundPosition: '0 0' }, { backgroundPosition: '52px 0' }], { duration: 160, iterations: Infinity });
+
+    const rot = `rotate(${angle}deg)`;
+    const frames: Keyframe[] = [{ transform: `${rot} scale(0,.6)`, opacity: 1, offset: 0 }];
+    const flickers = 12;
+    for (let k = 0; k <= flickers; k++) {
+      frames.push({
+        transform: `${rot} scale(1,${k % 2 ? 0.88 : 1.1})`,
+        opacity: 1,
+        offset: (grow + (k / flickers) * hold) / total
+      });
+    }
+    frames.push({ transform: `${rot} scale(1,.1)`, opacity: 0, offset: 1 });
+    const beamDone = this.anim(beam, frames, { duration: total, easing: 'linear' }).then(() => beam.remove());
+
+    // Golden and white sparkles burst off the sides of the beam.
+    for (let i = 0; i < 36; i++) {
+      const t = Math.random();
+      const side = Math.random() < 0.5 ? -1 : 1;
+      const off = side * (10 + Math.random() * 8);
+      const drift = side * (14 + Math.random() * 26);
+      const star = this.sparkStar(7 + Math.random() * 9, i % 3 ? gold : '#FFFFFF');
+      place(star, { x: launch.x + dx * t + nx * off, y: launch.y + dy * t + ny * off });
+      fxEl.appendChild(star);
+      this.anim(star, [
+        { transform: 'translate(0,0) scale(0) rotate(0deg)', opacity: 0 },
+        { transform: `translate(${nx * drift * 0.4}px,${ny * drift * 0.4}px) scale(1.2) rotate(70deg)`, opacity: 1, offset: 0.3 },
+        { transform: `translate(${nx * drift}px,${ny * drift}px) scale(.2) rotate(160deg)`, opacity: 0 }
+      ], { duration: 450 + Math.random() * 250, easing: 'ease-out', delay: grow * t + Math.random() * hold * 0.85 }).then(() => star.remove());
+    }
+
+    // Impact: the target is pummelled with golden flashes and the field shakes.
+    await this.wait(grow);
+    this.shakeField(fieldEl, 0.8);
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => {
+        this.flash(targetEl, gold, 0.6);
+        this.shake(targetEl, 5);
+      }, i * 210);
+    }
+    await beamDone;
+
+    // Final burst of sparkles from the target.
+    for (let i = 0; i < 10; i++) {
+      const star = this.sparkStar(10 + Math.random() * 8, i % 2 ? gold : '#FFFFFF');
+      place(star, target);
+      fxEl.appendChild(star);
+      const ang = (Math.PI * 2 * i) / 10;
+      this.anim(star, [
+        { transform: 'translate(0,0) scale(.3)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * 46}px,${Math.sin(ang) * 46}px) scale(1)`, opacity: 0 }
+      ], { duration: 380, easing: 'ease-out' }).then(() => star.remove());
+    }
+    await this.anim(bg, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    bg.remove();
   }
 
   /**
@@ -1586,9 +1928,7 @@ export class MoveAnimationService {
     const bubbles: { el: HTMLElement; end: Point; rest: string }[] = [];
     const arrivals: Promise<void>[] = [];
     for (let i = 0; i < count; i++) {
-      const size = 12 + Math.random() * 14;
-      const el = document.createElement('div');
-      el.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;border:1.5px solid #ffffffdd;background:radial-gradient(circle at 30% 28%,#ffffffee 0 14%,transparent 18%),radial-gradient(circle at 50% 50%,#BFE6FF22 55%,#8FD0FF66);box-shadow:inset 0 0 5px #A8DCFF99,0 0 3px #ffffff88`;
+      const el = this.bubbleGlyph(12 + Math.random() * 14);
       const start = { x: launch.x + (Math.random() * 2 - 1) * jitter, y: launch.y + (Math.random() * 2 - 1) * jitter };
       place(el, start);
       fxEl.appendChild(el);
@@ -1644,6 +1984,112 @@ export class MoveAnimationService {
     );
     await Promise.all(pops);
     await this.wait(260);
+  }
+
+  /** A see-through water bubble with a highlight (Bubble, Bubble Beam, Crabhammer). */
+  private bubbleGlyph(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;border:1.5px solid #ffffffdd;background:radial-gradient(circle at 30% 28%,#ffffffee 0 14%,transparent 18%),radial-gradient(circle at 50% 50%,#BFE6FF22 55%,#8FD0FF66);box-shadow:inset 0 0 5px #A8DCFF99,0 0 3px #ffffff88`;
+    return el;
+  }
+
+  /**
+   * Crabhammer: a large water drop plunges fast from above onto the target and
+   * bursts into a splash crown, then bubbles form around the target and pop.
+   */
+  private async playCrabhammer(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const hit: Point = { x: target.x, y: target.y - r.height * 0.15 };
+    const fall = hit.y + 60; // starts just above the top edge of the field
+
+    // The drop: a teardrop with its tip pointing up (a rotated square tear), stretched while it falls.
+    const size = 38;
+    const drop = document.createElement('div');
+    drop.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 6px #7CC8FF)`;
+    const tear = document.createElement('div');
+    tear.style.cssText = `width:100%;height:100%;border-radius:50% 0 50% 50%;transform:rotate(-45deg);background:radial-gradient(circle at 40% 60%,#fff,#9CD6FF 35%,#3F8FD8 80%,#2A6CB5)`;
+    drop.appendChild(tear);
+    place(drop, hit);
+    fxEl.appendChild(drop);
+
+    // Light streaks trailing above the drop.
+    for (let i = 0; i < 3; i++) {
+      const streak = document.createElement('div');
+      const w = 3 + (i === 1 ? 3 : 0);
+      streak.style.cssText = `position:absolute;left:${hit.x - w / 2 + (i - 1) * 9}px;top:${hit.y - 90}px;width:${w}px;height:90px;border-radius:${w}px;pointer-events:none;background:linear-gradient(180deg,transparent,#E8F6FFcc);transform-origin:50% 100%`;
+      fxEl.appendChild(streak);
+      this.anim(streak, [
+        { transform: `translateY(${-fall}px) scaleY(.4)`, opacity: 0 },
+        { transform: 'translateY(0) scaleY(1)', opacity: 0.9, offset: 0.6 },
+        { transform: 'translateY(0) scaleY(.2)', opacity: 0 }
+      ], { duration: 460, easing: 'ease-in' }).then(() => streak.remove());
+    }
+    await this.anim(drop, [
+      { transform: `translateY(${-fall}px) scale(.8,1.25)`, opacity: 0.6 },
+      { transform: 'translateY(0) scale(.85,1.3)', opacity: 1 }
+    ], { duration: 260, easing: 'ease-in' });
+
+    // Splash: the drop flattens and bursts, a ring spreads out, droplets fly up and fall.
+    this.anim(drop, [
+      { transform: 'scale(1.1,.9)', opacity: 1 },
+      { transform: 'scale(1.9,.35)', opacity: 0 }
+    ], { duration: 160, easing: 'ease-out' }).then(() => drop.remove());
+    const ring = document.createElement('div');
+    ring.style.cssText = 'position:absolute;width:40px;height:14px;border-radius:50%;pointer-events:none;border:3px solid #E8F6FF;box-shadow:0 0 8px #7CC8FF,inset 0 0 6px #7CC8FF';
+    place(ring, hit);
+    fxEl.appendChild(ring);
+    this.anim(ring, [
+      { transform: 'scale(.4)', opacity: 1 },
+      { transform: 'scale(2.6)', opacity: 0 }
+    ], { duration: 420, easing: 'ease-out' }).then(() => ring.remove());
+    for (let i = 0; i < 16; i++) {
+      const s = 5 + Math.random() * 6;
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute;width:${s}px;height:${s * 1.2}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#fff,#9CD6FF 60%,#3F8FD8);box-shadow:0 0 4px #9CD6FF`;
+      place(d, hit);
+      fxEl.appendChild(d);
+      // Thrown up and out in a crown, then pulled down again.
+      const vx = (Math.random() * 2 - 1) * 60;
+      const vy = 50 + Math.random() * 45;
+      const frames: Keyframe[] = [];
+      const steps = 8;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        frames.push({
+          transform: `translate(${vx * t}px,${-vy * t + 110 * t * t}px) scale(${1 - t * 0.5})`,
+          opacity: t < 0.7 ? 1 : (1 - t) / 0.3
+        });
+      }
+      this.anim(d, frames, { duration: 520 + Math.random() * 180, easing: 'linear' }).then(() => d.remove());
+    }
+    this.flash(targetEl, '#8FD0FF', 0.7);
+    this.shake(targetEl, 6);
+    this.shakeField(fieldEl, 0.5);
+    await this.wait(260);
+
+    // Bubbles form around the target, float up a little and pop.
+    const spreadX = Math.max(r.width * 0.55, 30);
+    const spreadY = Math.max(r.height * 0.45, 26);
+    const pops: Promise<void>[] = [];
+    for (let i = 0; i < 12; i++) {
+      const b = this.bubbleGlyph(8 + Math.random() * 12);
+      place(b, {
+        x: target.x + (Math.random() * 2 - 1) * spreadX,
+        y: target.y + (Math.random() * 2 - 1) * spreadY
+      });
+      fxEl.appendChild(b);
+      const rise = 14 + Math.random() * 18;
+      pops.push(
+        this.anim(b, [
+          { transform: 'translateY(0) scale(0)', opacity: 0 },
+          { transform: `translateY(${-rise * 0.3}px) scale(1)`, opacity: 1, offset: 0.25 },
+          { transform: `translateY(${-rise}px) scale(1)`, opacity: 1, offset: 0.85 },
+          { transform: `translateY(${-rise}px) scale(1.5)`, opacity: 0 }
+        ], { duration: 750 + Math.random() * 250, easing: 'ease-out', delay: Math.random() * 300 }).then(() => b.remove())
+      );
+    }
+    await Promise.all(pops);
   }
 
   /**

@@ -60,7 +60,7 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - [ ] **Constrict** / Umklammerung — `constrict` · Normal · Physical · `melee`
 - [ ] **Conversion** / Umwandlung — `conversion` · Normal · Status · `selfAura`
 - [ ] **Counter** / Konter — `counter` · Fighting · Physical · `melee`
-- [ ] ⭐ **Crabhammer** / Krabbhammer — `crabhammer` · Water · Physical · `melee`
+- [x] ⭐ **Crabhammer** / Krabbhammer — `crabhammer` · Water · Physical · big water drop from above + splash crown + bubbles (custom, needs review)
 - [ ] **Cut** / Zerschneider — `cut` · Normal · Physical · `melee`
 - [ ] **Defense Curl** / Einigler — `defensecurl` · Normal · Status · `selfAura`
 - [ ] ⭐ **Dig** / Schaufler — `dig` · Ground · Physical · `beam`
@@ -98,11 +98,11 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - [ ] ⭐ **High Jump Kick** / Turmkick — `highjumpkick` · Fighting · Physical · `melee`
 - [ ] **Horn Attack** / Hornattacke — `hornattack` · Normal · Physical · `melee`
 - [ ] **Horn Drill** / Hornbohrer — `horndrill` · Normal · Physical · `melee`
-- [ ] ⭐ **Hydro Pump** / Hydropumpe — `hydropump` · Water · Special · `projectile`
-- [ ] ⭐ **Hyper Beam** / Hyperstrahl — `hyperbeam` · Normal · Special · `projectile`
+- [x] ⭐ **Hydro Pump** / Hydropumpe — `hydropump` · Water · Special · dark → deep blue streak backdrop + water ring beam (custom, needs review)
+- [x] ⭐ **Hyper Beam** / Hyperstrahl — `hyperbeam` · Normal · Special · dark → green backdrop with edge streaks + golden spiky sparkling beam (custom, needs review)
 - [ ] ⭐ **Hyper Fang** / Hyperzahn — `hyperfang` · Normal · Physical · `melee`
 - [ ] **Hypnosis** / Hypnose — `hypnosis` · Psychic · Status · `targetAura`
-- [ ] ⭐ **Ice Beam** / Eisstrahl — `icebeam` · Ice · Special · `projectile`
+- [x] ⭐ **Ice Beam** / Eisstrahl — `icebeam` · Ice · Special · light blue flickering beam + frost sparkles + iced target (custom, needs review)
 - [ ] ⭐ **Ice Punch** / Eishieb — `icepunch` · Ice · Physical · `melee`
 - [ ] ⭐ **Jump Kick** / Sprungkick — `jumpkick` · Fighting · Physical · `melee`
 - [ ] **Karate Chop** / Karateschlag — `karatechop` · Fighting · Physical · `melee`
