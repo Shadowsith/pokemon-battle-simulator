@@ -20,6 +20,7 @@ A local Pokémon battle simulator app with animated battles against NPCs. Stack:
 - `core/models/` – data shapes and static data: `pokemon`, `move`, `item`, `team`, `trainer`, `battle-pokemon` (`toBattlePokemon` turns a team slot into a battle-ready mon), `trainer-run.model` (shared shapes for run modes: `RunRegion`, `RunMember`, `RunMon`), authored rosters `elite-four.model` and `gym-leader.model` (split per region under `gym-leader/`), generated tables (`item-table`, `species-names.de`).
 - `core/battle/` – pure, Angular-free battle logic: `battle-format` (singles/doubles slots, move targeting, turn order), `item-effects` (held item effects), `npc-ai` (NPC move choice), `npc-items` (item picks for random NPCs).
 - `core/services/` – `damage-calc` (damage, HP stats, drain/recoil), `status`, `stat-change`, `move-animation` (animation engine composing per-move effects from @pkmn/sim move data), `audio` (SFX/cries/music, no-op if file missing), `dex-data` (loads static team-builder JSON from `public/assets/data`), `npc-team` (random NPC teams), `trainer-roster` (trainer sprites), `trainer-run` + `gym-run` / `elite-four-run` (run state), `team`, `custom-battle`, `settings`.
+- `core/services/move-animation/` – the animation engine behind the `move-animation.service` facade: static classes `Fx` (DOM primitives), `FxGlyphs` (particle/prop elements), `FxEffects` (effects shared across types), `DeliveryAnimations` (generic animation per delivery: melee, beam, lob, …), `MoveVisualBuilder` (move data → `MoveVisual`). Hand-made per-move animations live in `moves/<type>-moves.ts` (one static class per type with an `anims` registry, merged in `moves/index.ts`) — **a new custom animation goes into the file of its move's type**.
 - `shared/` – reusable components: `item-icon`, `item-picker`, `search-select`.
 - `pages/battle/battle.page.ts` currently holds the battle loop itself (state, turn execution, damage application, items, AI calls, animations) — the main candidate for refactoring into engine classes.
 
@@ -30,7 +31,7 @@ A local Pokémon battle simulator app with animated battles against NPCs. Stack:
 
 ## Known oversized files (split before extending)
 
-`move-animation.service.ts` (~4500 lines), `battle.page.ts` (~1900), `item-table.ts` (~1000, generated).
+`battle.page.ts` (~1900), `item-table.ts` (~1000, generated).
 
 # Code structure
 
