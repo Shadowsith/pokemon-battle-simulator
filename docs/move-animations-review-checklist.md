@@ -185,10 +185,10 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - [ ] **Teleport** / Teleport — `teleport` · Psychic · Status · `selfAura`
 - [ ] ⭐ **Thrash** / Fuchtler — `thrash` · Normal · Physical · `melee`
 - [x] ⭐ **Thunder** / Donner — `thunder` · Electric · Special · dark storm clouds + lightning strike from above (custom, needs review)
-- [ ] ⭐ **Thunder Punch** / Donnerschlag — `thunderpunch` · Electric · Physical · `melee`
+- [x] ⭐ **Thunder Punch** / Donnerschlag — `thunderpunch` · Electric · Physical · like Ice Punch: yellow fist slams in, small lightning bolts burst around the target (custom, needs review)
 - [ ] **Thunder Shock** / Donnerschock — `thundershock` · Electric · Special · `projectile`
-- [ ] ⭐ **Thunder Wave** / Donnerwelle — `thunderwave` · Electric · Status · `targetAura`
-- [ ] ⭐ **Thunderbolt** / Donnerblitz — `thunderbolt` · Electric · Special · `projectile`
+- [x] ⭐ **Thunder Wave** / Donnerwelle — `thunderwave` · Electric · Status · scene darkens, yellow electric arcs swirl in around the target, target turns yellow with crackling bolts (custom, needs review)
+- [x] ⭐ **Thunderbolt** / Donnerblitz — `thunderbolt` · Electric · Special · four thin lightning strikes from above, glowing spiky electric ball crackling on the target (custom, needs review)
 - [ ] ⭐ **Toxic** / Toxin — `toxic` · Poison · Status · `targetAura`
 - [ ] **Transform** / Wandler — `transform` · Normal · Status · `targetAura`
 - [ ] ⭐ **Tri Attack** / Triplette — `triattack` · Normal · Special · `projectile`

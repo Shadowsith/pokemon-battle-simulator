@@ -182,7 +182,7 @@ const PSYCHIC_WAVES =
   ) +
   '")';
 
-/** Colours for the cartoon fist (Dizzy Punch, Fire Punch, Ice Punch). */
+/** Colours for the cartoon fist (Dizzy Punch, Fire Punch, Ice Punch, Thunder Punch). */
 const FIST_TONES = {
   yellow: { fill: '#FFD84A', edge: '#B8860B', lines: '#C9971A', glow: '#FFE04A' },
   red: { fill: '#D8342A', edge: '#6E1010', lines: '#8E1A14', glow: '#FF8A3C' },
@@ -257,7 +257,7 @@ export class MoveAnimationService {
     headbutt: (refs, _launch, target, v) => this.playHeadbutt(refs, target, v),
     highjumpkick: (refs, _launch, target, v) => this.playHighJumpKick(refs, target, v),
     hyperfang: (refs, _launch, target, v) => this.playHyperFang(refs, target, v),
-    icepunch: (refs, _launch, target) => this.playIcePunch(refs, target),
+    icepunch: (refs, _launch, target) => this.playElementalPunch(refs, target, 'ice', '#9CD6FF', () => this.iceChunk()),
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => this.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
     blizzard: (refs, launch, target) => this.playBlizzard(refs, launch, target),
@@ -274,6 +274,10 @@ export class MoveAnimationService {
     darkpulse: (refs, launch, target) => this.playDarkPulse(refs, launch, target),
     psychic: (refs) => this.playPsychic(refs),
     thunder: (refs, _launch, target) => this.playThunder(refs, target),
+    thunderbolt: (refs, _launch, target) => this.playThunderbolt(refs, target),
+    thunderwave: (refs, _launch, target) => this.playThunderWave(refs, target),
+    thunderpunch: (refs, _launch, target) =>
+      this.playElementalPunch(refs, target, 'yellow', '#FFE04A', () => this.sparkBolt()),
     ember: (refs, _launch, _target, v) => this.playGroundFlame(refs, v),
     fireblast: (refs, launch, target, v) => this.playFireBlast(refs, launch, target, v),
     flareblitz: (refs, launch, target, v) => this.playFlareBlitz(refs, launch, target, v),
@@ -2567,46 +2571,47 @@ export class MoveAnimationService {
   }
 
   /**
-   * Ice Punch: a light blue ice fist slams onto the target while see-through
-   * ice crystals burst out around it, tumbling and drifting as they fade.
+   * Elemental punch (Ice Punch, Thunder Punch): a coloured fist slams onto the
+   * target while element particles burst out around it, tumbling and drifting
+   * as they fade.
    */
-  private async playIcePunch(refs: BattleStageRefs, target: Point) {
+  private async playElementalPunch(
+    refs: BattleStageRefs,
+    target: Point,
+    tone: keyof typeof FIST_TONES,
+    flashColor: string,
+    particle: () => HTMLElement
+  ) {
     const { fxEl, targetEl } = refs;
     const r = targetEl.getBoundingClientRect();
 
-    const fist = this.fistGlyph(Math.max(r.width * 0.45, 36), 'ice');
+    const fist = this.fistGlyph(Math.max(r.width * 0.45, 36), tone);
     place(fist, target);
     fxEl.appendChild(fist);
     await this.anim(fist, [
       { transform: 'scale(1.8)', opacity: 0 },
       { transform: 'scale(1)', opacity: 1 }
     ], { duration: 150, easing: 'ease-in' });
-    this.flash(targetEl, '#9CD6FF', 0.7);
+    this.flash(targetEl, flashColor, 0.7);
     this.shake(targetEl, 5);
 
-    // Ice crystals: irregular see-through chunks flung out round the target.
-    const crystals: Promise<void>[] = [];
+    const bits: Promise<void>[] = [];
     for (let i = 0; i < 16; i++) {
-      const s = 12 + Math.random() * 14;
-      const chunk = document.createElement('div');
-      chunk.style.cssText = `position:absolute;width:${s}px;height:${s * 0.8}px;pointer-events:none;filter:drop-shadow(0 0 2px #ffffff)`;
-      const shape = document.createElement('div');
-      shape.style.cssText = 'width:100%;height:100%;clip-path:polygon(18% 0,70% 6%,100% 38%,88% 88%,40% 100%,0 70%,4% 24%);background:linear-gradient(135deg,#ffffffee,#DDF3FFb0 45%,#9CD6FF70)';
-      chunk.appendChild(shape);
-      place(chunk, target);
-      fxEl.appendChild(chunk);
+      const bit = particle();
+      place(bit, target);
+      fxEl.appendChild(bit);
       const ang = (Math.PI * 2 * i) / 16 + Math.random() * 0.4;
       const dist = Math.max(r.width * 0.7, 46) * (0.6 + Math.random() * 0.7);
       const x = Math.cos(ang) * dist;
       const y = Math.sin(ang) * dist * 0.75;
       const spin = (Math.random() * 2 - 1) * 200;
-      crystals.push(
-        this.anim(chunk, [
+      bits.push(
+        this.anim(bit, [
           { transform: 'translate(0,0) scale(.3) rotate(0deg)', opacity: 0 },
           { transform: `translate(${x * 0.6}px,${y * 0.6}px) scale(1) rotate(${spin * 0.4}deg)`, opacity: 1, offset: 0.3 },
           { transform: `translate(${x}px,${y - 6}px) scale(1) rotate(${spin}deg)`, opacity: 1, offset: 0.75 },
           { transform: `translate(${x * 1.05}px,${y - 10}px) scale(.8) rotate(${spin * 1.1}deg)`, opacity: 0 }
-        ], { duration: 800 + Math.random() * 250, easing: 'ease-out', delay: Math.random() * 120 }).then(() => chunk.remove())
+        ], { duration: 800 + Math.random() * 250, easing: 'ease-out', delay: Math.random() * 120 }).then(() => bit.remove())
       );
     }
     this.anim(fist, [
@@ -2614,11 +2619,33 @@ export class MoveAnimationService {
       { transform: 'scale(1)', opacity: 1, offset: 0.7 },
       { transform: 'scale(.9)', opacity: 0 }
     ], { duration: 700, easing: 'ease-in' }).then(() => fist.remove());
-    await Promise.all(crystals);
+    await Promise.all(bits);
+  }
+
+  /** An irregular see-through ice crystal chunk (Ice Punch). */
+  private iceChunk(): HTMLElement {
+    const s = 12 + Math.random() * 14;
+    const chunk = document.createElement('div');
+    chunk.style.cssText = `position:absolute;width:${s}px;height:${s * 0.8}px;pointer-events:none;filter:drop-shadow(0 0 2px #ffffff)`;
+    const shape = document.createElement('div');
+    shape.style.cssText = 'width:100%;height:100%;clip-path:polygon(18% 0,70% 6%,100% 38%,88% 88%,40% 100%,0 70%,4% 24%);background:linear-gradient(135deg,#ffffffee,#DDF3FFb0 45%,#9CD6FF70)';
+    chunk.appendChild(shape);
+    return chunk;
+  }
+
+  /** A small glowing yellow lightning bolt in a sized box, so place() centres it (Thunder Punch). */
+  private sparkBolt(): HTMLElement {
+    const s = 9 + Math.random() * 7;
+    const box = document.createElement('div');
+    box.style.cssText = `position:absolute;width:${s}px;height:${s * 1.6}px;pointer-events:none;filter:drop-shadow(0 0 4px #FFE04A)`;
+    const bolt = this.boltGlyph('#FFE04A', s);
+    bolt.style.position = 'static';
+    box.appendChild(bolt);
+    return box;
   }
 
   /**
-   * Hyper Fang:a pair of big rodent incisors chomps diagonally down into the
+   * Hyper Fang: a pair of big rodent incisors chomps diagonally down into the
    * target, while clusters of little red sparkles twinkle around it.
    */
   private async playHyperFang(refs: BattleStageRefs, target: Point, v: MoveVisual) {
@@ -3449,26 +3476,16 @@ export class MoveAnimationService {
 
     // The bolt: jagged path from the sky to the target's feet, plus two thinner forks.
     const foot = this.footOf(targetEl, fieldEl);
-    const zigzag = (x0: number, y0: number, x1: number, y1: number, jag: number): string => {
-      const pts: string[] = [];
-      const segs = Math.max(4, Math.round((y1 - y0) / 18));
-      for (let k = 0; k <= segs; k++) {
-        const t = k / segs;
-        const off = k === 0 || k === segs ? 0 : (Math.random() * 2 - 1) * jag;
-        pts.push(`${(x0 + (x1 - x0) * t + off).toFixed(1)},${(y0 + (y1 - y0) * t).toFixed(1)}`);
-      }
-      return pts.join(' ');
-    };
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
     svg.setAttribute('width', `${W}`);
     svg.setAttribute('height', `${H}`);
     svg.setAttribute('style', `position:absolute;left:0;top:0;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 6px ${yellow}) drop-shadow(0 0 14px ${yellow})`);
-    const main = zigzag(target.x + (Math.random() * 30 - 15), -10, foot.x, foot.y - 4, 14);
+    const main = zigzagPoints(target.x + (Math.random() * 30 - 15), -10, foot.x, foot.y - 4, 14);
     const forkY = H * 0.25 + Math.random() * H * 0.15;
     const forks = [
-      zigzag(target.x - 10, forkY, target.x - 40 - Math.random() * 30, forkY + 70, 9),
-      zigzag(target.x + 8, forkY + 30, target.x + 35 + Math.random() * 30, forkY + 95, 9)
+      zigzagPoints(target.x - 10, forkY, target.x - 40 - Math.random() * 30, forkY + 70, 9),
+      zigzagPoints(target.x + 8, forkY + 30, target.x + 35 + Math.random() * 30, forkY + 95, 9)
     ];
     svg.innerHTML =
       forks.map((f) => `<polyline points="${f}" fill="none" stroke="${yellow}" stroke-width="2.5" stroke-linejoin="bevel"/>`).join('') +
@@ -3530,6 +3547,159 @@ export class MoveAnimationService {
     await this.wait(250);
     await this.anim(sky, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in' });
     sky.remove();
+  }
+
+  /**
+   * Thunderbolt: thin yellow-green lightning bolts strike the target from
+   * above one after another, each flickering and fading. From the first hit
+   * on, a glowing spiky ball of electricity crackles on the target's centre.
+   */
+  private async playThunderbolt(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const r = targetEl.getBoundingClientRect();
+    const bolt = '#E4F44A';
+    const strikes = 4;
+    const gap = 230;
+    const ns = 'http://www.w3.org/2000/svg';
+
+    const strikeOnce = (): Promise<void> => {
+      const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+      svg.setAttribute('width', `${W}`);
+      svg.setAttribute('height', `${H}`);
+      svg.setAttribute('style', `position:absolute;left:0;top:0;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 5px ${bolt}) drop-shadow(0 0 10px ${bolt})`);
+      const pts = zigzagPoints(target.x + (Math.random() * 2 - 1) * r.width * 0.25, -10, target.x + (Math.random() * 2 - 1) * 8, target.y, 8);
+      svg.innerHTML =
+        `<polyline points="${pts}" fill="none" stroke="${bolt}" stroke-width="5" stroke-linejoin="bevel"/>` +
+        `<polyline points="${pts}" fill="none" stroke="#FCFFE0" stroke-width="1.8" stroke-linejoin="bevel"/>`;
+      fxEl.appendChild(svg);
+      this.flash(targetEl, bolt, 0.7);
+      this.shake(targetEl, 4);
+      return this.anim(svg, [
+        { opacity: 0 },
+        { opacity: 1, offset: 0.08 },
+        { opacity: 0.35, offset: 0.35 },
+        { opacity: 1, offset: 0.5 },
+        { opacity: 0 }
+      ], { duration: 360, easing: 'linear' }).then(() => svg.remove());
+    };
+
+    // First strike, then the electric ball lights up on the target.
+    const hits: Promise<void>[] = [strikeOnce()];
+    await this.wait(60);
+    const size = Math.max(r.width * 0.9, 64);
+    const ball = document.createElement('div');
+    ball.style.cssText =
+      `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      `background:radial-gradient(circle,#fff 0 14%,#F6FF9A 26%,#E4F44A00 55%),repeating-conic-gradient(#F0FF7Add 0 3deg,#F0FF7A00 3deg 13deg);` +
+      '-webkit-mask-image:radial-gradient(circle,#000 28%,transparent 70%);mask-image:radial-gradient(circle,#000 28%,transparent 70%);' +
+      `filter:drop-shadow(0 0 8px ${bolt})`;
+    place(ball, target);
+    fxEl.appendChild(ball);
+    const total = gap * (strikes - 1) + 600;
+    const ballDone = this.anim(ball, [
+      { transform: 'scale(.2) rotate(0deg)', opacity: 0 },
+      { transform: 'scale(1.1) rotate(20deg)', opacity: 1, offset: 0.12 },
+      { transform: 'scale(.9) rotate(45deg)', opacity: 0.85, offset: 0.35 },
+      { transform: 'scale(1.05) rotate(70deg)', opacity: 1, offset: 0.6 },
+      { transform: 'scale(.95) rotate(95deg)', opacity: 0.9, offset: 0.85 },
+      { transform: 'scale(1.3) rotate(110deg)', opacity: 0 }
+    ], { duration: total, easing: 'ease-in-out' }).then(() => ball.remove());
+
+    // Little sparks crackle off the ball while it glows.
+    for (let i = 0; i < 10; i++) {
+      setTimeout(() => {
+        const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+        const len = 14 + Math.random() * 16;
+        svg.setAttribute('width', `${len}`);
+        svg.setAttribute('height', `${len}`);
+        svg.setAttribute('style', `position:absolute;left:${target.x}px;top:${target.y}px;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 3px ${bolt})`);
+        const ang = (Math.random() * 2 - 1) * 180;
+        svg.innerHTML = `<polyline points="${zigzagPoints(0, size * 0.18, 0, size * 0.18 + len, 4)}" fill="none" stroke="#F6FF9A" stroke-width="1.6" transform="rotate(${ang})"/>`;
+        fxEl.appendChild(svg);
+        this.anim(svg, [{ opacity: 1 }, { opacity: 0 }], { duration: 180, easing: 'steps(2, end)' }).then(() => svg.remove());
+      }, 80 + i * (total - 300) / 10);
+    }
+
+    for (let i = 1; i < strikes; i++) {
+      await this.wait(gap);
+      hits.push(strikeOnce());
+    }
+    await Promise.all([...hits, ballDone]);
+  }
+
+  /**
+   * Thunder Wave: the scene goes dark, yellow electric arcs swirl in round the
+   * target like a whirlpool, then the target is paralysed - its sprite turns
+   * yellow while little lightning bolts crackle around it.
+   */
+  private async playThunderWave(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+
+    // 1. Darkness.
+    const dim = this.backdrop(fieldEl, DIM_BACKDROP);
+    await this.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // 2. Whirlpool of electric arcs, spinning and closing in on the target.
+    const big = Math.max(Math.max(r.width, r.height) * 1.9, 120);
+    const glow = document.createElement('div');
+    glow.style.cssText = `position:absolute;width:${big}px;height:${big}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#E8E04A55,#C8C02A33 45%,#C8C02A00 70%)`;
+    place(glow, target);
+    fxEl.appendChild(glow);
+    this.anim(glow, [
+      { transform: 'scale(.5)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.3 },
+      { transform: 'scale(.6)', opacity: 0 }
+    ], { duration: 1200, easing: 'ease-in-out' }).then(() => glow.remove());
+    const arcs: Promise<void>[] = [];
+    for (let i = 0; i < 7; i++) {
+      const s = big * (0.55 + (i % 4) * 0.15);
+      const w = 3 + Math.random() * 4;
+      const arc = document.createElement('div');
+      arc.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;border:${w}px solid transparent;border-top-color:#F0E84A;border-right-color:#E8E04A99;filter:drop-shadow(0 0 4px #F0E84A)`;
+      place(arc, target);
+      fxEl.appendChild(arc);
+      const rot0 = Math.random() * 360;
+      arcs.push(
+        this.anim(arc, [
+          { transform: `rotate(${rot0}deg) scale(1.2)`, opacity: 0 },
+          { transform: `rotate(${rot0 + 200}deg) scale(.9)`, opacity: 1, offset: 0.35 },
+          { transform: `rotate(${rot0 + 520}deg) scale(.25)`, opacity: 0 }
+        ], { duration: 900, easing: 'ease-in', delay: i * 70 }).then(() => arc.remove())
+      );
+    }
+    await Promise.all(arcs);
+
+    // 3. Paralysed: the sprite turns yellow and bolts crackle around it.
+    const tint = this.anim(targetEl, [
+      { filter: 'none' },
+      { filter: 'sepia(1) saturate(4) hue-rotate(8deg) brightness(1.25)', offset: 0.15 },
+      { filter: 'sepia(1) saturate(4) hue-rotate(8deg) brightness(1.1)', offset: 0.85 },
+      { filter: 'none' }
+    ], { duration: 1100, easing: 'ease-in-out', fill: 'none' });
+    for (let i = 0; i < 14; i++) {
+      setTimeout(() => {
+        const b = this.sparkBolt();
+        place(b, {
+          x: target.x + (Math.random() * 2 - 1) * Math.max(r.width * 0.55, 28),
+          y: target.y + (Math.random() * 2 - 1) * Math.max(r.height * 0.45, 24)
+        });
+        fxEl.appendChild(b);
+        const rot = Math.random() * 60 - 30;
+        this.anim(b, [
+          { transform: `rotate(${rot}deg) scale(.4)`, opacity: 0 },
+          { transform: `rotate(${rot}deg) scale(1.1)`, opacity: 1, offset: 0.3 },
+          { transform: `rotate(${rot}deg) scale(1)`, opacity: 0 }
+        ], { duration: 240, easing: 'ease-out' }).then(() => b.remove());
+        if (i % 4 === 0) this.shake(targetEl, 3);
+      }, 40 + i * 65);
+    }
+    await tint;
+
+    await this.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    dim.remove();
   }
 
   /**
@@ -4265,6 +4435,18 @@ export class MoveAnimationService {
 }
 
 // --- pure derivations from move data ----------------------------------
+
+/** SVG polyline points for a jagged lightning path from (x0,y0) to (x1,y1); jag = max px of sideways kink. */
+function zigzagPoints(x0: number, y0: number, x1: number, y1: number, jag: number): string {
+  const pts: string[] = [];
+  const segs = Math.max(4, Math.round((y1 - y0) / 18));
+  for (let k = 0; k <= segs; k++) {
+    const t = k / segs;
+    const off = k === 0 || k === segs ? 0 : (Math.random() * 2 - 1) * jag;
+    pts.push(`${(x0 + (x1 - x0) * t + off).toFixed(1)},${(y0 + (y1 - y0) * t).toFixed(1)}`);
+  }
+  return pts.join(' ');
+}
 
 function place(el: HTMLElement, p: Point): void {
   const w = parseFloat(el.style.width) || 0;
