@@ -171,21 +171,23 @@
     <div #screenFx class="screen-fx-layer"></div>
   </div>
 
-  <div class="party-indicator">
-    @for (e of playerEmblems(); track $index) {
-      <span
-        class="party-ball"
-        [class.owned]="e.owned"
-        [class.active]="e.active"
-        [class.fainted]="e.fainted"
-      ></span>
+  <div class="field-caption">
+    <div class="party-indicator">
+      @for (e of playerEmblems(); track $index) {
+        <span
+          class="party-ball"
+          [class.owned]="e.owned"
+          [class.active]="e.active"
+          [class.fainted]="e.fainted"
+        ></span>
+      }
+    </div>
+
+    <p class="battle-log">{{ log() }}</p>
+    @if (commandPrompt(); as prompt) {
+      <p class="command-prompt">{{ prompt }}</p>
     }
   </div>
-
-  <p class="battle-log">{{ log() }}</p>
-  @if (commandPrompt(); as prompt) {
-    <p class="command-prompt">{{ prompt }}</p>
-  }
 
   <div class="action-panel">
     @if (debug) {

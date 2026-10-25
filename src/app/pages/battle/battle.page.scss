@@ -219,6 +219,13 @@
   min-height: 1.2em;
 }
 
+/* Party balls, log and prompt below the field: same column as the field so
+   they stay under the player HUD on wide screens. */
+.field-caption {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
 .action-panel {
   padding: 0 16px 16px;
 }
