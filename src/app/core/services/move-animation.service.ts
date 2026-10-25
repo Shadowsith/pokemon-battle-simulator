@@ -182,6 +182,13 @@ const PSYCHIC_WAVES =
   ) +
   '")';
 
+/** Colours for the cartoon fist (Dizzy Punch, Fire Punch, Ice Punch). */
+const FIST_TONES = {
+  yellow: { fill: '#FFD84A', edge: '#B8860B', lines: '#C9971A', glow: '#FFE04A' },
+  red: { fill: '#D8342A', edge: '#6E1010', lines: '#8E1A14', glow: '#FF8A3C' },
+  ice: { fill: '#8FD4FF', edge: '#2A6CB5', lines: '#4A90D0', glow: '#CFF0FF' }
+};
+
 const WEATHER_COLOR: Record<Exclude<Weather, null>, string> = {
   sun: '#FFB13C',
   rain: '#4C8FD6',
@@ -238,12 +245,28 @@ export class MoveAnimationService {
     barrier: (refs, launch) => this.playBarrier(refs, launch),
     bind: (refs, _launch, target) => this.playBind(refs, target),
     bite: (refs, _launch, target) => this.playBite(refs, target),
+    dizzypunch: (refs, _launch, target, v) => this.playDizzyPunch(refs, target, v),
+    doubleedge: (refs, launch, target, v) => this.playDoubleEdge(refs, launch, target, v),
+    dreameater: (refs, launch, target, v) => this.playDreamEater(refs, launch, target, v),
+    drillpeck: (refs, _launch, target, v) => this.playDrillPeck(refs, target, v),
+    eggbomb: (refs, launch, target) => this.playEggBomb(refs, launch, target),
+    explosion: (refs, launch, target, v) => this.playExplosion(refs, launch, target, v),
+    firepunch: (refs, _launch, target) => this.playFirePunch(refs, target),
+    fly: (refs, _launch, target) => this.playFlyDown(refs, target),
+    glare: (refs, launch, target) => this.playGlare(refs, launch, target),
+    headbutt: (refs, _launch, target, v) => this.playHeadbutt(refs, target, v),
+    highjumpkick: (refs, _launch, target, v) => this.playHighJumpKick(refs, target, v),
+    hyperfang: (refs, _launch, target, v) => this.playHyperFang(refs, target, v),
+    icepunch: (refs, _launch, target) => this.playIcePunch(refs, target),
+    // Like Absorb, but blood-red sparkles are drained from the target.
+    leechlife: (refs, launch, target) => this.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
     blizzard: (refs, launch, target) => this.playBlizzard(refs, launch, target),
     boneclub: (refs, launch, target, v) => this.playBoneClub(refs, launch, target, v),
     bonemerang: (refs, launch, target, v) => this.playBonemerang(refs, launch, target, v),
     bubble: (refs, launch, target) => this.playBubbles(refs, launch, target, BUBBLE_DRIFT),
     bubblebeam: (refs, launch, target) => this.playBubbles(refs, launch, target, BUBBLE_BEAM),
     crabhammer: (refs, _launch, target) => this.playCrabhammer(refs, target),
+    dig: (refs, _launch, target) => this.playDigUp(refs, target),
     earthquake: (refs) => this.playEarthquake(refs),
     hydropump: (refs, launch, target) => this.playHydroPump(refs, launch, target),
     hyperbeam: (refs, launch, target) => this.playHyperBeam(refs, launch, target),
@@ -586,6 +609,8 @@ export class MoveAnimationService {
 
   /** Turn 1 of a two-turn move: gather energy, or duck under / fly up out of sight. */
   private async playChargeTurn(move: Move, refs: BattleStageRefs, launch: Point, v: MoveVisual) {
+    if (move.showdownId === 'dig') return this.playDigDown(refs);
+    if (move.showdownId === 'fly') return this.playFlyUp(refs, launch);
     if (SEMI_INVULN_ANIM.has(move.showdownId)) {
       const el = refs.launchEl;
       const down = move.showdownId === 'dig' || move.showdownId === 'dive';
@@ -603,8 +628,13 @@ export class MoveAnimationService {
 
   /** Turn 2 of a semi-invulnerable move: the user drops back into view. */
   private async playReleaseIntro(move: Move, refs: BattleStageRefs) {
-    if (!SEMI_INVULN_ANIM.has(move.showdownId)) return;
-    const el = refs.launchEl;
+    // Dig's and Fly's own animations bring the user back.
+    if (!SEMI_INVULN_ANIM.has(move.showdownId) || move.showdownId === 'dig' || move.showdownId === 'fly') return;
+    await this.dropBackIn(refs.launchEl);
+  }
+
+  /** The user drops back into view from above, after being away (Fly, Bounce, …). */
+  private async dropBackIn(el: HTMLElement) {
     el.getAnimations?.().forEach((a) => a.cancel());
     el.style.opacity = '1';
     await this.anim(el, [
@@ -825,15 +855,20 @@ export class MoveAnimationService {
   /**
    * Absorb: no projectile. Green energy stars are pulled out of the target and
    * drift back to the caster along wavy arcs, then sparkle around the caster
-   * to show the HP it gained.
+   * to show the HP it gained. The drained stars' colours can be changed
+   * (Leech Life drains blood-red ones).
    */
-  private async playAbsorb(refs: BattleStageRefs, launch: Point, target: Point) {
-    const { fxEl, targetEl, launchEl } = refs;
-    const green = FLECK_COLOR.statUp;
+  private async playAbsorb(
+    refs: BattleStageRefs,
+    launch: Point,
+    target: Point,
+    [main, light]: [string, string] = [FLECK_COLOR.statUp, '#E6FFB0']
+  ) {
+    const { fxEl, targetEl } = refs;
     const dx = launch.x - target.x;
     const dy = launch.y - target.y;
 
-    this.flash(targetEl, green, 0.4);
+    this.flash(targetEl, main, 0.4);
     this.shake(targetEl, 3);
 
     // Stream: stars leave the target in a steady trickle and float to the caster.
@@ -841,7 +876,7 @@ export class MoveAnimationService {
     const travel = 900;
     const spread = 1100;
     for (let i = 0; i < count; i++) {
-      const star = this.sparkStar(8 + Math.random() * 7, i % 3 ? green : '#E6FFB0');
+      const star = this.sparkStar(8 + Math.random() * 7, i % 3 ? main : light);
       place(star, { x: target.x + (Math.random() * 40 - 20), y: target.y + (Math.random() * 40 - 20) });
       fxEl.appendChild(star);
       const bend = (Math.random() * 2 - 1) * 45;
@@ -858,8 +893,13 @@ export class MoveAnimationService {
       this.anim(star, frames, { duration: travel, easing: 'linear', delay: (i / count) * spread }).then(() => star.remove());
     }
     await this.wait(travel + spread * 0.8);
+    await this.healSparkles(refs, launch);
+  }
 
-    // Gain: twinkling stars and a soft green glow around the caster.
+  /** HP gain: twinkling green stars and a soft green glow around the caster (drain moves). */
+  private async healSparkles(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const green = FLECK_COLOR.statUp;
     const r = launchEl.getBoundingClientRect();
     const rad = Math.max(r.width * 0.45, 28);
     for (let i = 0; i < 12; i++) {
@@ -881,7 +921,83 @@ export class MoveAnimationService {
   }
 
   /**
-   * Acid: the caster spits a quick volley of dark purple poison droplets that
+   * Dream Eater: the scene goes dark, glowing yellow dream orbs drift out of
+   * the sleeping target into the caster, the caster glows with purple psychic
+   * sparkles, then the target is hit and the caster gains HP (green sparkles).
+   */
+  private async playDreamEater(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl } = refs;
+
+    // 1. Darkness.
+    const dim = this.backdrop(fieldEl, DIM_BACKDROP);
+    await this.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // 2. Yellow dream orbs float from the target to the caster on wavy paths.
+    const dx = launch.x - target.x;
+    const dy = launch.y - target.y;
+    const count = 16;
+    const travel = 1000;
+    const spread = 900;
+    for (let i = 0; i < count; i++) {
+      const s = 8 + Math.random() * 8;
+      const orb = document.createElement('div');
+      orb.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFBE0,#FFE36A 45%,#F2C23A00 75%);box-shadow:0 0 ${s}px #FFE36A88`;
+      place(orb, { x: target.x + (Math.random() * 40 - 20), y: target.y + (Math.random() * 40 - 20) });
+      fxEl.appendChild(orb);
+      const bend = (Math.random() * 2 - 1) * 40;
+      const frames: Keyframe[] = [];
+      const steps = 8;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const ease = t * t * (3 - 2 * t);
+        frames.push({
+          transform: `translate(${dx * ease}px,${dy * ease + Math.sin(t * Math.PI) * bend}px) scale(${0.5 + Math.sin(t * Math.PI) * 0.6})`,
+          opacity: Math.min(1, t * 5, (1 - t) * 4 + 0.2)
+        });
+      }
+      this.anim(orb, frames, { duration: travel, easing: 'linear', delay: (i / count) * spread }).then(() => orb.remove());
+    }
+    await this.wait(travel + spread * 0.85);
+
+    // 3. The caster glows while purple psychic sparkles twinkle over it.
+    const r = launchEl.getBoundingClientRect();
+    const rad = Math.max(r.width * 0.45, 28);
+    const glow = this.anim(launchEl, [
+      { filter: 'brightness(1)' },
+      { filter: 'brightness(1.7) drop-shadow(0 0 10px #E9A8FF)', offset: 0.3 },
+      { filter: 'brightness(1.5) drop-shadow(0 0 8px #E9A8FF)', offset: 0.75 },
+      { filter: 'brightness(1)' }
+    ], { duration: 900, easing: 'ease-in-out', fill: 'none' });
+    for (let i = 0; i < 12; i++) {
+      const sp = this.psySparkle(14 + Math.random() * 10);
+      place(sp, { x: launch.x + (Math.random() * 2 - 1) * rad, y: launch.y + (Math.random() * 2 - 1) * rad });
+      fxEl.appendChild(sp);
+      this.anim(sp, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(.2) rotate(90deg)', opacity: 0 }
+      ], { duration: 500, easing: 'ease-out', delay: Math.random() * 400 }).then(() => sp.remove());
+    }
+    await glow;
+
+    // 4. The target takes the hit (blinking); the caster recovers HP.
+    await Promise.all([this.blink(refs.targetEl), this.impact(refs, target, v, 0)]);
+    const fade = this.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 400, delay: 300 }).then(() => dim.remove());
+    await this.healSparkles(refs, launch);
+    await fade;
+  }
+
+  /** A purple four-point psychic sparkle inside a thin glowing ring. */
+  private psySparkle(size: number): HTMLElement {
+    const el = this.sparkStar(size, '#C860FF');
+    const ring = document.createElement('div');
+    ring.style.cssText = 'position:absolute;inset:22%;border-radius:50%;border:1.5px solid #F0C8FF;box-shadow:0 0 4px #C860FF';
+    el.appendChild(ring);
+    return el;
+  }
+
+  /**
+   * Acid:the caster spits a quick volley of dark purple poison droplets that
    * fly in a shallow arc and splash on the target.
    */
   private async playAcidSpit(refs: BattleStageRefs, launch: Point, target: Point) {
@@ -1895,6 +2011,829 @@ export class MoveAnimationService {
     bone.remove();
   }
 
+  /**
+   * Dizzy Punch: the caster lunges, a yellow fist slams onto the target, then
+   * little yellow birds fly out of the fist in arcs and circle dizzily in a
+   * row above the target's head, with stars twinkling between them.
+   */
+  private async playDizzyPunch(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { launchEl, fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+
+    // Lunge in.
+    const original = launchEl.style.transform;
+    await this.anim(launchEl, [
+      { transform: `${original} translateX(${v.dir * -10}px)` },
+      { transform: `${original} translateX(${v.dir * 42}px)` }
+    ], { duration: 170, easing: 'ease-in', fill: 'none' });
+
+    // The fist slams in from big to normal size.
+    const fist = this.fistGlyph(Math.max(r.width * 0.5, 40));
+    place(fist, target);
+    fxEl.appendChild(fist);
+    this.anim(launchEl, [{ transform: `${original} translateX(${v.dir * 42}px)` }, { transform: original }], {
+      duration: 160,
+      easing: 'ease-out',
+      fill: 'none'
+    });
+    await this.anim(fist, [
+      { transform: 'scale(1.8)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], { duration: 160, easing: 'ease-in' });
+    this.flash(targetEl, '#FFE04A', 0.6);
+    this.shake(targetEl, 5);
+    for (let i = 0; i < 6; i++) {
+      const star = this.sparkStar(8 + Math.random() * 5, '#FFF6C8');
+      place(star, target);
+      fxEl.appendChild(star);
+      const ang = (Math.PI * 2 * i) / 6;
+      this.anim(star, [
+        { transform: 'translate(0,0) scale(.3)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * 40}px,${Math.sin(ang) * 30}px) scale(1)`, opacity: 0 }
+      ], { duration: 300, easing: 'ease-out' }).then(() => star.remove());
+    }
+    this.anim(fist, [
+      { transform: 'scale(1)', opacity: 1, offset: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.6 },
+      { transform: 'scale(.9)', opacity: 0 }
+    ], { duration: 500, easing: 'ease-in' }).then(() => fist.remove());
+
+    // Birds fly out of the fist in arcs and line up above the target's head.
+    const spread = Math.max(r.width * 0.75, 50);
+    const rowY = -Math.max(r.height * 0.6, 40);
+    const slots = [-1, -0.35, 0.35, 1];
+    const fly = 620;
+    const hover = 900;
+    const flights = slots.map((sx, i) => {
+      const bird = this.birdGlyph(22);
+      place(bird, target);
+      fxEl.appendChild(bird);
+      const end = { x: sx * spread, y: rowY };
+      const ctrl = { x: sx * spread * 1.3, y: rowY - 50 };
+      const face = sx < 0 ? -1 : 1;
+      const frames: Keyframe[] = [];
+      const steps = 12;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const u = 1 - t;
+        const x = 2 * u * t * ctrl.x + t * t * end.x;
+        const y = 2 * u * t * ctrl.y + t * t * end.y;
+        frames.push({ transform: `translate(${x}px,${y}px) scaleX(${face}) scale(${0.4 + t * 0.6})`, opacity: Math.min(1, t * 4) });
+      }
+      const at = `translate(${end.x}px,${end.y}px) scaleX(${face})`;
+      return this.anim(bird, frames, { duration: fly, easing: 'ease-out', delay: i * 60 })
+        .then(() =>
+          // Dizzy bobbing, out of step with the neighbours, then fade.
+          this.anim(bird, [
+            { transform: `${at}`, opacity: 1 },
+            { transform: `${at} translateY(${i % 2 ? 5 : -5}px)`, opacity: 1, offset: 0.25 },
+            { transform: `${at}`, opacity: 1, offset: 0.5 },
+            { transform: `${at} translateY(${i % 2 ? 5 : -5}px)`, opacity: 1, offset: 0.75 },
+            { transform: `${at}`, opacity: 0 }
+          ], { duration: hover, easing: 'ease-in-out' })
+        )
+        .then(() => bird.remove());
+    });
+
+    // Stars twinkle above and between the birds while they bob.
+    for (let i = 0; i < 5; i++) {
+      const star = this.sparkStar(9, '#FFE04A');
+      place(star, { x: target.x + (i - 2) * spread * 0.45, y: target.y + rowY - 16 - (i % 2) * 6 });
+      fxEl.appendChild(star);
+      this.anim(star, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.3 },
+        { transform: 'scale(.4) rotate(90deg)', opacity: 0.6, offset: 0.6 },
+        { transform: 'scale(1) rotate(135deg)', opacity: 1, offset: 0.8 },
+        { transform: 'scale(0) rotate(180deg)', opacity: 0 }
+      ], { duration: hover, easing: 'ease-in-out', delay: fly + i * 40 }).then(() => star.remove());
+    }
+    await Promise.all(flights);
+  }
+
+  /**
+   * Double-Edge: the caster runs one small circle on the spot while still
+   * facing the target, the scene goes dark, then it rams the
+   * target: a blazing orange sunburst fills the backdrop, colourful sparkles
+   * fly out and the target is squashed flat for a moment. Then recoil.
+   */
+  private async playDoubleEdge(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { launchEl, targetEl, fieldEl, fxEl } = refs;
+
+    // 1. Run one small circle on the spot (backwards first, then round), still facing the target.
+    const radius = 14;
+    const circle: Keyframe[] = [];
+    const steps = 16;
+    for (let k = 0; k <= steps; k++) {
+      const a = (Math.PI * 2 * k) / steps;
+      // Starts and ends at the home spot; flattened, since the circle lies on the ground.
+      circle.push({ transform: `translate(${-v.dir * Math.sin(a) * radius}px,${(1 - Math.cos(a)) * radius * -0.5}px)` });
+    }
+    await this.anim(launchEl, circle, { duration: 600, easing: 'linear', fill: 'none' });
+
+    // 2. The scene goes dark.
+    const dim = this.backdrop(fieldEl, DIM_BACKDROP);
+    await this.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+    await this.wait(150);
+
+    // 3. Ram the target.
+    const dash = v.dir * 60;
+    await this.anim(launchEl, [
+      { transform: `translateX(${v.dir * -12}px)` },
+      { transform: `translateX(${dash}px)` }
+    ], { duration: 160, easing: 'ease-in', fill: 'none' });
+
+    // Sunburst backdrop centred on the target: white core, orange rays, darker rim.
+    const at = `${target.x}px ${target.y}px`;
+    const burst = this.backdrop(
+      fieldEl,
+      `background:radial-gradient(circle at ${at},#fff 0 6%,#FFF6C8 14%,#FFE08A00 42%),` +
+        `radial-gradient(circle at ${at},transparent 50%,#C84A0099 100%),` +
+        `repeating-conic-gradient(from 0deg at ${at},#FF8A10 0 7deg,#FFC23A 7deg 14deg)`
+    );
+    dim.remove();
+    const burstShow = this.anim(burst, [
+      { opacity: 1, transform: 'scale(1.15)' },
+      { opacity: 1, transform: 'scale(1)', offset: 0.7 },
+      { opacity: 0, transform: 'scale(1)' }
+    ], { duration: 1000, easing: 'ease-out' }).then(() => burst.remove());
+
+    this.anim(launchEl, [{ transform: `translateX(${dash}px)` }, { transform: 'translateX(0)' }], {
+      duration: 260,
+      easing: 'ease-out',
+      fill: 'none'
+    });
+
+    // Target squashed flat on impact, then springs back.
+    const origin = targetEl.style.transformOrigin;
+    targetEl.style.transformOrigin = 'center bottom';
+    this.anim(targetEl, [
+      { transform: 'scale(1,1)' },
+      { transform: 'scale(1.18,.72)', offset: 0.25 },
+      { transform: 'scale(.94,1.06)', offset: 0.6 },
+      { transform: 'scale(1,1)' }
+    ], { duration: 520, easing: 'ease-out', fill: 'none' }).then(() => (targetEl.style.transformOrigin = origin));
+    this.flash(targetEl, '#ffffff', 0.8);
+    this.shakeField(fieldEl, 0.8);
+
+    // Sparkles: cyan stars and red / orange / white dots fly out from the target.
+    const colors = ['#5FF0E0', '#F04060', '#FF9A2A', '#ffffff', '#F25A9A'];
+    for (let i = 0; i < 26; i++) {
+      const c = colors[i % colors.length];
+      const s = 6 + Math.random() * 8;
+      let p: HTMLElement;
+      if (i % 3 === 0) {
+        p = this.sparkStar(s + 4, c);
+      } else {
+        p = document.createElement('div');
+        p.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 35%,#fff,${c} 55%,${c}00 80%)`;
+      }
+      place(p, target);
+      fxEl.appendChild(p);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 50 + Math.random() * 80;
+      this.anim(p, [
+        { transform: 'translate(0,0) scale(.3) rotate(0deg)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * dist * 0.7}px,${Math.sin(ang) * dist * 0.7}px) scale(1) rotate(90deg)`, opacity: 1, offset: 0.6 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist}px) scale(.6) rotate(140deg)`, opacity: 0 }
+      ], { duration: 700 + Math.random() * 300, easing: 'ease-out', delay: Math.random() * 120 }).then(() => p.remove());
+    }
+
+    await burstShow;
+    this.afterImpact(refs, launch, target, v);
+  }
+
+  /**
+   * Drill Peck: the caster steps forward, then rapid pecks land one after
+   * another on different spots of the target, turning round it like a
+   * revolver's cylinder. Each peck is a small yellow starburst with a puff of
+   * grey dust. The target shakes the whole time; then the caster steps back.
+   */
+  private async playDrillPeck(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { launchEl, targetEl, fxEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const fwd = v.dir * 30;
+
+    // 1. Step forward.
+    await this.anim(launchEl, [{ transform: 'translateX(0)' }, { transform: `translateX(${fwd}px)` }], {
+      duration: 200,
+      easing: 'ease-out'
+    });
+
+    // 2. Pecks round the target, each spot 135° on from the last.
+    const pecks = 9;
+    const gap = 75;
+    const rad = Math.max(Math.min(r.width, r.height) * 0.28, 16);
+    const start = Math.random() * Math.PI * 2;
+    for (let i = 0; i < pecks; i++) {
+      const a = start + i * ((Math.PI * 3) / 4);
+      const at = { x: target.x + Math.cos(a) * rad, y: target.y + Math.sin(a) * rad * 0.9 };
+      this.peckSpark(fxEl, at);
+      // The caster jabs in a little with every peck.
+      this.anim(launchEl, [
+        { transform: `translateX(${fwd}px)` },
+        { transform: `translateX(${fwd + v.dir * 8}px)`, offset: 0.4 },
+        { transform: `translateX(${fwd}px)` }
+      ], { duration: gap, easing: 'ease-out' });
+      if (i % 2 === 0) this.shake(targetEl, 4);
+      if (i % 3 === 0) this.flash(targetEl, '#FFF2A0', 0.35);
+      await this.wait(gap);
+    }
+    await this.wait(150);
+
+    // 3. Step back.
+    await this.anim(launchEl, [{ transform: `translateX(${fwd}px)` }, { transform: 'translateX(0)' }], {
+      duration: 220,
+      easing: 'ease-in-out',
+      fill: 'none'
+    });
+    launchEl.getAnimations().forEach((a) => a.cancel());
+  }
+
+  /**
+   * Egg Bomb: a white egg is lobbed in a high arc, tumbling, onto the target,
+   * where it blows up in a fiery blast with red sparks flying out.
+   */
+  private async playEggBomb(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+
+    // 1. The egg flies in a high arc and lands on the target.
+    const egg = document.createElement('div');
+    egg.style.cssText = 'position:absolute;width:20px;height:26px;pointer-events:none;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff 0 30%,#ECEAE4 60%,#BDB9B0);box-shadow:0 0 3px #00000055';
+    place(egg, launch);
+    fxEl.appendChild(egg);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const apexY = Math.min(0, dy) - 120;
+    const steps = 14;
+    const frames: Keyframe[] = [];
+    for (let k = 0; k <= steps; k++) {
+      const t = k / steps;
+      const u = 1 - t;
+      const x = t * dx;
+      const y = 2 * u * t * apexY + t * t * dy;
+      frames.push({ transform: `translate(${x}px,${y}px) rotate(${t * 300 * Math.sign(dx || 1)}deg) scale(${0.8 + t * 0.2})`, opacity: t === 0 ? 0 : 1 });
+    }
+    await this.anim(egg, frames, { duration: 700, easing: 'ease-in' });
+    egg.remove();
+
+    // 2. Explosion on the target.
+    const blast = this.fireBlastCloud(fxEl, { x: target.x, y: target.y + r.height * 0.1 }, Math.max(r.width * 0.55, 44), 12, '#E0201A');
+    this.flash(targetEl, '#FFB13C', 0.8);
+    this.shake(targetEl, 6);
+    this.shakeField(fieldEl, 0.6);
+    await blast;
+  }
+
+  /** A fiery explosion cloud: hot puffs swell out from a point while sparks scatter. */
+  private fireBlastCloud(fxEl: HTMLElement, hit: Point, size: number, count: number, sparkColor: string): Promise<void> {
+    const puffs: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const puff = this.firePuff(size * (0.5 + Math.random() * 0.5), i < 4 ? 'hot' : 'red');
+      const ang = Math.random() * Math.PI * 2;
+      const dist = i < 4 ? 0 : size * (0.25 + Math.random() * 0.3);
+      place(puff, hit);
+      fxEl.appendChild(puff);
+      const end = `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist * 0.8}px)`;
+      puffs.push(
+        this.anim(puff, [
+          { transform: 'translate(0,0) scale(.2)', opacity: 1 },
+          { transform: `${end} scale(1.2)`, opacity: 1, offset: 0.45 },
+          { transform: `${end} translateY(-8px) scale(1.4)`, opacity: 0 }
+        ], { duration: 650 + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 120 }).then(() => puff.remove())
+      );
+    }
+    for (let i = 0; i < 14; i++) {
+      const s = 5 + Math.random() * 4;
+      const spark = document.createElement('div');
+      spark.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 35%,#fff,${sparkColor} 55%,${sparkColor}88)`;
+      place(spark, hit);
+      fxEl.appendChild(spark);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = size * (1 + Math.random() * 0.8);
+      this.anim(spark, [
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * dist * 0.8}px,${Math.sin(ang) * dist * 0.8}px)`, opacity: 1, offset: 0.7 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist}px)`, opacity: 0 }
+      ], { duration: 700 + Math.random() * 200, easing: 'ease-out' }).then(() => spark.remove());
+    }
+    return Promise.all(puffs).then(() => void 0);
+  }
+
+  /**
+   * Explosion: glowing orange sparks gather into the caster as it lights up,
+   * then it blows up - a huge fireball with light rays and a white flash that
+   * fill the screen - and the target is hit (blinking).
+   */
+  private async playExplosion(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl, screenFxEl } = refs;
+    const field = fieldEl.getBoundingClientRect();
+    const r = launchEl.getBoundingClientRect();
+
+    // 1. Orange sparks drift in from all around and gather on the caster.
+    const gather = 900;
+    const glow = this.anim(launchEl, [
+      { filter: 'brightness(1)' },
+      { filter: 'brightness(1.8) drop-shadow(0 0 12px #FFB060)' }
+    ], { duration: gather, easing: 'ease-in', fill: 'forwards' });
+    for (let i = 0; i < 14; i++) {
+      const s = 8 + Math.random() * 6;
+      const orb = document.createElement('div');
+      orb.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF0C0,#FF8A2A 45%,#F0501A00 75%);box-shadow:0 0 ${s}px #FF8A2A`;
+      const ang = Math.random() * Math.PI * 2;
+      const dist = Math.max(r.width * 0.7, 50) * (0.8 + Math.random() * 0.4);
+      place(orb, { x: launch.x + Math.cos(ang) * dist, y: launch.y + Math.sin(ang) * dist * 0.8 });
+      fxEl.appendChild(orb);
+      this.anim(orb, [
+        { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+        { transform: 'translate(0,0) scale(1)', opacity: 1, offset: 0.3 },
+        { transform: `translate(${-Math.cos(ang) * dist}px,${-Math.sin(ang) * dist * 0.8}px) scale(.3)`, opacity: 0.8 }
+      ], { duration: 600, easing: 'ease-in', delay: Math.random() * (gather - 600) }).then(() => orb.remove());
+    }
+    await glow;
+
+    // 2. Boom: white flash, light rays and a giant fireball on the caster.
+    const at = `${launch.x}px ${launch.y}px`;
+    // Behind the sprites, so the target stays visible in front of the glare.
+    const rays = this.backdrop(
+      fieldEl,
+      `background:radial-gradient(circle at ${at},#fff 0 18%,#FFFDF0cc 35%,#FFF6D000 70%),` +
+        `repeating-conic-gradient(from 0deg at ${at},#FFE87Acc 0 8deg,#FFE87A00 8deg 24deg),#FFFBEF`
+    );
+    const raysShow = this.anim(rays, [
+      { opacity: 0 },
+      { opacity: 1, offset: 0.1 },
+      { opacity: 1, offset: 0.65 },
+      { opacity: 0 }
+    ], { duration: 1400, easing: 'ease-out' }).then(() => rays.remove());
+    this.screenWash(screenFxEl, '#ffffffcc', 80, 200, `${(launch.x / field.width) * 100}%`);
+    launchEl.getAnimations().forEach((a) => a.cancel());
+    const blast = this.fireBlastCloud(fxEl, launch, Math.max(field.width * 0.32, 110), 18, '#FF8A2A');
+    this.shakeField(fieldEl, 1.4);
+
+    // 3. The target is caught in the blast.
+    await this.wait(250);
+    await Promise.all([this.blink(targetEl), this.impact(refs, target, v, 0)]);
+    await Promise.all([blast, raysShow]);
+  }
+
+  /** One peck: a small yellow starburst that pops, with grey dust spraying out. */
+  private peckSpark(fxEl: HTMLElement, at: Point) {
+    const burst = document.createElement('div');
+    burst.style.cssText = 'position:absolute;width:22px;height:22px;pointer-events:none;filter:drop-shadow(0 0 3px #FFE36A)';
+    const shape = document.createElement('div');
+    shape.style.cssText = 'width:100%;height:100%;clip-path:polygon(50% 0,58% 34%,85% 15%,66% 42%,100% 50%,66% 58%,85% 85%,58% 66%,50% 100%,42% 66%,15% 85%,34% 58%,0 50%,34% 42%,15% 15%,42% 34%);background:radial-gradient(circle,#fff,#FFE04A 55%,#F2B21A)';
+    burst.appendChild(shape);
+    place(burst, at);
+    fxEl.appendChild(burst);
+    const rot = Math.random() * 90;
+    this.anim(burst, [
+      { transform: `scale(.3) rotate(${rot}deg)`, opacity: 1 },
+      { transform: `scale(1.1) rotate(${rot + 20}deg)`, opacity: 1, offset: 0.4 },
+      { transform: `scale(.6) rotate(${rot + 30}deg)`, opacity: 0 }
+    ], { duration: 200, easing: 'ease-out' }).then(() => burst.remove());
+
+    for (let i = 0; i < 6; i++) {
+      const s = 2 + Math.random() * 3;
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:${i % 2 ? '#C8C4B8' : '#F4F0E4'}`;
+      place(d, at);
+      fxEl.appendChild(d);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = 10 + Math.random() * 14;
+      this.anim(d, [
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist}px)`, opacity: 0 }
+      ], { duration: 260 + Math.random() * 120, easing: 'ease-out' }).then(() => d.remove());
+    }
+  }
+
+  /**
+   * Fire Punch: the backdrop turns red-hot, then a red fist slams onto the
+   * target and a cloud of little flickering flames bursts up around it.
+   */
+  private async playFirePunch(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+
+    // 1. Red-hot backdrop.
+    const heat = this.backdrop(fieldEl, HEAT_BACKDROP);
+    await this.anim(heat, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // 2. The fist slams in, flames burst around it.
+    const fist = this.fistGlyph(Math.max(r.width * 0.45, 36), 'red');
+    place(fist, target);
+    fxEl.appendChild(fist);
+    await this.anim(fist, [
+      { transform: 'scale(1.8)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], { duration: 150, easing: 'ease-in' });
+    this.flash(targetEl, '#FF8A3C', 0.7);
+    this.shake(targetEl, 5);
+
+    const spreadX = Math.max(r.width * 0.55, 34);
+    const spreadY = Math.max(r.height * 0.5, 30);
+    const flames: Promise<void>[] = [];
+    for (let i = 0; i < 18; i++) {
+      // Denser near the middle, with a few further out. burnFlame stands on this point.
+      const ang = Math.random() * Math.PI * 2;
+      const d = Math.sqrt(Math.random());
+      const base = { x: target.x + Math.cos(ang) * spreadX * d, y: target.y + 10 + Math.sin(ang) * spreadY * d };
+      flames.push(this.burnFlame(fxEl, base, 12 + Math.random() * 10, '#E8401C', 600 + Math.random() * 200, Math.random() * 350));
+    }
+    this.anim(fist, [
+      { transform: 'scale(1)', opacity: 1, offset: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(.9)', opacity: 0 }
+    ], { duration: 700, easing: 'ease-in' }).then(() => fist.remove());
+    await Promise.all(flames);
+
+    await this.anim(heat, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    heat.remove();
+  }
+
+  /**
+   * Headbutt: the caster darts forward and straight back, then the target is
+   * hit: a bright white-yellow starburst flares on it and a ring of yellow
+   * stars bursts outward.
+   */
+  private async playHeadbutt(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { launchEl, targetEl, fxEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+
+    // 1. Quick dart forward and back.
+    await this.dart(launchEl, v.dir);
+
+    // 2. Hit: starburst flare on the target.
+    const size = Math.max(r.width * 0.8, 56);
+    const flare = document.createElement('div');
+    flare.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 8px #FFF2A0)`;
+    const shape = document.createElement('div');
+    shape.style.cssText = 'width:100%;height:100%;clip-path:polygon(50% 0,56% 38%,85% 15%,62% 44%,100% 50%,62% 56%,85% 85%,56% 62%,50% 100%,44% 62%,15% 85%,38% 56%,0 50%,38% 44%,15% 15%,44% 38%);background:radial-gradient(circle,#fff 0 25%,#FFF6C0 45%,#FFE04A00 75%)';
+    flare.appendChild(shape);
+    place(flare, target);
+    fxEl.appendChild(flare);
+    const flareDone = this.anim(flare, [
+      { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+      { transform: 'scale(1.1) rotate(15deg)', opacity: 1, offset: 0.35 },
+      { transform: 'scale(1.3) rotate(25deg)', opacity: 0 }
+    ], { duration: 450, easing: 'ease-out' }).then(() => flare.remove());
+
+    // Ring of yellow stars bursting outward.
+    const n = 10;
+    const rad = Math.max(r.width * 0.6, 40);
+    for (let i = 0; i < n; i++) {
+      const star = this.sparkStar(12 + Math.random() * 6, '#FFD84A');
+      place(star, target);
+      fxEl.appendChild(star);
+      const ang = (Math.PI * 2 * i) / n + Math.random() * 0.3;
+      const x = Math.cos(ang) * rad;
+      const y = Math.sin(ang) * rad * 0.85;
+      this.anim(star, [
+        { transform: 'translate(0,0) scale(.3) rotate(0deg)', opacity: 1 },
+        { transform: `translate(${x}px,${y}px) scale(1) rotate(60deg)`, opacity: 1, offset: 0.6 },
+        { transform: `translate(${x * 1.15}px,${y * 1.15}px) scale(.5) rotate(90deg)`, opacity: 0 }
+      ], { duration: 550, easing: 'ease-out' }).then(() => star.remove());
+    }
+    this.flash(targetEl, '#FFF2A0', 0.7);
+    this.shake(targetEl, 6);
+    await flareDone;
+    await this.wait(150);
+  }
+
+  /** The caster darts quickly toward the target and straight back (Headbutt, High Jump Kick). */
+  private dart(el: HTMLElement, dir: 1 | -1): Promise<void> {
+    return this.anim(el, [
+      { transform: 'translateX(0)' },
+      { transform: `translateX(${dir * 46}px)`, offset: 0.45 },
+      { transform: 'translateX(0)' }
+    ], { duration: 260, easing: 'ease-in-out', fill: 'none' });
+  }
+
+  /**
+   * High Jump Kick: the caster darts forward and back, then jagged comic-style
+   * impact bursts - a big red one, a yellow-orange one over it, then a
+   * smaller one - pop on the target while red specks scatter.
+   */
+  private async playHighJumpKick(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { launchEl, targetEl, fieldEl, fxEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const size = Math.max(r.width * 0.9, 64);
+
+    await this.dart(launchEl, v.dir);
+
+    // [x offset, y offset, size factor, outer colour, inner colour, delay]
+    const bursts: [number, number, number, string, string, number][] = [
+      [-0.15, -0.1, 1, '#E8281C', '#FF6A2A', 0],
+      [0.18, 0.08, 0.85, '#FF9A1A', '#FFE84A', 70],
+      [-0.05, 0.22, 0.55, '#E8281C', '#FFB02A', 150]
+    ];
+    const pops = bursts.map(([ox, oy, f, outer, inner, delay]) =>
+      this.wait(delay).then(() => {
+        const s = size * f;
+        const el = this.spikyBurst(s, outer, inner);
+        place(el, { x: target.x + ox * size, y: target.y + oy * size });
+        fxEl.appendChild(el);
+        const rot = Math.random() * 30 - 15;
+        return this.anim(el, [
+          { transform: `scale(.3) rotate(${rot}deg)`, opacity: 1 },
+          { transform: `scale(1.1) rotate(${rot}deg)`, opacity: 1, offset: 0.25 },
+          { transform: `scale(1) rotate(${rot}deg)`, opacity: 1, offset: 0.7 },
+          { transform: `scale(1.05) rotate(${rot}deg)`, opacity: 0 }
+        ], { duration: 480, easing: 'ease-out' }).then(() => el.remove());
+      })
+    );
+
+    // Red specks scatter out, some landing on the platform.
+    for (let i = 0; i < 12; i++) {
+      const s = 4 + Math.random() * 4;
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 35%,#FF8A70,#E0281C 60%,#A01010)`;
+      place(d, target);
+      fxEl.appendChild(d);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = size * (0.5 + Math.random() * 0.5);
+      this.anim(d, [
+        { transform: 'translate(0,0)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist * 0.6 + 12}px)`, opacity: 1, offset: 0.7 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist * 0.6 + 16}px)`, opacity: 0 }
+      ], { duration: 600 + Math.random() * 200, easing: 'ease-out' }).then(() => d.remove());
+    }
+    this.flash(targetEl, '#FF6A2A', 0.7);
+    this.shake(targetEl, 7);
+    this.shakeField(fieldEl, 0.5);
+    await Promise.all(pops);
+  }
+
+  /**
+   * Ice Punch: a light blue ice fist slams onto the target while see-through
+   * ice crystals burst out around it, tumbling and drifting as they fade.
+   */
+  private async playIcePunch(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+
+    const fist = this.fistGlyph(Math.max(r.width * 0.45, 36), 'ice');
+    place(fist, target);
+    fxEl.appendChild(fist);
+    await this.anim(fist, [
+      { transform: 'scale(1.8)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], { duration: 150, easing: 'ease-in' });
+    this.flash(targetEl, '#9CD6FF', 0.7);
+    this.shake(targetEl, 5);
+
+    // Ice crystals: irregular see-through chunks flung out round the target.
+    const crystals: Promise<void>[] = [];
+    for (let i = 0; i < 16; i++) {
+      const s = 12 + Math.random() * 14;
+      const chunk = document.createElement('div');
+      chunk.style.cssText = `position:absolute;width:${s}px;height:${s * 0.8}px;pointer-events:none;filter:drop-shadow(0 0 2px #ffffff)`;
+      const shape = document.createElement('div');
+      shape.style.cssText = 'width:100%;height:100%;clip-path:polygon(18% 0,70% 6%,100% 38%,88% 88%,40% 100%,0 70%,4% 24%);background:linear-gradient(135deg,#ffffffee,#DDF3FFb0 45%,#9CD6FF70)';
+      chunk.appendChild(shape);
+      place(chunk, target);
+      fxEl.appendChild(chunk);
+      const ang = (Math.PI * 2 * i) / 16 + Math.random() * 0.4;
+      const dist = Math.max(r.width * 0.7, 46) * (0.6 + Math.random() * 0.7);
+      const x = Math.cos(ang) * dist;
+      const y = Math.sin(ang) * dist * 0.75;
+      const spin = (Math.random() * 2 - 1) * 200;
+      crystals.push(
+        this.anim(chunk, [
+          { transform: 'translate(0,0) scale(.3) rotate(0deg)', opacity: 0 },
+          { transform: `translate(${x * 0.6}px,${y * 0.6}px) scale(1) rotate(${spin * 0.4}deg)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${x}px,${y - 6}px) scale(1) rotate(${spin}deg)`, opacity: 1, offset: 0.75 },
+          { transform: `translate(${x * 1.05}px,${y - 10}px) scale(.8) rotate(${spin * 1.1}deg)`, opacity: 0 }
+        ], { duration: 800 + Math.random() * 250, easing: 'ease-out', delay: Math.random() * 120 }).then(() => chunk.remove())
+      );
+    }
+    this.anim(fist, [
+      { transform: 'scale(1)', opacity: 1, offset: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(.9)', opacity: 0 }
+    ], { duration: 700, easing: 'ease-in' }).then(() => fist.remove());
+    await Promise.all(crystals);
+  }
+
+  /**
+   * Hyper Fang:a pair of big rodent incisors chomps diagonally down into the
+   * target, while clusters of little red sparkles twinkle around it.
+   */
+  private async playHyperFang(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { targetEl, fxEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const h = Math.max(r.height * 0.55, 40);
+    // Tilted toward the caster's side, like a bite from that direction.
+    const tilt = `rotate(${-v.dir * 35}deg)`;
+
+    const teeth = this.incisorGlyph(h);
+    place(teeth, target);
+    fxEl.appendChild(teeth);
+    await this.anim(teeth, [
+      { transform: `${tilt} translateY(${-h * 0.8}px)`, opacity: 0 },
+      { transform: `${tilt} translateY(0)`, opacity: 1 }
+    ], { duration: 160, easing: 'ease-in' });
+
+    this.flash(targetEl, '#FF6A4A', 0.6);
+    this.shake(targetEl, 6);
+    const done = this.anim(teeth, [
+      { transform: `${tilt} translateY(0)`, opacity: 1 },
+      { transform: `${tilt} translateY(-6px)`, opacity: 1, offset: 0.2 },
+      { transform: `${tilt} translateY(0)`, opacity: 1, offset: 0.4 },
+      { transform: `${tilt} translateY(0)`, opacity: 1, offset: 0.75 },
+      { transform: `${tilt} translateY(-10px)`, opacity: 0 }
+    ], { duration: 650, easing: 'ease-out' }).then(() => teeth.remove());
+
+    // Red sparkle clusters pop up at a few spots around the target.
+    const spots = 4;
+    const start = Math.random() * Math.PI * 2;
+    for (let c = 0; c < spots; c++) {
+      const a = start + (Math.PI * 2 * c) / spots;
+      const centre = {
+        x: target.x + Math.cos(a) * Math.max(r.width * 0.55, 34),
+        y: target.y + Math.sin(a) * Math.max(r.height * 0.45, 28)
+      };
+      for (let i = 0; i < 4; i++) {
+        const star = this.sparkStar(6 + Math.random() * 7, i % 2 ? '#FF3A2A' : '#FF8A6A');
+        place(star, { x: centre.x + (Math.random() * 2 - 1) * 12, y: centre.y + (Math.random() * 2 - 1) * 12 });
+        fxEl.appendChild(star);
+        this.anim(star, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1.1) rotate(45deg)', opacity: 1, offset: 0.35 },
+          { transform: 'scale(.6) rotate(90deg)', opacity: 0.8, offset: 0.65 },
+          { transform: 'scale(0) rotate(135deg)', opacity: 0 }
+        ], { duration: 500, easing: 'ease-out', delay: c * 70 + Math.random() * 120 }).then(() => star.remove());
+      }
+    }
+    await done;
+  }
+
+  /** Two big rodent incisors side by side (cream to orange, chisel-edged at the bottom). */
+  private incisorGlyph(h: number): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:absolute;width:${h * (20 / 30)}px;height:${h}px;pointer-events:none;filter:drop-shadow(0 0 4px #FFB070)`;
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 20 30');
+    svg.setAttribute('style', 'width:100%;height:100%;overflow:visible');
+    const tooth = (x: number) => `<path d="M${x + 1},3 Q${x + 1},0 ${x + 4},0 H${x + 6} Q${x + 9},0 ${x + 9},3 V25 L${x + 1},28 Z"/>`;
+    const shapes = tooth(0.5) + tooth(10.5);
+    svg.innerHTML =
+      '<defs><linearGradient id="incisor" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#E89A50"/><stop offset=".45" stop-color="#FFE2B0"/><stop offset="1" stop-color="#FFF8EA"/>' +
+      '</linearGradient></defs>' +
+      `<g fill="#7A3E14" stroke="#7A3E14" stroke-width="1.6" stroke-linejoin="round">${shapes}</g>` +
+      `<g fill="url(#incisor)">${shapes}</g>`;
+    wrap.appendChild(svg);
+    return wrap;
+  }
+
+  /** A jagged comic-style impact burst: irregular spikes in one colour round a core of another. */
+  private spikyBurst(size: number, outer: string, inner: string): HTMLElement {
+    const spikes = 12;
+    const pts: string[] = [];
+    for (let i = 0; i < spikes * 2; i++) {
+      const a = (Math.PI * 2 * i) / (spikes * 2);
+      const rad = i % 2 ? 22 + Math.random() * 8 : 42 + Math.random() * 8;
+      pts.push(`${(50 + Math.cos(a) * rad).toFixed(1)}% ${(50 + Math.sin(a) * rad).toFixed(1)}%`);
+    }
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 4px ${inner})`;
+    const shape = document.createElement('div');
+    shape.style.cssText = `width:100%;height:100%;clip-path:polygon(${pts.join(',')});background:radial-gradient(circle,#FFF6C0 0 12%,${inner} 30%,${outer} 55%)`;
+    el.appendChild(shape);
+    return el;
+  }
+
+  /**
+   * Glare: the scene turns dark red and a pair of glowing red snake eyes
+   * opens above the field and stares; then the target is paralysed - its
+   * sprite goes dark while yellow sparks crackle around it.
+   */
+  private async playGlare(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const field = fieldEl.getBoundingClientRect();
+
+    const dark = this.backdrop(fieldEl, 'background:radial-gradient(circle at 45% 40%,#4A1A12,#24080A 60%,#120404)');
+    await this.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // 1. The eyes open (squeezed flat -> open), glow, narrow once, then fade.
+    const eyeW = Math.max(field.width * 0.16, 56);
+    const gap = eyeW * 0.25;
+    const centre = { x: (launch.x + target.x) / 2, y: Math.min(launch.y, target.y) - 10 };
+    const eyes = [-1, 1].map((side) => {
+      const eye = this.snakeEyeGlyph(eyeW, side as 1 | -1);
+      place(eye, { x: centre.x + side * (eyeW / 2 + gap / 2), y: centre.y });
+      fxEl.appendChild(eye);
+      return eye;
+    });
+    await Promise.all(
+      eyes.map((eye) =>
+        this.anim(eye, [
+          { transform: 'scaleY(0)', opacity: 0 },
+          { transform: 'scaleY(1.1)', opacity: 1, offset: 0.7 },
+          { transform: 'scaleY(1)', opacity: 1 }
+        ], { duration: 280, easing: 'ease-out' })
+      )
+    );
+    await Promise.all(
+      eyes.map((eye) =>
+        this.anim(eye, [
+          { transform: 'scaleY(1)', filter: 'brightness(1)' },
+          { transform: 'scaleY(.55)', filter: 'brightness(1.6)', offset: 0.45 },
+          { transform: 'scaleY(1)', filter: 'brightness(1.3)', offset: 0.7 },
+          { transform: 'scaleY(1)', filter: 'brightness(1)' }
+        ], { duration: 600, easing: 'ease-in-out' })
+      )
+    );
+    eyes.forEach((eye) =>
+      this.anim(eye, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' }).then(() => eye.remove())
+    );
+
+    // 2. Shock: the target goes dark and twitches while sparks crackle round it.
+    const r = targetEl.getBoundingClientRect();
+    const darken = this.anim(targetEl, [
+      { filter: 'brightness(1)' },
+      { filter: 'brightness(.35) saturate(.6)', offset: 0.15 },
+      { filter: 'brightness(.45) saturate(.6)', offset: 0.85 },
+      { filter: 'brightness(1)' }
+    ], { duration: 1100, easing: 'ease-in-out', fill: 'none' });
+    for (let i = 0; i < 12; i++) {
+      setTimeout(() => {
+        const bolt = this.boltGlyph('#FFE04A', 8 + Math.random() * 6);
+        place(bolt, {
+          x: target.x + (Math.random() * 2 - 1) * Math.max(r.width * 0.5, 26),
+          y: target.y + (Math.random() * 2 - 1) * Math.max(r.height * 0.45, 24)
+        });
+        bolt.style.filter = 'drop-shadow(0 0 4px #FFE04A)';
+        fxEl.appendChild(bolt);
+        const rot = Math.random() * 60 - 30;
+        this.anim(bolt, [
+          { transform: `rotate(${rot}deg) scale(.4)`, opacity: 0 },
+          { transform: `rotate(${rot}deg) scale(1.1)`, opacity: 1, offset: 0.3 },
+          { transform: `rotate(${rot}deg) scale(1)`, opacity: 0 }
+        ], { duration: 220, easing: 'ease-out' }).then(() => bolt.remove());
+        if (i % 3 === 0) this.shake(targetEl, 3);
+      }, 60 + i * 70);
+    }
+    await darken;
+
+    await this.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    dark.remove();
+  }
+
+  /** One glowing red snake eye with a black slit pupil; side -1 is the left eye (mirrored). */
+  private snakeEyeGlyph(w: number, side: 1 | -1): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:absolute;width:${w}px;height:${w * 0.5}px;pointer-events:none;filter:drop-shadow(0 0 6px #FF3A2A)`;
+    const svg = document.createElementNS(ns, 'svg');
+    svg.setAttribute('viewBox', '0 0 40 20');
+    svg.setAttribute('style', `width:100%;height:100%;overflow:visible;transform:scaleX(${side})`);
+    // Almond shape, inner corner lower than the outer one, for an angry stare.
+    svg.innerHTML =
+      '<defs><radialGradient id="snakeEye" cx="55%" cy="50%" r="60%">' +
+      '<stop offset="0" stop-color="#FFD0A0"/><stop offset=".35" stop-color="#FF4A2A"/><stop offset="1" stop-color="#A0100C"/>' +
+      '</radialGradient></defs>' +
+      '<path d="M2,14 Q16,0 38,4 Q28,20 2,14 Z" fill="url(#snakeEye)" stroke="#5A0806" stroke-width="1.4"/>' +
+      '<ellipse cx="21" cy="9.5" rx="1.8" ry="6" fill="#140404"/>';
+    wrap.appendChild(svg);
+    return wrap;
+  }
+
+  /** A cartoon fist seen from the front (see FIST_TONES for the colours): fingers curled in, thumb across the side. */
+  private fistGlyph(w: number, tone: keyof typeof FIST_TONES = 'yellow'): HTMLElement {
+    const c = FIST_TONES[tone];
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 24 20');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${w * (20 / 24)}px;filter:drop-shadow(0 0 4px ${c.glow})`);
+    const shapes = '<rect x="5" y="2" width="17" height="16" rx="4"/><rect x="2" y="6" width="8" height="11" rx="3.5"/>';
+    svg.innerHTML =
+      `<g fill="${c.edge}" stroke="${c.edge}" stroke-width="1.6">${shapes}</g>` +
+      `<g fill="${c.fill}">${shapes}</g>` +
+      `<path d="M11,6.5 H21 M11,10 H21 M11,13.5 H21" stroke="${c.lines}" stroke-width="1" stroke-linecap="round"/>`;
+    return svg;
+  }
+
+  /** A small yellow cartoon bird (a little chick) facing right. */
+  private birdGlyph(w: number): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 22 16');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${w * (16 / 22)}px`);
+    const shapes = '<ellipse cx="9" cy="11" rx="8" ry="4.8"/><circle cx="14" cy="5" r="4"/>';
+    svg.innerHTML =
+      `<g fill="#B88A00" stroke="#B88A00" stroke-width="1.4">${shapes}</g>` +
+      `<g fill="#FFE04A">${shapes}</g>` +
+      '<polygon points="17.5,4.2 21.5,5.6 17.5,7" fill="#F08A24"/>' +
+      '<circle cx="15" cy="4" r=".9" fill="#1a1a1a"/>' +
+      '<path d="M4,10 Q8,7 11,10" fill="none" stroke="#C99A10" stroke-width="1"/>';
+    return svg;
+  }
+
   /** A simple cartoon bone (shaft with two round knobs at each end), outlined only on its outside. */
   private boneGlyph(w: number): HTMLElement {
     const h = w * 0.3;
@@ -2137,6 +3076,235 @@ export class MoveAnimationService {
       setTimeout(() => this.flash(targetEl, '#C9A24B', 0.4), 200 + i * 320);
     }
     await quake;
+  }
+
+  /**
+   * Dig, turn 1: the user wriggles down into the ground. The part below the
+   * ground line is clipped away, so it sinks through the platform, while dust
+   * clouds billow around it and clods of dirt are thrown up.
+   */
+  private async playDigDown(refs: BattleStageRefs) {
+    const { launchEl: el, fieldEl, fxEl } = refs;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    const r = el.getBoundingClientRect();
+    const foot = this.footOf(el, fieldEl);
+    const dur = 1000;
+
+    this.kickUpDirt(fxEl, foot, Math.max(r.width * 0.6, 34), dur, '#B89A5E');
+
+    const steps = 12;
+    const frames: Keyframe[] = [];
+    for (let k = 0; k <= steps; k++) {
+      const t = k / steps;
+      const depth = r.height * t;
+      const wiggle = k === 0 || k === steps ? 0 : (k % 2 ? 1 : -1) * 4;
+      frames.push({ transform: `translate(${wiggle}px,${depth}px)`, clipPath: `inset(0 0 ${depth}px 0)` });
+    }
+    await this.anim(el, frames, { duration: dur, easing: 'ease-in', fill: 'forwards' });
+    el.style.opacity = '0';
+  }
+
+  /**
+   * Dig, turn 2: the user bursts back up out of the ground in a cloud of dust
+   * and dirt, then the target is hit and white dust specks rise around it.
+   */
+  private async playDigUp(refs: BattleStageRefs, target: Point) {
+    const { launchEl: el, fieldEl, fxEl, targetEl } = refs;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    el.style.opacity = '1';
+    const r = el.getBoundingClientRect();
+    const foot = this.footOf(el, fieldEl);
+
+    this.kickUpDirt(fxEl, foot, Math.max(r.width * 0.6, 34), 700, '#D8CBB0');
+    await this.anim(el, [
+      { transform: `translateY(${r.height}px)`, clipPath: `inset(0 0 ${r.height}px 0)` },
+      { transform: 'translateY(-16px)', clipPath: 'inset(0 0 -40px 0)', offset: 0.6 },
+      { transform: 'translateY(0)', clipPath: 'inset(0 0 -40px 0)' }
+    ], { duration: 520, easing: 'ease-out', fill: 'none' });
+
+    // Hit: the target shakes and white dust specks rise up around it.
+    const tr = targetEl.getBoundingClientRect();
+    this.flash(targetEl, '#F6F3EA', 0.6);
+    this.shake(targetEl, 6);
+    this.shakeField(fieldEl, 0.4);
+    const specks: Promise<void>[] = [];
+    for (let i = 0; i < 16; i++) {
+      const s = 4 + Math.random() * 6;
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 35%,#fff,#E8E4DA 60%,#C9C2B0);box-shadow:0 0 3px #ffffffaa`;
+      place(d, {
+        x: target.x + (Math.random() * 2 - 1) * Math.max(tr.width * 0.35, 20),
+        y: target.y + Math.random() * tr.height * 0.2
+      });
+      fxEl.appendChild(d);
+      const rise = 30 + Math.random() * 40;
+      specks.push(
+        this.anim(d, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `translate(0,${-rise * 0.3}px) scale(1)`, opacity: 1, offset: 0.25 },
+          { transform: `translate(${(Math.random() * 2 - 1) * 8}px,${-rise}px) scale(.8)`, opacity: 0 }
+        ], { duration: 650 + Math.random() * 250, easing: 'ease-out', delay: Math.random() * 200 }).then(() => d.remove())
+      );
+    }
+    await Promise.all(specks);
+  }
+
+  /**
+   * Fly, turn 1: the sky backdrop rushes downward (streaks moving up), a blue
+   * bubble forms around the user, which fades into it, and the bubble shoots
+   * up out of the top of the screen.
+   */
+  private async playFlyUp(refs: BattleStageRefs, launch: Point) {
+    const { launchEl: el, fieldEl, fxEl } = refs;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    const r = el.getBoundingClientRect();
+    const sky = this.skyBackdrop(fieldEl, 'up');
+    await this.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    const size = Math.max(Math.max(r.width, r.height) * 1.05, 60);
+    const bubble = document.createElement('div');
+    bubble.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 28%,#ffffffdd 0 7%,#C8F6FF 20%,#5CD6F4 62%,#2A9CD8);box-shadow:0 0 12px #A8ECFF;opacity:.92`;
+    place(bubble, launch);
+    fxEl.appendChild(bubble);
+    this.anim(el, [
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: 'scale(.6)', opacity: 0 }
+    ], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+    await this.anim(bubble, [
+      { transform: 'scale(0)', opacity: 0 },
+      { transform: 'scale(1.1)', opacity: 0.92, offset: 0.7 },
+      { transform: 'scale(1)', opacity: 0.92 }
+    ], { duration: 320, easing: 'ease-out' });
+    await this.wait(150);
+    await this.anim(bubble, [
+      { transform: 'translateY(0) scale(1,1)' },
+      { transform: `translateY(${-(launch.y + size)}px) scale(.85,1.2)` }
+    ], { duration: 550, easing: 'ease-in' });
+    bubble.remove();
+    el.style.opacity = '0';
+
+    await this.wait(200);
+    await this.anim(sky, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    sky.remove();
+  }
+
+  /**
+   * Fly, turn 2: the sky backdrop returns (streaks now moving down), a white
+   * glowing orb dives from above onto the target with a burst of yellow
+   * sparks, then the user drops back into its place.
+   */
+  private async playFlyDown(refs: BattleStageRefs, target: Point) {
+    const { launchEl, fieldEl, fxEl, targetEl } = refs;
+    // Away in the sky until the end (also when Power Herb skipped turn 1).
+    launchEl.getAnimations?.().forEach((a) => a.cancel());
+    launchEl.style.opacity = '0';
+    const r = targetEl.getBoundingClientRect();
+    const sky = this.skyBackdrop(fieldEl, 'down');
+    await this.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+    await this.wait(150);
+
+    const size = Math.max(r.width * 0.75, 50);
+    const orb = document.createElement('div');
+    orb.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0 42%,#F2F8FFee 55%,#DCEBFF00 72%);box-shadow:0 0 ${size * 0.4}px #ffffffcc`;
+    place(orb, target);
+    fxEl.appendChild(orb);
+    await this.anim(orb, [
+      { transform: `translate(${-size * 0.8}px,${-(target.y + size)}px) scale(.8,1.3)`, opacity: 0.8 },
+      { transform: 'translate(0,0) scale(.9,1.15)', opacity: 1 }
+    ], { duration: 320, easing: 'ease-in' });
+
+    // Hit: the orb flattens and fades, yellow sparks burst, the target blinks.
+    this.anim(orb, [
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: 'scale(1.5,.8)', opacity: 0 }
+    ], { duration: 380, easing: 'ease-out' }).then(() => orb.remove());
+    for (let i = 0; i < 10; i++) {
+      const star = this.sparkStar(10 + Math.random() * 8, '#FFE04A');
+      place(star, target);
+      fxEl.appendChild(star);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = size * (0.4 + Math.random() * 0.5);
+      this.anim(star, [
+        { transform: 'translate(0,0) scale(.3)', opacity: 1 },
+        { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist}px) scale(1)`, opacity: 1, offset: 0.6 },
+        { transform: `translate(${Math.cos(ang) * dist * 1.2}px,${Math.sin(ang) * dist * 1.2}px) scale(.4)`, opacity: 0 }
+      ], { duration: 500 + Math.random() * 150, easing: 'ease-out' }).then(() => star.remove());
+    }
+    this.flash(targetEl, '#ffffff', 0.7);
+    this.shake(targetEl, 6);
+    this.shakeField(fieldEl, 0.5);
+    await this.blink(targetEl);
+    await this.wait(250);
+
+    await this.anim(sky, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    sky.remove();
+    await this.dropBackIn(launchEl);
+  }
+
+  /**
+   * A bright blue sky backdrop (light column in the middle, deeper blue at the
+   * sides) with white wind streaks endlessly rushing up or down. Remove it when done.
+   */
+  private skyBackdrop(fieldEl: HTMLElement, dir: 'up' | 'down'): HTMLElement {
+    const sky = this.backdrop(
+      fieldEl,
+      'background:linear-gradient(90deg,#1A56C8,#3E8CEA 22%,#A8D4FF 42%,#E4F2FF 50%,#A8D4FF 58%,#3E8CEA 78%,#1A56C8)'
+    );
+    const { width, height } = fieldEl.getBoundingClientRect();
+    for (let i = 0; i < 26; i++) {
+      const w = 5 + Math.random() * 9;
+      const h = 30 + Math.random() * 50;
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;left:${Math.random() * width}px;top:0;width:${w}px;height:${h}px;border-radius:50%;background:radial-gradient(ellipse,#ffffff,#ffffffaa 50%,#ffffff00 75%);opacity:${0.55 + Math.random() * 0.4}`;
+      sky.appendChild(streak);
+      const from = height + h;
+      const to = -h;
+      const dur = 450 + Math.random() * 450;
+      streak.animate(
+        [{ transform: `translateY(${dir === 'up' ? from : to}px)` }, { transform: `translateY(${dir === 'up' ? to : from}px)` }],
+        // Negative delay: the streaks are already spread over the screen when it appears.
+        { duration: dur, iterations: Infinity, delay: -Math.random() * dur, easing: 'linear' }
+      );
+    }
+    return sky;
+  }
+
+  /** Dust clouds swelling around a spot on the ground, plus clods of dirt thrown up and falling back. */
+  private kickUpDirt(fxEl: HTMLElement, foot: Point, spread: number, dur: number, dust: string) {
+    for (let i = 0; i < 9; i++) {
+      const s = 22 + Math.random() * 18;
+      const puff = document.createElement('div');
+      puff.style.cssText = `position:absolute;width:${s}px;height:${s * 0.8}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 45% 40%,${dust},${dust}cc 45%,${dust}00 72%)`;
+      const side = i % 2 ? 1 : -1;
+      place(puff, { x: foot.x + side * Math.random() * spread, y: foot.y - Math.random() * 10 });
+      fxEl.appendChild(puff);
+      this.anim(puff, [
+        { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+        { transform: `translate(${side * 6}px,-6px) scale(1)`, opacity: 0.95, offset: 0.3 },
+        { transform: `translate(${side * 16}px,-18px) scale(1.5)`, opacity: 0 }
+      ], { duration: dur * 0.7, easing: 'ease-out', delay: Math.random() * dur * 0.4 }).then(() => puff.remove());
+    }
+    for (let i = 0; i < 12; i++) {
+      const s = 8 + Math.random() * 8;
+      const clod = document.createElement('div');
+      clod.style.cssText = `position:absolute;width:${s}px;height:${s * 0.9}px;border-radius:45% 55% 50% 40%;pointer-events:none;background:radial-gradient(circle at 30% 70%,#3E3A16 0 18%,transparent 22%),radial-gradient(circle at 65% 35%,#9A9A4A,#6E6A2A 55%,#4A4618)`;
+      place(clod, { x: foot.x + (Math.random() * 2 - 1) * spread * 0.6, y: foot.y - 6 });
+      fxEl.appendChild(clod);
+      const vx = (Math.random() * 2 - 1) * 50;
+      const up = 70 + Math.random() * 70;
+      const spin = (Math.random() * 2 - 1) * 300;
+      const frames: Keyframe[] = [];
+      const steps = 8;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        // Thrown up, then pulled back down a little below where it started.
+        frames.push({
+          transform: `translate(${vx * t}px,${-up * 4 * t * (1 - t) + 20 * t}px) rotate(${spin * t}deg)`,
+          opacity: t < 0.8 ? 1 : (1 - t) / 0.2
+        });
+      }
+      this.anim(clod, frames, { duration: 700 + Math.random() * 200, easing: 'linear', delay: Math.random() * dur * 0.5 }).then(() => clod.remove());
+    }
   }
 
   /**
@@ -3035,6 +4203,15 @@ export class MoveAnimationService {
     const blur = 4 + intensity * 20;
     el.style.filter = `brightness(${1 + intensity}) drop-shadow(0 0 ${blur}px ${color})`;
     setTimeout(() => (el.style.filter = ''), 150);
+  }
+
+  /** Classic hit blink: the sprite flickers off and on a few times. */
+  private blink(el: HTMLElement, times = 4, ms = 70): Promise<void> {
+    const frames: Keyframe[] = [];
+    // step-end on each frame: hard on/off cuts instead of fading.
+    for (let i = 0; i < times; i++) frames.push({ opacity: 0, easing: 'step-end' }, { opacity: 1, easing: 'step-end' });
+    frames.push({ opacity: 1 });
+    return this.anim(el, frames, { duration: times * 2 * ms, easing: 'linear', fill: 'none' });
   }
 
   private shake(el: HTMLElement, amp = 4): void {

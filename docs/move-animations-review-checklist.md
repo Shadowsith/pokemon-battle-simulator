@@ -63,51 +63,51 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - [x] ⭐ **Crabhammer** / Krabbhammer — `crabhammer` · Water · Physical · big water drop from above + splash crown + bubbles (custom, needs review)
 - [ ] **Cut** / Zerschneider — `cut` · Normal · Physical · `melee`
 - [ ] **Defense Curl** / Einigler — `defensecurl` · Normal · Status · `selfAura`
-- [ ] ⭐ **Dig** / Schaufler — `dig` · Ground · Physical · `beam`
+- [x] ⭐ **Dig** / Schaufler — `dig` · Ground · Physical · turn 1 sinks into the ground with dust + dirt clods, turn 2 bursts back up, target hit with rising white dust (custom, needs review)
 - [ ] **Disable** / Aussetzer — `disable` · Normal · Status · `targetAura`
-- [ ] ⭐ **Dizzy Punch** / Irrschlag — `dizzypunch` · Normal · Physical · `melee`
+- [x] ⭐ **Dizzy Punch** / Irrschlag — `dizzypunch` · Normal · Physical · yellow fist slams in, little yellow birds fly out in arcs and bob above the target with stars (custom, needs review)
 - [ ] **Double Kick** / Doppelkick — `doublekick` · Fighting · Physical · `melee`
 - [ ] **Double Slap** / Duplexhieb — `doubleslap` · Normal · Physical · `melee`
 - [ ] **Double Team** / Doppelteam — `doubleteam` · Normal · Status · `selfAura`
-- [ ] ⭐ **Double-Edge** / Risikotackle — `doubleedge` · Normal · Physical · `melee`
+- [x] ⭐ **Double-Edge** / Risikotackle — `doubleedge` · Normal · Physical · caster runs a small circle, scene darkens, ram with orange sunburst backdrop + sparkles, target squashed, recoil (custom, needs review)
 - [ ] **Dragon Rage** / Drachenwut — `dragonrage` · Dragon · Special · `projectile`
-- [ ] ⭐ **Dream Eater** / Traumfresser — `dreameater` · Psychic · Special · `projectile`
-- [ ] ⭐ **Drill Peck** / Bohrschnabel — `drillpeck` · Flying · Physical · `melee`
+- [x] ⭐ **Dream Eater** / Traumfresser — `dreameater` · Psychic · Special · scene darkens, yellow dream orbs drain to caster, caster glows with purple sparkles, target hit + green HP sparkles (custom, needs review)
+- [x] ⭐ **Drill Peck** / Bohrschnabel — `drillpeck` · Flying · Physical · step forward, rapid yellow peck bursts circling the target like a revolver, step back (custom, needs review)
 - [x] ⭐ **Earthquake** / Erdbeben — `earthquake` · Ground · Physical · field shake + jumping rocks (custom, needs review)
-- [ ] ⭐ **Egg Bomb** / Eierbombe — `eggbomb` · Normal · Physical · `lob`
+- [x] ⭐ **Egg Bomb** / Eierbombe — `eggbomb` · Normal · Physical · white egg lobbed in an arc, fiery explosion with red sparks on the target (custom, needs review)
 - [x] **Ember** / Glut — `ember` · Fire · Special · single ground flame (custom, needs review)
-- [ ] ⭐ **Explosion** / Explosion — `explosion` · Normal · Physical · `field`
+- [x] ⭐ **Explosion** / Explosion — `explosion` · Normal · Physical · orange sparks gather on caster, giant fireball with light rays + white flash, target blinks (custom, needs review)
 - [x] ⭐ **Fire Blast** / Feuersturm — `fireblast` · Fire · Special · gather → fireball → five-arm blast on sunburst (custom, needs review)
-- [ ] ⭐ **Fire Punch** / Feuerschlag — `firepunch` · Fire · Physical · `melee`
+- [x] ⭐ **Fire Punch** / Feuerschlag — `firepunch` · Fire · Physical · red-hot backdrop, red fist slams in with flickering flames bursting around the target (custom, needs review)
 - [x] **Fire Spin** / Feuerwirbel — `firespin` · Fire · Special · `projectile` + fire vortex (custom, needs review)
 - [ ] **Fissure** / Geofissur — `fissure` · Ground · Physical · `projectile`
 - [x] ⭐ **Flamethrower** / Flammenwurf — `flamethrower` · Fire · Special · red-hot backdrop + fire stream + burning target (custom, needs review)
 - [ ] **Flash** / Blitz — `flash` · Normal · Status · `selfAura`
-- [ ] ⭐ **Fly** / Fliegen — `fly` · Flying · Physical · `beam`
+- [x] ⭐ **Fly** / Fliegen — `fly` · Flying · Physical · turn 1 blue bubble rises on a rushing sky backdrop, turn 2 white orb dives onto the target with yellow sparks (custom, needs review)
 - [ ] **Focus Energy** / Energiefokus — `focusenergy` · Normal · Status · `selfAura`
 - [ ] **Fury Attack** / Furienschlag — `furyattack` · Normal · Physical · `melee`
 - [ ] **Fury Swipes** / Kratzfurie — `furyswipes` · Normal · Physical · `melee`
-- [ ] ⭐ **Glare** / Schlangenblick — `glare` · Normal · Status · `targetAura`
+- [x] ⭐ **Glare** / Schlangenblick — `glare` · Normal · Status · dark red scene, glowing red snake eyes open and stare, target goes dark with yellow sparks (custom, needs review)
 - [ ] **Growl** / Heuler — `growl` · Normal · Status · `selfAura`
 - [ ] ⭐ **Growth** / Wachstum — `growth` · Normal · Status · `selfAura`
 - [ ] **Guillotine** / Guillotine — `guillotine` · Normal · Physical · `melee`
 - [ ] **Gust** / Windstoß — `gust` · Flying · Special · `projectile`
 - [ ] **Harden** / Härtner — `harden` · Normal · Status · `selfAura`
 - [ ] ⭐ **Haze** / Dunkelnebel — `haze` · Ice · Status · `targetAura`
-- [ ] ⭐ **Headbutt** / Kopfnuss — `headbutt` · Normal · Physical · `melee`
-- [ ] ⭐ **High Jump Kick** / Turmkick — `highjumpkick` · Fighting · Physical · `melee`
+- [x] ⭐ **Headbutt** / Kopfnuss — `headbutt` · Normal · Physical · quick dart forward and back, white-yellow starburst + ring of yellow stars on the target (custom, needs review)
+- [x] ⭐ **High Jump Kick** / Turmkick — `highjumpkick` · Fighting · Physical · quick dart forward and back, jagged red/yellow comic impact bursts + red specks on the target (custom, needs review)
 - [ ] **Horn Attack** / Hornattacke — `hornattack` · Normal · Physical · `melee`
 - [ ] **Horn Drill** / Hornbohrer — `horndrill` · Normal · Physical · `melee`
 - [x] ⭐ **Hydro Pump** / Hydropumpe — `hydropump` · Water · Special · dark → deep blue streak backdrop + water ring beam (custom, needs review)
 - [x] ⭐ **Hyper Beam** / Hyperstrahl — `hyperbeam` · Normal · Special · dark → green backdrop with edge streaks + golden spiky sparkling beam (custom, needs review)
-- [ ] ⭐ **Hyper Fang** / Hyperzahn — `hyperfang` · Normal · Physical · `melee`
+- [x] ⭐ **Hyper Fang** / Hyperzahn — `hyperfang` · Normal · Physical · big rodent incisors chomp diagonally into the target, red sparkle clusters around it (custom, needs review)
 - [ ] **Hypnosis** / Hypnose — `hypnosis` · Psychic · Status · `targetAura`
 - [x] ⭐ **Ice Beam** / Eisstrahl — `icebeam` · Ice · Special · light blue flickering beam + frost sparkles + iced target (custom, needs review)
-- [ ] ⭐ **Ice Punch** / Eishieb — `icepunch` · Ice · Physical · `melee`
+- [x] ⭐ **Ice Punch** / Eishieb — `icepunch` · Ice · Physical · light blue ice fist slams in, see-through ice crystals burst and tumble around the target (custom, needs review)
 - [ ] ⭐ **Jump Kick** / Sprungkick — `jumpkick` · Fighting · Physical · `melee`
 - [ ] **Karate Chop** / Karateschlag — `karatechop` · Fighting · Physical · `melee`
 - [ ] **Kinesis** / Psykraft — `kinesis` · Psychic · Status · `selfAura`
-- [ ] ⭐ **Leech Life** / Blutsauger — `leechlife` · Bug · Physical · `melee`
+- [x] ⭐ **Leech Life** / Blutsauger — `leechlife` · Bug · Physical · like Absorb: blood-red sparkles drain to caster, then green HP sparkles (custom, needs review)
 - [ ] ⭐ **Leech Seed** / Egelsamen — `leechseed` · Grass · Status · `targetAura`
 - [ ] **Leer** / Silberblick — `leer` · Normal · Status · `selfAura`
 - [ ] **Lick** / Schlecker — `lick` · Ghost · Physical · `melee`
