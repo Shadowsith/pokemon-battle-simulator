@@ -141,30 +141,30 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - [ ] **Rage** / Raserei — `rage` · Normal · Physical · `melee`
 - [ ] **Razor Leaf** / Rasierblatt — `razorleaf` · Grass · Physical · `field`
 - [x] ⭐ **Razor Wind** / Klingensturm — `razorwind` · Normal · Special · turn 1: blue whirlwind around the caster; turn 2: red blade slashes on the target (custom, needs review)
-- [ ] ⭐ **Recover** / Genesung — `recover` · Normal · Status · `selfAura`
-- [ ] ⭐ **Reflect** / Reflektor — `reflect` · Psychic · Status · `selfAura`
-- [ ] ⭐ **Rest** / Erholung — `rest` · Psychic · Status · `selfAura`
+- [x] ⭐ **Recover** / Genesung — `recover` · Normal · Status · orange twinkling stars + green HP sparkles (custom, needs review)
+- [x] ⭐ **Reflect** / Reflektor — `reflect` · Psychic · Status · purple-blue light screen + purple/white sparkles (custom, needs review)
+- [x] ⭐ **Rest** / Erholung — `rest` · Psychic · Status · sleep bubble + pink rising "Z"s + green HP sparkles (custom, needs review)
 - [ ] ⭐ **Roar** / Brüller — `roar` · Normal · Status · `targetAura`
-- [ ] ⭐ **Rock Slide** / Steinhagel — `rockslide` · Rock · Physical · `field`
+- [x] ⭐ **Rock Slide** / Steinhagel — `rockslide` · Rock · Physical · hail of golden-brown stones falling onto the target (custom, needs review)
 - [ ] **Rock Throw** / Steinwurf — `rockthrow` · Rock · Physical · `projectile`
 - [ ] **Rolling Kick** / Fegekick — `rollingkick` · Fighting · Physical · `melee`
 - [ ] **Sand Attack** / Sandwirbel — `sandattack` · Ground · Status · `selfAura`
 - [ ] **Scratch** / Kratzer — `scratch` · Normal · Physical · `melee`
 - [ ] **Screech** / Kreideschrei — `screech` · Normal · Status · `selfAura`
-- [ ] ⭐ **Seismic Toss** / Geowurf — `seismictoss` · Fighting · Physical · `melee`
-- [ ] ⭐ **Self-Destruct** / Finale — `selfdestruct` · Normal · Physical · `field`
+- [x] ⭐ **Seismic Toss** / Geowurf — `seismictoss` · Fighting · Physical · dark → blue sky with rising then falling orange streaks + yellow impact with stones (custom, needs review)
+- [x] ⭐ **Self-Destruct** / Finale — `selfdestruct` · Normal · Physical · dark → turning red/white rays + chain of small explosions on caster, target blinks (custom, needs review)
 - [ ] **Sharpen** / Schärfer — `sharpen` · Normal · Status · `selfAura`
 - [ ] **Sing** / Gesang — `sing` · Normal · Status · `targetAura`
-- [ ] ⭐ **Skull Bash** / Schädelwumme — `skullbash` · Normal · Physical · `beam`
-- [ ] ⭐ **Sky Attack** / Himmelsfeger — `skyattack` · Flying · Physical · `beam`
-- [ ] ⭐ **Slam** / Slam — `slam` · Normal · Physical · `melee`
-- [ ] ⭐ **Slash** / Schlitzer — `slash` · Normal · Physical · `melee`
-- [ ] ⭐ **Sleep Powder** / Schlafpuder — `sleeppowder` · Grass · Status · `powder`
+- [x] ⭐ **Skull Bash** / Schädelwumme — `skullbash` · Normal · Physical · turn 1: rears back twice + orange sparkles; turn 2: dark, fast lunges, fiery blast on target (custom, needs review)
+- [x] ⭐ **Sky Attack** / Himmelsfeger — `skyattack` · Flying · Physical · turn 1: very dark + blue lights + white glow; turn 2: blue sky with edge streaks, blue light cloud hits, black flash (custom, needs review)
+- [x] ⭐ **Slam** / Slam — `slam` · Normal · Physical · white-yellow flash + target squash + red/white glowing sparks (custom, needs review)
+- [x] ⭐ **Slash** / Schlitzer — `slash` · Normal · Physical · white diagonal cut + flash + yellow-orange sparks (custom, needs review)
+- [x] ⭐ **Sleep Powder** / Schlafpuder — `sleeppowder` · Grass · Status · dark green powder falls onto target + purple rising "Z"s (custom, needs review)
 - [ ] **Sludge** / Schlammbad — `sludge` · Poison · Special · `projectile`
 - [ ] **Smog** / Smog — `smog` · Poison · Special · `projectile`
 - [ ] **Smokescreen** / Rauchwolke — `smokescreen` · Normal · Status · `selfAura`
-- [ ] ⭐ **Soft-Boiled** / Weichei — `softboiled` · Normal · Status · `selfAura`
-- [ ] ⭐ **Solar Beam** / Solarstrahl — `solarbeam` · Grass · Special · `beam`
+- [x] ⭐ **Soft-Boiled** / Weichei — `softboiled` · Normal · Status · egg cracks on caster + blue sparkles + pale blue wave + green HP sparkles (custom, needs review)
+- [x] ⭐ **Solar Beam** / Solarstrahl — `solarbeam` · Grass · Special · turn 1: dark + sun motes gather, caster blinks yellow; turn 2: sunbeam strikes target from above (custom, needs review)
 - [ ] **Sonic Boom** / Ultraschall — `sonicboom` · Normal · Special · `projectile`
 - [ ] **Spike Cannon** / Dornkanone — `spikecannon` · Normal · Physical · `beam`
 - [ ] **Splash** / Platscher — `splash` · Normal · Status · `selfAura`

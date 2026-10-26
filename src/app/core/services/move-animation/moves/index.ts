@@ -12,6 +12,7 @@ import { IceMoveAnimations } from './ice-moves';
 import { NormalMoveAnimations } from './normal-moves';
 import { PoisonMoveAnimations } from './poison-moves';
 import { PsychicMoveAnimations } from './psychic-moves';
+import { RockMoveAnimations } from './rock-moves';
 import { WaterMoveAnimations } from './water-moves';
 
 /**
@@ -35,6 +36,7 @@ export const MOVE_ANIMATION_GROUPS: readonly {
   FlyingMoveAnimations,
   PsychicMoveAnimations,
   BugMoveAnimations,
+  RockMoveAnimations,
   GhostMoveAnimations,
   DarkMoveAnimations
 ];

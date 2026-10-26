@@ -12,7 +12,9 @@ export class PsychicMoveAnimations {
     amnesia: (refs, launch) => PsychicMoveAnimations.playAmnesia(refs, launch),
     barrier: (refs, launch) => PsychicMoveAnimations.playBarrier(refs, launch),
     dreameater: (refs, launch, target, v) => PsychicMoveAnimations.playDreamEater(refs, launch, target, v),
-    lightscreen: (refs, launch, _target, v) => PsychicMoveAnimations.playLightScreen(refs, launch, v),
+    lightscreen: (refs, launch, _target, v) => PsychicMoveAnimations.playScreen(refs, launch, v, PsychicMoveAnimations.LIGHT_SCREEN),
+    rest: (refs, launch, _target, v) => PsychicMoveAnimations.playRest(refs, launch, v),
+    reflect: (refs, launch, _target, v) => PsychicMoveAnimations.playScreen(refs, launch, v, PsychicMoveAnimations.REFLECT),
     psychic: (refs) => PsychicMoveAnimations.playPsychic(refs)
   };
 
@@ -245,22 +247,7 @@ export class PsychicMoveAnimations {
     await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 420, easing: 'ease-in' });
     dim.remove();
 
-    // Orange sparkles drift down over the caster.
-    const spread = Math.max(r.width * 0.45, 30);
-    for (let i = 0; i < 16; i++) {
-      const s = 6 + Math.random() * 6;
-      const dot = document.createElement('div');
-      dot.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF3C4,#FFA62B 55%,#FF7A0000);box-shadow:0 0 6px #FFA62B`;
-      Fx.place(dot, { x: launch.x + (Math.random() * 2 - 1) * spread, y: head.y + Math.random() * r.height * 0.6 });
-      fxEl.appendChild(dot);
-      Fx.anim(dot, [
-        { transform: 'translateY(0) scale(0)', opacity: 0 },
-        { transform: 'translateY(6px) scale(1.2)', opacity: 1, offset: 0.35 },
-        { transform: 'translateY(22px) scale(.3)', opacity: 0 }
-      ], { duration: 700, easing: 'ease-out', delay: Math.random() * 500 }).then(() => dot.remove());
-    }
-    Fx.flash(launchEl, '#FFA62B', 0.3);
-    await Fx.wait(1200);
+    await FxEffects.orangeSparkles(refs, launch, head.y);
   }
 
   /**
@@ -318,14 +305,66 @@ export class PsychicMoveAnimations {
   }
 
   /**
-   * Light Screen: a round, bluish-pink screen of light opens on the foe's
-   * side of the caster, seen at an angle; a sheen sweeps over it while blue
-   * and pink sparkles twinkle around its rim, then it fades.
+   * Rest: the caster falls asleep. A sleep bubble swells and shrinks at its
+   * head while pink "Z"s float up and away, growing as they rise; then green
+   * HP sparkles show it regaining health.
    */
-  private static async playLightScreen(refs: BattleStageRefs, launch: Point, v: MoveVisual) {
+  private static async playRest(refs: BattleStageRefs, launch: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = launchEl.getBoundingClientRect();
+    const f = fieldEl.getBoundingClientRect();
+    // The bubble and the Zs sit at the head, drifting away from the foe.
+    const away = -v.dir;
+    const head: Point = { x: launch.x + away * r.width * 0.15, y: r.top - f.top + r.height * 0.2 };
+
+    // Sleep bubble: breathes in and out twice, then pops.
+    const size = Math.max(r.width * 0.28, 24);
+    const bubble = document.createElement('div');
+    bubble.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 32% 28%,#ffffffee 0 10%,#ffffff33 30%,#E6F4FF22 60%,#CFE6FF55);border:1.5px solid #ffffffcc;box-shadow:0 0 6px #ffffff88`;
+    Fx.place(bubble, { x: head.x + away * size * 0.6, y: head.y - size * 0.3 });
+    fxEl.appendChild(bubble);
+    const bubbleDone = Fx.anim(bubble, [
+      { transform: 'scale(0)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.2 },
+      { transform: 'scale(.55)', opacity: 1, offset: 0.4 },
+      { transform: 'scale(1.15)', opacity: 1, offset: 0.65 },
+      { transform: 'scale(.6)', opacity: 1, offset: 0.85 },
+      { transform: 'scale(1.5)', opacity: 0 }
+    ], { duration: 1700, easing: 'ease-in-out' }).then(() => bubble.remove());
+
+    // Pink Zs float up and away one after another.
+    const zs = FxEffects.sleepZs(fxEl, head, away, ['#F08CD8', '#D79BF0']);
+    await Promise.all([bubbleDone, zs]);
+
+    await FxEffects.healSparkles(refs, launch);
+  }
+
+  /** Light Screen: bluish-pink, sparkles twinkle around the rim. */
+  private static readonly LIGHT_SCREEN: ScreenStyle = {
+    rim: '#FF8FE0',
+    glow: '#7FB8FF',
+    sparkColors: ['#7FB8FF', '#FF8FE0'],
+    sparkles: 14,
+    rimOnly: true
+  };
+
+  /** Reflect: purple-blue, more sparkles, also white ones scattered over the face. */
+  private static readonly REFLECT: ScreenStyle = {
+    rim: '#B07CFF',
+    glow: '#7F9CFF',
+    sparkColors: ['#B07CFF', '#ffffff', '#8FA8FF'],
+    sparkles: 18,
+    rimOnly: false
+  };
+
+  /**
+   * Light Screen / Reflect: a round screen of light opens on the foe's side
+   * of the caster, seen at an angle; a sheen sweeps over it while sparkles
+   * twinkle on it, then it fades. `style` sets the colours and sparkles.
+   */
+  private static async playScreen(refs: BattleStageRefs, launch: Point, v: MoveVisual, style: ScreenStyle) {
     const { fxEl, launchEl } = refs;
-    const blue = '#7FB8FF';
-    const pink = '#FF8FE0';
+    const { rim, glow } = style;
     const r = launchEl.getBoundingClientRect();
     const h = Math.max(r.height * 1.15, 80);
     const w = h * 0.5;
@@ -333,7 +372,7 @@ export class PsychicMoveAnimations {
     const tilt = v.dir * 12;
 
     const screen = document.createElement('div');
-    screen.style.cssText = `position:absolute;width:${w}px;height:${h}px;border-radius:50%;pointer-events:none;overflow:hidden;border:3px solid ${pink};background:radial-gradient(ellipse at 50% 50%,#FFFFFFcc 0%,#DDEBFFaa 30%,${blue}88 60%,${pink}aa 90%);box-shadow:0 0 14px ${pink},0 0 26px ${blue}aa,inset 0 0 16px #ffffffaa`;
+    screen.style.cssText = `position:absolute;width:${w}px;height:${h}px;border-radius:50%;pointer-events:none;overflow:hidden;border:3px solid ${rim};background:radial-gradient(ellipse at 50% 50%,#FFFFFFcc 0%,#E6E4FFaa 30%,${glow}88 60%,${rim}aa 90%);box-shadow:0 0 14px ${rim},0 0 26px ${glow}aa,inset 0 0 16px #ffffffaa`;
     const sheen = document.createElement('div');
     sheen.style.cssText = `position:absolute;left:-20%;top:0;width:140%;height:${h * 0.25}px;background:linear-gradient(180deg,transparent,#ffffffdd,transparent)`;
     screen.appendChild(sheen);
@@ -354,13 +393,15 @@ export class PsychicMoveAnimations {
       { transform: `translateY(${h * 1.05}px)` }
     ], { duration: 700, easing: 'ease-in-out', delay: 280 });
 
-    // Blue and pink sparkles twinkle around the rim of the screen.
+    // Sparkles twinkle around the rim (and, unless rimOnly, every third one on the face).
     const rad = (tilt * Math.PI) / 180;
-    for (let i = 0; i < 14; i++) {
+    for (let i = 0; i < style.sparkles; i++) {
       const ang = Math.random() * Math.PI * 2;
-      const ex = Math.cos(ang) * (w / 2) * (0.9 + Math.random() * 0.35);
-      const ey = Math.sin(ang) * (h / 2) * (0.9 + Math.random() * 0.2);
-      const star = FxGlyphs.sparkStar(9 + Math.random() * 10, i % 2 ? blue : pink);
+      const onFace = !style.rimOnly && i % 3 === 0;
+      const dist = onFace ? Math.random() * 0.7 : 0.9 + Math.random() * 0.3;
+      const ex = Math.cos(ang) * (w / 2) * dist;
+      const ey = Math.sin(ang) * (h / 2) * dist;
+      const star = FxGlyphs.sparkStar(9 + Math.random() * 10, style.sparkColors[i % style.sparkColors.length]);
       Fx.place(star, {
         x: at.x + ex * Math.cos(rad) - ey * Math.sin(rad),
         y: at.y + ex * Math.sin(rad) + ey * Math.cos(rad)
@@ -372,7 +413,19 @@ export class PsychicMoveAnimations {
         { transform: 'scale(0) rotate(90deg)', opacity: 0 }
       ], { duration: 520, easing: 'ease-out', delay: 200 + Math.random() * 1000 }).then(() => star.remove());
     }
-    Fx.flash(launchEl, blue, 0.3);
+    Fx.flash(launchEl, glow, 0.3);
     await done;
   }
+}
+
+/** Colours and sparkle layout of a protective screen (Light Screen, Reflect). */
+interface ScreenStyle {
+  /** Rim and outer-edge colour. */
+  rim: string;
+  /** Inner glow colour. */
+  glow: string;
+  sparkColors: string[];
+  sparkles: number;
+  /** Sparkles only on the rim; otherwise some also twinkle on the face. */
+  rimOnly: boolean;
 }

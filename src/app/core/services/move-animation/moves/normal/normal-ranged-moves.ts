@@ -14,7 +14,8 @@ export class NormalRangedMoveAnimations {
     glare: (refs, launch, target) => NormalRangedMoveAnimations.playGlare(refs, launch, target),
     hyperbeam: (refs, launch, target) => NormalRangedMoveAnimations.playHyperBeam(refs, launch, target),
     triattack: (refs, launch, target) => NormalRangedMoveAnimations.playTriAttack(refs, launch, target),
-    razorwind: (refs, _launch, target) => NormalRangedMoveAnimations.playRazorBlades(refs, target)
+    razorwind: (refs, _launch, target) => NormalRangedMoveAnimations.playRazorBlades(refs, target),
+    selfdestruct: (refs, launch, target, v) => NormalRangedMoveAnimations.playSelfDestruct(refs, launch, target, v)
   };
 
   /** Turn-1 animations of two-turn moves, by @pkmn/sim move id. */
@@ -64,8 +65,7 @@ export class NormalRangedMoveAnimations {
     const r = targetEl.getBoundingClientRect();
 
     // 1. The egg flies in a high arc and lands on the target.
-    const egg = document.createElement('div');
-    egg.style.cssText = 'position:absolute;width:20px;height:26px;pointer-events:none;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff 0 30%,#ECEAE4 60%,#BDB9B0);box-shadow:0 0 3px #00000055';
+    const egg = FxGlyphs.eggGlyph(20);
     Fx.place(egg, launch);
     fxEl.appendChild(egg);
     const dx = target.x - launch.x;
@@ -146,6 +146,62 @@ export class NormalRangedMoveAnimations {
     await Promise.all([Fx.blink(targetEl), FxEffects.impact(refs, target, v, 0)]);
     await Promise.all([blast, raysShow]);
   }
+  /**
+   * Self-Destruct: the scene goes dark, then the caster blows up in a chain
+   * of small explosions while red and white light rays turn slowly behind
+   * it; then the target is hit (blinking).
+   */
+  private static async playSelfDestruct(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const field = fieldEl.getBoundingClientRect();
+    const r = launchEl.getBoundingClientRect();
+
+    // 1. Darkness.
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // 2. Red / white rays centred on the caster turn slowly; a white glare sits on top of them.
+    const reach = Math.hypot(field.width, field.height);
+    const rays = document.createElement('div');
+    rays.style.cssText = `position:absolute;left:${launch.x - reach}px;top:${launch.y - reach}px;width:${reach * 2}px;height:${reach * 2}px;background:repeating-conic-gradient(from 0deg,#FF3A3A 0 7deg,#FFE0E0 7deg 12deg,#E8202A 12deg 20deg)`;
+    const glare = document.createElement('div');
+    glare.style.cssText = `position:absolute;inset:0;background:radial-gradient(circle at ${launch.x}px ${launch.y}px,#fff 0 12%,#FFF4F0ee 22%,#FFD0D066 40%,#D0101800 60%,#B0101099)`;
+    dim.appendChild(rays);
+    dim.appendChild(glare);
+    const total = 1500;
+    const layers = [rays, glare].map((el) =>
+      Fx.anim(el, [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: total, easing: 'ease-out' })
+    );
+    Fx.anim(rays, [{ transform: 'rotate(0deg)' }, { transform: 'rotate(25deg)' }], { duration: total, easing: 'linear', composite: 'add' });
+
+    // 3. The caster lights up while small explosions pop all around it.
+    Fx.anim(launchEl, [
+      { filter: 'brightness(1)' },
+      { filter: 'brightness(2) drop-shadow(0 0 14px #FFB060)', offset: 0.3 },
+      { filter: 'brightness(1)' }
+    ], { duration: total, easing: 'ease-out', fill: 'none' });
+    const spread = Math.max(r.width * 0.6, 40);
+    const booms: Promise<void>[] = [];
+    for (let i = 0; i < 8; i++) {
+      const at: Point = {
+        x: launch.x + (Math.random() * 2 - 1) * spread,
+        y: launch.y + (Math.random() * 2 - 1) * spread * 0.85
+      };
+      booms.push(
+        Fx.wait(100 + i * 110).then(() => {
+          if (i % 3 === 0) Fx.shakeField(fieldEl, 0.5);
+          return FxEffects.fireBlastCloud(fxEl, at, 26 + Math.random() * 14, 5, '#FFD040');
+        })
+      );
+    }
+
+    // 4. The target is caught in the blast.
+    await Fx.wait(700);
+    await Promise.all([Fx.blink(targetEl, 5), FxEffects.impact(refs, target, v, 0)]);
+    await Promise.all([...booms, ...layers]);
+    dim.remove();
+  }
+
   /**
    * Glare: the scene turns dark red and a pair of glowing red snake eyes
    * opens above the field and stares; then the target is paralysed - its

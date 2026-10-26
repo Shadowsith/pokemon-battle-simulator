@@ -14,8 +14,180 @@ export class NormalStrikeMoveAnimations {
     headbutt: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHeadbutt(refs, target, v),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
     megakick: (refs, _launch, target) => NormalStrikeMoveAnimations.playMegaKick(refs, target),
-    megapunch: (refs, _launch, target) => NormalStrikeMoveAnimations.playMegaPunch(refs, target)
+    megapunch: (refs, _launch, target) => NormalStrikeMoveAnimations.playMegaPunch(refs, target),
+    skullbash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSkullBash(refs, target, v),
+    slam: (refs, _launch, target) => NormalStrikeMoveAnimations.playSlam(refs, target),
+    slash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v)
   };
+
+  /**
+   * Slash: a bright white cut is drawn diagonally across the target with a
+   * white flash where it lands, while yellow-orange sparks spray out of it.
+   */
+  private static async playSlash(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const len = Math.max(r.width * 1.1, 80);
+    // Top-back to bottom-front of the target, mirrored with the attack direction.
+    const angle = v.dir > 0 ? 35 : 145;
+
+    const blade = document.createElement('div');
+    blade.style.cssText = `position:absolute;width:${len}px;height:7px;pointer-events:none;clip-path:polygon(0 50%,50% 0,100% 50%,50% 100%);background:linear-gradient(90deg,#ffffff00,#fff 30%,#fff 70%,#ffffff00);filter:drop-shadow(0 0 5px #FFF6C0)`;
+    // The blade turns round its left end; place that end so its middle crosses the target.
+    const rad = (angle * Math.PI) / 180;
+    Fx.place(blade, { x: target.x - (Math.cos(rad) * len) / 2 + len / 2, y: target.y - (Math.sin(rad) * len) / 2 });
+    fxEl.appendChild(blade);
+    const bladeDone = Fx.anim(blade, [
+      { transform: `rotate(${angle}deg) scale(0,1)`, transformOrigin: '0 50%', opacity: 1 },
+      { transform: `rotate(${angle}deg) scale(1,1.3)`, transformOrigin: '0 50%', opacity: 1, offset: 0.4 },
+      { transform: `rotate(${angle}deg) scale(1,.3)`, transformOrigin: '0 50%', opacity: 0 }
+    ], { duration: 360, easing: 'ease-out' }).then(() => blade.remove());
+
+    await Fx.wait(110);
+    const star = FxGlyphs.sparkStar(Math.max(r.width * 0.4, 34), '#FFF3A0');
+    Fx.place(star, target);
+    fxEl.appendChild(star);
+    const starDone = Fx.anim(star, [
+      { transform: 'scale(.2) rotate(0deg)', opacity: 1 },
+      { transform: 'scale(1.1) rotate(30deg)', opacity: 1, offset: 0.4 },
+      { transform: 'scale(.6) rotate(45deg)', opacity: 0 }
+    ], { duration: 320, easing: 'ease-out' }).then(() => star.remove());
+    Fx.flash(targetEl, '#ffffff', 0.6);
+    Fx.shake(targetEl, 5);
+
+    // Yellow-orange sparks spray out, mostly upward and toward the front.
+    const sparks: Promise<void>[] = [];
+    const reach = Math.max(r.width * 0.55, 40);
+    for (let i = 0; i < 16; i++) {
+      const s = 4 + Math.random() * 4;
+      const spark = document.createElement('div');
+      const c = i % 2 ? '#FFD040' : '#FF9A2A';
+      spark.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF8D0,${c} 60%);box-shadow:0 0 5px ${c}`;
+      const along = (Math.random() * 2 - 1) * 0.4;
+      Fx.place(spark, { x: target.x + Math.cos(rad) * len * along, y: target.y + Math.sin(rad) * len * along });
+      fxEl.appendChild(spark);
+      const ang = -Math.PI / 2 + v.dir * Math.random() * 1.4 + (Math.random() - 0.5) * 0.8;
+      const d = reach * (0.4 + Math.random() * 0.7);
+      sparks.push(
+        Fx.anim(spark, [
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d * 0.7}px,${Math.sin(ang) * d * 0.7}px) scale(1)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d + 10}px) scale(.4)`, opacity: 0 }
+        ], { duration: 520 + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 80 }).then(() => spark.remove())
+      );
+    }
+    await Promise.all([bladeDone, starDone, ...sparks]);
+  }
+
+  /**
+   * Slam: a white-yellow flash on the target, which is squashed flat for a
+   * moment, while glowing red-and-white sparks fly out around it.
+   */
+  private static async playSlam(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+
+    const size = Math.max(r.width * 0.75, 52);
+    const flash = document.createElement('div');
+    flash.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0 25%,#FFF6B0 50%,#FFE45A00 72%)`;
+    Fx.place(flash, target);
+    fxEl.appendChild(flash);
+    const flashDone = Fx.anim(flash, [
+      { transform: 'scale(.3)', opacity: 1 },
+      { transform: 'scale(1.1)', opacity: 0.9, offset: 0.4 },
+      { transform: 'scale(1.25)', opacity: 0 }
+    ], { duration: 380, easing: 'ease-out' }).then(() => flash.remove());
+
+    // Squash: flattened from the top, then springs back.
+    const origin = targetEl.style.transformOrigin;
+    const base = targetEl.style.transform;
+    targetEl.style.transformOrigin = 'center bottom';
+    const squash = Fx.anim(targetEl, [
+      { transform: `${base} scale(1,1)` },
+      { transform: `${base} scale(1.14,.78)`, offset: 0.3 },
+      { transform: `${base} scale(.96,1.04)`, offset: 0.7 },
+      { transform: `${base} scale(1,1)` }
+    ], { duration: 380, easing: 'ease-out', fill: 'none' }).then(() => (targetEl.style.transformOrigin = origin));
+    Fx.flash(targetEl, '#FFF3A0', 0.6);
+
+    // Red-and-white glowing sparks fly out in all directions.
+    const sparks: Promise<void>[] = [];
+    const reach = Math.max(r.width * 0.45, 34);
+    for (let i = 0; i < 12; i++) {
+      const s = 7 + Math.random() * 5;
+      const spark = document.createElement('div');
+      spark.style.cssText = `position:absolute;width:${s}px;height:${s * 1.5}px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,#fff 0 35%,#FF6A3A 65%,#E0201A);box-shadow:0 0 6px #FF4A2A`;
+      Fx.place(spark, target);
+      fxEl.appendChild(spark);
+      const ang = (Math.PI * 2 * i) / 12 + Math.random() * 0.4;
+      const d = reach * (0.7 + Math.random() * 0.5);
+      const x = Math.cos(ang) * d;
+      const y = Math.sin(ang) * d * 0.8;
+      const tilt = (ang * 180) / Math.PI + 90;
+      sparks.push(
+        Fx.anim(spark, [
+          { transform: `translate(0,0) rotate(${tilt}deg) scale(.4)`, opacity: 1 },
+          { transform: `translate(${x * 0.8}px,${y * 0.8}px) rotate(${tilt}deg) scale(1)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(${x}px,${y}px) rotate(${tilt}deg) scale(.6)`, opacity: 0 }
+        ], { duration: 480 + Math.random() * 120, easing: 'ease-out', delay: 40 }).then(() => spark.remove())
+      );
+    }
+    await Promise.all([flashDone, squash, ...sparks]);
+  }
+
+  /** Turn-1 animations of two-turn moves, by @pkmn/sim move id. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    skullbash: (refs, launch, _target, v) => NormalStrikeMoveAnimations.playSkullBashCharge(refs, launch, v)
+  };
+
+  /**
+   * Skull Bash, turn 1 (tucks its head in): the caster rears back diagonally,
+   * away from the foe, twice; then orange sparkles drift down over it.
+   */
+  private static async playSkullBashCharge(refs: BattleStageRefs, launch: Point, v: MoveVisual) {
+    const { fieldEl, launchEl } = refs;
+    const back = `translate(${-v.dir * 14}px,-8px)`;
+    for (let i = 0; i < 2; i++) {
+      await Fx.anim(launchEl, [
+        { transform: 'translate(0,0)' },
+        { transform: back, offset: 0.4 },
+        { transform: 'translate(0,0)' }
+      ], { duration: 280, easing: 'ease-in-out', fill: 'none' });
+    }
+    const top = launchEl.getBoundingClientRect().top - fieldEl.getBoundingClientRect().top;
+    await FxEffects.orangeSparkles(refs, launch, top);
+  }
+
+  /**
+   * Skull Bash, turn 2: the scene goes dark, the caster darts forward and
+   * back very fast a few times, then the target is hit by a fiery blast
+   * with yellow sparks.
+   */
+  private static async playSkullBash(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    await Fx.anim(launchEl, [
+      { transform: 'translateX(0)' },
+      { transform: `translateX(${v.dir * 30}px)`, offset: 0.17 },
+      { transform: 'translateX(0)', offset: 0.33 },
+      { transform: `translateX(${v.dir * 30}px)`, offset: 0.5 },
+      { transform: 'translateX(0)', offset: 0.67 },
+      { transform: `translateX(${v.dir * 46}px)`, offset: 0.85 },
+      { transform: 'translateX(0)' }
+    ], { duration: 420, easing: 'linear', fill: 'none' });
+
+    const r = targetEl.getBoundingClientRect();
+    const blast = FxEffects.fireBlastCloud(fxEl, target, Math.max(r.width * 0.5, 42), 10, '#FFE04A');
+    Fx.flash(targetEl, '#FFB13C', 0.7);
+    Fx.shake(targetEl, 6);
+    Fx.shakeField(fieldEl, 0.6);
+    await blast;
+
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in' });
+    dim.remove();
+  }
 
   /**
    * Bind: nested dark arcs close in on both sides of the target and squeeze

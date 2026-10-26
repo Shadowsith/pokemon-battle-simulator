@@ -1,4 +1,5 @@
 import { Point, BattleStageRefs, MoveVisual, MoveAnimRegistry } from '../animation.types';
+import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
@@ -9,7 +10,8 @@ export class FightingMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     highjumpkick: (refs, _launch, target, v) => FightingMoveAnimations.playHighJumpKick(refs, target, v),
     jumpkick: (refs, launch, target) => FightingMoveAnimations.playJumpKick(refs, launch, target),
-    lowkick: (refs, _launch, target) => FightingMoveAnimations.playLowKick(refs, target)
+    lowkick: (refs, _launch, target) => FightingMoveAnimations.playLowKick(refs, target),
+    seismictoss: (refs, _launch, target) => FightingMoveAnimations.playSeismicToss(refs, target)
   };
 
   /**
@@ -131,6 +133,86 @@ export class FightingMoveAnimations {
 
     await Fx.wait(travel * 0.45);
     await Promise.all([sweep, FightingMoveAnimations.sparkleHit(fxEl, targetEl, target)]);
+  }
+
+  /**
+   * Seismic Toss: the backdrop goes dark, then a deep blue sky fades in with
+   * yellow-orange streaks rushing upward (the target is hurled up). The
+   * streaks turn and rush downward (the fall), then the target slams down:
+   * a yellow impact burst while stones fly out left and right of it.
+   */
+  private static async playSeismicToss(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // Blue sky layer on top of the dim layer, still behind platforms and sprites.
+    const sky = document.createElement('div');
+    sky.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:linear-gradient(90deg,#06123A,#1B4FB0 30%,#3C86E0 50%,#1B4FB0 70%,#06123A)';
+    dim.appendChild(sky);
+    await Fx.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    await FightingMoveAnimations.rushStreaks(sky, -1, 900);
+    await FightingMoveAnimations.rushStreaks(sky, 1, 700);
+
+    // Impact: yellow burst on the target, the ground shakes, stones fly out sideways.
+    const r = targetEl.getBoundingClientRect();
+    const burstSize = Math.max(r.width * 0.6, 50);
+    const burst = FxGlyphs.spikyBurst(burstSize, '#FFB020', '#FFE04A');
+    Fx.place(burst, { x: target.x, y: target.y + r.height * 0.15 });
+    fxEl.appendChild(burst);
+    const burstDone = Fx.anim(burst, [
+      { transform: 'scale(.3)', opacity: 1 },
+      { transform: 'scale(1.15)', opacity: 1, offset: 0.3 },
+      { transform: 'scale(1.2)', opacity: 0 }
+    ], { duration: 520, easing: 'ease-out' }).then(() => burst.remove());
+    Fx.shakeField(fieldEl, 0.7);
+
+    const stones: Promise<void>[] = [];
+    for (let i = 0; i < 8; i++) {
+      const side = i % 2 ? 1 : -1;
+      const stone = FxGlyphs.rockChunk(10 + Math.random() * 10);
+      Fx.place(stone, { x: target.x + side * r.width * 0.2, y: target.y + r.height * 0.3 });
+      fxEl.appendChild(stone);
+      const dx = side * (r.width * 0.45 + Math.random() * 30);
+      const peak = -(20 + Math.random() * 30);
+      stones.push(
+        Fx.anim(stone, [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${dx * 0.6}px,${peak}px) rotate(${side * 120}deg)`, opacity: 1, offset: 0.5 },
+          { transform: `translate(${dx}px,${peak * 0.2}px) rotate(${side * 220}deg)`, opacity: 0 }
+        ], { duration: 600 + Math.random() * 150, easing: 'ease-out', delay: Math.random() * 80 }).then(() => stone.remove())
+      );
+    }
+    await Promise.all([burstDone, FightingMoveAnimations.sparkleHit(fxEl, targetEl, target), ...stones]);
+
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in' });
+    dim.remove();
+  }
+
+  /** Glowing yellow-orange streaks rush across `layer` for `duration` ms: up (-1) or down (1). */
+  private static rushStreaks(layer: HTMLElement, dir: 1 | -1, duration: number): Promise<void> {
+    const { width, height } = layer.getBoundingClientRect();
+    const runs: Promise<void>[] = [];
+    const count = 22;
+    for (let i = 0; i < count; i++) {
+      const len = 50 + Math.random() * 70;
+      const w = 4 + Math.random() * 5;
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;left:${Math.random() * width}px;top:0;width:${w}px;height:${len}px;border-radius:${w}px;pointer-events:none;background:linear-gradient(${dir < 0 ? 0 : 180}deg,#FF8A1F00,#FFA62B 50%,#FFF0A0);box-shadow:0 0 8px #FFB020`;
+      layer.appendChild(streak);
+      const from = dir < 0 ? height : -len;
+      const to = dir < 0 ? -len : height;
+      const travel = 280 + Math.random() * 160;
+      runs.push(
+        Fx.anim(streak, [
+          { transform: `translateY(${from}px)` },
+          { transform: `translateY(${to}px)` }
+        ], { duration: travel, easing: 'linear', delay: (i / count) * (duration - travel) }).then(() => streak.remove())
+      );
+    }
+    return Promise.all(runs).then(() => void 0);
   }
 
   /** A kick lands: a white flash on the target with yellow sparkles flying out (Jump Kick, Low Kick). */

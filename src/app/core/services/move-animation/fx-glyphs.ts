@@ -28,6 +28,29 @@ export class FxGlyphs {
     return svg;
   }
 
+  /** A lumpy, golden-brown stone with darker speckles (Rock Slide). */
+  static rockChunk(size: number): HTMLElement {
+    const el = document.createElement('div');
+    const r = () => 38 + Math.round(Math.random() * 24);
+    el.style.cssText = `position:absolute;width:${size}px;height:${size * 0.9}px;pointer-events:none;border-radius:${r()}% ${r()}% ${r()}% ${r()}% / ${r()}% ${r()}% ${r()}% ${r()}%;background:radial-gradient(circle at 30% 70%,#5E3F12 0 9%,transparent 11%),radial-gradient(circle at 68% 40%,#5E3F12 0 7%,transparent 9%),radial-gradient(circle at 35% 30%,#F2CF6B,#C8932E 50%,#7A5418);box-shadow:inset -2px -3px 4px #00000055,0 2px 3px #00000066`;
+    return el;
+  }
+
+  /** A plain white egg, `w` px wide (Egg Bomb, Soft-Boiled). */
+  static eggGlyph(w: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${w * 1.3}px;pointer-events:none;border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff 0 30%,#ECEAE4 60%,#BDB9B0);box-shadow:0 0 3px #00000055`;
+    return el;
+  }
+
+  /** A bold, softly glowing "Z" for sleep effects (Rest). */
+  static sleepZ(size: number, color: string): HTMLElement {
+    const el = document.createElement('div');
+    el.textContent = 'Z';
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;text-align:center;font:900 ${size}px/${size}px sans-serif;color:${color};-webkit-text-stroke:1px #ffffffcc;text-shadow:0 0 6px ${color}`;
+    return el;
+  }
+
   /** A four-point glowing star used for energy / sparkle effects. */
   static sparkStar(size: number, color: string): HTMLElement {
     // The glow sits on a wrapper: clip-path on the same element would cut the drop-shadow off.

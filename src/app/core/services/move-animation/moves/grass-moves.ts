@@ -1,5 +1,5 @@
-import { Point, BattleStageRefs, MoveAnimRegistry } from '../animation.types';
-import { FLECK_COLOR } from '../animation.constants';
+import { Point, BattleStageRefs, MoveVisual, MoveAnimRegistry } from '../animation.types';
+import { DIM_BACKDROP, FLECK_COLOR } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
@@ -10,8 +10,140 @@ export class GrassMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     absorb: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
-    petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target)
+    petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
+    sleeppowder: (refs, _launch, target, v) => GrassMoveAnimations.playSleepPowder(refs, target, v),
+    solarbeam: (refs, _launch, target) => GrassMoveAnimations.playSolarBeam(refs, target)
   };
+
+  /** Turn-1 animations of two-turn Grass moves, by @pkmn/sim move id. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    solarbeam: (refs, launch) => GrassMoveAnimations.playSolarBeamCharge(refs, launch)
+  };
+
+  /** A soft, glowing yellow ball of sunlight. */
+  private static sunMote(s: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFDE0,#F4F07A 40%,#E8E04A00 72%);box-shadow:0 0 ${s}px #F4F07A88`;
+    return el;
+  }
+
+  /**
+   * Solar Beam, turn 1 (absorbs sunlight): the scene goes dark, soft yellow
+   * lights of sunshine float in toward the caster, which blinks light yellow
+   * as it soaks them up.
+   */
+  private static async playSolarBeamCharge(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    const r = launchEl.getBoundingClientRect();
+    const reach = Math.max(r.width, r.height) * 1.1;
+    const motes: Promise<void>[] = [];
+    for (let i = 0; i < 18; i++) {
+      const mote = GrassMoveAnimations.sunMote(10 + Math.random() * 10);
+      const ang = Math.random() * Math.PI * 2;
+      const d = reach * (0.5 + Math.random() * 0.6);
+      const off = { x: Math.cos(ang) * d, y: Math.sin(ang) * d * 0.7 };
+      Fx.place(mote, { x: launch.x + off.x, y: launch.y + off.y });
+      fxEl.appendChild(mote);
+      motes.push(
+        Fx.anim(mote, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: 'translate(0,0) scale(1)', opacity: 1, offset: 0.3 },
+          { transform: `translate(${-off.x * 0.85}px,${-off.y * 0.85}px) scale(.5)`, opacity: 0 }
+        ], { duration: 1000, easing: 'ease-in', delay: Math.random() * 700 }).then(() => mote.remove())
+      );
+    }
+    for (let i = 0; i < 4; i++) setTimeout(() => Fx.flash(launchEl, '#FFF59A', 0.6), 450 + i * 300);
+    await Promise.all(motes);
+
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    dim.remove();
+  }
+
+  /**
+   * Solar Beam, turn 2: a blazing column of sunlight strikes the target from
+   * the sky, flaring a bright glow on the ground around it.
+   */
+  private static async playSolarBeam(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const f = fieldEl.getBoundingClientRect();
+    const foot = r.bottom - f.top - r.height * 0.08;
+    const w = Math.max(r.width * 0.16, 16);
+
+    // The beam runs from the top of the field down to the target's feet.
+    const beam = document.createElement('div');
+    beam.style.cssText = `position:absolute;left:${target.x - w / 2}px;top:0;width:${w}px;height:${foot}px;pointer-events:none;transform-origin:50% 0;border-radius:0 0 ${w}px ${w}px;background:linear-gradient(90deg,#F4E83A00,#F4E83A 20%,#FFFBD0 40%,#fff 50%,#FFFBD0 60%,#F4E83A 80%,#F4E83A00);box-shadow:0 0 18px #F4E83A,0 0 36px #F4E83Aaa`;
+    fxEl.appendChild(beam);
+
+    const glowW = Math.max(r.width * 1.2, 90);
+    const glow = document.createElement('div');
+    glow.style.cssText = `position:absolute;width:${glowW}px;height:${glowW * 0.35}px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,#FFFBD0,#F4E83Acc 40%,#F4E83A00 72%)`;
+    Fx.place(glow, { x: target.x, y: foot });
+    fxEl.appendChild(glow);
+
+    await Fx.anim(beam, [
+      { transform: 'scale(.4,0)', opacity: 0.6 },
+      { transform: 'scale(1,1)', opacity: 1 }
+    ], { duration: 180, easing: 'ease-in' });
+
+    const glowDone = Fx.anim(glow, [
+      { transform: 'scale(.3)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.25 },
+      { transform: 'scale(1.1)', opacity: 0.8, offset: 0.7 },
+      { transform: 'scale(1.2)', opacity: 0 }
+    ], { duration: 900, easing: 'ease-out' }).then(() => glow.remove());
+    Fx.shakeField(fieldEl, 0.5);
+    Fx.flash(targetEl, '#FFF59A', 0.8);
+    const hit = Fx.blink(targetEl);
+
+    // The beam pulses a little wider, then thins out and fades.
+    await Fx.anim(beam, [
+      { transform: 'scale(1,1)', opacity: 1 },
+      { transform: 'scale(1.35,1)', opacity: 1, offset: 0.3 },
+      { transform: 'scale(1,1)', opacity: 1, offset: 0.6 },
+      { transform: 'scale(.1,1)', opacity: 0 }
+    ], { duration: 750, easing: 'ease-in-out' });
+    beam.remove();
+    await Promise.all([glowDone, hit]);
+  }
+
+  /**
+   * Sleep Powder: glowing dark green powder drifts down from above onto the
+   * target, then purple "Z"s float up from it as it falls asleep.
+   */
+  private static async playSleepPowder(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const f = fieldEl.getBoundingClientRect();
+    const top = r.top - f.top;
+    const spread = Math.max(r.width * 0.6, 40);
+
+    const grains: Promise<void>[] = [];
+    for (let i = 0; i < 28; i++) {
+      const s = 6 + Math.random() * 7;
+      const grain = document.createElement('div');
+      grain.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#C8FFD8,#3FCB78 45%,#1E8A4C00 75%);box-shadow:0 0 ${s}px #2FB868`;
+      Fx.place(grain, { x: target.x + (Math.random() * 2 - 1) * spread, y: top - 20 - Math.random() * 30 });
+      fxEl.appendChild(grain);
+      const fall = r.height * (0.6 + Math.random() * 0.4) + 20;
+      const sway = (Math.random() * 2 - 1) * 14;
+      grains.push(
+        Fx.anim(grain, [
+          { transform: 'translate(0,0) scale(.5)', opacity: 0 },
+          { transform: `translate(${sway}px,${fall * 0.3}px) scale(1)`, opacity: 1, offset: 0.2 },
+          { transform: `translate(${-sway}px,${fall * 0.7}px) scale(1)`, opacity: 0.9, offset: 0.65 },
+          { transform: `translate(${sway * 0.5}px,${fall}px) scale(.6)`, opacity: 0 }
+        ], { duration: 900 + Math.random() * 300, easing: 'ease-in-out', delay: Math.random() * 700 }).then(() => grain.remove())
+      );
+    }
+    setTimeout(() => Fx.flash(targetEl, '#3FCB78', 0.3), 700);
+    await Promise.all(grains);
+
+    await FxEffects.sleepZs(fxEl, { x: target.x, y: top + r.height * 0.15 }, -v.dir, ['#9C7CE8', '#B59CF2']);
+  }
 
   /**
    * Absorb: no projectile. Green energy stars are pulled out of the target and

@@ -175,6 +175,47 @@ export class FxEffects {
     ], { duration: 260, easing: 'ease-in-out', fill: 'none' });
   }
 
+  /** Glowing orange sparkles drift down over the caster, from `top` downward (Amnesia, Skull Bash). */
+  static async orangeSparkles(refs: BattleStageRefs, launch: Point, top: number) {
+    const { fxEl, launchEl } = refs;
+    const r = launchEl.getBoundingClientRect();
+    const spread = Math.max(r.width * 0.45, 30);
+    for (let i = 0; i < 16; i++) {
+      const s = 6 + Math.random() * 6;
+      const dot = document.createElement('div');
+      dot.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF3C4,#FFA62B 55%,#FF7A0000);box-shadow:0 0 6px #FFA62B`;
+      Fx.place(dot, { x: launch.x + (Math.random() * 2 - 1) * spread, y: top + Math.random() * r.height * 0.6 });
+      fxEl.appendChild(dot);
+      Fx.anim(dot, [
+        { transform: 'translateY(0) scale(0)', opacity: 0 },
+        { transform: 'translateY(6px) scale(1.2)', opacity: 1, offset: 0.35 },
+        { transform: 'translateY(22px) scale(.3)', opacity: 0 }
+      ], { duration: 700, easing: 'ease-out', delay: Math.random() * 500 }).then(() => dot.remove());
+    }
+    Fx.flash(launchEl, '#FFA62B', 0.3);
+    await Fx.wait(1200);
+  }
+
+  /** Sleep: "Z"s float up from `head` one after another, drifting sideways (`away`) and growing as they rise (Rest, Sleep Powder). */
+  static sleepZs(fxEl: HTMLElement, head: Point, away: number, colors: string[]): Promise<void> {
+    const zs: Promise<void>[] = [];
+    for (let i = 0; i < 4; i++) {
+      const z = FxGlyphs.sleepZ(18 + i * 5, colors[i % colors.length]);
+      Fx.place(z, { x: head.x, y: head.y - 6 });
+      fxEl.appendChild(z);
+      const dx = away * (34 + Math.random() * 10);
+      zs.push(
+        Fx.anim(z, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `translate(${dx * 0.35}px,-18px) scale(.8)`, opacity: 1, offset: 0.25 },
+          { transform: `translate(${dx * 0.75}px,-44px) scale(1.1)`, opacity: 1, offset: 0.7 },
+          { transform: `translate(${dx}px,-62px) scale(1.25)`, opacity: 0 }
+        ], { duration: 1100, easing: 'ease-out', delay: i * 280 }).then(() => z.remove())
+      );
+    }
+    return Promise.all(zs).then(() => void 0);
+  }
+
   /** HP gain: twinkling green stars and a soft green glow around the caster (drain moves). */
   static async healSparkles(refs: BattleStageRefs, launch: Point) {
     const { fxEl, launchEl } = refs;
