@@ -223,10 +223,19 @@
             <span class="menu-title">POKÉMON</span>
             <span class="menu-subtitle">Pokémon wechseln.</span>
           </button>
-          <button type="button" class="menu-btn" [disabled]="isAnimating()" (click)="runAway()">
-            <span class="menu-title">FLUCHT</span>
-            <span class="menu-subtitle">Vor dem Kampf fliehen.</span>
+          <button type="button" class="menu-btn" [disabled]="isAnimating()" (click)="openForfeit()">
+            <span class="menu-title">AUFGEBEN</span>
+            <span class="menu-subtitle">Den Kampf verloren geben.</span>
           </button>
+        </div>
+      }
+      @case ('forfeit') {
+        <div class="forfeit-confirm">
+          <p class="forfeit-question">Willst du den Kampf beenden und aufgeben?</p>
+          <div class="forfeit-actions">
+            <button type="button" class="forfeit-btn" (click)="confirmForfeit()">Ja</button>
+            <button type="button" class="forfeit-btn" (click)="backToMain()">Nein</button>
+          </div>
         </div>
       }
       @case ('fight') {

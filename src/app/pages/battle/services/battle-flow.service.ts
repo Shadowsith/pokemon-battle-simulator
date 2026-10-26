@@ -98,6 +98,12 @@ export class BattleFlowService {
     await this.beginCommandPhase(true);
   }
 
+  /** The player gives up: the battle is lost on the spot. */
+  forfeit(): void {
+    this.endBattle('loss');
+    this.state.log.set('Du hast den Kampf aufgegeben.');
+  }
+
   private endBattle(outcome: 'win' | 'loss'): void {
     const s = this.state;
     this.audio.stopBattleMusic();

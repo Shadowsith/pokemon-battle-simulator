@@ -2,7 +2,7 @@ import { Move } from '../../core/models/move.model';
 import { BattlePokemon } from '../../core/models/pokemon.model';
 import { Slot } from '../../core/battle/battle-format';
 
-export type MenuState = 'main' | 'fight' | 'target' | 'pokemon';
+export type MenuState = 'main' | 'fight' | 'target' | 'pokemon' | 'forfeit';
 /** intro = "VS" screen, fight = the battle proper, result = win/loss screen. */
 export type BattlePhase = 'intro' | 'fight' | 'result';
 /**

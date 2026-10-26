@@ -444,9 +444,15 @@ export class BattlePage implements OnInit, OnDestroy {
     this.log.set('Der Beutel ist in diesem Prototyp noch leer.');
   }
 
-  runAway(): void {
-    if (this.isAnimating()) return;
-    this.log.set('Du kannst nicht vor einem Trainerkampf fliehen!');
+  /** "Aufgeben": ask first; only allowed between turns, never mid-animation. */
+  openForfeit(): void {
+    if (this.phase() !== 'fight' || this.isAnimating()) return;
+    this.menuState.set('forfeit');
+  }
+
+  confirmForfeit(): void {
+    if (this.menuState() !== 'forfeit' || this.phase() !== 'fight' || this.isAnimating()) return;
+    this.flow.forfeit();
   }
 
   backToMain(): void {
