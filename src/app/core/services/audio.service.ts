@@ -19,7 +19,8 @@ export const MUSIC_TRACKS: readonly string[] = [
 /**
  * Plays move / cry / misc sound files under assets/sounds/. Move files are
  * named after the move's canonical @pkmn/sim id (e.g. "solarbeam.mp3") in
- * assets/sounds/moves/. Every clip is scaled by the base volume from
+ * assets/sounds/moves/; a self-made version of the same name in
+ * assets/sounds/moves/free/ is preferred when it exists. Every clip is scaled by the base volume from
  * {@link SettingsService}. Missing files fail silently.
  *
  * Also owns the looping battle music ({@link startBattleMusic} /
@@ -31,6 +32,9 @@ export class AudioService {
 
   /** The currently looping battle theme, if any. */
   private music: HTMLAudioElement | null = null;
+
+  /** Clip files that failed to load; skipped on later plays. */
+  private readonly missing = new Set<string>();
 
   constructor() {
     // Keep a playing track in sync with the music-volume slider.
@@ -87,7 +91,7 @@ export class AudioService {
   }
 
   playMove(showdownId?: string): void {
-    if (showdownId) this.play(`assets/sounds/moves/${showdownId}.mp3`);
+    if (showdownId) this.play(this.moveSources(showdownId));
   }
 
   /**
@@ -95,17 +99,17 @@ export class AudioService {
    * for the classic "wound-down" fainting sound.
    */
   playCry(dexId: number, faint = false): void {
-    this.play(`assets/sounds/cries/${dexId}.mp3`, faint);
+    this.play([`assets/sounds/cries/${dexId}.mp3`], faint);
   }
 
   /** The pop of a Poké Ball springing open as a Pokémon is released. */
   playBallOpen(): void {
-    this.play('assets/sounds/misc/ball_open.mp3');
+    this.play(['assets/sounds/misc/ball_open.mp3']);
   }
 
   /** The whir of a Poké Ball recalling a Pokémon to its ball. */
   playBallReturn(): void {
-    this.play('assets/sounds/misc/ball_return.mp3');
+    this.play(['assets/sounds/misc/ball_return.mp3']);
   }
 
   /**
@@ -121,18 +125,33 @@ export class AudioService {
           : effectiveness === 1
             ? 'hit-normal-damage'
             : null;
-    if (file) this.play(`assets/sounds/moves/${file}.mp3`);
+    if (file) this.play(this.moveSources(file));
   }
 
-  private play(src: string, faint = false): void {
+  /** A move clip: the self-made free version first, the regular clip as fallback. */
+  private moveSources(file: string): string[] {
+    return [`assets/sounds/moves/free/${file}.mp3`, `assets/sounds/moves/${file}.mp3`];
+  }
+
+  /**
+   * Play the first of `sources` that loads. A source that failed once is
+   * remembered and skipped from then on, so missing files are requested only once.
+   */
+  private play(sources: string[], faint = false): void {
+    const [src, ...rest] = sources.filter((s) => !this.missing.has(s));
+    if (!src) return;
     const audio = new Audio(src);
     audio.volume = this.settings.volume();
     if (faint) {
       audio.playbackRate = 0.55;
       (audio as HTMLAudioElement & { preservesPitch: boolean }).preservesPitch = false;
     }
+    audio.addEventListener('error', () => {
+      this.missing.add(src);
+      this.play(rest, faint);
+    });
     audio.play().catch(() => {
-      /* file missing or autoplay blocked before a user gesture - ignore */
+      /* autoplay blocked or file missing - a missing file is handled by the error listener */
     });
   }
 }
