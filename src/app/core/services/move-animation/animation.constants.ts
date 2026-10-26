@@ -77,6 +77,21 @@ export const PSYCHIC_WAVES =
   ) +
   '")';
 
+/** Tile of light blue water with white foamy wave crests for the rising Waterfall backdrop (80 x 48 px). */
+export const WATERFALL_WAVES =
+  'url("data:image/svg+xml,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="80" height="48" viewBox="0 0 80 48">' +
+      '<defs><linearGradient id="f" x1="0" y1="0" x2="0" y2="1">' +
+      '<stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/>' +
+      '</linearGradient></defs>' +
+      '<rect width="80" height="48" fill="#86C6F0"/>' +
+      '<path d="M0,22 Q10,8 20,22 T40,22 T60,22 T80,22 L80,34 Q70,26 60,34 T40,34 T20,34 T0,34 Z" fill="url(#f)"/>' +
+      '<path d="M0,22 Q10,8 20,22 T40,22 T60,22 T80,22" fill="none" stroke="#ffffff" stroke-width="3"/>' +
+      '</svg>'
+  ) +
+  '")';
+
 /** Colours for the cartoon fist (Dizzy Punch, Fire Punch, Ice Punch, Thunder Punch). */
 export const FIST_TONES = {
   yellow: { fill: '#FFD84A', edge: '#B8860B', lines: '#C9971A', glow: '#FFE04A' },

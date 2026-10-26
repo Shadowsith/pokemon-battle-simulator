@@ -89,6 +89,21 @@ export class FxGlyphs {
     return el;
   }
 
+  /** A black cartoon foot sole with four toes, `w` px wide (Jump Kick). */
+  static footGlyph(w: number, color = '#141414'): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 20 26');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${w * 1.3}px;filter:drop-shadow(0 0 2px #00000088)`);
+    svg.innerHTML =
+      `<g fill="${color}">` +
+      '<path d="M5,10 C4,6 16,6 15.5,11 C15,15 13,17 13.5,21 C14,25 6,25 6,21 C6,17 5.5,14 5,10 Z"/>' +
+      '<circle cx="4.5" cy="5.5" r="2.2"/><circle cx="8.5" cy="3.2" r="2.3"/>' +
+      '<circle cx="12.6" cy="3.4" r="2.1"/><circle cx="16" cy="6" r="1.8"/>' +
+      '</g>';
+    return svg;
+  }
+
   /** A cartoon fist seen from the front (see FIST_TONES for the colours): fingers curled in, thumb across the side. */
   static fistGlyph(w: number, tone: keyof typeof FIST_TONES = 'yellow'): HTMLElement {
     const c = FIST_TONES[tone];
@@ -198,8 +213,8 @@ export class FxGlyphs {
     return wrap;
   }
 
-  /** A jagged comic-style impact burst: irregular spikes in one colour round a core of another. */
-  static spikyBurst(size: number, outer: string, inner: string): HTMLElement {
+  /** A jagged comic-style impact burst: irregular spikes in one colour round a core of another, with a bright centre. */
+  static spikyBurst(size: number, outer: string, inner: string, centre = '#FFF6C0'): HTMLElement {
     const spikes = 12;
     const pts: string[] = [];
     for (let i = 0; i < spikes * 2; i++) {
@@ -210,7 +225,7 @@ export class FxGlyphs {
     const el = document.createElement('div');
     el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 4px ${inner})`;
     const shape = document.createElement('div');
-    shape.style.cssText = `width:100%;height:100%;clip-path:polygon(${pts.join(',')});background:radial-gradient(circle,#FFF6C0 0 12%,${inner} 30%,${outer} 55%)`;
+    shape.style.cssText = `width:100%;height:100%;clip-path:polygon(${pts.join(',')});background:radial-gradient(circle,${centre} 0 12%,${inner} 30%,${outer} 55%)`;
     el.appendChild(shape);
     return el;
   }

@@ -12,6 +12,7 @@ export class PsychicMoveAnimations {
     amnesia: (refs, launch) => PsychicMoveAnimations.playAmnesia(refs, launch),
     barrier: (refs, launch) => PsychicMoveAnimations.playBarrier(refs, launch),
     dreameater: (refs, launch, target, v) => PsychicMoveAnimations.playDreamEater(refs, launch, target, v),
+    lightscreen: (refs, launch, _target, v) => PsychicMoveAnimations.playLightScreen(refs, launch, v),
     psychic: (refs) => PsychicMoveAnimations.playPsychic(refs)
   };
 
@@ -313,6 +314,65 @@ export class PsychicMoveAnimations {
       ], { duration: 520, easing: 'ease-out', delay: 300 + Math.random() * 900 }).then(() => star.remove());
     }
     Fx.flash(launchEl, '#B8FFF6', 0.3);
+    await done;
+  }
+
+  /**
+   * Light Screen: a round, bluish-pink screen of light opens on the foe's
+   * side of the caster, seen at an angle; a sheen sweeps over it while blue
+   * and pink sparkles twinkle around its rim, then it fades.
+   */
+  private static async playLightScreen(refs: BattleStageRefs, launch: Point, v: MoveVisual) {
+    const { fxEl, launchEl } = refs;
+    const blue = '#7FB8FF';
+    const pink = '#FF8FE0';
+    const r = launchEl.getBoundingClientRect();
+    const h = Math.max(r.height * 1.15, 80);
+    const w = h * 0.5;
+    const at = { x: launch.x + v.dir * Math.max(r.width * 0.5, 34), y: launch.y - h * 0.05 };
+    const tilt = v.dir * 12;
+
+    const screen = document.createElement('div');
+    screen.style.cssText = `position:absolute;width:${w}px;height:${h}px;border-radius:50%;pointer-events:none;overflow:hidden;border:3px solid ${pink};background:radial-gradient(ellipse at 50% 50%,#FFFFFFcc 0%,#DDEBFFaa 30%,${blue}88 60%,${pink}aa 90%);box-shadow:0 0 14px ${pink},0 0 26px ${blue}aa,inset 0 0 16px #ffffffaa`;
+    const sheen = document.createElement('div');
+    sheen.style.cssText = `position:absolute;left:-20%;top:0;width:140%;height:${h * 0.25}px;background:linear-gradient(180deg,transparent,#ffffffdd,transparent)`;
+    screen.appendChild(sheen);
+    Fx.place(screen, at);
+    fxEl.appendChild(screen);
+
+    const total = 1700;
+    const done = Fx.anim(screen, [
+      { transform: `rotate(${tilt}deg) scale(.05,.3)`, opacity: 0 },
+      { transform: `rotate(${tilt}deg) scale(1.08,1.05)`, opacity: 1, offset: 0.15 },
+      { transform: `rotate(${tilt}deg) scale(1,1)`, opacity: 0.9, offset: 0.3 },
+      { transform: `rotate(${tilt}deg) scale(1.03,1.03)`, opacity: 1, offset: 0.6 },
+      { transform: `rotate(${tilt}deg) scale(1,1)`, opacity: 0.85, offset: 0.85 },
+      { transform: `rotate(${tilt}deg) scale(.95,1)`, opacity: 0 }
+    ], { duration: total, easing: 'ease-in-out' }).then(() => screen.remove());
+    Fx.anim(sheen, [
+      { transform: `translateY(${-h * 0.3}px)` },
+      { transform: `translateY(${h * 1.05}px)` }
+    ], { duration: 700, easing: 'ease-in-out', delay: 280 });
+
+    // Blue and pink sparkles twinkle around the rim of the screen.
+    const rad = (tilt * Math.PI) / 180;
+    for (let i = 0; i < 14; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const ex = Math.cos(ang) * (w / 2) * (0.9 + Math.random() * 0.35);
+      const ey = Math.sin(ang) * (h / 2) * (0.9 + Math.random() * 0.2);
+      const star = FxGlyphs.sparkStar(9 + Math.random() * 10, i % 2 ? blue : pink);
+      Fx.place(star, {
+        x: at.x + ex * Math.cos(rad) - ey * Math.sin(rad),
+        y: at.y + ex * Math.sin(rad) + ey * Math.cos(rad)
+      });
+      fxEl.appendChild(star);
+      Fx.anim(star, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1.2) rotate(45deg)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+      ], { duration: 520, easing: 'ease-out', delay: 200 + Math.random() * 1000 }).then(() => star.remove());
+    }
+    Fx.flash(launchEl, blue, 0.3);
     await done;
   }
 }

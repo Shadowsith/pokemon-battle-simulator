@@ -8,7 +8,7 @@ import { Fx } from './move-animation/fx';
 import { FxEffects } from './move-animation/fx-effects';
 import { FxGlyphs } from './move-animation/fx-glyphs';
 import { MoveVisualBuilder } from './move-animation/move-visual.builder';
-import { CUSTOM_MOVE_ANIMATIONS, FlyingMoveAnimations, GroundMoveAnimations } from './move-animation/moves';
+import { CUSTOM_CHARGE_ANIMATIONS, CUSTOM_MOVE_ANIMATIONS } from './move-animation/moves';
 
 export type { BattleStageRefs } from './move-animation/animation.types';
 
@@ -40,25 +40,26 @@ export class MoveAnimationService {
     v.dir = target.x >= launch.x ? 1 : -1;
 
     if (phase === 'charge') {
-      return this.playChargeTurn(move, refs, launch, v);
+      return this.playChargeTurn(move, refs, launch, target, v);
     }
     if (phase === 'release') {
       await this.playReleaseIntro(move, refs);
     } else if (v.charge) {
-      await FxEffects.chargeUp(refs, launch, v);
+      const customCharge = CUSTOM_CHARGE_ANIMATIONS[move.showdownId];
+      await (customCharge ? customCharge(refs, launch, target, v) : FxEffects.chargeUp(refs, launch, v));
     }
 
     const custom = CUSTOM_MOVE_ANIMATIONS[move.showdownId];
     await (custom ? custom(refs, launch, target, v) : DeliveryAnimations.playDelivery(refs, launch, target, v));
   }
 
-  /** Turn 1 of a two-turn move: gather energy, or duck under / fly up out of sight. */
-  private async playChargeTurn(move: Move, refs: BattleStageRefs, launch: Point, v: MoveVisual) {
-    if (move.showdownId === 'dig') return GroundMoveAnimations.playDigDown(refs);
-    if (move.showdownId === 'fly') return FlyingMoveAnimations.playFlyUp(refs, launch);
+  /** Turn 1 of a two-turn move: a hand-made charge, gather energy, or duck under / fly up out of sight. */
+  private async playChargeTurn(move: Move, refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const custom = CUSTOM_CHARGE_ANIMATIONS[move.showdownId];
+    if (custom) return custom(refs, launch, target, v);
     if (SEMI_INVULN_ANIM.has(move.showdownId)) {
       const el = refs.launchEl;
-      const down = move.showdownId === 'dig' || move.showdownId === 'dive';
+      const down = move.showdownId === 'dive';
       el.getAnimations?.().forEach((a) => a.cancel());
       el.style.transformOrigin = 'center bottom';
       await Fx.anim(el, [

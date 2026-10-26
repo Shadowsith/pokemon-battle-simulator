@@ -13,6 +13,11 @@ export class GroundMoveAnimations {
     earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs)
   };
 
+  /** Turn-1 animations of two-turn Ground moves, by @pkmn/sim move id. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    dig: (refs) => GroundMoveAnimations.playDigDown(refs)
+  };
+
   /**
    * Bone Club: a spinning bone is thrown high and drops onto the target from
    * above, lands with a hit, then bounces off.

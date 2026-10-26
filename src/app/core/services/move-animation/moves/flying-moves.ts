@@ -11,6 +11,11 @@ export class FlyingMoveAnimations {
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target)
   };
 
+  /** Turn-1 animations of two-turn Flying moves, by @pkmn/sim move id. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    fly: (refs, launch) => FlyingMoveAnimations.playFlyUp(refs, launch)
+  };
+
   /**
    * Fly, turn 1: the sky backdrop rushes downward (streaks moving up), a blue
    * bubble forms around the user, which fades into it, and the bubble shoots

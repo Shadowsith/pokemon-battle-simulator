@@ -1,5 +1,5 @@
 import { Point, BattleStageRefs, BubbleStyle, MoveAnimRegistry } from '../animation.types';
-import { BUBBLE_DRIFT, BUBBLE_BEAM, DIM_BACKDROP } from '../animation.constants';
+import { BUBBLE_DRIFT, BUBBLE_BEAM, DIM_BACKDROP, WATERFALL_WAVES } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 
@@ -10,7 +10,8 @@ export class WaterMoveAnimations {
     bubble: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_DRIFT),
     bubblebeam: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_BEAM),
     crabhammer: (refs, _launch, target) => WaterMoveAnimations.playCrabhammer(refs, target),
-    hydropump: (refs, launch, target) => WaterMoveAnimations.playHydroPump(refs, launch, target)
+    hydropump: (refs, launch, target) => WaterMoveAnimations.playHydroPump(refs, launch, target),
+    waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target)
   };
 
   /**
@@ -296,5 +297,87 @@ export class WaterMoveAnimations {
       );
     }
     await Promise.all(pops);
+  }
+
+  /**
+   * Waterfall: the field goes black, then a wall of light blue water with
+   * white wave crests rushes upward behind the battle, and the target is
+   * struck by a rising column of blue splashes with white spray streaks.
+   */
+  private static async playWaterfall(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const black = Fx.backdrop(fieldEl, 'background:#000');
+    await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    // Rising water: the wave tile scrolls upward, faded in over the black.
+    const water = document.createElement('div');
+    water.style.cssText = `position:absolute;inset:0;background-image:${WATERFALL_WAVES};background-size:80px 48px`;
+    black.appendChild(water);
+    water.animate([{ backgroundPosition: '0 0' }, { backgroundPosition: '0 -48px' }], {
+      duration: 260,
+      iterations: Infinity,
+      easing: 'linear'
+    });
+    await Fx.anim(water, [
+      { transform: 'translateY(100%)', opacity: 0.6 },
+      { transform: 'translateY(0)', opacity: 1 }
+    ], { duration: 420, easing: 'ease-out' });
+    await Fx.wait(350);
+
+    // The hit: blue splashes stacked from the target's feet up, plus white spray.
+    const r = targetEl.getBoundingClientRect();
+    const h = Math.max(r.height, 50);
+    const base = { x: target.x, y: target.y + h * 0.35 };
+    const blobs = 5;
+    const done: Promise<void>[] = [];
+    for (let i = 0; i < blobs; i++) {
+      const size = Math.max(r.width * 0.55, 34) * (1 - i * 0.1);
+      const blob = FxGlyphs.spikyBurst(size, '#2F52F0', '#6F8CFF', '#E8F0FF');
+      Fx.place(blob, { x: base.x + (Math.random() * 10 - 5), y: base.y - (i * h * 0.95) / blobs });
+      fxEl.appendChild(blob);
+      done.push(
+        Fx.anim(blob, [
+          { transform: 'translateY(20px) scale(.3) rotate(0)', opacity: 0 },
+          { transform: 'translateY(0) scale(1.05) rotate(20deg)', opacity: 0.95, offset: 0.3 },
+          { transform: 'translateY(-26px) scale(.8) rotate(35deg)', opacity: 0 }
+        ], { duration: 560, easing: 'ease-out', delay: i * 55 }).then(() => blob.remove())
+      );
+      if (i % 2 === 0) setTimeout(() => Fx.shake(targetEl, 5), i * 55);
+    }
+    for (let i = 0; i < 9; i++) {
+      const w = 3 + Math.random() * 4;
+      const len = h * (0.5 + Math.random() * 0.6);
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;width:${w}px;height:${len}px;border-radius:${w}px;pointer-events:none;background:linear-gradient(0deg,#ffffff00,#ffffff 50%,#E8F6FF00)`;
+      Fx.place(streak, { x: target.x + (Math.random() * 2 - 1) * Math.max(r.width * 0.5, 28), y: base.y - len / 2 });
+      fxEl.appendChild(streak);
+      done.push(
+        Fx.anim(streak, [
+          { transform: 'translateY(30px) scaleY(.3)', opacity: 0 },
+          { transform: 'translateY(0) scaleY(1)', opacity: 0.95, offset: 0.35 },
+          { transform: `translateY(${-h * 0.6}px) scaleY(.6)`, opacity: 0 }
+        ], { duration: 520, easing: 'ease-out', delay: 40 + Math.random() * 220 }).then(() => streak.remove())
+      );
+    }
+    for (let i = 0; i < 12; i++) {
+      const s = 4 + Math.random() * 5;
+      const drop = document.createElement('div');
+      drop.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:#2F52F0;box-shadow:0 0 4px #6F8CFF`;
+      Fx.place(drop, { x: target.x + (Math.random() * 2 - 1) * r.width * 0.6, y: target.y + (Math.random() * 2 - 1) * h * 0.5 });
+      fxEl.appendChild(drop);
+      done.push(
+        Fx.anim(drop, [
+          { transform: 'translateY(0) scale(.4)', opacity: 0 },
+          { transform: 'translateY(-10px) scale(1)', opacity: 1, offset: 0.3 },
+          { transform: `translateY(${-30 - Math.random() * 30}px) scale(.6)`, opacity: 0 }
+        ], { duration: 600, easing: 'ease-out', delay: Math.random() * 300 }).then(() => drop.remove())
+      );
+    }
+    Fx.flash(targetEl, '#4F7BFF', 0.7);
+    Fx.shakeField(fieldEl, 0.4);
+    await Promise.all(done);
+
+    await Fx.anim(black, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    black.remove();
   }
 }

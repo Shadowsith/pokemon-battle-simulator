@@ -1,7 +1,7 @@
 import { Dex } from '@pkmn/sim';
 import { Move } from '../../models/move.model';
 import { MoveVisualBuilder } from './move-visual.builder';
-import { CUSTOM_MOVE_ANIMATIONS, MOVE_ANIMATION_GROUPS } from './moves';
+import { CUSTOM_CHARGE_ANIMATIONS, CUSTOM_MOVE_ANIMATIONS, MOVE_ANIMATION_GROUPS } from './moves';
 
 function moveFor(id: string): Move {
   const d = Dex.moves.get(id);
@@ -22,6 +22,12 @@ describe('move animation registry', () => {
   it('only uses real @pkmn/sim move ids', () => {
     const unknown = Object.keys(CUSTOM_MOVE_ANIMATIONS).filter((id) => !Dex.moves.get(id).exists);
     expect(unknown).toEqual([]);
+  });
+
+  it('only registers turn-1 animations for real two-turn moves', () => {
+    const wrong = Object.keys(CUSTOM_CHARGE_ANIMATIONS).filter((id) => !Dex.moves.get(id).flags.charge);
+    expect(wrong).toEqual([]);
+    expect(Object.keys(CUSTOM_CHARGE_ANIMATIONS)).toEqual(jasmine.arrayContaining(['dig', 'fly', 'razorwind']));
   });
 });
 

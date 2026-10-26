@@ -19,6 +19,8 @@
 | `targetAura` | aura around the target (status moves) | 96 |
 | `weather` | screen-wide weather effect | 4 |
 
+**Rule:** a Pokémon sprite never turns around or spins on its own axis (that never happens in the Pokémon games and looks odd). It always keeps facing its opponent; a "circling" movement moves the sprite along a path instead.
+
 Type sets the colour and particle shape. Base power sets the size. Multi-hit, priority, two-turn, drain and recoil add extra motion.
 
 ## Priority
@@ -104,29 +106,29 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - [ ] **Hypnosis** / Hypnose — `hypnosis` · Psychic · Status · `targetAura`
 - [x] ⭐ **Ice Beam** / Eisstrahl — `icebeam` · Ice · Special · light blue flickering beam + frost sparkles + iced target (custom, needs review)
 - [x] ⭐ **Ice Punch** / Eishieb — `icepunch` · Ice · Physical · light blue ice fist slams in, see-through ice crystals burst and tumble around the target (custom, needs review)
-- [ ] ⭐ **Jump Kick** / Sprungkick — `jumpkick` · Fighting · Physical · `melee`
+- [x] ⭐ **Jump Kick** / Sprungkick — `jumpkick` · Fighting · Physical · black feet stamp the target one by one + white flash with yellow sparkles (custom, needs review)
 - [ ] **Karate Chop** / Karateschlag — `karatechop` · Fighting · Physical · `melee`
 - [ ] **Kinesis** / Psykraft — `kinesis` · Psychic · Status · `selfAura`
 - [x] ⭐ **Leech Life** / Blutsauger — `leechlife` · Bug · Physical · like Absorb: blood-red sparkles drain to caster, then green HP sparkles (custom, needs review)
-- [ ] ⭐ **Leech Seed** / Egelsamen — `leechseed` · Grass · Status · `targetAura`
+- [x] ⭐ **Leech Seed** / Egelsamen — `leechseed` · Grass · Status · seeds tossed in a high arc, green sprouts grow on the target (custom, needs review)
 - [ ] **Leer** / Silberblick — `leer` · Normal · Status · `selfAura`
 - [ ] **Lick** / Schlecker — `lick` · Ghost · Physical · `melee`
-- [ ] ⭐ **Light Screen** / Lichtschild — `lightscreen` · Psychic · Status · `selfAura`
+- [x] ⭐ **Light Screen** / Lichtschild — `lightscreen` · Psychic · Status · round blue-pink light screen in front of the caster + blue/pink rim sparkles (custom, needs review)
 - [ ] **Lovely Kiss** / Todeskuss — `lovelykiss` · Normal · Status · `targetAura`
-- [ ] ⭐ **Low Kick** / Fußkick — `lowkick` · Fighting · Physical · `melee`
+- [x] ⭐ **Low Kick** / Fußkick — `lowkick` · Fighting · Physical · single black foot sweeps left→right across the target + yellow sparkle hit (custom, needs review)
 - [ ] **Meditate** / Meditation — `meditate` · Psychic · Status · `selfAura`
 - [ ] **Mega Drain** / Megasauger — `megadrain` · Grass · Special · `projectile`
-- [ ] ⭐ **Mega Kick** / Megakick — `megakick` · Normal · Physical · `melee`
-- [ ] ⭐ **Mega Punch** / Megahieb — `megapunch` · Normal · Physical · `melee`
+- [x] ⭐ **Mega Kick** / Megakick — `megakick` · Normal · Physical · black → red backdrop with yellow burst lines + big vibrating foot stamps the target (custom, needs review)
+- [x] ⭐ **Mega Punch** / Megahieb — `megapunch` · Normal · Physical · black backdrop + red fist slam with yellow hit burst, red/yellow sparks, ground quake (custom, needs review)
 - [ ] **Metronome** / Metronom — `metronome` · Normal · Status · `selfAura`
 - [ ] **Mimic** / Mimikry — `mimic` · Normal · Status · `targetAura`
 - [ ] **Minimize** / Komprimator — `minimize` · Normal · Status · `selfAura`
 - [ ] **Mirror Move** / Spiegeltrick — `mirrormove` · Flying · Status · `targetAura`
 - [ ] **Mist** / Weißnebel — `mist` · Ice · Status · `selfAura`
-- [ ] ⭐ **Night Shade** / Nachtnebel — `nightshade` · Ghost · Special · `projectile`
+- [x] ⭐ **Night Shade** / Nachtnebel — `nightshade` · Ghost · Special · near-black screen, caster glows pale pink, target darkens and trembles (custom, needs review)
 - [ ] **Pay Day** / Zahltag — `payday` · Normal · Physical · `projectile`
 - [ ] **Peck** / Pikser — `peck` · Flying · Physical · `melee`
-- [ ] ⭐ **Petal Dance** / Blättertanz — `petaldance` · Grass · Special · `projectile`
+- [x] ⭐ **Petal Dance** / Blättertanz — `petaldance` · Grass · Special · caster dances in circles (still facing the target) and whirls up pink petals, which then swirl around the target (custom, needs review)
 - [ ] **Pin Missile** / Nadelrakete — `pinmissile` · Bug · Physical · `projectile`
 - [ ] **Poison Gas** / Giftwolke — `poisongas` · Poison · Status · `targetAura`
 - [ ] **Poison Powder** / Giftpuder — `poisonpowder` · Poison · Status · `powder`
@@ -138,7 +140,7 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - [ ] **Quick Attack** / Ruckzuckhieb — `quickattack` · Normal · Physical · `melee`
 - [ ] **Rage** / Raserei — `rage` · Normal · Physical · `melee`
 - [ ] **Razor Leaf** / Rasierblatt — `razorleaf` · Grass · Physical · `field`
-- [ ] ⭐ **Razor Wind** / Klingensturm — `razorwind` · Normal · Special · `beam`
+- [x] ⭐ **Razor Wind** / Klingensturm — `razorwind` · Normal · Special · turn 1: blue whirlwind around the caster; turn 2: red blade slashes on the target (custom, needs review)
 - [ ] ⭐ **Recover** / Genesung — `recover` · Normal · Status · `selfAura`
 - [ ] ⭐ **Reflect** / Reflektor — `reflect` · Psychic · Status · `selfAura`
 - [ ] ⭐ **Rest** / Erholung — `rest` · Psychic · Status · `selfAura`
@@ -189,14 +191,14 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - [ ] **Thunder Shock** / Donnerschock — `thundershock` · Electric · Special · `projectile`
 - [x] ⭐ **Thunder Wave** / Donnerwelle — `thunderwave` · Electric · Status · scene darkens, yellow electric arcs swirl in around the target, target turns yellow with crackling bolts (custom, needs review)
 - [x] ⭐ **Thunderbolt** / Donnerblitz — `thunderbolt` · Electric · Special · four thin lightning strikes from above, glowing spiky electric ball crackling on the target (custom, needs review)
-- [ ] ⭐ **Toxic** / Toxin — `toxic` · Poison · Status · `targetAura`
+- [x] ⭐ **Toxic** / Toxin — `toxic` · Poison · Status · purple poison pool + rising bubbles + purple tint (custom, needs review)
 - [ ] **Transform** / Wandler — `transform` · Normal · Status · `targetAura`
-- [ ] ⭐ **Tri Attack** / Triplette — `triattack` · Normal · Special · `projectile`
+- [x] ⭐ **Tri Attack** / Triplette — `triattack` · Normal · Special · black backdrop + blue/yellow/red orbs orbit, hurled → electric/ice/fire hits (custom, needs review)
 - [ ] **Twineedle** / Duonadel — `twineedle` · Bug · Physical · `projectile`
 - [ ] **Vine Whip** / Rankenhieb — `vinewhip` · Grass · Physical · `melee`
 - [ ] **Vise Grip** / Klammer — `visegrip` · Normal · Physical · `melee`
 - [ ] **Water Gun** / Aquaknarre — `watergun` · Water · Special · `projectile`
-- [ ] ⭐ **Waterfall** / Kaskade — `waterfall` · Water · Physical · `melee`
+- [x] ⭐ **Waterfall** / Kaskade — `waterfall` · Water · Physical · black backdrop → rising wave backdrop + blue splash column hit (custom, needs review)
 - [ ] ⭐ **Whirlwind** / Wirbelwind — `whirlwind` · Normal · Status · `targetAura`
 - [ ] **Wing Attack** / Flügelschlag — `wingattack` · Flying · Physical · `melee`
 - [ ] **Withdraw** / Panzerschutz — `withdraw` · Water · Status · `selfAura`
