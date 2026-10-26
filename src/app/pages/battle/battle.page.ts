@@ -51,7 +51,7 @@ import { MoveResolverService } from './services/move-resolver.service';
   imports: [IonContent, IonButton, ItemIconComponent, DebugPanelComponent],
   providers: [BattleStateService, BattleStageService, BattleSetupService, MoveResolverService, BattleFlowService],
   templateUrl: './battle.page.html',
-  styleUrl: './battle.page.scss'
+  styleUrls: ['./battle.page.scss', './battle-portrait.scss']
 })
 export class BattlePage implements OnInit, OnDestroy {
   @ViewChild('field', { static: true }) fieldRef!: ElementRef<HTMLElement>;

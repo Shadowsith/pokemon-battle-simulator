@@ -1,0 +1,174 @@
+/* --- narrow / portrait screens ------------------------------------------
+   The default field is a fixed 640 × 300 stage; on narrower screens its right
+   half (the whole opponent side) would be clipped. Below 640px the field is
+   re-laid out with real positions instead of being scaled, so HUD text stays
+   readable and the move animations (which measure live element boxes) keep
+   aiming correctly:
+     opponent HUD top-left,      opponent sprite right (anchored via `right`)
+     player sprite bottom-left,  player HUD right, below the opponent.
+   Loaded after battle.page.scss, so these rules override it. */
+
+@media (max-width: 639px) {
+  .field {
+    height: 340px;
+  }
+
+  /* Move buttons reserve room on the right for the hint badge; two per row
+     don't fit, so stack them full-width. */
+  .move-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hud {
+    width: min(168px, 46%);
+  }
+
+  .party-indicator.opp {
+    left: 10px;
+    top: 8px;
+  }
+
+  .opponent-hud {
+    left: 10px;
+    top: 26px;
+  }
+
+  .opponent-platform {
+    left: auto;
+    right: 20px;
+    top: 140px;
+  }
+
+  .opponent-sprite {
+    left: auto;
+    right: 30px;
+    bottom: 190px;
+    height: 88px;
+    max-width: 140px;
+  }
+
+  .player-platform {
+    left: 20px;
+    top: 250px;
+  }
+
+  .player-sprite {
+    left: 20px;
+    bottom: 63px;
+    height: 112px;
+    max-width: 150px;
+  }
+
+  .player-hud {
+    left: auto;
+    right: 10px;
+    top: 196px;
+  }
+
+  /* Doubles: opponent pair staggered on the right with both HUDs stacked
+     top-left; player pair staggered bottom-left with both HUDs stacked on
+     the right, in the gap between the two sides. */
+  .field.doubles {
+    /* `left: auto` sits in each .posN rule: the base .posN rules set `left`
+       with higher specificity than a plain .field.doubles reset. */
+    height: 420px;
+
+    .party-indicator.opp {
+      left: 10px;
+    }
+
+    .hud {
+      width: min(140px, 40%);
+    }
+
+    .opponent-hud {
+      left: 10px;
+
+      &.pos0 {
+        top: 26px;
+      }
+
+      &.pos1 {
+        top: 72px;
+      }
+    }
+
+    .opponent-platform {
+      width: 90px;
+      height: 18px;
+
+      &.pos0 {
+        left: auto;
+        right: 110px;
+        top: 150px;
+      }
+
+      &.pos1 {
+        left: auto;
+        right: 10px;
+        top: 166px;
+      }
+    }
+
+    .opponent-sprite {
+      height: 72px;
+      max-width: 100px;
+
+      &.pos0 {
+        left: auto;
+        right: 115px;
+        bottom: 260px;
+      }
+
+      &.pos1 {
+        left: auto;
+        right: 15px;
+        bottom: 244px;
+      }
+    }
+
+    .player-platform {
+      width: 100px;
+      height: 22px;
+
+      &.pos0 {
+        left: 10px;
+        top: 350px;
+      }
+
+      &.pos1 {
+        left: 115px;
+        top: 366px;
+      }
+    }
+
+    .player-sprite {
+      height: 96px;
+      max-width: 110px;
+
+      &.pos0 {
+        left: 10px;
+        bottom: 43px;
+      }
+
+      &.pos1 {
+        left: 115px;
+        bottom: 27px;
+      }
+    }
+
+    .player-hud {
+      right: 10px;
+
+      &.pos0 {
+        left: auto;
+        top: 190px;
+      }
+
+      &.pos1 {
+        left: auto;
+        top: 236px;
+      }
+    }
+  }
+}
