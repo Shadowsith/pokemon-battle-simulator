@@ -3,11 +3,12 @@
 **Goal:** replace every move sound under `public/assets/sounds/moves/` with a free (CC0 / CC-BY / own recording) or self-made file, for all 621 moves up to Gen 6.
 
 ## Rules
-- **File name:** `<showdownId>.mp3` (the @pkmn/sim id, e.g. `solarbeam.mp3`). `AudioService.playMove()` loads exactly that name.
+- **File name:** `<showdownId>.mp3` (the @pkmn/sim id, e.g. `solarbeam.mp3`), placed in `public/assets/sounds/moves/free/`. `AudioService.playMove()` plays the `free/` file when it exists and falls back to the regular clip of the same name otherwise.
+- **Self-made sounds:** `node scripts/synth-move-sounds.mjs [moveId ...]` synthesizes original GBA-style clips (no samples) into `free/`. Each move has a recipe in `scripts/move-sounds/recipes/<type>.mjs`, timed to its battle animation.
 - **Format:** mp3, mono or stereo, normalized loudness, about 0.3–2 s, no silence at the start.
 - **Licence:** note the source and licence of every file you did not make yourself in a `CREDITS.md` next to the files. CC-BY needs attribution; avoid non-commercial (NC) licences if the app may ever be sold.
 - **Sources:** freesound.org (filter by CC0), sonniss.com GDC bundles, opengameart.org, kenney.nl, or your own synth (sfxr / jsfxr / ChipTone / Bfxr).
-- Tick the box when the new file is in place **and** you have heard it in a battle.
+- Tick the box when the new file is in place in `free/` **and** you have heard it in a battle.
 
 ## Generic battle sounds (used by code)
 - [ ] `hit-normal-damage.mp3` — normal hit
@@ -95,639 +96,639 @@ These come with the current sound pack. Replace them only if you plan to wire th
 
 ## Gen 1 moves (165)
 
-- [ ] **Absorb** / Absorber — `absorb.mp3` · Grass
-- [ ] **Acid** / Säure — `acid.mp3` · Poison
-- [ ] **Acid Armor** / Säurepanzer — `acidarmor.mp3` · Poison
-- [ ] **Agility** / Agilität — `agility.mp3` · Psychic
-- [ ] **Amnesia** / Amnesie — `amnesia.mp3` · Psychic
-- [ ] **Aurora Beam** / Aurorastrahl — `aurorabeam.mp3` · Ice
-- [ ] **Barrage** / Stakkato — `barrage.mp3` · Normal — ⚠️ no `barrage.mp3`, currently silent (only `barrage-1hit`, `barrage-2hits`)
-- [ ] **Barrier** / Barriere — `barrier.mp3` · Psychic
-- [ ] **Bide** / Geduld — `bide.mp3` · Normal
-- [ ] **Bind** / Klammergriff — `bind.mp3` · Normal
-- [ ] **Bite** / Biss — `bite.mp3` · Dark
-- [ ] **Blizzard** / Blizzard — `blizzard.mp3` · Ice
-- [ ] **Body Slam** / Bodyslam — `bodyslam.mp3` · Normal
-- [ ] **Bone Club** / Knochenkeule — `boneclub.mp3` · Ground
-- [ ] **Bonemerang** / Knochmerang — `bonemerang.mp3` · Ground — ⚠️ no `bonemerang.mp3`, currently silent (only `bonemerang-1hit`, `bonemerang-2hits`)
-- [ ] **Bubble** / Blubber — `bubble.mp3` · Water
-- [ ] **Bubble Beam** / Blubbstrahl — `bubblebeam.mp3` · Water
-- [ ] **Clamp** / Schnapper — `clamp.mp3` · Water
-- [ ] **Comet Punch** / Kometenhieb — `cometpunch.mp3` · Normal — ⚠️ no `cometpunch.mp3`, currently silent (only `cometpunch-1hit`, `cometpunch-2hits`)
-- [ ] **Confuse Ray** / Konfusstrahl — `confuseray.mp3` · Ghost
-- [ ] **Confusion** / Konfusion — `confusion.mp3` · Psychic
-- [ ] **Constrict** / Umklammerung — `constrict.mp3` · Normal
-- [ ] **Conversion** / Umwandlung — `conversion.mp3` · Normal
-- [ ] **Counter** / Konter — `counter.mp3` · Fighting
-- [ ] **Crabhammer** / Krabbhammer — `crabhammer.mp3` · Water
-- [ ] **Cut** / Zerschneider — `cut.mp3` · Normal
-- [ ] **Defense Curl** / Einigler — `defensecurl.mp3` · Normal
-- [ ] **Dig** / Schaufler — `dig.mp3` · Ground
-- [ ] **Disable** / Aussetzer — `disable.mp3` · Normal
-- [ ] **Dizzy Punch** / Irrschlag — `dizzypunch.mp3` · Normal
-- [ ] **Double Kick** / Doppelkick — `doublekick.mp3` · Fighting — ⚠️ no `doublekick.mp3`, currently silent (only `doublekick-1hit`, `doublekick-2hits`)
-- [ ] **Double Slap** / Duplexhieb — `doubleslap.mp3` · Normal — ⚠️ no `doubleslap.mp3`, currently silent (only `doubleslap-1hit`, `doubleslap-2hits`)
-- [ ] **Double Team** / Doppelteam — `doubleteam.mp3` · Normal
-- [ ] **Double-Edge** / Risikotackle — `doubleedge.mp3` · Normal
-- [ ] **Dragon Rage** / Drachenwut — `dragonrage.mp3` · Dragon
-- [ ] **Dream Eater** / Traumfresser — `dreameater.mp3` · Psychic
-- [ ] **Drill Peck** / Bohrschnabel — `drillpeck.mp3` · Flying
-- [ ] **Earthquake** / Erdbeben — `earthquake.mp3` · Ground
-- [ ] **Egg Bomb** / Eierbombe — `eggbomb.mp3` · Normal
-- [ ] **Ember** / Glut — `ember.mp3` · Fire
-- [ ] **Explosion** / Explosion — `explosion.mp3` · Normal
-- [ ] **Fire Blast** / Feuersturm — `fireblast.mp3` · Fire
-- [ ] **Fire Punch** / Feuerschlag — `firepunch.mp3` · Fire
-- [ ] **Fire Spin** / Feuerwirbel — `firespin.mp3` · Fire
-- [ ] **Fissure** / Geofissur — `fissure.mp3` · Ground
-- [ ] **Flamethrower** / Flammenwurf — `flamethrower.mp3` · Fire
-- [ ] **Flash** / Blitz — `flash.mp3` · Normal
-- [ ] **Fly** / Fliegen — `fly.mp3` · Flying
-- [ ] **Focus Energy** / Energiefokus — `focusenergy.mp3` · Normal
-- [ ] **Fury Attack** / Furienschlag — `furyattack.mp3` · Normal — ⚠️ no `furyattack.mp3`, currently silent (only `furyattack-1hit`, `furyattack-2hits`)
-- [ ] **Fury Swipes** / Kratzfurie — `furyswipes.mp3` · Normal — ⚠️ no `furyswipes.mp3`, currently silent (only `furyswipes-1hit`, `furyswipes-2hits`)
-- [ ] **Glare** / Schlangenblick — `glare.mp3` · Normal
-- [ ] **Growl** / Heuler — `growl.mp3` · Normal
-- [ ] **Growth** / Wachstum — `growth.mp3` · Normal
-- [ ] **Guillotine** / Guillotine — `guillotine.mp3` · Normal
-- [ ] **Gust** / Windstoß — `gust.mp3` · Flying
-- [ ] **Harden** / Härtner — `harden.mp3` · Normal
-- [ ] **Haze** / Dunkelnebel — `haze.mp3` · Ice
-- [ ] **Headbutt** / Kopfnuss — `headbutt.mp3` · Normal
-- [ ] **High Jump Kick** / Turmkick — `highjumpkick.mp3` · Fighting
-- [ ] **Horn Attack** / Hornattacke — `hornattack.mp3` · Normal
-- [ ] **Horn Drill** / Hornbohrer — `horndrill.mp3` · Normal
-- [ ] **Hydro Pump** / Hydropumpe — `hydropump.mp3` · Water
-- [ ] **Hyper Beam** / Hyperstrahl — `hyperbeam.mp3` · Normal
-- [ ] **Hyper Fang** / Hyperzahn — `hyperfang.mp3` · Normal
-- [ ] **Hypnosis** / Hypnose — `hypnosis.mp3` · Psychic
-- [ ] **Ice Beam** / Eisstrahl — `icebeam.mp3` · Ice
-- [ ] **Ice Punch** / Eishieb — `icepunch.mp3` · Ice
-- [ ] **Jump Kick** / Sprungkick — `jumpkick.mp3` · Fighting
-- [ ] **Karate Chop** / Karateschlag — `karatechop.mp3` · Fighting
-- [ ] **Kinesis** / Psykraft — `kinesis.mp3` · Psychic
-- [ ] **Leech Life** / Blutsauger — `leechlife.mp3` · Bug
-- [ ] **Leech Seed** / Egelsamen — `leechseed.mp3` · Grass
-- [ ] **Leer** / Silberblick — `leer.mp3` · Normal
-- [ ] **Lick** / Schlecker — `lick.mp3` · Ghost
-- [ ] **Light Screen** / Lichtschild — `lightscreen.mp3` · Psychic
-- [ ] **Lovely Kiss** / Todeskuss — `lovelykiss.mp3` · Normal
-- [ ] **Low Kick** / Fußkick — `lowkick.mp3` · Fighting
-- [ ] **Meditate** / Meditation — `meditate.mp3` · Psychic
-- [ ] **Mega Drain** / Megasauger — `megadrain.mp3` · Grass
-- [ ] **Mega Kick** / Megakick — `megakick.mp3` · Normal
-- [ ] **Mega Punch** / Megahieb — `megapunch.mp3` · Normal
-- [ ] **Metronome** / Metronom — `metronome.mp3` · Normal
-- [ ] **Mimic** / Mimikry — `mimic.mp3` · Normal
-- [ ] **Minimize** / Komprimator — `minimize.mp3` · Normal
-- [ ] **Mirror Move** / Spiegeltrick — `mirrormove.mp3` · Flying — ⚠️ no file yet, currently silent
-- [ ] **Mist** / Weißnebel — `mist.mp3` · Ice
-- [ ] **Night Shade** / Nachtnebel — `nightshade.mp3` · Ghost
-- [ ] **Pay Day** / Zahltag — `payday.mp3` · Normal
-- [ ] **Peck** / Pikser — `peck.mp3` · Flying
-- [ ] **Petal Dance** / Blättertanz — `petaldance.mp3` · Grass
-- [ ] **Pin Missile** / Nadelrakete — `pinmissile.mp3` · Bug — ⚠️ no `pinmissile.mp3`, currently silent (only `pinmissile-1hit`, `pinmissile-2hits`)
-- [ ] **Poison Gas** / Giftwolke — `poisongas.mp3` · Poison
-- [ ] **Poison Powder** / Giftpuder — `poisonpowder.mp3` · Poison
-- [ ] **Poison Sting** / Giftstachel — `poisonsting.mp3` · Poison
-- [ ] **Pound** / Klaps — `pound.mp3` · Normal
-- [ ] **Psybeam** / Psystrahl — `psybeam.mp3` · Psychic
-- [ ] **Psychic** / Psychokinese — `psychic.mp3` · Psychic
-- [ ] **Psywave** / Psywelle — `psywave.mp3` · Psychic
-- [ ] **Quick Attack** / Ruckzuckhieb — `quickattack.mp3` · Normal
-- [ ] **Rage** / Raserei — `rage.mp3` · Normal
-- [ ] **Razor Leaf** / Rasierblatt — `razorleaf.mp3` · Grass
-- [ ] **Razor Wind** / Klingensturm — `razorwind.mp3` · Normal
-- [ ] **Recover** / Genesung — `recover.mp3` · Normal
-- [ ] **Reflect** / Reflektor — `reflect.mp3` · Psychic
-- [ ] **Rest** / Erholung — `rest.mp3` · Psychic
-- [ ] **Roar** / Brüller — `roar.mp3` · Normal
-- [ ] **Rock Slide** / Steinhagel — `rockslide.mp3` · Rock
-- [ ] **Rock Throw** / Steinwurf — `rockthrow.mp3` · Rock
-- [ ] **Rolling Kick** / Fegekick — `rollingkick.mp3` · Fighting
-- [ ] **Sand Attack** / Sandwirbel — `sandattack.mp3` · Ground
-- [ ] **Scratch** / Kratzer — `scratch.mp3` · Normal
-- [ ] **Screech** / Kreideschrei — `screech.mp3` · Normal
-- [ ] **Seismic Toss** / Geowurf — `seismictoss.mp3` · Fighting
-- [ ] **Self-Destruct** / Finale — `selfdestruct.mp3` · Normal
-- [ ] **Sharpen** / Schärfer — `sharpen.mp3` · Normal
-- [ ] **Sing** / Gesang — `sing.mp3` · Normal
-- [ ] **Skull Bash** / Schädelwumme — `skullbash.mp3` · Normal
-- [ ] **Sky Attack** / Himmelsfeger — `skyattack.mp3` · Flying
-- [ ] **Slam** / Slam — `slam.mp3` · Normal
-- [ ] **Slash** / Schlitzer — `slash.mp3` · Normal
-- [ ] **Sleep Powder** / Schlafpuder — `sleeppowder.mp3` · Grass
-- [ ] **Sludge** / Schlammbad — `sludge.mp3` · Poison
-- [ ] **Smog** / Smog — `smog.mp3` · Poison
-- [ ] **Smokescreen** / Rauchwolke — `smokescreen.mp3` · Normal
-- [ ] **Soft-Boiled** / Weichei — `softboiled.mp3` · Normal
-- [ ] **Solar Beam** / Solarstrahl — `solarbeam.mp3` · Grass
-- [ ] **Sonic Boom** / Ultraschall — `sonicboom.mp3` · Normal
-- [ ] **Spike Cannon** / Dornkanone — `spikecannon.mp3` · Normal — ⚠️ no `spikecannon.mp3`, currently silent (only `spikecannon-1hit`, `spikecannon-2hits`)
-- [ ] **Splash** / Platscher — `splash.mp3` · Normal
-- [ ] **Spore** / Pilzspore — `spore.mp3` · Grass
-- [ ] **Stomp** / Stampfer — `stomp.mp3` · Normal
-- [ ] **Strength** / Stärke — `strength.mp3` · Normal
-- [ ] **String Shot** / Fadenschuss — `stringshot.mp3` · Bug
-- [ ] **Struggle** / Verzweifler — `struggle.mp3` · Normal
-- [ ] **Stun Spore** / Stachelspore — `stunspore.mp3` · Grass
-- [ ] **Submission** / Überroller — `submission.mp3` · Fighting
-- [ ] **Substitute** / Delegator — `substitute.mp3` · Normal
-- [ ] **Super Fang** / Superzahn — `superfang.mp3` · Normal
-- [ ] **Supersonic** / Superschall — `supersonic.mp3` · Normal
-- [ ] **Surf** / Surfer — `surf.mp3` · Water
-- [ ] **Swift** / Sternschauer — `swift.mp3` · Normal
-- [ ] **Swords Dance** / Schwerttanz — `swordsdance.mp3` · Normal
-- [ ] **Tackle** / Tackle — `tackle.mp3` · Normal
-- [ ] **Tail Whip** / Rutenschlag — `tailwhip.mp3` · Normal
-- [ ] **Take Down** / Bodycheck — `takedown.mp3` · Normal
-- [ ] **Teleport** / Teleport — `teleport.mp3` · Psychic
-- [ ] **Thrash** / Fuchtler — `thrash.mp3` · Normal
-- [ ] **Thunder** / Donner — `thunder.mp3` · Electric
-- [ ] **Thunder Punch** / Donnerschlag — `thunderpunch.mp3` · Electric
-- [ ] **Thunder Shock** / Donnerschock — `thundershock.mp3` · Electric
-- [ ] **Thunder Wave** / Donnerwelle — `thunderwave.mp3` · Electric
-- [ ] **Thunderbolt** / Donnerblitz — `thunderbolt.mp3` · Electric
-- [ ] **Toxic** / Toxin — `toxic.mp3` · Poison
-- [ ] **Transform** / Wandler — `transform.mp3` · Normal
-- [ ] **Tri Attack** / Triplette — `triattack.mp3` · Normal
-- [ ] **Twineedle** / Duonadel — `twineedle.mp3` · Bug — ⚠️ no `twineedle.mp3`, currently silent (only `twineedle-1hit`, `twineedle-2hits`)
-- [ ] **Vine Whip** / Rankenhieb — `vinewhip.mp3` · Grass
-- [ ] **Vise Grip** / Klammer — `visegrip.mp3` · Normal
-- [ ] **Water Gun** / Aquaknarre — `watergun.mp3` · Water
-- [ ] **Waterfall** / Kaskade — `waterfall.mp3` · Water
-- [ ] **Whirlwind** / Wirbelwind — `whirlwind.mp3` · Normal
-- [ ] **Wing Attack** / Flügelschlag — `wingattack.mp3` · Flying
-- [ ] **Withdraw** / Panzerschutz — `withdraw.mp3` · Water
-- [ ] **Wrap** / Wickel — `wrap.mp3` · Normal
+- [x] **Absorb** / Absorber — `absorb.mp3` · Grass
+- [x] **Acid** / Säure — `acid.mp3` · Poison
+- [x] **Acid Armor** / Säurepanzer — `acidarmor.mp3` · Poison
+- [x] **Agility** / Agilität — `agility.mp3` · Psychic
+- [x] **Amnesia** / Amnesie — `amnesia.mp3` · Psychic
+- [x] **Aurora Beam** / Aurorastrahl — `aurorabeam.mp3` · Ice
+- [x] **Barrage** / Stakkato — `barrage.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Barrier** / Barriere — `barrier.mp3` · Psychic
+- [x] **Bide** / Geduld — `bide.mp3` · Normal
+- [x] **Bind** / Klammergriff — `bind.mp3` · Normal
+- [x] **Bite** / Biss — `bite.mp3` · Dark
+- [x] **Blizzard** / Blizzard — `blizzard.mp3` · Ice
+- [x] **Body Slam** / Bodyslam — `bodyslam.mp3` · Normal
+- [x] **Bone Club** / Knochenkeule — `boneclub.mp3` · Ground
+- [x] **Bonemerang** / Knochmerang — `bonemerang.mp3` · Ground — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Bubble** / Blubber — `bubble.mp3` · Water
+- [x] **Bubble Beam** / Blubbstrahl — `bubblebeam.mp3` · Water
+- [x] **Clamp** / Schnapper — `clamp.mp3` · Water
+- [x] **Comet Punch** / Kometenhieb — `cometpunch.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Confuse Ray** / Konfusstrahl — `confuseray.mp3` · Ghost
+- [x] **Confusion** / Konfusion — `confusion.mp3` · Psychic
+- [x] **Constrict** / Umklammerung — `constrict.mp3` · Normal
+- [x] **Conversion** / Umwandlung — `conversion.mp3` · Normal
+- [x] **Counter** / Konter — `counter.mp3` · Fighting
+- [x] **Crabhammer** / Krabbhammer — `crabhammer.mp3` · Water
+- [x] **Cut** / Zerschneider — `cut.mp3` · Normal
+- [x] **Defense Curl** / Einigler — `defensecurl.mp3` · Normal
+- [x] **Dig** / Schaufler — `dig.mp3` · Ground
+- [x] **Disable** / Aussetzer — `disable.mp3` · Normal
+- [x] **Dizzy Punch** / Irrschlag — `dizzypunch.mp3` · Normal
+- [x] **Double Kick** / Doppelkick — `doublekick.mp3` · Fighting — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Double Slap** / Duplexhieb — `doubleslap.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Double Team** / Doppelteam — `doubleteam.mp3` · Normal
+- [x] **Double-Edge** / Risikotackle — `doubleedge.mp3` · Normal
+- [x] **Dragon Rage** / Drachenwut — `dragonrage.mp3` · Dragon
+- [x] **Dream Eater** / Traumfresser — `dreameater.mp3` · Psychic
+- [x] **Drill Peck** / Bohrschnabel — `drillpeck.mp3` · Flying
+- [x] **Earthquake** / Erdbeben — `earthquake.mp3` · Ground
+- [x] **Egg Bomb** / Eierbombe — `eggbomb.mp3` · Normal
+- [x] **Ember** / Glut — `ember.mp3` · Fire
+- [x] **Explosion** / Explosion — `explosion.mp3` · Normal
+- [x] **Fire Blast** / Feuersturm — `fireblast.mp3` · Fire
+- [x] **Fire Punch** / Feuerschlag — `firepunch.mp3` · Fire
+- [x] **Fire Spin** / Feuerwirbel — `firespin.mp3` · Fire
+- [x] **Fissure** / Geofissur — `fissure.mp3` · Ground
+- [x] **Flamethrower** / Flammenwurf — `flamethrower.mp3` · Fire
+- [x] **Flash** / Blitz — `flash.mp3` · Normal
+- [x] **Fly** / Fliegen — `fly.mp3` · Flying
+- [x] **Focus Energy** / Energiefokus — `focusenergy.mp3` · Normal
+- [x] **Fury Attack** / Furienschlag — `furyattack.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Fury Swipes** / Kratzfurie — `furyswipes.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Glare** / Schlangenblick — `glare.mp3` · Normal
+- [x] **Growl** / Heuler — `growl.mp3` · Normal
+- [x] **Growth** / Wachstum — `growth.mp3` · Normal
+- [x] **Guillotine** / Guillotine — `guillotine.mp3` · Normal
+- [x] **Gust** / Windstoß — `gust.mp3` · Flying
+- [x] **Harden** / Härtner — `harden.mp3` · Normal
+- [x] **Haze** / Dunkelnebel — `haze.mp3` · Ice
+- [x] **Headbutt** / Kopfnuss — `headbutt.mp3` · Normal
+- [x] **High Jump Kick** / Turmkick — `highjumpkick.mp3` · Fighting
+- [x] **Horn Attack** / Hornattacke — `hornattack.mp3` · Normal
+- [x] **Horn Drill** / Hornbohrer — `horndrill.mp3` · Normal
+- [x] **Hydro Pump** / Hydropumpe — `hydropump.mp3` · Water
+- [x] **Hyper Beam** / Hyperstrahl — `hyperbeam.mp3` · Normal
+- [x] **Hyper Fang** / Hyperzahn — `hyperfang.mp3` · Normal
+- [x] **Hypnosis** / Hypnose — `hypnosis.mp3` · Psychic
+- [x] **Ice Beam** / Eisstrahl — `icebeam.mp3` · Ice
+- [x] **Ice Punch** / Eishieb — `icepunch.mp3` · Ice
+- [x] **Jump Kick** / Sprungkick — `jumpkick.mp3` · Fighting
+- [x] **Karate Chop** / Karateschlag — `karatechop.mp3` · Fighting
+- [x] **Kinesis** / Psykraft — `kinesis.mp3` · Psychic
+- [x] **Leech Life** / Blutsauger — `leechlife.mp3` · Bug
+- [x] **Leech Seed** / Egelsamen — `leechseed.mp3` · Grass
+- [x] **Leer** / Silberblick — `leer.mp3` · Normal
+- [x] **Lick** / Schlecker — `lick.mp3` · Ghost
+- [x] **Light Screen** / Lichtschild — `lightscreen.mp3` · Psychic
+- [x] **Lovely Kiss** / Todeskuss — `lovelykiss.mp3` · Normal
+- [x] **Low Kick** / Fußkick — `lowkick.mp3` · Fighting
+- [x] **Meditate** / Meditation — `meditate.mp3` · Psychic
+- [x] **Mega Drain** / Megasauger — `megadrain.mp3` · Grass
+- [x] **Mega Kick** / Megakick — `megakick.mp3` · Normal
+- [x] **Mega Punch** / Megahieb — `megapunch.mp3` · Normal
+- [x] **Metronome** / Metronom — `metronome.mp3` · Normal
+- [x] **Mimic** / Mimikry — `mimic.mp3` · Normal
+- [x] **Minimize** / Komprimator — `minimize.mp3` · Normal
+- [x] **Mirror Move** / Spiegeltrick — `mirrormove.mp3` · Flying — free version fills the gap (regular pack had no file)
+- [x] **Mist** / Weißnebel — `mist.mp3` · Ice
+- [x] **Night Shade** / Nachtnebel — `nightshade.mp3` · Ghost
+- [x] **Pay Day** / Zahltag — `payday.mp3` · Normal
+- [x] **Peck** / Pikser — `peck.mp3` · Flying
+- [x] **Petal Dance** / Blättertanz — `petaldance.mp3` · Grass
+- [x] **Pin Missile** / Nadelrakete — `pinmissile.mp3` · Bug — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Poison Gas** / Giftwolke — `poisongas.mp3` · Poison
+- [x] **Poison Powder** / Giftpuder — `poisonpowder.mp3` · Poison
+- [x] **Poison Sting** / Giftstachel — `poisonsting.mp3` · Poison
+- [x] **Pound** / Klaps — `pound.mp3` · Normal
+- [x] **Psybeam** / Psystrahl — `psybeam.mp3` · Psychic
+- [x] **Psychic** / Psychokinese — `psychic.mp3` · Psychic
+- [x] **Psywave** / Psywelle — `psywave.mp3` · Psychic
+- [x] **Quick Attack** / Ruckzuckhieb — `quickattack.mp3` · Normal
+- [x] **Rage** / Raserei — `rage.mp3` · Normal
+- [x] **Razor Leaf** / Rasierblatt — `razorleaf.mp3` · Grass
+- [x] **Razor Wind** / Klingensturm — `razorwind.mp3` · Normal
+- [x] **Recover** / Genesung — `recover.mp3` · Normal
+- [x] **Reflect** / Reflektor — `reflect.mp3` · Psychic
+- [x] **Rest** / Erholung — `rest.mp3` · Psychic
+- [x] **Roar** / Brüller — `roar.mp3` · Normal
+- [x] **Rock Slide** / Steinhagel — `rockslide.mp3` · Rock
+- [x] **Rock Throw** / Steinwurf — `rockthrow.mp3` · Rock
+- [x] **Rolling Kick** / Fegekick — `rollingkick.mp3` · Fighting
+- [x] **Sand Attack** / Sandwirbel — `sandattack.mp3` · Ground
+- [x] **Scratch** / Kratzer — `scratch.mp3` · Normal
+- [x] **Screech** / Kreideschrei — `screech.mp3` · Normal
+- [x] **Seismic Toss** / Geowurf — `seismictoss.mp3` · Fighting
+- [x] **Self-Destruct** / Finale — `selfdestruct.mp3` · Normal
+- [x] **Sharpen** / Schärfer — `sharpen.mp3` · Normal
+- [x] **Sing** / Gesang — `sing.mp3` · Normal
+- [x] **Skull Bash** / Schädelwumme — `skullbash.mp3` · Normal
+- [x] **Sky Attack** / Himmelsfeger — `skyattack.mp3` · Flying
+- [x] **Slam** / Slam — `slam.mp3` · Normal
+- [x] **Slash** / Schlitzer — `slash.mp3` · Normal
+- [x] **Sleep Powder** / Schlafpuder — `sleeppowder.mp3` · Grass
+- [x] **Sludge** / Schlammbad — `sludge.mp3` · Poison
+- [x] **Smog** / Smog — `smog.mp3` · Poison
+- [x] **Smokescreen** / Rauchwolke — `smokescreen.mp3` · Normal
+- [x] **Soft-Boiled** / Weichei — `softboiled.mp3` · Normal
+- [x] **Solar Beam** / Solarstrahl — `solarbeam.mp3` · Grass
+- [x] **Sonic Boom** / Ultraschall — `sonicboom.mp3` · Normal
+- [x] **Spike Cannon** / Dornkanone — `spikecannon.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Splash** / Platscher — `splash.mp3` · Normal
+- [x] **Spore** / Pilzspore — `spore.mp3` · Grass
+- [x] **Stomp** / Stampfer — `stomp.mp3` · Normal
+- [x] **Strength** / Stärke — `strength.mp3` · Normal
+- [x] **String Shot** / Fadenschuss — `stringshot.mp3` · Bug
+- [x] **Struggle** / Verzweifler — `struggle.mp3` · Normal
+- [x] **Stun Spore** / Stachelspore — `stunspore.mp3` · Grass
+- [x] **Submission** / Überroller — `submission.mp3` · Fighting
+- [x] **Substitute** / Delegator — `substitute.mp3` · Normal
+- [x] **Super Fang** / Superzahn — `superfang.mp3` · Normal
+- [x] **Supersonic** / Superschall — `supersonic.mp3` · Normal
+- [x] **Surf** / Surfer — `surf.mp3` · Water
+- [x] **Swift** / Sternschauer — `swift.mp3` · Normal
+- [x] **Swords Dance** / Schwerttanz — `swordsdance.mp3` · Normal
+- [x] **Tackle** / Tackle — `tackle.mp3` · Normal
+- [x] **Tail Whip** / Rutenschlag — `tailwhip.mp3` · Normal
+- [x] **Take Down** / Bodycheck — `takedown.mp3` · Normal
+- [x] **Teleport** / Teleport — `teleport.mp3` · Psychic
+- [x] **Thrash** / Fuchtler — `thrash.mp3` · Normal
+- [x] **Thunder** / Donner — `thunder.mp3` · Electric
+- [x] **Thunder Punch** / Donnerschlag — `thunderpunch.mp3` · Electric
+- [x] **Thunder Shock** / Donnerschock — `thundershock.mp3` · Electric
+- [x] **Thunder Wave** / Donnerwelle — `thunderwave.mp3` · Electric
+- [x] **Thunderbolt** / Donnerblitz — `thunderbolt.mp3` · Electric
+- [x] **Toxic** / Toxin — `toxic.mp3` · Poison
+- [x] **Transform** / Wandler — `transform.mp3` · Normal
+- [x] **Tri Attack** / Triplette — `triattack.mp3` · Normal
+- [x] **Twineedle** / Duonadel — `twineedle.mp3` · Bug — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Vine Whip** / Rankenhieb — `vinewhip.mp3` · Grass
+- [x] **Vise Grip** / Klammer — `visegrip.mp3` · Normal
+- [x] **Water Gun** / Aquaknarre — `watergun.mp3` · Water
+- [x] **Waterfall** / Kaskade — `waterfall.mp3` · Water
+- [x] **Whirlwind** / Wirbelwind — `whirlwind.mp3` · Normal
+- [x] **Wing Attack** / Flügelschlag — `wingattack.mp3` · Flying
+- [x] **Withdraw** / Panzerschutz — `withdraw.mp3` · Water
+- [x] **Wrap** / Wickel — `wrap.mp3` · Normal
 
 ## Gen 2 moves (86)
 
-- [ ] **Aeroblast** / Luftstoß — `aeroblast.mp3` · Flying
-- [ ] **Ancient Power** / Antik-Kraft — `ancientpower.mp3` · Rock
-- [ ] **Attract** / Anziehung — `attract.mp3` · Normal
-- [ ] **Baton Pass** / Stafette — `batonpass.mp3` · Normal
-- [ ] **Beat Up** / Prügler — `beatup.mp3` · Dark
-- [ ] **Belly Drum** / Bauchtrommel — `bellydrum.mp3` · Normal
-- [ ] **Bone Rush** / Knochenhatz — `bonerush.mp3` · Ground — ⚠️ no `bonerush.mp3`, currently silent (only `bonerush-1hit`, `bonerush-2hits`)
-- [ ] **Charm** / Charme — `charm.mp3` · Fairy
-- [ ] **Conversion 2** / Umwandlung2 — `conversion2.mp3` · Normal
-- [ ] **Cotton Spore** / Baumwollsaat — `cottonspore.mp3` · Grass
-- [ ] **Cross Chop** / Kreuzhieb — `crosschop.mp3` · Fighting
-- [ ] **Crunch** / Knirscher — `crunch.mp3` · Dark
-- [ ] **Curse** / Fluch — `curse.mp3` · Ghost
-- [ ] **Destiny Bond** / Abgangsbund — `destinybond.mp3` · Ghost
-- [ ] **Detect** / Scanner — `detect.mp3` · Fighting
-- [ ] **Dragon Breath** / Feuerodem — `dragonbreath.mp3` · Dragon
-- [ ] **Dynamic Punch** / Wuchtschlag — `dynamicpunch.mp3` · Fighting
-- [ ] **Encore** / Zugabe — `encore.mp3` · Normal
-- [ ] **Endure** / Ausdauer — `endure.mp3` · Normal
-- [ ] **Extreme Speed** / Turbotempo — `extremespeed.mp3` · Normal
-- [ ] **False Swipe** / Trugschlag — `falseswipe.mp3` · Normal
-- [ ] **Feint Attack** / Finte — `feintattack.mp3` · Dark
-- [ ] **Flail** / Dreschflegel — `flail.mp3` · Normal
-- [ ] **Flame Wheel** / Flammenrad — `flamewheel.mp3` · Fire
-- [ ] **Foresight** / Scharfblick — `foresight.mp3` · Normal
-- [ ] **Frustration** / Frustration — `frustration.mp3` · Normal
-- [ ] **Fury Cutter** / Zornklinge — `furycutter.mp3` · Bug
-- [ ] **Future Sight** / Seher — `futuresight.mp3` · Psychic
-- [ ] **Giga Drain** / Gigasauger — `gigadrain.mp3` · Grass
-- [ ] **Heal Bell** / Vitalglocke — `healbell.mp3` · Normal
-- [ ] **Hidden Power** / Kraftreserve — `hiddenpower.mp3` · Normal
-- [ ] **Icy Wind** / Eissturm — `icywind.mp3` · Ice
-- [ ] **Iron Tail** / Eisenschweif — `irontail.mp3` · Steel
-- [ ] **Lock-On** / Zielschuss — `lockon.mp3` · Normal
-- [ ] **Mach Punch** / Tempohieb — `machpunch.mp3` · Fighting
-- [ ] **Magnitude** / Intensität — `magnitude.mp3` · Ground
-- [ ] **Mean Look** / Horrorblick — `meanlook.mp3` · Normal
-- [ ] **Megahorn** / Vielender — `megahorn.mp3` · Bug
-- [ ] **Metal Claw** / Metallklaue — `metalclaw.mp3` · Steel
-- [ ] **Milk Drink** / Milchgetränk — `milkdrink.mp3` · Normal
-- [ ] **Mind Reader** / Willensleser — `mindreader.mp3` · Normal
-- [ ] **Mirror Coat** / Spiegelcape — `mirrorcoat.mp3` · Psychic
-- [ ] **Moonlight** / Mondschein — `moonlight.mp3` · Fairy
-- [ ] **Morning Sun** / Morgengrauen — `morningsun.mp3` · Normal
-- [ ] **Mud-Slap** / Lehmschelle — `mudslap.mp3` · Ground
-- [ ] **Nightmare** / Nachtmahr — `nightmare.mp3` · Ghost
-- [ ] **Octazooka** / Octazooka — `octazooka.mp3` · Water
-- [ ] **Outrage** / Wutanfall — `outrage.mp3` · Dragon
-- [ ] **Pain Split** / Leidteiler — `painsplit.mp3` · Normal
-- [ ] **Perish Song** / Abgesang — `perishsong.mp3` · Normal
-- [ ] **Powder Snow** / Pulverschnee — `powdersnow.mp3` · Ice
-- [ ] **Present** / Geschenk — `present.mp3` · Normal — ⚠️ no `present.mp3`, currently silent (only `present-damage`, `present-heal`)
-- [ ] **Protect** / Schutzschild — `protect.mp3` · Normal
-- [ ] **Psych Up** / Psycho-Plus — `psychup.mp3` · Normal
-- [ ] **Pursuit** / Verfolgung — `pursuit.mp3` · Dark
-- [ ] **Rain Dance** / Regentanz — `raindance.mp3` · Water
-- [ ] **Rapid Spin** / Turbodreher — `rapidspin.mp3` · Normal
-- [ ] **Return** / Rückkehr — `return.mp3` · Normal
-- [ ] **Reversal** / Gegenschlag — `reversal.mp3` · Fighting
-- [ ] **Rock Smash** / Zertrümmerer — `rocksmash.mp3` · Fighting
-- [ ] **Rollout** / Walzer — `rollout.mp3` · Rock
-- [ ] **Sacred Fire** / Läuterfeuer — `sacredfire.mp3` · Fire
-- [ ] **Safeguard** / Bodyguard — `safeguard.mp3` · Normal
-- [ ] **Sandstorm** / Sandsturm — `sandstorm.mp3` · Rock
-- [ ] **Scary Face** / Grimasse — `scaryface.mp3` · Normal
-- [ ] **Shadow Ball** / Spukball — `shadowball.mp3` · Ghost
-- [ ] **Sketch** / Nachahmer — `sketch.mp3` · Normal
-- [ ] **Sleep Talk** / Schlafrede — `sleeptalk.mp3` · Normal
-- [ ] **Sludge Bomb** / Matschbombe — `sludgebomb.mp3` · Poison
-- [ ] **Snore** / Schnarcher — `snore.mp3` · Normal
-- [ ] **Spark** / Funkensprung — `spark.mp3` · Electric
-- [ ] **Spider Web** / Spinnennetz — `spiderweb.mp3` · Bug
-- [ ] **Spikes** / Stachler — `spikes.mp3` · Ground
-- [ ] **Spite** / Groll — `spite.mp3` · Ghost
-- [ ] **Steel Wing** / Stahlflügel — `steelwing.mp3` · Steel
-- [ ] **Sunny Day** / Sonnentag — `sunnyday.mp3` · Fire
-- [ ] **Swagger** / Angeberei — `swagger.mp3` · Normal
-- [ ] **Sweet Kiss** / Bitterkuss — `sweetkiss.mp3` · Fairy
-- [ ] **Sweet Scent** / Lockduft — `sweetscent.mp3` · Normal
-- [ ] **Synthesis** / Synthese — `synthesis.mp3` · Grass
-- [ ] **Thief** / Raub — `thief.mp3` · Dark
-- [ ] **Triple Kick** / Dreifachkick — `triplekick.mp3` · Fighting — ⚠️ no `triplekick.mp3`, currently silent (only `triplekick-1hit`, `triplekick-2hits`)
-- [ ] **Twister** / Windhose — `twister.mp3` · Dragon
-- [ ] **Vital Throw** / Überwurf — `vitalthrow.mp3` · Fighting
-- [ ] **Whirlpool** / Whirlpool — `whirlpool.mp3` · Water
-- [ ] **Zap Cannon** / Blitzkanone — `zapcannon.mp3` · Electric
+- [x] **Aeroblast** / Luftstoß — `aeroblast.mp3` · Flying
+- [x] **Ancient Power** / Antik-Kraft — `ancientpower.mp3` · Rock
+- [x] **Attract** / Anziehung — `attract.mp3` · Normal
+- [x] **Baton Pass** / Stafette — `batonpass.mp3` · Normal
+- [x] **Beat Up** / Prügler — `beatup.mp3` · Dark
+- [x] **Belly Drum** / Bauchtrommel — `bellydrum.mp3` · Normal
+- [x] **Bone Rush** / Knochenhatz — `bonerush.mp3` · Ground — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Charm** / Charme — `charm.mp3` · Fairy
+- [x] **Conversion 2** / Umwandlung2 — `conversion2.mp3` · Normal
+- [x] **Cotton Spore** / Baumwollsaat — `cottonspore.mp3` · Grass
+- [x] **Cross Chop** / Kreuzhieb — `crosschop.mp3` · Fighting
+- [x] **Crunch** / Knirscher — `crunch.mp3` · Dark
+- [x] **Curse** / Fluch — `curse.mp3` · Ghost
+- [x] **Destiny Bond** / Abgangsbund — `destinybond.mp3` · Ghost
+- [x] **Detect** / Scanner — `detect.mp3` · Fighting
+- [x] **Dragon Breath** / Feuerodem — `dragonbreath.mp3` · Dragon
+- [x] **Dynamic Punch** / Wuchtschlag — `dynamicpunch.mp3` · Fighting
+- [x] **Encore** / Zugabe — `encore.mp3` · Normal
+- [x] **Endure** / Ausdauer — `endure.mp3` · Normal
+- [x] **Extreme Speed** / Turbotempo — `extremespeed.mp3` · Normal
+- [x] **False Swipe** / Trugschlag — `falseswipe.mp3` · Normal
+- [x] **Feint Attack** / Finte — `feintattack.mp3` · Dark
+- [x] **Flail** / Dreschflegel — `flail.mp3` · Normal
+- [x] **Flame Wheel** / Flammenrad — `flamewheel.mp3` · Fire
+- [x] **Foresight** / Scharfblick — `foresight.mp3` · Normal
+- [x] **Frustration** / Frustration — `frustration.mp3` · Normal
+- [x] **Fury Cutter** / Zornklinge — `furycutter.mp3` · Bug
+- [x] **Future Sight** / Seher — `futuresight.mp3` · Psychic
+- [x] **Giga Drain** / Gigasauger — `gigadrain.mp3` · Grass
+- [x] **Heal Bell** / Vitalglocke — `healbell.mp3` · Normal
+- [x] **Hidden Power** / Kraftreserve — `hiddenpower.mp3` · Normal
+- [x] **Icy Wind** / Eissturm — `icywind.mp3` · Ice
+- [x] **Iron Tail** / Eisenschweif — `irontail.mp3` · Steel
+- [x] **Lock-On** / Zielschuss — `lockon.mp3` · Normal
+- [x] **Mach Punch** / Tempohieb — `machpunch.mp3` · Fighting
+- [x] **Magnitude** / Intensität — `magnitude.mp3` · Ground
+- [x] **Mean Look** / Horrorblick — `meanlook.mp3` · Normal
+- [x] **Megahorn** / Vielender — `megahorn.mp3` · Bug
+- [x] **Metal Claw** / Metallklaue — `metalclaw.mp3` · Steel
+- [x] **Milk Drink** / Milchgetränk — `milkdrink.mp3` · Normal
+- [x] **Mind Reader** / Willensleser — `mindreader.mp3` · Normal
+- [x] **Mirror Coat** / Spiegelcape — `mirrorcoat.mp3` · Psychic
+- [x] **Moonlight** / Mondschein — `moonlight.mp3` · Fairy
+- [x] **Morning Sun** / Morgengrauen — `morningsun.mp3` · Normal
+- [x] **Mud-Slap** / Lehmschelle — `mudslap.mp3` · Ground
+- [x] **Nightmare** / Nachtmahr — `nightmare.mp3` · Ghost
+- [x] **Octazooka** / Octazooka — `octazooka.mp3` · Water
+- [x] **Outrage** / Wutanfall — `outrage.mp3` · Dragon
+- [x] **Pain Split** / Leidteiler — `painsplit.mp3` · Normal
+- [x] **Perish Song** / Abgesang — `perishsong.mp3` · Normal
+- [x] **Powder Snow** / Pulverschnee — `powdersnow.mp3` · Ice
+- [x] **Present** / Geschenk — `present.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Protect** / Schutzschild — `protect.mp3` · Normal
+- [x] **Psych Up** / Psycho-Plus — `psychup.mp3` · Normal
+- [x] **Pursuit** / Verfolgung — `pursuit.mp3` · Dark
+- [x] **Rain Dance** / Regentanz — `raindance.mp3` · Water
+- [x] **Rapid Spin** / Turbodreher — `rapidspin.mp3` · Normal
+- [x] **Return** / Rückkehr — `return.mp3` · Normal
+- [x] **Reversal** / Gegenschlag — `reversal.mp3` · Fighting
+- [x] **Rock Smash** / Zertrümmerer — `rocksmash.mp3` · Fighting
+- [x] **Rollout** / Walzer — `rollout.mp3` · Rock
+- [x] **Sacred Fire** / Läuterfeuer — `sacredfire.mp3` · Fire
+- [x] **Safeguard** / Bodyguard — `safeguard.mp3` · Normal
+- [x] **Sandstorm** / Sandsturm — `sandstorm.mp3` · Rock
+- [x] **Scary Face** / Grimasse — `scaryface.mp3` · Normal
+- [x] **Shadow Ball** / Spukball — `shadowball.mp3` · Ghost
+- [x] **Sketch** / Nachahmer — `sketch.mp3` · Normal
+- [x] **Sleep Talk** / Schlafrede — `sleeptalk.mp3` · Normal
+- [x] **Sludge Bomb** / Matschbombe — `sludgebomb.mp3` · Poison
+- [x] **Snore** / Schnarcher — `snore.mp3` · Normal
+- [x] **Spark** / Funkensprung — `spark.mp3` · Electric
+- [x] **Spider Web** / Spinnennetz — `spiderweb.mp3` · Bug
+- [x] **Spikes** / Stachler — `spikes.mp3` · Ground
+- [x] **Spite** / Groll — `spite.mp3` · Ghost
+- [x] **Steel Wing** / Stahlflügel — `steelwing.mp3` · Steel
+- [x] **Sunny Day** / Sonnentag — `sunnyday.mp3` · Fire
+- [x] **Swagger** / Angeberei — `swagger.mp3` · Normal
+- [x] **Sweet Kiss** / Bitterkuss — `sweetkiss.mp3` · Fairy
+- [x] **Sweet Scent** / Lockduft — `sweetscent.mp3` · Normal
+- [x] **Synthesis** / Synthese — `synthesis.mp3` · Grass
+- [x] **Thief** / Raub — `thief.mp3` · Dark
+- [x] **Triple Kick** / Dreifachkick — `triplekick.mp3` · Fighting — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Twister** / Windhose — `twister.mp3` · Dragon
+- [x] **Vital Throw** / Überwurf — `vitalthrow.mp3` · Fighting
+- [x] **Whirlpool** / Whirlpool — `whirlpool.mp3` · Water
+- [x] **Zap Cannon** / Blitzkanone — `zapcannon.mp3` · Electric
 
 ## Gen 3 moves (103)
 
-- [ ] **Aerial Ace** / Aero-Ass — `aerialace.mp3` · Flying
-- [ ] **Air Cutter** / Windschnitt — `aircutter.mp3` · Flying
-- [ ] **Arm Thrust** / Armstoß — `armthrust.mp3` · Fighting — ⚠️ no `armthrust.mp3`, currently silent (only `armthrust-1hit`, `armthrust-2hits`)
-- [ ] **Aromatherapy** / Aromakur — `aromatherapy.mp3` · Grass
-- [ ] **Assist** / Zuschuss — `assist.mp3` · Normal
-- [ ] **Astonish** / Erstauner — `astonish.mp3` · Ghost
-- [ ] **Blast Burn** / Lohekanonade — `blastburn.mp3` · Fire
-- [ ] **Blaze Kick** / Feuerfeger — `blazekick.mp3` · Fire
-- [ ] **Block** / Rückentzug — `block.mp3` · Normal
-- [ ] **Bounce** / Sprungfeder — `bounce.mp3` · Flying
-- [ ] **Brick Break** / Durchbruch — `brickbreak.mp3` · Fighting
-- [ ] **Bulk Up** / Protzer — `bulkup.mp3` · Fighting
-- [ ] **Bullet Seed** / Kugelsaat — `bulletseed.mp3` · Grass — ⚠️ no `bulletseed.mp3`, currently silent (only `bulletseed-1hit`, `bulletseed-2hits`)
-- [ ] **Calm Mind** / Gedankengut — `calmmind.mp3` · Psychic
-- [ ] **Camouflage** / Tarnung — `camouflage.mp3` · Normal
-- [ ] **Charge** / Ladevorgang — `charge.mp3` · Electric
-- [ ] **Cosmic Power** / Kosmik-Kraft — `cosmicpower.mp3` · Psychic
-- [ ] **Covet** / Bezirzer — `covet.mp3` · Normal
-- [ ] **Crush Claw** / Zermalmklaue — `crushclaw.mp3` · Normal
-- [ ] **Dive** / Taucher — `dive.mp3` · Water
-- [ ] **Doom Desire** / Kismetwunsch — `doomdesire.mp3` · Steel
-- [ ] **Dragon Claw** / Drachenklaue — `dragonclaw.mp3` · Dragon
-- [ ] **Dragon Dance** / Drachentanz — `dragondance.mp3` · Dragon
-- [ ] **Endeavor** / Notsituation — `endeavor.mp3` · Normal
-- [ ] **Eruption** / Eruption — `eruption.mp3` · Fire
-- [ ] **Extrasensory** / Sondersensor — `extrasensory.mp3` · Psychic
-- [ ] **Facade** / Fassade — `facade.mp3` · Normal
-- [ ] **Fake Out** / Mogelhieb — `fakeout.mp3` · Normal
-- [ ] **Fake Tears** / Trugträne — `faketears.mp3` · Dark
-- [ ] **Feather Dance** / Daunenreigen — `featherdance.mp3` · Flying
-- [ ] **Flatter** / Schmeichler — `flatter.mp3` · Dark
-- [ ] **Focus Punch** / Power-Punch — `focuspunch.mp3` · Fighting
-- [ ] **Follow Me** / Spotlight — `followme.mp3` · Normal
-- [ ] **Frenzy Plant** / Flora-Statue — `frenzyplant.mp3` · Grass
-- [ ] **Grass Whistle** / Grasflöte — `grasswhistle.mp3` · Grass
-- [ ] **Grudge** / Nachspiel — `grudge.mp3` · Ghost
-- [ ] **Hail** / Hagelsturm — `hail.mp3` · Ice
-- [ ] **Heat Wave** / Hitzewelle — `heatwave.mp3` · Fire
-- [ ] **Helping Hand** / Rechte Hand — `helpinghand.mp3` · Normal
-- [ ] **Howl** / Jauler — `howl.mp3` · Normal
-- [ ] **Hydro Cannon** / Aquahaubitze — `hydrocannon.mp3` · Water
-- [ ] **Hyper Voice** / Schallwelle — `hypervoice.mp3` · Normal
-- [ ] **Ice Ball** / Frostbeule — `iceball.mp3` · Ice
-- [ ] **Icicle Spear** / Eisspeer — `iciclespear.mp3` · Ice — ⚠️ no `iciclespear.mp3`, currently silent (only `iciclespear-1hit`, `iciclespear-2hits`)
-- [ ] **Imprison** / Begrenzer — `imprison.mp3` · Psychic
-- [ ] **Ingrain** / Verwurzler — `ingrain.mp3` · Grass
-- [ ] **Iron Defense** / Eisenabwehr — `irondefense.mp3` · Steel
-- [ ] **Knock Off** / Abschlag — `knockoff.mp3` · Dark
-- [ ] **Leaf Blade** / Laubklinge — `leafblade.mp3` · Grass
-- [ ] **Luster Purge** / Scheinwerfer — `lusterpurge.mp3` · Psychic
-- [ ] **Magic Coat** / Magiemantel — `magiccoat.mp3` · Psychic
-- [ ] **Magical Leaf** / Zauberblatt — `magicalleaf.mp3` · Grass
-- [ ] **Memento** / Memento-Mori — `memento.mp3` · Dark
-- [ ] **Metal Sound** / Metallsound — `metalsound.mp3` · Steel
-- [ ] **Meteor Mash** / Sternenhieb — `meteormash.mp3` · Steel
-- [ ] **Mist Ball** / Nebelball — `mistball.mp3` · Psychic
-- [ ] **Mud Shot** / Lehmschuss — `mudshot.mp3` · Ground
-- [ ] **Mud Sport** / Lehmsuhler — `mudsport.mp3` · Ground
-- [ ] **Muddy Water** / Lehmbrühe — `muddywater.mp3` · Water
-- [ ] **Nature Power** / Natur-Kraft — `naturepower.mp3` · Normal — ⚠️ no file yet, currently silent
-- [ ] **Needle Arm** / Nietenranke — `needlearm.mp3` · Grass
-- [ ] **Odor Sleuth** / Schnüffler — `odorsleuth.mp3` · Normal
-- [ ] **Overheat** / Hitzekoller — `overheat.mp3` · Fire
-- [ ] **Poison Fang** / Giftzahn — `poisonfang.mp3` · Poison
-- [ ] **Poison Tail** / Giftschweif — `poisontail.mp3` · Poison
-- [ ] **Psycho Boost** / Psyschub — `psychoboost.mp3` · Psychic
-- [ ] **Recycle** / Aufbereitung — `recycle.mp3` · Normal
-- [ ] **Refresh** / Heilung — `refresh.mp3` · Normal
-- [ ] **Revenge** / Vergeltung — `revenge.mp3` · Fighting
-- [ ] **Rock Blast** / Felswurf — `rockblast.mp3` · Rock — ⚠️ no `rockblast.mp3`, currently silent (only `rockblast-1hit`, `rockblast-2hits`)
-- [ ] **Rock Tomb** / Felsgrab — `rocktomb.mp3` · Rock
-- [ ] **Role Play** / Rollenspiel — `roleplay.mp3` · Psychic
-- [ ] **Sand Tomb** / Sandgrab — `sandtomb.mp3` · Ground
-- [ ] **Secret Power** / Geheimpower — `secretpower.mp3` · Normal
-- [ ] **Shadow Punch** / Finsterfaust — `shadowpunch.mp3` · Ghost
-- [ ] **Sheer Cold** / Eiseskälte — `sheercold.mp3` · Ice
-- [ ] **Shock Wave** / Schockwelle — `shockwave.mp3` · Electric
-- [ ] **Signal Beam** / Ampelleuchte — `signalbeam.mp3` · Bug
-- [ ] **Silver Wind** / Silberhauch — `silverwind.mp3` · Bug
-- [ ] **Skill Swap** / Fähigkeitstausch — `skillswap.mp3` · Psychic
-- [ ] **Sky Uppercut** / Himmelhieb — `skyuppercut.mp3` · Fighting
-- [ ] **Slack Off** / Tagedieb — `slackoff.mp3` · Normal
-- [ ] **Smelling Salts** / Riechsalz — `smellingsalts.mp3` · Normal
-- [ ] **Snatch** / Übernahme — `snatch.mp3` · Dark
-- [ ] **Spit Up** / Entfessler — `spitup.mp3` · Normal
-- [ ] **Stockpile** / Horter — `stockpile.mp3` · Normal
-- [ ] **Superpower** / Kraftkoloss — `superpower.mp3` · Fighting
-- [ ] **Swallow** / Verzehrer — `swallow.mp3` · Normal
-- [ ] **Tail Glow** / Schweifglanz — `tailglow.mp3` · Bug
-- [ ] **Taunt** / Verhöhner — `taunt.mp3` · Dark
-- [ ] **Teeter Dance** / Taumeltanz — `teeterdance.mp3` · Normal
-- [ ] **Tickle** / Spaßkanone — `tickle.mp3` · Normal
-- [ ] **Torment** / Folterknecht — `torment.mp3` · Dark
-- [ ] **Trick** / Trickbetrug — `trick.mp3` · Psychic
-- [ ] **Uproar** / Aufruhr — `uproar.mp3` · Normal
-- [ ] **Volt Tackle** / Volttackle — `volttackle.mp3` · Electric
-- [ ] **Water Pulse** / Aquawelle — `waterpulse.mp3` · Water
-- [ ] **Water Sport** / Nassmacher — `watersport.mp3` · Water
-- [ ] **Water Spout** / Fontränen — `waterspout.mp3` · Water
-- [ ] **Weather Ball** / Meteorologe — `weatherball.mp3` · Normal
-- [ ] **Will-O-Wisp** / Irrlicht — `willowisp.mp3` · Fire
-- [ ] **Wish** / Wunschtraum — `wish.mp3` · Normal
-- [ ] **Yawn** / Gähner — `yawn.mp3` · Normal
+- [x] **Aerial Ace** / Aero-Ass — `aerialace.mp3` · Flying
+- [x] **Air Cutter** / Windschnitt — `aircutter.mp3` · Flying
+- [x] **Arm Thrust** / Armstoß — `armthrust.mp3` · Fighting — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Aromatherapy** / Aromakur — `aromatherapy.mp3` · Grass
+- [x] **Assist** / Zuschuss — `assist.mp3` · Normal
+- [x] **Astonish** / Erstauner — `astonish.mp3` · Ghost
+- [x] **Blast Burn** / Lohekanonade — `blastburn.mp3` · Fire
+- [x] **Blaze Kick** / Feuerfeger — `blazekick.mp3` · Fire
+- [x] **Block** / Rückentzug — `block.mp3` · Normal
+- [x] **Bounce** / Sprungfeder — `bounce.mp3` · Flying
+- [x] **Brick Break** / Durchbruch — `brickbreak.mp3` · Fighting
+- [x] **Bulk Up** / Protzer — `bulkup.mp3` · Fighting
+- [x] **Bullet Seed** / Kugelsaat — `bulletseed.mp3` · Grass — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Calm Mind** / Gedankengut — `calmmind.mp3` · Psychic
+- [x] **Camouflage** / Tarnung — `camouflage.mp3` · Normal
+- [x] **Charge** / Ladevorgang — `charge.mp3` · Electric
+- [x] **Cosmic Power** / Kosmik-Kraft — `cosmicpower.mp3` · Psychic
+- [x] **Covet** / Bezirzer — `covet.mp3` · Normal
+- [x] **Crush Claw** / Zermalmklaue — `crushclaw.mp3` · Normal
+- [x] **Dive** / Taucher — `dive.mp3` · Water
+- [x] **Doom Desire** / Kismetwunsch — `doomdesire.mp3` · Steel
+- [x] **Dragon Claw** / Drachenklaue — `dragonclaw.mp3` · Dragon
+- [x] **Dragon Dance** / Drachentanz — `dragondance.mp3` · Dragon
+- [x] **Endeavor** / Notsituation — `endeavor.mp3` · Normal
+- [x] **Eruption** / Eruption — `eruption.mp3` · Fire
+- [x] **Extrasensory** / Sondersensor — `extrasensory.mp3` · Psychic
+- [x] **Facade** / Fassade — `facade.mp3` · Normal
+- [x] **Fake Out** / Mogelhieb — `fakeout.mp3` · Normal
+- [x] **Fake Tears** / Trugträne — `faketears.mp3` · Dark
+- [x] **Feather Dance** / Daunenreigen — `featherdance.mp3` · Flying
+- [x] **Flatter** / Schmeichler — `flatter.mp3` · Dark
+- [x] **Focus Punch** / Power-Punch — `focuspunch.mp3` · Fighting
+- [x] **Follow Me** / Spotlight — `followme.mp3` · Normal
+- [x] **Frenzy Plant** / Flora-Statue — `frenzyplant.mp3` · Grass
+- [x] **Grass Whistle** / Grasflöte — `grasswhistle.mp3` · Grass
+- [x] **Grudge** / Nachspiel — `grudge.mp3` · Ghost
+- [x] **Hail** / Hagelsturm — `hail.mp3` · Ice
+- [x] **Heat Wave** / Hitzewelle — `heatwave.mp3` · Fire
+- [x] **Helping Hand** / Rechte Hand — `helpinghand.mp3` · Normal
+- [x] **Howl** / Jauler — `howl.mp3` · Normal
+- [x] **Hydro Cannon** / Aquahaubitze — `hydrocannon.mp3` · Water
+- [x] **Hyper Voice** / Schallwelle — `hypervoice.mp3` · Normal
+- [x] **Ice Ball** / Frostbeule — `iceball.mp3` · Ice
+- [x] **Icicle Spear** / Eisspeer — `iciclespear.mp3` · Ice — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Imprison** / Begrenzer — `imprison.mp3` · Psychic
+- [x] **Ingrain** / Verwurzler — `ingrain.mp3` · Grass
+- [x] **Iron Defense** / Eisenabwehr — `irondefense.mp3` · Steel
+- [x] **Knock Off** / Abschlag — `knockoff.mp3` · Dark
+- [x] **Leaf Blade** / Laubklinge — `leafblade.mp3` · Grass
+- [x] **Luster Purge** / Scheinwerfer — `lusterpurge.mp3` · Psychic
+- [x] **Magic Coat** / Magiemantel — `magiccoat.mp3` · Psychic
+- [x] **Magical Leaf** / Zauberblatt — `magicalleaf.mp3` · Grass
+- [x] **Memento** / Memento-Mori — `memento.mp3` · Dark
+- [x] **Metal Sound** / Metallsound — `metalsound.mp3` · Steel
+- [x] **Meteor Mash** / Sternenhieb — `meteormash.mp3` · Steel
+- [x] **Mist Ball** / Nebelball — `mistball.mp3` · Psychic
+- [x] **Mud Shot** / Lehmschuss — `mudshot.mp3` · Ground
+- [x] **Mud Sport** / Lehmsuhler — `mudsport.mp3` · Ground
+- [x] **Muddy Water** / Lehmbrühe — `muddywater.mp3` · Water
+- [x] **Nature Power** / Natur-Kraft — `naturepower.mp3` · Normal — free version fills the gap (regular pack had no file)
+- [x] **Needle Arm** / Nietenranke — `needlearm.mp3` · Grass
+- [x] **Odor Sleuth** / Schnüffler — `odorsleuth.mp3` · Normal
+- [x] **Overheat** / Hitzekoller — `overheat.mp3` · Fire
+- [x] **Poison Fang** / Giftzahn — `poisonfang.mp3` · Poison
+- [x] **Poison Tail** / Giftschweif — `poisontail.mp3` · Poison
+- [x] **Psycho Boost** / Psyschub — `psychoboost.mp3` · Psychic
+- [x] **Recycle** / Aufbereitung — `recycle.mp3` · Normal
+- [x] **Refresh** / Heilung — `refresh.mp3` · Normal
+- [x] **Revenge** / Vergeltung — `revenge.mp3` · Fighting
+- [x] **Rock Blast** / Felswurf — `rockblast.mp3` · Rock — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Rock Tomb** / Felsgrab — `rocktomb.mp3` · Rock
+- [x] **Role Play** / Rollenspiel — `roleplay.mp3` · Psychic
+- [x] **Sand Tomb** / Sandgrab — `sandtomb.mp3` · Ground
+- [x] **Secret Power** / Geheimpower — `secretpower.mp3` · Normal
+- [x] **Shadow Punch** / Finsterfaust — `shadowpunch.mp3` · Ghost
+- [x] **Sheer Cold** / Eiseskälte — `sheercold.mp3` · Ice
+- [x] **Shock Wave** / Schockwelle — `shockwave.mp3` · Electric
+- [x] **Signal Beam** / Ampelleuchte — `signalbeam.mp3` · Bug
+- [x] **Silver Wind** / Silberhauch — `silverwind.mp3` · Bug
+- [x] **Skill Swap** / Fähigkeitstausch — `skillswap.mp3` · Psychic
+- [x] **Sky Uppercut** / Himmelhieb — `skyuppercut.mp3` · Fighting
+- [x] **Slack Off** / Tagedieb — `slackoff.mp3` · Normal
+- [x] **Smelling Salts** / Riechsalz — `smellingsalts.mp3` · Normal
+- [x] **Snatch** / Übernahme — `snatch.mp3` · Dark
+- [x] **Spit Up** / Entfessler — `spitup.mp3` · Normal
+- [x] **Stockpile** / Horter — `stockpile.mp3` · Normal
+- [x] **Superpower** / Kraftkoloss — `superpower.mp3` · Fighting
+- [x] **Swallow** / Verzehrer — `swallow.mp3` · Normal
+- [x] **Tail Glow** / Schweifglanz — `tailglow.mp3` · Bug
+- [x] **Taunt** / Verhöhner — `taunt.mp3` · Dark
+- [x] **Teeter Dance** / Taumeltanz — `teeterdance.mp3` · Normal
+- [x] **Tickle** / Spaßkanone — `tickle.mp3` · Normal
+- [x] **Torment** / Folterknecht — `torment.mp3` · Dark
+- [x] **Trick** / Trickbetrug — `trick.mp3` · Psychic
+- [x] **Uproar** / Aufruhr — `uproar.mp3` · Normal
+- [x] **Volt Tackle** / Volttackle — `volttackle.mp3` · Electric
+- [x] **Water Pulse** / Aquawelle — `waterpulse.mp3` · Water
+- [x] **Water Sport** / Nassmacher — `watersport.mp3` · Water
+- [x] **Water Spout** / Fontränen — `waterspout.mp3` · Water
+- [x] **Weather Ball** / Meteorologe — `weatherball.mp3` · Normal
+- [x] **Will-O-Wisp** / Irrlicht — `willowisp.mp3` · Fire
+- [x] **Wish** / Wunschtraum — `wish.mp3` · Normal
+- [x] **Yawn** / Gähner — `yawn.mp3` · Normal
 
 ## Gen 4 moves (113)
 
-- [ ] **Acupressure** / Akupressur — `acupressure.mp3` · Normal
-- [ ] **Air Slash** / Luftschnitt — `airslash.mp3` · Flying
-- [ ] **Aqua Jet** / Wasserdüse — `aquajet.mp3` · Water
-- [ ] **Aqua Ring** / Wasserring — `aquaring.mp3` · Water
-- [ ] **Aqua Tail** / Nassschweif — `aquatail.mp3` · Water
-- [ ] **Assurance** / Gewissheit — `assurance.mp3` · Dark
-- [ ] **Attack Order** / Schlagbefehl — `attackorder.mp3` · Bug
-- [ ] **Aura Sphere** / Aurasphäre — `aurasphere.mp3` · Fighting
-- [ ] **Avalanche** / Lawine — `avalanche.mp3` · Ice
-- [ ] **Brave Bird** / Sturzflug — `bravebird.mp3` · Flying
-- [ ] **Brine** / Lake — `brine.mp3` · Water
-- [ ] **Bug Bite** / Käferbiss — `bugbite.mp3` · Bug
-- [ ] **Bug Buzz** / Käfergebrumm — `bugbuzz.mp3` · Bug
-- [ ] **Bullet Punch** / Patronenhieb — `bulletpunch.mp3` · Steel
-- [ ] **Captivate** / Liebreiz — `captivate.mp3` · Normal
-- [ ] **Charge Beam** / Ladestrahl — `chargebeam.mp3` · Electric
-- [ ] **Chatter** / Geschwätz — `chatter.mp3` · Flying
-- [ ] **Close Combat** / Nahkampf — `closecombat.mp3` · Fighting
-- [ ] **Copycat** / Imitator — `copycat.mp3` · Normal
-- [ ] **Cross Poison** / Giftstreich — `crosspoison.mp3` · Poison
-- [ ] **Crush Grip** / Quetschgriff — `crushgrip.mp3` · Normal
-- [ ] **Dark Pulse** / Finsteraura — `darkpulse.mp3` · Dark
-- [ ] **Dark Void** / Schlummerort — `darkvoid.mp3` · Dark
-- [ ] **Defend Order** / Blockbefehl — `defendorder.mp3` · Bug
-- [ ] **Defog** / Auflockern — `defog.mp3` · Flying
-- [ ] **Discharge** / Ladungsstoß — `discharge.mp3` · Electric
-- [ ] **Double Hit** / Doppelschlag — `doublehit.mp3` · Normal — ⚠️ no `doublehit.mp3`, currently silent (only `doublehit-1hit`, `doublehit-2hits`)
-- [ ] **Draco Meteor** / Draco Meteor — `dracometeor.mp3` · Dragon
-- [ ] **Dragon Pulse** / Drachenpuls — `dragonpulse.mp3` · Dragon
-- [ ] **Dragon Rush** / Drachenstoß — `dragonrush.mp3` · Dragon
-- [ ] **Drain Punch** / Ableithieb — `drainpunch.mp3` · Fighting
-- [ ] **Earth Power** / Erdkräfte — `earthpower.mp3` · Ground
-- [ ] **Embargo** / Itemsperre — `embargo.mp3` · Dark
-- [ ] **Energy Ball** / Energieball — `energyball.mp3` · Grass
-- [ ] **Feint** / Offenlegung — `feint.mp3` · Normal
-- [ ] **Fire Fang** / Feuerzahn — `firefang.mp3` · Fire
-- [ ] **Flare Blitz** / Flammenblitz — `flareblitz.mp3` · Fire
-- [ ] **Flash Cannon** / Lichtkanone — `flashcannon.mp3` · Steel
-- [ ] **Fling** / Schleuder — `fling.mp3` · Dark
-- [ ] **Focus Blast** / Fokusstoß — `focusblast.mp3` · Fighting
-- [ ] **Force Palm** / Kraftwelle — `forcepalm.mp3` · Fighting
-- [ ] **Gastro Acid** / Magensäfte — `gastroacid.mp3` · Poison
-- [ ] **Giga Impact** / Gigastoß — `gigaimpact.mp3` · Normal
-- [ ] **Grass Knot** / Strauchler — `grassknot.mp3` · Grass
-- [ ] **Gravity** / Erdanziehung — `gravity.mp3` · Psychic
-- [ ] **Guard Swap** / Schutztausch — `guardswap.mp3` · Psychic
-- [ ] **Gunk Shot** / Mülltreffer — `gunkshot.mp3` · Poison
-- [ ] **Gyro Ball** / Gyroball — `gyroball.mp3` · Steel
-- [ ] **Hammer Arm** / Hammerarm — `hammerarm.mp3` · Fighting
-- [ ] **Head Smash** / Kopfstoß — `headsmash.mp3` · Rock
-- [ ] **Heal Block** / Heilblockade — `healblock.mp3` · Psychic
-- [ ] **Heal Order** / Heilbefehl — `healorder.mp3` · Bug
-- [ ] **Healing Wish** / Heilopfer — `healingwish.mp3` · Psychic
-- [ ] **Heart Swap** / Statustausch — `heartswap.mp3` · Psychic
-- [ ] **Ice Fang** / Eiszahn — `icefang.mp3` · Ice
-- [ ] **Ice Shard** / Eissplitter — `iceshard.mp3` · Ice
-- [ ] **Iron Head** / Eisenschädel — `ironhead.mp3` · Steel
-- [ ] **Judgment** / Urteilskraft — `judgment.mp3` · Normal
-- [ ] **Last Resort** / Zuflucht — `lastresort.mp3` · Normal
-- [ ] **Lava Plume** / Flammensturm — `lavaplume.mp3` · Fire
-- [ ] **Leaf Storm** / Blättersturm — `leafstorm.mp3` · Grass
-- [ ] **Lucky Chant** / Beschwörung — `luckychant.mp3` · Normal
-- [ ] **Lunar Dance** / Lunartanz — `lunardance.mp3` · Psychic
-- [ ] **Magma Storm** / Lavasturm — `magmastorm.mp3` · Fire
-- [ ] **Magnet Bomb** / Magnetbombe — `magnetbomb.mp3` · Steel
-- [ ] **Magnet Rise** / Magnetflug — `magnetrise.mp3` · Electric
-- [ ] **Me First** / Egotrip — `mefirst.mp3` · Normal
-- [ ] **Metal Burst** / Metallstoß — `metalburst.mp3` · Steel
-- [ ] **Miracle Eye** / Wunderauge — `miracleeye.mp3` · Psychic
-- [ ] **Mirror Shot** / Spiegelsalve — `mirrorshot.mp3` · Steel
-- [ ] **Mud Bomb** / Schlammbombe — `mudbomb.mp3` · Ground
-- [ ] **Nasty Plot** / Ränkeschmied — `nastyplot.mp3` · Dark
-- [ ] **Natural Gift** / Beerenkräfte — `naturalgift.mp3` · Normal
-- [ ] **Night Slash** / Nachthieb — `nightslash.mp3` · Dark
-- [ ] **Ominous Wind** / Unheilböen — `ominouswind.mp3` · Ghost
-- [ ] **Payback** / Gegenstoß — `payback.mp3` · Dark
-- [ ] **Pluck** / Pflücker — `pluck.mp3` · Flying
-- [ ] **Poison Jab** / Gifthieb — `poisonjab.mp3` · Poison
-- [ ] **Power Gem** / Juwelenkraft — `powergem.mp3` · Rock
-- [ ] **Power Swap** / Krafttausch — `powerswap.mp3` · Psychic
-- [ ] **Power Trick** / Krafttrick — `powertrick.mp3` · Psychic
-- [ ] **Power Whip** / Blattgeißel — `powerwhip.mp3` · Grass
-- [ ] **Psycho Cut** / Psychoklinge — `psychocut.mp3` · Psychic
-- [ ] **Psycho Shift** / Psybann — `psychoshift.mp3` · Psychic
-- [ ] **Punishment** / Strafattacke — `punishment.mp3` · Dark
-- [ ] **Roar of Time** / Zeitenlärm — `roaroftime.mp3` · Dragon
-- [ ] **Rock Climb** / Kraxler — `rockclimb.mp3` · Normal
-- [ ] **Rock Polish** / Steinpolitur — `rockpolish.mp3` · Rock
-- [ ] **Rock Wrecker** / Felswerfer — `rockwrecker.mp3` · Rock
-- [ ] **Roost** / Ruheort — `roost.mp3` · Flying
-- [ ] **Seed Bomb** / Samenbomben — `seedbomb.mp3` · Grass
-- [ ] **Seed Flare** / Schocksamen — `seedflare.mp3` · Grass
-- [ ] **Shadow Claw** / Dunkelklaue — `shadowclaw.mp3` · Ghost
-- [ ] **Shadow Force** / Schemenkraft — `shadowforce.mp3` · Ghost
-- [ ] **Shadow Sneak** / Schattenstoß — `shadowsneak.mp3` · Ghost
-- [ ] **Spacial Rend** / Raumschlag — `spacialrend.mp3` · Dragon
-- [ ] **Stealth Rock** / Tarnsteine — `stealthrock.mp3` · Rock
-- [ ] **Stone Edge** / Steinkante — `stoneedge.mp3` · Rock
-- [ ] **Sucker Punch** / Tiefschlag — `suckerpunch.mp3` · Dark
-- [ ] **Switcheroo** / Wechseldich — `switcheroo.mp3` · Dark
-- [ ] **Tailwind** / Rückenwind — `tailwind.mp3` · Flying
-- [ ] **Thunder Fang** / Donnerzahn — `thunderfang.mp3` · Electric
-- [ ] **Toxic Spikes** / Giftspitzen — `toxicspikes.mp3` · Poison
-- [ ] **Trick Room** / Bizarroraum — `trickroom.mp3` · Psychic
-- [ ] **Trump Card** / Trumpfkarte — `trumpcard.mp3` · Normal
-- [ ] **U-turn** / Kehrtwende — `uturn.mp3` · Bug
-- [ ] **Vacuum Wave** / Vakuumwelle — `vacuumwave.mp3` · Fighting
-- [ ] **Wake-Up Slap** / Weckruf — `wakeupslap.mp3` · Fighting
-- [ ] **Wood Hammer** / Holzhammer — `woodhammer.mp3` · Grass
-- [ ] **Worry Seed** / Sorgensamen — `worryseed.mp3` · Grass
-- [ ] **Wring Out** / Auswringen — `wringout.mp3` · Normal
-- [ ] **X-Scissor** / Kreuzschere — `xscissor.mp3` · Bug
-- [ ] **Zen Headbutt** / Zen-Kopfstoß — `zenheadbutt.mp3` · Psychic
+- [x] **Acupressure** / Akupressur — `acupressure.mp3` · Normal
+- [x] **Air Slash** / Luftschnitt — `airslash.mp3` · Flying
+- [x] **Aqua Jet** / Wasserdüse — `aquajet.mp3` · Water
+- [x] **Aqua Ring** / Wasserring — `aquaring.mp3` · Water
+- [x] **Aqua Tail** / Nassschweif — `aquatail.mp3` · Water
+- [x] **Assurance** / Gewissheit — `assurance.mp3` · Dark
+- [x] **Attack Order** / Schlagbefehl — `attackorder.mp3` · Bug
+- [x] **Aura Sphere** / Aurasphäre — `aurasphere.mp3` · Fighting
+- [x] **Avalanche** / Lawine — `avalanche.mp3` · Ice
+- [x] **Brave Bird** / Sturzflug — `bravebird.mp3` · Flying
+- [x] **Brine** / Lake — `brine.mp3` · Water
+- [x] **Bug Bite** / Käferbiss — `bugbite.mp3` · Bug
+- [x] **Bug Buzz** / Käfergebrumm — `bugbuzz.mp3` · Bug
+- [x] **Bullet Punch** / Patronenhieb — `bulletpunch.mp3` · Steel
+- [x] **Captivate** / Liebreiz — `captivate.mp3` · Normal
+- [x] **Charge Beam** / Ladestrahl — `chargebeam.mp3` · Electric
+- [x] **Chatter** / Geschwätz — `chatter.mp3` · Flying
+- [x] **Close Combat** / Nahkampf — `closecombat.mp3` · Fighting
+- [x] **Copycat** / Imitator — `copycat.mp3` · Normal
+- [x] **Cross Poison** / Giftstreich — `crosspoison.mp3` · Poison
+- [x] **Crush Grip** / Quetschgriff — `crushgrip.mp3` · Normal
+- [x] **Dark Pulse** / Finsteraura — `darkpulse.mp3` · Dark
+- [x] **Dark Void** / Schlummerort — `darkvoid.mp3` · Dark
+- [x] **Defend Order** / Blockbefehl — `defendorder.mp3` · Bug
+- [x] **Defog** / Auflockern — `defog.mp3` · Flying
+- [x] **Discharge** / Ladungsstoß — `discharge.mp3` · Electric
+- [x] **Double Hit** / Doppelschlag — `doublehit.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Draco Meteor** / Draco Meteor — `dracometeor.mp3` · Dragon
+- [x] **Dragon Pulse** / Drachenpuls — `dragonpulse.mp3` · Dragon
+- [x] **Dragon Rush** / Drachenstoß — `dragonrush.mp3` · Dragon
+- [x] **Drain Punch** / Ableithieb — `drainpunch.mp3` · Fighting
+- [x] **Earth Power** / Erdkräfte — `earthpower.mp3` · Ground
+- [x] **Embargo** / Itemsperre — `embargo.mp3` · Dark
+- [x] **Energy Ball** / Energieball — `energyball.mp3` · Grass
+- [x] **Feint** / Offenlegung — `feint.mp3` · Normal
+- [x] **Fire Fang** / Feuerzahn — `firefang.mp3` · Fire
+- [x] **Flare Blitz** / Flammenblitz — `flareblitz.mp3` · Fire
+- [x] **Flash Cannon** / Lichtkanone — `flashcannon.mp3` · Steel
+- [x] **Fling** / Schleuder — `fling.mp3` · Dark
+- [x] **Focus Blast** / Fokusstoß — `focusblast.mp3` · Fighting
+- [x] **Force Palm** / Kraftwelle — `forcepalm.mp3` · Fighting
+- [x] **Gastro Acid** / Magensäfte — `gastroacid.mp3` · Poison
+- [x] **Giga Impact** / Gigastoß — `gigaimpact.mp3` · Normal
+- [x] **Grass Knot** / Strauchler — `grassknot.mp3` · Grass
+- [x] **Gravity** / Erdanziehung — `gravity.mp3` · Psychic
+- [x] **Guard Swap** / Schutztausch — `guardswap.mp3` · Psychic
+- [x] **Gunk Shot** / Mülltreffer — `gunkshot.mp3` · Poison
+- [x] **Gyro Ball** / Gyroball — `gyroball.mp3` · Steel
+- [x] **Hammer Arm** / Hammerarm — `hammerarm.mp3` · Fighting
+- [x] **Head Smash** / Kopfstoß — `headsmash.mp3` · Rock
+- [x] **Heal Block** / Heilblockade — `healblock.mp3` · Psychic
+- [x] **Heal Order** / Heilbefehl — `healorder.mp3` · Bug
+- [x] **Healing Wish** / Heilopfer — `healingwish.mp3` · Psychic
+- [x] **Heart Swap** / Statustausch — `heartswap.mp3` · Psychic
+- [x] **Ice Fang** / Eiszahn — `icefang.mp3` · Ice
+- [x] **Ice Shard** / Eissplitter — `iceshard.mp3` · Ice
+- [x] **Iron Head** / Eisenschädel — `ironhead.mp3` · Steel
+- [x] **Judgment** / Urteilskraft — `judgment.mp3` · Normal
+- [x] **Last Resort** / Zuflucht — `lastresort.mp3` · Normal
+- [x] **Lava Plume** / Flammensturm — `lavaplume.mp3` · Fire
+- [x] **Leaf Storm** / Blättersturm — `leafstorm.mp3` · Grass
+- [x] **Lucky Chant** / Beschwörung — `luckychant.mp3` · Normal
+- [x] **Lunar Dance** / Lunartanz — `lunardance.mp3` · Psychic
+- [x] **Magma Storm** / Lavasturm — `magmastorm.mp3` · Fire
+- [x] **Magnet Bomb** / Magnetbombe — `magnetbomb.mp3` · Steel
+- [x] **Magnet Rise** / Magnetflug — `magnetrise.mp3` · Electric
+- [x] **Me First** / Egotrip — `mefirst.mp3` · Normal
+- [x] **Metal Burst** / Metallstoß — `metalburst.mp3` · Steel
+- [x] **Miracle Eye** / Wunderauge — `miracleeye.mp3` · Psychic
+- [x] **Mirror Shot** / Spiegelsalve — `mirrorshot.mp3` · Steel
+- [x] **Mud Bomb** / Schlammbombe — `mudbomb.mp3` · Ground
+- [x] **Nasty Plot** / Ränkeschmied — `nastyplot.mp3` · Dark
+- [x] **Natural Gift** / Beerenkräfte — `naturalgift.mp3` · Normal
+- [x] **Night Slash** / Nachthieb — `nightslash.mp3` · Dark
+- [x] **Ominous Wind** / Unheilböen — `ominouswind.mp3` · Ghost
+- [x] **Payback** / Gegenstoß — `payback.mp3` · Dark
+- [x] **Pluck** / Pflücker — `pluck.mp3` · Flying
+- [x] **Poison Jab** / Gifthieb — `poisonjab.mp3` · Poison
+- [x] **Power Gem** / Juwelenkraft — `powergem.mp3` · Rock
+- [x] **Power Swap** / Krafttausch — `powerswap.mp3` · Psychic
+- [x] **Power Trick** / Krafttrick — `powertrick.mp3` · Psychic
+- [x] **Power Whip** / Blattgeißel — `powerwhip.mp3` · Grass
+- [x] **Psycho Cut** / Psychoklinge — `psychocut.mp3` · Psychic
+- [x] **Psycho Shift** / Psybann — `psychoshift.mp3` · Psychic
+- [x] **Punishment** / Strafattacke — `punishment.mp3` · Dark
+- [x] **Roar of Time** / Zeitenlärm — `roaroftime.mp3` · Dragon
+- [x] **Rock Climb** / Kraxler — `rockclimb.mp3` · Normal
+- [x] **Rock Polish** / Steinpolitur — `rockpolish.mp3` · Rock
+- [x] **Rock Wrecker** / Felswerfer — `rockwrecker.mp3` · Rock
+- [x] **Roost** / Ruheort — `roost.mp3` · Flying
+- [x] **Seed Bomb** / Samenbomben — `seedbomb.mp3` · Grass
+- [x] **Seed Flare** / Schocksamen — `seedflare.mp3` · Grass
+- [x] **Shadow Claw** / Dunkelklaue — `shadowclaw.mp3` · Ghost
+- [x] **Shadow Force** / Schemenkraft — `shadowforce.mp3` · Ghost
+- [x] **Shadow Sneak** / Schattenstoß — `shadowsneak.mp3` · Ghost
+- [x] **Spacial Rend** / Raumschlag — `spacialrend.mp3` · Dragon
+- [x] **Stealth Rock** / Tarnsteine — `stealthrock.mp3` · Rock
+- [x] **Stone Edge** / Steinkante — `stoneedge.mp3` · Rock
+- [x] **Sucker Punch** / Tiefschlag — `suckerpunch.mp3` · Dark
+- [x] **Switcheroo** / Wechseldich — `switcheroo.mp3` · Dark
+- [x] **Tailwind** / Rückenwind — `tailwind.mp3` · Flying
+- [x] **Thunder Fang** / Donnerzahn — `thunderfang.mp3` · Electric
+- [x] **Toxic Spikes** / Giftspitzen — `toxicspikes.mp3` · Poison
+- [x] **Trick Room** / Bizarroraum — `trickroom.mp3` · Psychic
+- [x] **Trump Card** / Trumpfkarte — `trumpcard.mp3` · Normal
+- [x] **U-turn** / Kehrtwende — `uturn.mp3` · Bug
+- [x] **Vacuum Wave** / Vakuumwelle — `vacuumwave.mp3` · Fighting
+- [x] **Wake-Up Slap** / Weckruf — `wakeupslap.mp3` · Fighting
+- [x] **Wood Hammer** / Holzhammer — `woodhammer.mp3` · Grass
+- [x] **Worry Seed** / Sorgensamen — `worryseed.mp3` · Grass
+- [x] **Wring Out** / Auswringen — `wringout.mp3` · Normal
+- [x] **X-Scissor** / Kreuzschere — `xscissor.mp3` · Bug
+- [x] **Zen Headbutt** / Zen-Kopfstoß — `zenheadbutt.mp3` · Psychic
 
 ## Gen 5 moves (92)
 
-- [ ] **Acid Spray** / Säurespeier — `acidspray.mp3` · Poison
-- [ ] **Acrobatics** / Akrobatik — `acrobatics.mp3` · Flying
-- [ ] **After You** / Galanterie — `afteryou.mp3` · Normal
-- [ ] **Ally Switch** / Seitentausch — `allyswitch.mp3` · Psychic
-- [ ] **Autotomize** / Autotomie — `autotomize.mp3` · Steel
-- [ ] **Bestow** / Offerte — `bestow.mp3` · Normal
-- [ ] **Blue Flare** / Blauflammen — `blueflare.mp3` · Fire
-- [ ] **Bolt Strike** / Blitzschlag — `boltstrike.mp3` · Electric
-- [ ] **Bulldoze** / Dampfwalze — `bulldoze.mp3` · Ground
-- [ ] **Chip Away** / Zermürben — `chipaway.mp3` · Normal
-- [ ] **Circle Throw** / Überkopfwurf — `circlethrow.mp3` · Fighting
-- [ ] **Clear Smog** / Klärsmog — `clearsmog.mp3` · Poison
-- [ ] **Coil** / Einrollen — `coil.mp3` · Poison
-- [ ] **Cotton Guard** / Watteschild — `cottonguard.mp3` · Grass
-- [ ] **Dragon Tail** / Drachenrute — `dragontail.mp3` · Dragon
-- [ ] **Drill Run** / Schlagbohrer — `drillrun.mp3` · Ground
-- [ ] **Dual Chop** / Doppelhieb — `dualchop.mp3` · Dragon — ⚠️ no `dualchop.mp3`, currently silent (only `dualchop-1hit`, `dualchop-2hits`)
-- [ ] **Echoed Voice** / Widerhall — `echoedvoice.mp3` · Normal
-- [ ] **Electro Ball** / Elektroball — `electroball.mp3` · Electric
-- [ ] **Electroweb** / Elektronetz — `electroweb.mp3` · Electric
-- [ ] **Entrainment** / Zwango — `entrainment.mp3` · Normal
-- [ ] **Fiery Dance** / Feuerreigen — `fierydance.mp3` · Fire
-- [ ] **Final Gambit** / Wagemut — `finalgambit.mp3` · Fighting
-- [ ] **Fire Pledge** / Feuersäulen — `firepledge.mp3` · Fire
-- [ ] **Flame Burst** / Funkenflug — `flameburst.mp3` · Fire
-- [ ] **Flame Charge** / Nitroladung — `flamecharge.mp3` · Fire
-- [ ] **Foul Play** / Schmarotzer — `foulplay.mp3` · Dark
-- [ ] **Freeze Shock** / Frostvolt — `freezeshock.mp3` · Ice
-- [ ] **Frost Breath** / Eisesodem — `frostbreath.mp3` · Ice
-- [ ] **Fusion Bolt** / Kreuzdonner — `fusionbolt.mp3` · Electric
-- [ ] **Fusion Flare** / Kreuzflamme — `fusionflare.mp3` · Fire
-- [ ] **Gear Grind** / Klikkdiskus — `geargrind.mp3` · Steel — ⚠️ no `geargrind.mp3`, currently silent (only `geargrind-1hit`, `geargrind-2hits`)
-- [ ] **Glaciate** / Eiszeit — `glaciate.mp3` · Ice
-- [ ] **Grass Pledge** / Pflanzensäulen — `grasspledge.mp3` · Grass
-- [ ] **Guard Split** / Schutzteiler — `guardsplit.mp3` · Psychic
-- [ ] **Head Charge** / Steinschädel — `headcharge.mp3` · Normal
-- [ ] **Heal Pulse** / Heilwoge — `healpulse.mp3` · Psychic
-- [ ] **Heart Stamp** / Herzstempel — `heartstamp.mp3` · Psychic
-- [ ] **Heat Crash** / Brandstempel — `heatcrash.mp3` · Fire
-- [ ] **Heavy Slam** / Rammboss — `heavyslam.mp3` · Steel
-- [ ] **Hex** / Bürde — `hex.mp3` · Ghost
-- [ ] **Hone Claws** / Klauenwetzer — `honeclaws.mp3` · Dark
-- [ ] **Horn Leech** / Holzgeweih — `hornleech.mp3` · Grass
-- [ ] **Hurricane** / Orkan — `hurricane.mp3` · Flying
-- [ ] **Ice Burn** / Frosthauch — `iceburn.mp3` · Ice
-- [ ] **Icicle Crash** / Eiszapfhagel — `iciclecrash.mp3` · Ice
-- [ ] **Incinerate** / Einäschern — `incinerate.mp3` · Fire
-- [ ] **Inferno** / Inferno — `inferno.mp3` · Fire
-- [ ] **Leaf Tornado** / Grasmixer — `leaftornado.mp3` · Grass
-- [ ] **Low Sweep** / Fußtritt — `lowsweep.mp3` · Fighting
-- [ ] **Magic Room** / Magieraum — `magicroom.mp3` · Psychic
-- [ ] **Night Daze** / Nachtflut — `nightdaze.mp3` · Dark
-- [ ] **Power Split** / Kraftteiler — `powersplit.mp3` · Psychic
-- [ ] **Psyshock** / Psychoschock — `psyshock.mp3` · Psychic
-- [ ] **Psystrike** / Psychostoß — `psystrike.mp3` · Psychic
-- [ ] **Quash** / Verzögerung — `quash.mp3` · Dark
-- [ ] **Quick Guard** / Rapidschutz — `quickguard.mp3` · Fighting
-- [ ] **Quiver Dance** / Falterreigen — `quiverdance.mp3` · Bug
-- [ ] **Rage Powder** / Wutpulver — `ragepowder.mp3` · Bug
-- [ ] **Razor Shell** / Kalkklinge — `razorshell.mp3` · Water
-- [ ] **Reflect Type** / Typenspiegel — `reflecttype.mp3` · Normal
-- [ ] **Relic Song** / Urgesang — `relicsong.mp3` · Normal
-- [ ] **Retaliate** / Heimzahlung — `retaliate.mp3` · Normal
-- [ ] **Round** / Kanon — `round.mp3` · Normal
-- [ ] **Sacred Sword** / Sanctoklinge — `sacredsword.mp3` · Fighting
-- [ ] **Scald** / Siedewasser — `scald.mp3` · Water
-- [ ] **Searing Shot** / Flammenball — `searingshot.mp3` · Fire
-- [ ] **Secret Sword** / Mystoschwert — `secretsword.mp3` · Fighting
-- [ ] **Shell Smash** / Hausbruch — `shellsmash.mp3` · Normal
-- [ ] **Shift Gear** / Gangwechsel — `shiftgear.mp3` · Steel
-- [ ] **Simple Beam** / Wankelstrahl — `simplebeam.mp3` · Normal
-- [ ] **Sky Drop** / Freier Fall — `skydrop.mp3` · Flying
-- [ ] **Sludge Wave** / Schlammwoge — `sludgewave.mp3` · Poison
-- [ ] **Smack Down** / Katapult — `smackdown.mp3` · Rock
-- [ ] **Snarl** / Standpauke — `snarl.mp3` · Dark
-- [ ] **Soak** / Überflutung — `soak.mp3` · Water
-- [ ] **Steamroller** / Quetschwalze — `steamroller.mp3` · Bug
-- [ ] **Stored Power** / Kraftvorrat — `storedpower.mp3` · Psychic
-- [ ] **Storm Throw** / Bergsturm — `stormthrow.mp3` · Fighting
-- [ ] **Struggle Bug** / Käfertrutz — `strugglebug.mp3` · Bug
-- [ ] **Synchronoise** / Synchrolärm — `synchronoise.mp3` · Psychic
-- [ ] **Tail Slap** / Kehrschelle — `tailslap.mp3` · Normal — ⚠️ no `tailslap.mp3`, currently silent (only `tailslap-1hit`, `tailslap-2hits`)
-- [ ] **Techno Blast** / Techblaster — `technoblast.mp3` · Normal
-- [ ] **Telekinesis** / Telekinese — `telekinesis.mp3` · Psychic
-- [ ] **V-create** / V-Generator — `vcreate.mp3` · Fire
-- [ ] **Venoshock** / Giftschock — `venoshock.mp3` · Poison
-- [ ] **Volt Switch** / Voltwechsel — `voltswitch.mp3` · Electric
-- [ ] **Water Pledge** / Wassersäulen — `waterpledge.mp3` · Water
-- [ ] **Wide Guard** / Rundumschutz — `wideguard.mp3` · Rock
-- [ ] **Wild Charge** / Stromstoß — `wildcharge.mp3` · Electric
-- [ ] **Wonder Room** / Wunderraum — `wonderroom.mp3` · Psychic
-- [ ] **Work Up** / Kraftschub — `workup.mp3` · Normal
+- [x] **Acid Spray** / Säurespeier — `acidspray.mp3` · Poison
+- [x] **Acrobatics** / Akrobatik — `acrobatics.mp3` · Flying
+- [x] **After You** / Galanterie — `afteryou.mp3` · Normal
+- [x] **Ally Switch** / Seitentausch — `allyswitch.mp3` · Psychic
+- [x] **Autotomize** / Autotomie — `autotomize.mp3` · Steel
+- [x] **Bestow** / Offerte — `bestow.mp3` · Normal
+- [x] **Blue Flare** / Blauflammen — `blueflare.mp3` · Fire
+- [x] **Bolt Strike** / Blitzschlag — `boltstrike.mp3` · Electric
+- [x] **Bulldoze** / Dampfwalze — `bulldoze.mp3` · Ground
+- [x] **Chip Away** / Zermürben — `chipaway.mp3` · Normal
+- [x] **Circle Throw** / Überkopfwurf — `circlethrow.mp3` · Fighting
+- [x] **Clear Smog** / Klärsmog — `clearsmog.mp3` · Poison
+- [x] **Coil** / Einrollen — `coil.mp3` · Poison
+- [x] **Cotton Guard** / Watteschild — `cottonguard.mp3` · Grass
+- [x] **Dragon Tail** / Drachenrute — `dragontail.mp3` · Dragon
+- [x] **Drill Run** / Schlagbohrer — `drillrun.mp3` · Ground
+- [x] **Dual Chop** / Doppelhieb — `dualchop.mp3` · Dragon — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Echoed Voice** / Widerhall — `echoedvoice.mp3` · Normal
+- [x] **Electro Ball** / Elektroball — `electroball.mp3` · Electric
+- [x] **Electroweb** / Elektronetz — `electroweb.mp3` · Electric
+- [x] **Entrainment** / Zwango — `entrainment.mp3` · Normal
+- [x] **Fiery Dance** / Feuerreigen — `fierydance.mp3` · Fire
+- [x] **Final Gambit** / Wagemut — `finalgambit.mp3` · Fighting
+- [x] **Fire Pledge** / Feuersäulen — `firepledge.mp3` · Fire
+- [x] **Flame Burst** / Funkenflug — `flameburst.mp3` · Fire
+- [x] **Flame Charge** / Nitroladung — `flamecharge.mp3` · Fire
+- [x] **Foul Play** / Schmarotzer — `foulplay.mp3` · Dark
+- [x] **Freeze Shock** / Frostvolt — `freezeshock.mp3` · Ice
+- [x] **Frost Breath** / Eisesodem — `frostbreath.mp3` · Ice
+- [x] **Fusion Bolt** / Kreuzdonner — `fusionbolt.mp3` · Electric
+- [x] **Fusion Flare** / Kreuzflamme — `fusionflare.mp3` · Fire
+- [x] **Gear Grind** / Klikkdiskus — `geargrind.mp3` · Steel — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Glaciate** / Eiszeit — `glaciate.mp3` · Ice
+- [x] **Grass Pledge** / Pflanzensäulen — `grasspledge.mp3` · Grass
+- [x] **Guard Split** / Schutzteiler — `guardsplit.mp3` · Psychic
+- [x] **Head Charge** / Steinschädel — `headcharge.mp3` · Normal
+- [x] **Heal Pulse** / Heilwoge — `healpulse.mp3` · Psychic
+- [x] **Heart Stamp** / Herzstempel — `heartstamp.mp3` · Psychic
+- [x] **Heat Crash** / Brandstempel — `heatcrash.mp3` · Fire
+- [x] **Heavy Slam** / Rammboss — `heavyslam.mp3` · Steel
+- [x] **Hex** / Bürde — `hex.mp3` · Ghost
+- [x] **Hone Claws** / Klauenwetzer — `honeclaws.mp3` · Dark
+- [x] **Horn Leech** / Holzgeweih — `hornleech.mp3` · Grass
+- [x] **Hurricane** / Orkan — `hurricane.mp3` · Flying
+- [x] **Ice Burn** / Frosthauch — `iceburn.mp3` · Ice
+- [x] **Icicle Crash** / Eiszapfhagel — `iciclecrash.mp3` · Ice
+- [x] **Incinerate** / Einäschern — `incinerate.mp3` · Fire
+- [x] **Inferno** / Inferno — `inferno.mp3` · Fire
+- [x] **Leaf Tornado** / Grasmixer — `leaftornado.mp3` · Grass
+- [x] **Low Sweep** / Fußtritt — `lowsweep.mp3` · Fighting
+- [x] **Magic Room** / Magieraum — `magicroom.mp3` · Psychic
+- [x] **Night Daze** / Nachtflut — `nightdaze.mp3` · Dark
+- [x] **Power Split** / Kraftteiler — `powersplit.mp3` · Psychic
+- [x] **Psyshock** / Psychoschock — `psyshock.mp3` · Psychic
+- [x] **Psystrike** / Psychostoß — `psystrike.mp3` · Psychic
+- [x] **Quash** / Verzögerung — `quash.mp3` · Dark
+- [x] **Quick Guard** / Rapidschutz — `quickguard.mp3` · Fighting
+- [x] **Quiver Dance** / Falterreigen — `quiverdance.mp3` · Bug
+- [x] **Rage Powder** / Wutpulver — `ragepowder.mp3` · Bug
+- [x] **Razor Shell** / Kalkklinge — `razorshell.mp3` · Water
+- [x] **Reflect Type** / Typenspiegel — `reflecttype.mp3` · Normal
+- [x] **Relic Song** / Urgesang — `relicsong.mp3` · Normal
+- [x] **Retaliate** / Heimzahlung — `retaliate.mp3` · Normal
+- [x] **Round** / Kanon — `round.mp3` · Normal
+- [x] **Sacred Sword** / Sanctoklinge — `sacredsword.mp3` · Fighting
+- [x] **Scald** / Siedewasser — `scald.mp3` · Water
+- [x] **Searing Shot** / Flammenball — `searingshot.mp3` · Fire
+- [x] **Secret Sword** / Mystoschwert — `secretsword.mp3` · Fighting
+- [x] **Shell Smash** / Hausbruch — `shellsmash.mp3` · Normal
+- [x] **Shift Gear** / Gangwechsel — `shiftgear.mp3` · Steel
+- [x] **Simple Beam** / Wankelstrahl — `simplebeam.mp3` · Normal
+- [x] **Sky Drop** / Freier Fall — `skydrop.mp3` · Flying
+- [x] **Sludge Wave** / Schlammwoge — `sludgewave.mp3` · Poison
+- [x] **Smack Down** / Katapult — `smackdown.mp3` · Rock
+- [x] **Snarl** / Standpauke — `snarl.mp3` · Dark
+- [x] **Soak** / Überflutung — `soak.mp3` · Water
+- [x] **Steamroller** / Quetschwalze — `steamroller.mp3` · Bug
+- [x] **Stored Power** / Kraftvorrat — `storedpower.mp3` · Psychic
+- [x] **Storm Throw** / Bergsturm — `stormthrow.mp3` · Fighting
+- [x] **Struggle Bug** / Käfertrutz — `strugglebug.mp3` · Bug
+- [x] **Synchronoise** / Synchrolärm — `synchronoise.mp3` · Psychic
+- [x] **Tail Slap** / Kehrschelle — `tailslap.mp3` · Normal — free version fills the gap (regular pack has only multi-hit files)
+- [x] **Techno Blast** / Techblaster — `technoblast.mp3` · Normal
+- [x] **Telekinesis** / Telekinese — `telekinesis.mp3` · Psychic
+- [x] **V-create** / V-Generator — `vcreate.mp3` · Fire
+- [x] **Venoshock** / Giftschock — `venoshock.mp3` · Poison
+- [x] **Volt Switch** / Voltwechsel — `voltswitch.mp3` · Electric
+- [x] **Water Pledge** / Wassersäulen — `waterpledge.mp3` · Water
+- [x] **Wide Guard** / Rundumschutz — `wideguard.mp3` · Rock
+- [x] **Wild Charge** / Stromstoß — `wildcharge.mp3` · Electric
+- [x] **Wonder Room** / Wunderraum — `wonderroom.mp3` · Psychic
+- [x] **Work Up** / Kraftschub — `workup.mp3` · Normal
 
 ## Gen 6 moves (62)
 
-- [ ] **Aromatic Mist** / Duftwolke — `aromaticmist.mp3` · Fairy
-- [ ] **Baby-Doll Eyes** / Kulleraugen — `babydolleyes.mp3` · Fairy
-- [ ] **Belch** / Rülpser — `belch.mp3` · Poison
-- [ ] **Boomburst** / Überschallknall — `boomburst.mp3` · Normal
-- [ ] **Celebrate** / Ehrentag — `celebrate.mp3` · Normal
-- [ ] **Confide** / Vertrauenssache — `confide.mp3` · Normal
-- [ ] **Crafty Shield** / Trickschutz — `craftyshield.mp3` · Fairy
-- [ ] **Dazzling Gleam** / Zauberschein — `dazzlinggleam.mp3` · Fairy
-- [ ] **Diamond Storm** / Diamantsturm — `diamondstorm.mp3` · Rock
-- [ ] **Disarming Voice** / Säuselstimme — `disarmingvoice.mp3` · Fairy
-- [ ] **Dragon Ascent** / Zenitstürmer — `dragonascent.mp3` · Flying
-- [ ] **Draining Kiss** / Diebeskuss — `drainingkiss.mp3` · Fairy
-- [ ] **Eerie Impulse** / Mystowellen — `eerieimpulse.mp3` · Electric
-- [ ] **Electric Terrain** / Elektrofeld — `electricterrain.mp3` · Electric
-- [ ] **Electrify** / Elektrifizierung — `electrify.mp3` · Electric
-- [ ] **Fairy Lock** / Feenschloss — `fairylock.mp3` · Fairy
-- [ ] **Fairy Wind** / Feenbrise — `fairywind.mp3` · Fairy — ⚠️ no file yet, currently silent
-- [ ] **Fell Stinger** / Stachelfinale — `fellstinger.mp3` · Bug
-- [ ] **Flower Shield** / Floraschutz — `flowershield.mp3` · Fairy
-- [ ] **Flying Press** / Flying Press — `flyingpress.mp3` · Fighting
-- [ ] **Forest's Curse** / Waldesfluch — `forestscurse.mp3` · Grass
-- [ ] **Freeze-Dry** / Gefriertrockner — `freezedry.mp3` · Ice
-- [ ] **Geomancy** / Geokontrolle — `geomancy.mp3` · Fairy
-- [ ] **Grassy Terrain** / Grasfeld — `grassyterrain.mp3` · Grass
-- [ ] **Happy Hour** / Goldene Zeiten — `happyhour.mp3` · Normal
-- [ ] **Hold Back** / Zurückhaltung — `holdback.mp3` · Normal
-- [ ] **Hold Hands** / Händchenhalten — `holdhands.mp3` · Normal
-- [ ] **Hyperspace Fury** / Dimensionswahn — `hyperspacefury.mp3` · Dark
-- [ ] **Hyperspace Hole** / Dimensionsloch — `hyperspacehole.mp3` · Psychic
-- [ ] **Infestation** / Plage — `infestation.mp3` · Bug
-- [ ] **Ion Deluge** / Plasmaschauer — `iondeluge.mp3` · Electric
-- [ ] **King's Shield** / Königsschild — `kingsshield.mp3` · Steel
-- [ ] **Land's Wrath** / Bodengewalt — `landswrath.mp3` · Ground
-- [ ] **Light of Ruin** / Lux Calamitatis — `lightofruin.mp3` · Fairy
-- [ ] **Magnetic Flux** / Magnetregler — `magneticflux.mp3` · Electric
-- [ ] **Mat Block** / Tatami-Schild — `matblock.mp3` · Fighting
-- [ ] **Misty Terrain** / Nebelfeld — `mistyterrain.mp3` · Fairy
-- [ ] **Moonblast** / Mondgewalt — `moonblast.mp3` · Fairy
-- [ ] **Mystical Fire** / Magieflamme — `mysticalfire.mp3` · Fire
-- [ ] **Noble Roar** / Kampfgebrüll — `nobleroar.mp3` · Normal
-- [ ] **Nuzzle** / Wangenrubbler — `nuzzle.mp3` · Electric
-- [ ] **Oblivion Wing** / Unheilsschwingen — `oblivionwing.mp3` · Flying
-- [ ] **Origin Pulse** / Ursprungswoge — `originpulse.mp3` · Water
-- [ ] **Parabolic Charge** / Parabolladung — `paraboliccharge.mp3` · Electric
-- [ ] **Parting Shot** / Abgangstirade — `partingshot.mp3` · Dark
-- [ ] **Petal Blizzard** / Blütenwirbel — `petalblizzard.mp3` · Grass
-- [ ] **Phantom Force** / Phantomkraft — `phantomforce.mp3` · Ghost
-- [ ] **Play Nice** / Kameradschaft — `playnice.mp3` · Normal
-- [ ] **Play Rough** / Knuddler — `playrough.mp3` · Fairy
-- [ ] **Powder** / Pulverschleuder — `powder.mp3` · Bug
-- [ ] **Power-Up Punch** / Steigerungshieb — `poweruppunch.mp3` · Fighting
-- [ ] **Precipice Blades** / Abgrundsklinge — `precipiceblades.mp3` · Ground
-- [ ] **Rototiller** / Pflüger — `rototiller.mp3` · Ground
-- [ ] **Spiky Shield** / Schutzstacheln — `spikyshield.mp3` · Grass
-- [ ] **Steam Eruption** / Dampfschwall — `steameruption.mp3` · Water
-- [ ] **Sticky Web** / Klebenetz — `stickyweb.mp3` · Bug
-- [ ] **Thousand Arrows** / Tausend Pfeile — `thousandarrows.mp3` · Ground
-- [ ] **Thousand Waves** / Tausend Wellen — `thousandwaves.mp3` · Ground
-- [ ] **Topsy-Turvy** / Invertigo — `topsyturvy.mp3` · Dark
-- [ ] **Trick-or-Treat** / Halloween — `trickortreat.mp3` · Ghost
-- [ ] **Venom Drench** / Giftfalle — `venomdrench.mp3` · Poison
-- [ ] **Water Shuriken** / Wasser-Shuriken — `watershuriken.mp3` · Water
+- [x] **Aromatic Mist** / Duftwolke — `aromaticmist.mp3` · Fairy
+- [x] **Baby-Doll Eyes** / Kulleraugen — `babydolleyes.mp3` · Fairy
+- [x] **Belch** / Rülpser — `belch.mp3` · Poison
+- [x] **Boomburst** / Überschallknall — `boomburst.mp3` · Normal
+- [x] **Celebrate** / Ehrentag — `celebrate.mp3` · Normal
+- [x] **Confide** / Vertrauenssache — `confide.mp3` · Normal
+- [x] **Crafty Shield** / Trickschutz — `craftyshield.mp3` · Fairy
+- [x] **Dazzling Gleam** / Zauberschein — `dazzlinggleam.mp3` · Fairy
+- [x] **Diamond Storm** / Diamantsturm — `diamondstorm.mp3` · Rock
+- [x] **Disarming Voice** / Säuselstimme — `disarmingvoice.mp3` · Fairy
+- [x] **Dragon Ascent** / Zenitstürmer — `dragonascent.mp3` · Flying
+- [x] **Draining Kiss** / Diebeskuss — `drainingkiss.mp3` · Fairy
+- [x] **Eerie Impulse** / Mystowellen — `eerieimpulse.mp3` · Electric
+- [x] **Electric Terrain** / Elektrofeld — `electricterrain.mp3` · Electric
+- [x] **Electrify** / Elektrifizierung — `electrify.mp3` · Electric
+- [x] **Fairy Lock** / Feenschloss — `fairylock.mp3` · Fairy
+- [x] **Fairy Wind** / Feenbrise — `fairywind.mp3` · Fairy — free version fills the gap (regular pack had no file)
+- [x] **Fell Stinger** / Stachelfinale — `fellstinger.mp3` · Bug
+- [x] **Flower Shield** / Floraschutz — `flowershield.mp3` · Fairy
+- [x] **Flying Press** / Flying Press — `flyingpress.mp3` · Fighting
+- [x] **Forest's Curse** / Waldesfluch — `forestscurse.mp3` · Grass
+- [x] **Freeze-Dry** / Gefriertrockner — `freezedry.mp3` · Ice
+- [x] **Geomancy** / Geokontrolle — `geomancy.mp3` · Fairy
+- [x] **Grassy Terrain** / Grasfeld — `grassyterrain.mp3` · Grass
+- [x] **Happy Hour** / Goldene Zeiten — `happyhour.mp3` · Normal
+- [x] **Hold Back** / Zurückhaltung — `holdback.mp3` · Normal
+- [x] **Hold Hands** / Händchenhalten — `holdhands.mp3` · Normal
+- [x] **Hyperspace Fury** / Dimensionswahn — `hyperspacefury.mp3` · Dark
+- [x] **Hyperspace Hole** / Dimensionsloch — `hyperspacehole.mp3` · Psychic
+- [x] **Infestation** / Plage — `infestation.mp3` · Bug
+- [x] **Ion Deluge** / Plasmaschauer — `iondeluge.mp3` · Electric
+- [x] **King's Shield** / Königsschild — `kingsshield.mp3` · Steel
+- [x] **Land's Wrath** / Bodengewalt — `landswrath.mp3` · Ground
+- [x] **Light of Ruin** / Lux Calamitatis — `lightofruin.mp3` · Fairy
+- [x] **Magnetic Flux** / Magnetregler — `magneticflux.mp3` · Electric
+- [x] **Mat Block** / Tatami-Schild — `matblock.mp3` · Fighting
+- [x] **Misty Terrain** / Nebelfeld — `mistyterrain.mp3` · Fairy
+- [x] **Moonblast** / Mondgewalt — `moonblast.mp3` · Fairy
+- [x] **Mystical Fire** / Magieflamme — `mysticalfire.mp3` · Fire
+- [x] **Noble Roar** / Kampfgebrüll — `nobleroar.mp3` · Normal
+- [x] **Nuzzle** / Wangenrubbler — `nuzzle.mp3` · Electric
+- [x] **Oblivion Wing** / Unheilsschwingen — `oblivionwing.mp3` · Flying
+- [x] **Origin Pulse** / Ursprungswoge — `originpulse.mp3` · Water
+- [x] **Parabolic Charge** / Parabolladung — `paraboliccharge.mp3` · Electric
+- [x] **Parting Shot** / Abgangstirade — `partingshot.mp3` · Dark
+- [x] **Petal Blizzard** / Blütenwirbel — `petalblizzard.mp3` · Grass
+- [x] **Phantom Force** / Phantomkraft — `phantomforce.mp3` · Ghost
+- [x] **Play Nice** / Kameradschaft — `playnice.mp3` · Normal
+- [x] **Play Rough** / Knuddler — `playrough.mp3` · Fairy
+- [x] **Powder** / Pulverschleuder — `powder.mp3` · Bug
+- [x] **Power-Up Punch** / Steigerungshieb — `poweruppunch.mp3` · Fighting
+- [x] **Precipice Blades** / Abgrundsklinge — `precipiceblades.mp3` · Ground
+- [x] **Rototiller** / Pflüger — `rototiller.mp3` · Ground
+- [x] **Spiky Shield** / Schutzstacheln — `spikyshield.mp3` · Grass
+- [x] **Steam Eruption** / Dampfschwall — `steameruption.mp3` · Water
+- [x] **Sticky Web** / Klebenetz — `stickyweb.mp3` · Bug
+- [x] **Thousand Arrows** / Tausend Pfeile — `thousandarrows.mp3` · Ground
+- [x] **Thousand Waves** / Tausend Wellen — `thousandwaves.mp3` · Ground
+- [x] **Topsy-Turvy** / Invertigo — `topsyturvy.mp3` · Dark
+- [x] **Trick-or-Treat** / Halloween — `trickortreat.mp3` · Ghost
+- [x] **Venom Drench** / Giftfalle — `venomdrench.mp3` · Poison
+- [x] **Water Shuriken** / Wasser-Shuriken — `watershuriken.mp3` · Water
