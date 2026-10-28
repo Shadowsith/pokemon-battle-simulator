@@ -371,13 +371,18 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic powder (stream 0-0.76 s) + sleep fleck (0.76 s): a puff of spores, then a lullaby. */
+  /**
+   * GrassMoveAnimations.playSpore: orange and green spores drift down (0-1.9 s,
+   * flash at 0.7 s), then FxEffects.sleepZs - four Zs float up 0.28 s apart (from 1.9 s).
+   * An earthy puff of spores, then a lullaby.
+   */
   spore: () => {
-    const s = new MoveSfx(1.35, 0x5907);
-    s.noise(0.0, 0.1, { clock: env.ramp(3000, 1200), gain: env.attackDecay(0.3, 0.1) });
-    s.noise(0.05, 0.7, { clock: () => 3200, gain: env.swell(0.12) });
-    s.sparkle(0.05, 0.65, 10, { lo: 1800, hi: 3200, gain: 0.13 });
-    s.sleep(0.76, 0.22);
+    const s = new MoveSfx(3.2, 0x5907);
+    s.noise(0.0, 0.12, { clock: env.ramp(3000, 1200), gain: env.attackDecay(0.28, 0.1) });
+    s.noise(0.05, 1.8, { clock: () => 1800, gain: env.swell(0.11) });
+    s.sparkle(0.1, 1.7, 14, { lo: 1200, hi: 2600, gain: 0.12 });
+    s.wave(0.05, 1.8, { freq: (u) => 520 - 180 * u + 25 * Math.sin(2 * Math.PI * 5 * u), gain: env.swell(0.1) });
+    [79, 76, 72, 67].forEach((n, i) => s.arpeggio(1.9 + i * 0.28, [n], 0.28, { gain: 0.24, voice: 'wave', hold: 0.4 }));
     return s;
   },
 

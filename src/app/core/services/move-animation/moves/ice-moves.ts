@@ -11,8 +11,36 @@ export class IceMoveAnimations {
     aurorabeam: (refs, launch, target) => IceMoveAnimations.playAuroraBeam(refs, launch, target),
     icepunch: (refs, _launch, target) => FxEffects.playElementalPunch(refs, target, 'ice', '#9CD6FF', () => FxGlyphs.iceChunk()),
     blizzard: (refs, launch, target) => IceMoveAnimations.playBlizzard(refs, launch, target),
-    icebeam: (refs, launch, target) => IceMoveAnimations.playIceBeam(refs, launch, target)
+    icebeam: (refs, launch, target) => IceMoveAnimations.playIceBeam(refs, launch, target),
+    haze: (refs) => IceMoveAnimations.playHaze(refs)
   };
+
+  /**
+   * Haze: a murky dark green haze rolls in over the whole scene, drifts
+   * slowly for a moment, then clears.
+   */
+  private static async playHaze(refs: BattleStageRefs) {
+    const { fieldEl } = refs;
+    const haze = Fx.backdrop(fieldEl, 'background:radial-gradient(ellipse at 50% 55%,#2F4A3A,#16241C 60%,#0A120E)');
+    // Soft, darker and lighter cloud banks drift across on top of the base tint.
+    const clouds = document.createElement('div');
+    clouds.style.cssText =
+      'position:absolute;inset:-20% -40%;background:' +
+      'radial-gradient(ellipse 30% 22% at 20% 30%,#5C7A5Acc,#5C7A5A00),' +
+      'radial-gradient(ellipse 35% 25% at 60% 70%,#0A1410dd,#0A141000),' +
+      'radial-gradient(ellipse 28% 20% at 80% 25%,#4A6A50bb,#4A6A5000),' +
+      'radial-gradient(ellipse 32% 24% at 40% 85%,#3E5A46aa,#3E5A4600)';
+    haze.appendChild(clouds);
+    const total = 2000;
+    Fx.anim(clouds, [{ transform: 'translateX(-6%)' }, { transform: 'translateX(6%)' }], { duration: total, easing: 'ease-in-out' });
+    await Fx.anim(haze, [
+      { opacity: 0 },
+      { opacity: 0.95, offset: 0.2 },
+      { opacity: 0.95, offset: 0.75 },
+      { opacity: 0 }
+    ], { duration: total, easing: 'ease-in-out' });
+    haze.remove();
+  }
 
   /**
    * Blizzard: the scene whites out under a snowy backdrop and a light fog,

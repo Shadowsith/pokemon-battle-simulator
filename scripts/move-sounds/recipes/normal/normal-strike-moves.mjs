@@ -526,15 +526,25 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee: a mighty, slow-building shove. */
+  /**
+   * NormalStrikeMoveAnimations.playStrength: the caster glows red and trembles
+   * (0-0.8 s), six bursts pound the target (0.8-1.4 s, 0.12 s apart), embers to
+   * ~1.9 s. A straining power-up, then a pummelling flurry.
+   */
   strength: () => {
-    const s = new MoveSfx(0.8, 0x57e9);
-    s.pulse(0.0, 0.18, { freq: env.ramp(70, 110), gain: env.swell(0.25), duty: 0.5 });
-    s.whoosh(0.0, 0.18, { from: 600, to: 2200, gain: 0.3 });
-    s.thud(0.17, 0.9, 1);
-    s.rumble(0.2, 0.4, { from: 300, to: 110, gain: 0.28 });
+    const s = new MoveSfx(2.1, 0x57e9);
+    s.pulse(0.0, 0.8, { freq: env.ramp(70, 120), gain: (u) => 0.22 * Math.min(1, u * 4) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 12 * u)), duty: 0.5 });
+    s.rumble(0.0, 0.8, { from: 160, to: 260, gain: 0.2 });
+    for (let i = 0; i < 6; i++) {
+      const at = 0.8 + i * 0.12;
+      s.thud(at, 0.55 + 0.05 * i, 0.8);
+      s.noise(at, 0.08, { clock: () => 2500 + s.random() * 2000, gain: env.decay(0.25, 1.5) });
+    }
+    s.rumble(1.45, 0.5, { from: 300, to: 110, gain: 0.25 });
+    s.sparkle(1.0, 0.9, 8, { lo: 1800, hi: 3500, gain: 0.1 });
     return s;
   },
+
 
   /** Generic melee + 1/4 HP self-damage (~0.12 s after impact): a desperate flailing hit. */
   struggle: () => {

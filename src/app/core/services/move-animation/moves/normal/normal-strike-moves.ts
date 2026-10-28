@@ -17,8 +17,71 @@ export class NormalStrikeMoveAnimations {
     megapunch: (refs, _launch, target) => NormalStrikeMoveAnimations.playMegaPunch(refs, target),
     skullbash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSkullBash(refs, target, v),
     slam: (refs, _launch, target) => NormalStrikeMoveAnimations.playSlam(refs, target),
-    slash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v)
+    slash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v),
+    strength: (refs, _launch, target) => NormalStrikeMoveAnimations.playStrength(refs, target)
   };
+
+  /**
+   * Strength: the caster powers up - its sprite glows red and trembles - then a flurry of fiery comic-style bursts pounds the target
+   * while orange embers drift around it.
+   */
+  private static async playStrength(refs: BattleStageRefs, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+
+    // 1. Power up: red tint and a trembling shake (0.8 s).
+    const red = 'sepia(1) saturate(6) hue-rotate(-35deg) brightness(.95) drop-shadow(0 0 8px #FF3A1A)';
+    const tint = Fx.anim(launchEl, [
+      { filter: 'none' },
+      { filter: red, offset: 0.25 },
+      { filter: red, offset: 0.8 },
+      { filter: 'none' }
+    ], { duration: 800, easing: 'ease-in-out', fill: 'none' });
+    const base = launchEl.style.transform;
+    const tremble: Keyframe[] = [];
+    for (let k = 0; k <= 12; k++) tremble.push({ transform: `${base} translateX(${k === 0 || k === 12 ? 0 : k % 2 ? 3 : -3}px)` });
+    await Promise.all([tint, Fx.anim(launchEl, tremble, { duration: 800, easing: 'linear', fill: 'none' })]);
+
+    // 2. Six bursts pound the target one after another.
+    const r = targetEl.getBoundingClientRect();
+    const size = Math.max(r.width * 0.4, 36);
+    const hits: Promise<void>[] = [];
+    for (let i = 0; i < 6; i++) {
+      hits.push(
+        Fx.wait(i * 120).then(() => {
+          const burst = FxGlyphs.spikyBurst(size * (0.8 + Math.random() * 0.4), '#FF5A1A', '#FFC23A');
+          Fx.place(burst, {
+            x: target.x + (Math.random() * 2 - 1) * r.width * 0.35,
+            y: target.y + (Math.random() * 2 - 1) * r.height * 0.3
+          });
+          fxEl.appendChild(burst);
+          Fx.shake(targetEl, 4);
+          if (i % 2 === 0) Fx.flash(targetEl, '#FFB13C', 0.5);
+          const rot = Math.random() * 40 - 20;
+          return Fx.anim(burst, [
+            { transform: `scale(.3) rotate(${rot}deg)`, opacity: 1 },
+            { transform: `scale(1.1) rotate(${rot}deg)`, opacity: 1, offset: 0.3 },
+            { transform: `scale(1) rotate(${rot}deg)`, opacity: 1, offset: 0.7 },
+            { transform: `scale(1.05) rotate(${rot}deg)`, opacity: 0 }
+          ], { duration: 480, easing: 'ease-out' }).then(() => burst.remove());
+        })
+      );
+    }
+    // Orange embers drift up around the target.
+    const reach = Math.max(r.width * 0.8, 60);
+    for (let i = 0; i < 10; i++) {
+      const s = 4 + Math.random() * 4;
+      const ember = document.createElement('div');
+      ember.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF0C0,#FF9A2A 60%);box-shadow:0 0 6px #FF8A1F`;
+      Fx.place(ember, { x: target.x + (Math.random() * 2 - 1) * reach, y: target.y + (Math.random() * 2 - 1) * reach * 0.6 });
+      fxEl.appendChild(ember);
+      Fx.anim(ember, [
+        { transform: 'translateY(0) scale(0)', opacity: 0 },
+        { transform: 'translateY(-6px) scale(1)', opacity: 1, offset: 0.3 },
+        { transform: 'translateY(-20px) scale(.5)', opacity: 0 }
+      ], { duration: 700, easing: 'ease-out', delay: Math.random() * 500 }).then(() => ember.remove());
+    }
+    await Promise.all([...hits, Fx.wait(1100)]);
+  }
 
   /**
    * Slash: a bright white cut is drawn diagonally across the target with a

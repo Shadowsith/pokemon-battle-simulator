@@ -103,12 +103,15 @@ export const ICE = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a low, murky fog rolls over the field and settles. */
+  /**
+   * IceMoveAnimations.playHaze: a dark green haze rolls in (0-0.4 s), drifts
+   * (to 1.5 s) and clears by 2.0 s. A low, murky fog that swells and fades.
+   */
   haze: () => {
-    const s = new MoveSfx(1.2, 0x4a2e);
-    s.noise(0.0, 1.1, { clock: (u) => 700 - 300 * u, gain: env.swell(0.4) });
-    s.wave(0.0, 1.05, { freq: (u) => 140 + 25 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.3) });
-    s.wave(0.1, 0.9, { freq: (u) => 210 - 40 * u, gain: env.swell(0.12) });
+    const s = new MoveSfx(2.15, 0x4a2e);
+    s.noise(0.0, 2.05, { clock: (u) => 700 - 300 * u, gain: (u) => 0.4 * Math.min(1, u * 5) * Math.min(1, (1 - u) * 4) });
+    s.wave(0.0, 2.0, { freq: (u) => 140 + 25 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.3 * Math.min(1, u * 5) * Math.min(1, (1 - u) * 4) });
+    s.wave(0.2, 1.7, { freq: (u) => 210 - 40 * u, gain: env.swell(0.12) });
     return s;
   },
 

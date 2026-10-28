@@ -12,7 +12,8 @@ export class GrassMoveAnimations {
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     sleeppowder: (refs, _launch, target, v) => GrassMoveAnimations.playSleepPowder(refs, target, v),
-    solarbeam: (refs, _launch, target) => GrassMoveAnimations.playSolarBeam(refs, target)
+    solarbeam: (refs, _launch, target) => GrassMoveAnimations.playSolarBeam(refs, target),
+    spore: (refs, _launch, target, v) => GrassMoveAnimations.playSpore(refs, target, v)
   };
 
   /** Turn-1 animations of two-turn Grass moves, by @pkmn/sim move id. */
@@ -115,17 +116,33 @@ export class GrassMoveAnimations {
    * target, then purple "Z"s float up from it as it falls asleep.
    */
   private static async playSleepPowder(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    await GrassMoveAnimations.powderFall(refs, target, [GrassMoveAnimations.GREEN_GRAIN]);
+    await GrassMoveAnimations.sleepOnTarget(refs, target, v);
+  }
+
+  /** Spore: like Sleep Powder, but the spores are a mix of orange and green. */
+  private static async playSpore(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    await GrassMoveAnimations.powderFall(refs, target, [GrassMoveAnimations.GREEN_GRAIN, GrassMoveAnimations.ORANGE_GRAIN]);
+    await GrassMoveAnimations.sleepOnTarget(refs, target, v);
+  }
+
+  /** Powder grain colours: bright core, body, glow. */
+  private static readonly GREEN_GRAIN: GrainColors = ['#C8FFD8', '#3FCB78', '#2FB868'];
+  private static readonly ORANGE_GRAIN: GrainColors = ['#FFE6C0', '#FF8A2A', '#F07020'];
+
+  /** Glowing powder drifts down from above onto the target, swaying; grains cycle through `colors`. */
+  private static async powderFall(refs: BattleStageRefs, target: Point, colors: GrainColors[]) {
     const { fieldEl, fxEl, targetEl } = refs;
     const r = targetEl.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
-    const top = r.top - f.top;
+    const top = r.top - fieldEl.getBoundingClientRect().top;
     const spread = Math.max(r.width * 0.6, 40);
 
     const grains: Promise<void>[] = [];
     for (let i = 0; i < 28; i++) {
       const s = 6 + Math.random() * 7;
+      const [core, body, glow] = colors[i % colors.length];
       const grain = document.createElement('div');
-      grain.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#C8FFD8,#3FCB78 45%,#1E8A4C00 75%);box-shadow:0 0 ${s}px #2FB868`;
+      grain.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,${core},${body} 45%,${body}00 75%);box-shadow:0 0 ${s}px ${glow}`;
       Fx.place(grain, { x: target.x + (Math.random() * 2 - 1) * spread, y: top - 20 - Math.random() * 30 });
       fxEl.appendChild(grain);
       const fall = r.height * (0.6 + Math.random() * 0.4) + 20;
@@ -139,10 +156,15 @@ export class GrassMoveAnimations {
         ], { duration: 900 + Math.random() * 300, easing: 'ease-in-out', delay: Math.random() * 700 }).then(() => grain.remove())
       );
     }
-    setTimeout(() => Fx.flash(targetEl, '#3FCB78', 0.3), 700);
+    setTimeout(() => Fx.flash(targetEl, colors[0][1], 0.3), 700);
     await Promise.all(grains);
+  }
 
-    await FxEffects.sleepZs(fxEl, { x: target.x, y: top + r.height * 0.15 }, -v.dir, ['#9C7CE8', '#B59CF2']);
+  /** Purple "Z"s float up from the target's head as it falls asleep. */
+  private static sleepOnTarget(refs: BattleStageRefs, target: Point, v: MoveVisual): Promise<void> {
+    const r = refs.targetEl.getBoundingClientRect();
+    const top = r.top - refs.fieldEl.getBoundingClientRect().top;
+    return FxEffects.sleepZs(refs.fxEl, { x: target.x, y: top + r.height * 0.15 }, -v.dir, ['#9C7CE8', '#B59CF2']);
   }
 
   /**
@@ -359,3 +381,6 @@ export class GrassMoveAnimations {
     return petal;
   }
 }
+
+/** Powder grain colours: [bright core, body, glow]. */
+type GrainColors = readonly [string, string, string];

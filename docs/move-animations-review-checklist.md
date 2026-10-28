@@ -104,7 +104,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Guillotine** / Guillotine — `guillotine` · Normal · Physical · `melee`
 - [ ] **Gust** / Windstoß — `gust` · Flying · Special · `projectile`
 - [ ] **Harden** / Härtner — `harden` · Normal · Status · `selfAura`
-- [ ] ⭐ **Haze** / Dunkelnebel — `haze` · Ice · Status · `targetAura`
+- [x] ⭐ **Haze** / Dunkelnebel — `haze` · Ice · Status · murky dark green haze drifts over the scene (custom, needs review)
 - [x] ⭐ **Headbutt** / Kopfnuss — `headbutt` · Normal · Physical · quick dart forward and back, white-yellow starburst + ring of yellow stars on the target (custom, needs review)
 - [x] ⭐ **High Jump Kick** / Turmkick — `highjumpkick` · Fighting · Physical · quick dart forward and back, jagged red/yellow comic impact bursts + red specks on the target (custom, needs review)
 - [ ] **Horn Attack** / Hornattacke — `hornattack` · Normal · Physical · `melee`
@@ -177,9 +177,9 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Sonic Boom** / Ultraschall — `sonicboom` · Normal · Special · `projectile`
 - [ ] **Spike Cannon** / Dornkanone — `spikecannon` · Normal · Physical · `beam`
 - [ ] **Splash** / Platscher — `splash` · Normal · Status · `selfAura`
-- [ ] ⭐ **Spore** / Pilzspore — `spore` · Grass · Status · `powder`
+- [x] ⭐ **Spore** / Pilzspore — `spore` · Grass · Status · orange + green spores fall onto target + purple rising "Z"s (custom, needs review)
 - [ ] **Stomp** / Stampfer — `stomp` · Normal · Physical · `melee`
-- [ ] ⭐ **Strength** / Stärke — `strength` · Normal · Physical · `melee`
+- [x] ⭐ **Strength** / Stärke — `strength` · Normal · Physical · caster glows red and trembles, then six fiery bursts pound the target (custom, needs review)
 - [ ] **String Shot** / Fadenschuss — `stringshot` · Bug · Status · `selfAura`
 - [ ] **Struggle** / Verzweifler — `struggle` · Normal · Physical · `melee`
 - [ ] **Stun Spore** / Stachelspore — `stunspore` · Grass · Status · `powder`
