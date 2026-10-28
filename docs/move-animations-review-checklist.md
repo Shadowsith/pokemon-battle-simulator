@@ -36,6 +36,15 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - If a move looks wrong, add a short note after the entry, e.g. `— ❌ should be a beam, not a lob`.
 - **Reviewed** = watched at least once, as attacker on both sides.
 
+## When a new custom animation is added
+Every move has a self-made free sound (`public/assets/sounds/moves/free/<id>.mp3`). Its recipe in `scripts/move-sounds/recipes/<type>.mjs` (Normal: `recipes/normal/`) is timed to the animation the move had when the sound was made. **Only when a move gets a new hand-made animation** (an entry in a `moves/<type>-moves.ts` registry, including a custom charge turn), check that move's free sound again:
+- [ ] Compare the free sound with the original clip (`public/assets/sounds/moves/<id>.mp3`) and with the new animation: does it still fit?
+- [ ] If not, re-time the recipe to the new animation: impact moments, number of hits, length (animation length plus a short tail). Note the new timeline in the recipe's comment.
+- [ ] Remove fleck jingles (`statUp`, `burn`, `flinch`, …) that the new animation no longer shows. Custom animations don't play the generic fleck unless they call `FxEffects.afterImpact`.
+- [ ] Regenerate with `node scripts/synth-move-sounds.mjs <id>` and listen to it in the Debug-Kampf.
+
+Changes to the generic delivery animations or to this review list alone don't need a sound check.
+
 ## Gen 1 (165)
 
 - [x] **Absorb** / Absorber — `absorb` · Grass · Special · green energy stars drain to caster (custom, needs review)
