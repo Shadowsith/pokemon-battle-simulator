@@ -7,6 +7,7 @@ export class DarkMoveAnimations {
   /** Hand-made Dark move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     bite: (refs, _launch, target) => DarkMoveAnimations.playBite(refs, target),
+    crunch: (refs, _launch, target) => DarkMoveAnimations.playCrunch(refs, target),
     darkpulse: (refs, launch, target) => DarkMoveAnimations.playDarkPulse(refs, launch, target)
   };
 
@@ -15,29 +16,71 @@ export class DarkMoveAnimations {
    * snaps shut on it, stopping just before the teeth touch.
    */
   private static async playBite(refs: BattleStageRefs, target: Point) {
+    const r = refs.targetEl.getBoundingClientRect();
+    await DarkMoveAnimations.chomp(refs, target, { w: Math.max(r.width * 1.1, 72), tilt: 0, grinds: 0, rays: false });
+  }
+
+  /**
+   * Crunch: the scene goes black, then a dark purple and magenta swirl fades
+   * in; a big tilted jaw snaps shut on the target with white impact rays and
+   * grinds down twice more before letting go.
+   */
+  private static async playCrunch(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, targetEl } = refs;
+    const black = Fx.backdrop(fieldEl, 'background:#000');
+    await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    // Dark purple swirl over the black, still behind platforms and sprites.
+    const field = fieldEl.getBoundingClientRect();
+    const reach = Math.hypot(field.width, field.height);
+    const purple = document.createElement('div');
+    purple.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:radial-gradient(circle at 50% 45%,#7A1E6E,#3E0E4A 55%,#1A0622)';
+    const swirl = document.createElement('div');
+    swirl.style.cssText = `position:absolute;left:${target.x - reach}px;top:${target.y - reach}px;width:${reach * 2}px;height:${reach * 2}px;opacity:.55;background:repeating-conic-gradient(from 0deg,#C2307A00 0 12deg,#C2307A 12deg 18deg,#5A1460 18deg 30deg)`;
+    purple.appendChild(swirl);
+    black.appendChild(purple);
+    swirl.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(60deg)' }], { duration: 1800, easing: 'linear' });
+    await Fx.anim(purple, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    const r = targetEl.getBoundingClientRect();
+    await DarkMoveAnimations.chomp(refs, target, { w: Math.max(r.width * 1.35, 90), tilt: -22, grinds: 2, rays: true });
+
+    await Fx.anim(black, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    black.remove();
+  }
+
+  /**
+   * A white jaw (`w` px wide, turned by `tilt` degrees) opens above and below
+   * the target and snaps shut, stopping just before the teeth touch: a flash,
+   * a shake and white sparks - plus white impact rays when `rays` is set.
+   * `grinds` extra small bites follow before the jaw lets go.
+   */
+  private static async chomp(refs: BattleStageRefs, target: Point, o: { w: number; tilt: number; grinds: number; rays: boolean }) {
     const { fxEl, targetEl } = refs;
     const r = targetEl.getBoundingClientRect();
-    const w = Math.max(r.width * 1.1, 72);
+    const { w } = o;
     const h = w * 0.46;
     // Tooth tips sit at 45/46 of the glyph height; stop them a few px apart so the halves never touch.
     const gap = 3;
     const shut = h * (45 / 46 - 0.5) + gap;
     const open = shut + Math.max(r.height * 0.22, 16);
+    const turn = `rotate(${o.tilt}deg)`;
 
     const upper = FxGlyphs.jawGlyph(w, h, false);
     const lower = FxGlyphs.jawGlyph(w, h, true);
     Fx.place(upper, target);
     Fx.place(lower, target);
     fxEl.append(upper, lower);
+    const at = (sign: number, flip: string, d: number) => `${turn} translateY(${sign * d}px) ${flip}`;
 
     const move = (el: HTMLElement, sign: number, flip: string): Promise<void> =>
       Fx.anim(el, [
-        { transform: `translateY(${sign * (open + 8)}px) ${flip}`, opacity: 0, offset: 0 },
-        { transform: `translateY(${sign * open}px) ${flip}`, opacity: 1, offset: 0.43 },
-        { transform: `translateY(${sign * (open + 4)}px) ${flip}`, opacity: 1, offset: 0.79 },
+        { transform: at(sign, flip, open + 8), opacity: 0, offset: 0 },
+        { transform: at(sign, flip, open), opacity: 1, offset: 0.43 },
+        { transform: at(sign, flip, open + 4), opacity: 1, offset: 0.79 },
         // Must end at offset 1: otherwise the browser adds a final frame at the untransformed spot.
-        { transform: `translateY(${sign * shut}px) ${flip}`, opacity: 1, offset: 1 }
-      ], { duration: 450, easing: 'ease-in' });
+        { transform: at(sign, flip, shut), opacity: 1, offset: 1 }
+      ], { duration: 450, easing: 'ease-in', fill: 'forwards' });
     await Promise.all([move(upper, -1, ''), move(lower, 1, 'scaleY(-1)')]);
 
     // Snap: flash, shake and a burst of white sparks where the teeth meet.
@@ -53,13 +96,46 @@ export class DarkMoveAnimations {
         { transform: `translate(${Math.cos(ang) * w * 0.55}px,${Math.sin(ang) * h * 0.6}px) scale(1)`, opacity: 0 }
       ], { duration: 320, easing: 'ease-out' }).then(() => star.remove());
     }
+    if (o.rays) DarkMoveAnimations.impactRays(fxEl, target, w * 0.75);
+
+    // Grinding: the jaw eases open a little and bites down again.
+    for (let g = 0; g < o.grinds; g++) {
+      await Fx.wait(90);
+      const grind = (el: HTMLElement, sign: number, flip: string): Promise<void> =>
+        Fx.anim(el, [
+          { transform: at(sign, flip, shut) },
+          { transform: at(sign, flip, shut + 8), offset: 0.45 },
+          { transform: at(sign, flip, shut) }
+        ], { duration: 160, easing: 'ease-in-out', fill: 'forwards' });
+      await Promise.all([grind(upper, -1, ''), grind(lower, 1, 'scaleY(-1)')]);
+      Fx.flash(targetEl, '#ffffff', 0.45);
+      Fx.shake(targetEl, 4);
+      if (o.rays) DarkMoveAnimations.impactRays(fxEl, target, w * 0.55);
+    }
+
     await Fx.wait(220);
     const release = (el: HTMLElement, sign: number, flip: string): Promise<void> =>
       Fx.anim(el, [
-        { transform: `translateY(${sign * shut}px) ${flip}`, opacity: 1 },
-        { transform: `translateY(${sign * (shut + 10)}px) ${flip}`, opacity: 0 }
+        { transform: at(sign, flip, shut), opacity: 1 },
+        { transform: at(sign, flip, shut + 10), opacity: 0 }
       ], { duration: 220, easing: 'ease-out' }).then(() => el.remove());
     await Promise.all([release(upper, -1, ''), release(lower, 1, 'scaleY(-1)')]);
+  }
+
+  /** Thin white impact rays shooting out from `at` and fading. */
+  private static impactRays(fxEl: HTMLElement, at: Point, reach: number): void {
+    for (let i = 0; i < 10; i++) {
+      const len = reach * (0.35 + Math.random() * 0.35);
+      const ray = document.createElement('div');
+      ray.style.cssText = `position:absolute;width:${len}px;height:3px;border-radius:2px;pointer-events:none;background:linear-gradient(90deg,#ffffff00,#ffffff);box-shadow:0 0 4px #ffffff`;
+      Fx.place(ray, at);
+      fxEl.appendChild(ray);
+      const deg = (360 * i) / 10 + Math.random() * 20;
+      Fx.anim(ray, [
+        { transform: `rotate(${deg}deg) translateX(${reach * 0.15}px) scaleX(.3)`, opacity: 1 },
+        { transform: `rotate(${deg}deg) translateX(${reach * 0.6}px) scaleX(1)`, opacity: 0 }
+      ], { duration: 280, easing: 'ease-out' }).then(() => ray.remove());
+    }
   }
 
   /**

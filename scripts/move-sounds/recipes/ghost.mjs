@@ -23,25 +23,39 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic target aura: an ominous curse is nailed down. */
+  /**
+   * GhostMoveAnimations.playCurse: the purple circle spreads (0-0.35 s), the nail flies in
+   * (0.35-0.6 s), hammer blows at ~0.75 / ~0.95 s, pulse and fade by ~1.55 s.
+   * An ominous drone, a nail flying in and being hammered down.
+   */
   curse: () => {
-    const s = new MoveSfx(1.1, 0xc025);
-    s.pulse(0.02, 0.9, { freq: () => 110, gain: env.swell(0.18), duty: 0.25 });
-    s.pulse(0.02, 0.9, { freq: () => 116.5, gain: env.swell(0.14), duty: 0.25 });
-    s.thud(0.3, 0.55, 0.6);
-    s.thud(0.5, 0.6, 0.6);
-    s.wave(0.55, 0.5, { freq: env.ramp(500, 350), gain: env.decay(0.15, 1.5) });
+    const s = new MoveSfx(1.6, 0xc025);
+    s.pulse(0.02, 1.4, { freq: () => 110, gain: env.swell(0.18), duty: 0.25 });
+    s.pulse(0.02, 1.4, { freq: () => 116.5, gain: env.swell(0.14), duty: 0.25 });
+    s.whoosh(0.35, 0.25, { from: 2500, to: 7000, gain: 0.2 });
+    s.thud(0.75, 0.55, 0.6);
+    s.noise(0.75, 0.04, { clock: () => 12000, gain: env.decay(0.3, 1) });
+    s.thud(0.95, 0.65, 0.6);
+    s.noise(0.95, 0.04, { clock: () => 12000, gain: env.decay(0.35, 1) });
+    s.wave(1.0, 0.55, { freq: env.ramp(500, 350), gain: env.decay(0.15, 1.5) });
     return s;
   },
 
-  /** Generic self aura: a ghostly bond, with an eerie wail. */
+
+  /**
+   * GhostMoveAnimations.playDestinyBond: the ghostly haze fades in (0-0.35 s), the white disc
+   * glides to the foe (0.45-1.15 s), the foe glows white at 1.15 s (to ~1.65 s), the haze
+   * clears by ~2.0 s. A ghostly bond, with an eerie wail and a pale chime on the bond.
+   */
   destinybond: () => {
-    const s = new MoveSfx(1.1, 0xde57);
-    s.pulse(0.02, 0.9, { freq: () => 73.4, gain: (u) => 0.2 * Math.sin(Math.PI * u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 6 * u)), duty: 0.25 });
-    s.pulse(0.02, 0.9, { freq: () => 77.8, gain: env.swell(0.12), duty: 0.25 });
-    s.wave(0.15, 0.75, { freq: (u) => 500 + 300 * Math.sin(Math.PI * u), gain: env.swell(0.22) });
+    const s = new MoveSfx(2.0, 0xde57);
+    s.pulse(0.02, 1.9, { freq: () => 73.4, gain: (u) => 0.2 * Math.sin(Math.PI * u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 6 * u)), duty: 0.25 });
+    s.pulse(0.02, 1.9, { freq: () => 77.8, gain: env.swell(0.12), duty: 0.25 });
+    s.wave(0.45, 0.7, { freq: (u) => 500 + 300 * Math.sin(Math.PI * u), gain: env.swell(0.22) });
+    s.chord(1.15, 0.6, [79, 83, 86], { rate: 0.03, gain: 0.14, voice: 'wave', vibrato: 0.01 });
     return s;
   },
+
 
   /** Generic self aura (~0.8 s), no fleck: a spiteful curse, a dissonant moaning tone that fades away. */
   grudge: () => {

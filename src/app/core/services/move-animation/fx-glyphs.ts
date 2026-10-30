@@ -43,6 +43,70 @@ export class FxGlyphs {
     return el;
   }
 
+  /** A grey iron nail, `len` px long, point to the right (Curse). */
+  static nailGlyph(len: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${len}px;height:${len * 0.3}px;pointer-events:none;filter:drop-shadow(0 0 2px #00000099)`;
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 40 12" preserveAspectRatio="none">' +
+      '<rect x="0" y="0" width="5" height="12" rx="1.2" fill="#8A8A96" stroke="#3A3A44" stroke-width=".8"/>' +
+      '<polygon points="5,4 32,4 40,6 32,8 5,8" fill="#B8B8C4" stroke="#3A3A44" stroke-width=".8"/>' +
+      '<line x1="6" y1="5" x2="31" y2="5" stroke="#E8E8F0" stroke-width=".8"/>' +
+      '</svg>';
+    return el;
+  }
+
+  /** A red relay baton, `w` px long, lying horizontally (Baton Pass). */
+  static batonGlyph(w: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${w * 0.22}px;pointer-events:none;border-radius:${w * 0.11}px;background:linear-gradient(180deg,#FF8A7A,#E8202A 40%,#A81018);box-shadow:inset 0 0 0 1.5px #6E0A10,0 0 4px #00000066`;
+    return el;
+  }
+
+  /** A cartoon glove, open palm up with spread fingers, `w` px wide; white by default (Baton Pass, Belly Drum). */
+  static gloveGlyph(w: number, fill = '#ffffff', edge = '#9A9AA6'): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${w * 1.1}px;pointer-events:none;filter:drop-shadow(0 0 2px #00000077)`;
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 30 33">' +
+      `<g fill="${fill}" stroke="${edge}" stroke-width="1.2" stroke-linejoin="round">` +
+      '<rect x="6" y="10" width="4.6" height="12" rx="2.3"/><rect x="11" y="6" width="4.6" height="16" rx="2.3"/>' +
+      '<rect x="16" y="7" width="4.6" height="15" rx="2.3"/><rect x="21" y="10" width="4.4" height="12" rx="2.2"/>' +
+      '<rect x="1" y="15" width="10" height="4.6" rx="2.3" transform="rotate(-25 6 17)"/>' +
+      '<path d="M6,17 H25.4 V24 C25.4,29 21,31.5 15.7,31.5 C10.4,31.5 6,29 6,24 Z"/>' +
+      '</g></svg>';
+    return el;
+  }
+
+  /** A white bubble with a blue music note in it (Belly Drum). */
+  static noteBubble(size: number, note = '♪'): HTMLElement {
+    const el = document.createElement('div');
+    el.textContent = note;
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;text-align:center;font:bold ${size * 0.62}px/${size}px sans-serif;color:#2A56C8;background:radial-gradient(circle at 35% 30%,#fff,#F2F6FF 60%,#D6E2FF);box-shadow:0 0 6px #ffffffcc`;
+    return el;
+  }
+
+  /** Counter for unique SVG gradient ids of the sword glyph. */
+  private static swordId = 0;
+
+  /** An upright sword pointing down, `h` px tall: teal blade, dark guard and grip (Swords Dance). */
+  static swordGlyph(h: number): HTMLElement {
+    const id = `swb${FxGlyphs.swordId++}`;
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${h * 0.2}px;height:${h}px;pointer-events:none;filter:drop-shadow(0 0 3px #7FF0E8aa)`;
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 20 100" preserveAspectRatio="none">' +
+      `<defs><linearGradient id="${id}" x1="0" y1="0" x2="1" y2="0">` +
+      '<stop offset="0" stop-color="#2E8C88"/><stop offset=".45" stop-color="#9AF2E8"/><stop offset=".55" stop-color="#5CC8C0"/><stop offset="1" stop-color="#22706C"/>' +
+      '</linearGradient></defs>' +
+      '<circle cx="10" cy="4" r="3.5" fill="#1E4E5A"/>' +
+      '<rect x="7.5" y="6" width="5" height="16" rx="1.5" fill="#2A5E6A"/>' +
+      '<rect x="0.5" y="21" width="19" height="5" rx="2" fill="#1E4E5A"/>' +
+      `<polygon points="4,26 16,26 15,84 10,99 5,84" fill="url(#${id})" stroke="#1A5A58" stroke-width=".8"/>` +
+      '</svg>';
+    return el;
+  }
+
   /** A bold, softly glowing "Z" for sleep effects (Rest). */
   static sleepZ(size: number, color: string): HTMLElement {
     const el = document.createElement('div');
@@ -255,10 +319,15 @@ export class FxGlyphs {
 
   /** A purple four-point psychic sparkle inside a thin glowing ring. */
   static psySparkle(size: number): HTMLElement {
-    const el = FxGlyphs.sparkStar(size, '#C860FF');
-    const ring = document.createElement('div');
-    ring.style.cssText = 'position:absolute;inset:22%;border-radius:50%;border:1.5px solid #F0C8FF;box-shadow:0 0 4px #C860FF';
-    el.appendChild(ring);
+    return FxGlyphs.ringSparkle(size, '#C860FF', '#F0C8FF');
+  }
+
+  /** A four-point sparkle in `color` inside a thin glowing `ring` (Detect: cyan). */
+  static ringSparkle(size: number, color: string, ring: string): HTMLElement {
+    const el = FxGlyphs.sparkStar(size, color);
+    const circle = document.createElement('div');
+    circle.style.cssText = `position:absolute;inset:22%;border-radius:50%;border:1.5px solid ${ring};box-shadow:0 0 4px ${color}`;
+    el.appendChild(circle);
     return el;
   }
 

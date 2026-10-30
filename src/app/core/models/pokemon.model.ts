@@ -69,6 +69,11 @@ export function backSpritePath(dexId: number): string {
   return `assets/sprites/showdown/back/${dexId}.gif`;
 }
 
+/** The Substitute doll shown in place of a Pokémon hiding behind one (back view for the player's side). */
+export function substituteSpritePath(back: boolean): string {
+  return back ? 'assets/sprites/showdown/back/substitute.png' : 'assets/sprites/showdown/substitute.png';
+}
+
 /** Muted per-type colours for type tags / chips (keys are @pkmn/sim type names). */
 export const POKEMON_TYPE_COLORS: Record<string, string> = {
   Normal: '#9a9a86',

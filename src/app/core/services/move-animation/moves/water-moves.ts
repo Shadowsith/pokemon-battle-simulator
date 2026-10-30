@@ -1,4 +1,4 @@
-import { Point, BattleStageRefs, BubbleStyle, MoveAnimRegistry } from '../animation.types';
+import { Point, BattleStageRefs, BubbleStyle, MoveAnimRegistry, MoveVisual } from '../animation.types';
 import { BUBBLE_DRIFT, BUBBLE_BEAM, DIM_BACKDROP, WATERFALL_WAVES } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
@@ -11,8 +11,133 @@ export class WaterMoveAnimations {
     bubblebeam: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_BEAM),
     crabhammer: (refs, _launch, target) => WaterMoveAnimations.playCrabhammer(refs, target),
     hydropump: (refs, launch, target) => WaterMoveAnimations.playHydroPump(refs, launch, target),
+    surf: (refs, launch, target, v) => WaterMoveAnimations.playSurf(refs, launch, target, v),
     waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target)
   };
+
+  /**
+   * Surf: a curling dark blue wave - moving water inside, a white foam crest
+   * throwing spray off its top - rises in front of the caster, then swells
+   * huge while the field floods, rolls over to the target and crashes onto it.
+   */
+  private static async playSurf(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const f = fieldEl.getBoundingClientRect();
+    const lr = launchEl.getBoundingClientRect();
+    const tr = targetEl.getBoundingClientRect();
+
+    // 1. A wave rises in front of the caster, on its foe's side (0-0.5 s).
+    const w = Math.max(lr.width * 1.3, 100);
+    const h = w * 0.6;
+    const wave = WaterMoveAnimations.waveGlyph(w, h, v.dir);
+    const base: Point = { x: launch.x + v.dir * w * 0.45, y: lr.bottom - f.top - h / 2 };
+    Fx.place(wave, base);
+    fxEl.appendChild(wave);
+    const spray = WaterMoveAnimations.crestSpray(fxEl, fieldEl, wave, v.dir);
+    await Fx.anim(wave, [
+      { transform: 'translate(0,0) scale(.7,0)', opacity: 0.7 },
+      { transform: 'translate(0,0) scale(1,1.08)', opacity: 1, offset: 0.7 },
+      { transform: 'translate(0,0) scale(1,1)', opacity: 1 }
+    ], { duration: 450, easing: 'ease-out', fill: 'forwards' });
+    await Fx.wait(120);
+
+    // 2. The field floods while the wave swells and rolls to the target (0.57-1.3 s).
+    const sea = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#081A40,#0F3274 45%,#164496 70%,#0A2458)');
+    Fx.anim(sea, [{ opacity: 0 }, { opacity: 0.95 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+    const grow = Math.max((tr.height * 1.5) / h, 1.8);
+    const dx = target.x - v.dir * w * grow * 0.15 - base.x;
+    const dy = tr.bottom - f.top - h / 2 - base.y;
+    await Fx.anim(wave, [
+      { transform: 'translate(0,0) scale(1,1)' },
+      { transform: `translate(${dx * 0.45}px,${dy * 0.45}px) scale(${grow * 0.75},${grow * 0.7})`, offset: 0.5 },
+      { transform: `translate(${dx}px,${dy}px) scale(${grow},${grow})` }
+    ], { duration: 720, easing: 'ease-in', fill: 'forwards' });
+
+    // 3. Crash (1.3 s): the lip falls onto the target and the wave collapses into splashes.
+    spray.stop();
+    Fx.anim(wave, [
+      { transform: `translate(${dx}px,${dy}px) scale(${grow},${grow})`, opacity: 1 },
+      { transform: `translate(${dx + v.dir * w * 0.3}px,${dy + h * 0.2}px) scale(${grow * 1.15},${grow * 0.35})`, opacity: 0 }
+    ], { duration: 360, easing: 'ease-in' }).then(() => wave.remove());
+    await WaterMoveAnimations.waterCrash(refs, target, SURF_SPLASH);
+
+    await Fx.anim(sea, [{ opacity: 0.95 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    sea.remove();
+  }
+
+  /** Counter for unique SVG ids (several waves can be on screen at once). */
+  private static waveId = 0;
+
+  /**
+   * A curling wave, `w` x `h` px, breaking toward `dir`: dark blue water with
+   * light wave lines drifting through it and a white foam crest along its top.
+   */
+  private static waveGlyph(w: number, h: number, dir: 1 | -1): HTMLElement {
+    const id = `surf${WaterMoveAnimations.waveId++}`;
+    // Silhouette (viewBox 200 x 120, breaking to the right): a long rising back,
+    // a crest curling over at the front and a hollow under the lip.
+    const top = 'M0,116 C36,104 78,52 118,24 C146,10 174,8 189,25 C197,34 194,47 182,49 C172,51 168,41 159,44';
+    const body = `${top} C149,48 151,74 166,120 L0,120 Z`;
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${h}px;pointer-events:none;transform-origin:50% 100%;filter:drop-shadow(0 0 6px #0A245899)`;
+    el.innerHTML =
+      `<svg width="100%" height="100%" viewBox="0 0 200 120" preserveAspectRatio="none" style="overflow:visible;transform:scaleX(${dir})">` +
+      `<defs>` +
+      `<pattern id="${id}p" width="40" height="18" patternUnits="userSpaceOnUse">` +
+      `<rect width="40" height="18" fill="#123A86"/>` +
+      `<path d="M0,9 Q10,3 20,9 T40,9" fill="none" stroke="#3F74C8" stroke-width="2.2"/>` +
+      `<path d="M0,15 Q10,11 20,15 T40,15" fill="none" stroke="#1E4FA0" stroke-width="1.6"/>` +
+      `</pattern>` +
+      `<linearGradient id="${id}g" x1="0" y1="0" x2="0" y2="1">` +
+      `<stop offset="0" stop-color="#6FA3E8" stop-opacity=".55"/><stop offset=".45" stop-color="#0A2458" stop-opacity="0"/>` +
+      `<stop offset="1" stop-color="#061638" stop-opacity=".75"/></linearGradient>` +
+      `<clipPath id="${id}c"><path d="${body}"/></clipPath>` +
+      `</defs>` +
+      `<g clip-path="url(#${id}c)"><rect class="flow" x="-40" y="0" width="280" height="120" fill="url(#${id}p)"/>` +
+      `<rect width="200" height="120" fill="url(#${id}g)"/></g>` +
+      `<path d="${top}" fill="none" stroke="#DDEEFF" stroke-width="9" stroke-linecap="round" opacity=".55"/>` +
+      `<path d="${top}" fill="none" stroke="#ffffff" stroke-width="4.5" stroke-linecap="round"/>` +
+      `</svg>`;
+    // The water inside drifts forward, so the wave looks like it's rolling.
+    el.querySelector<SVGElement>('.flow')?.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(40px)' }], {
+      duration: 420,
+      iterations: Infinity,
+      easing: 'linear'
+    });
+    return el;
+  }
+
+  /**
+   * White spray keeps flying off the top of `wave` (its crest and curling lip)
+   * until stopped: droplets and short streaks thrown back and up, then falling.
+   */
+  private static crestSpray(fxEl: HTMLElement, fieldEl: HTMLElement, wave: HTMLElement, dir: 1 | -1): { stop: () => void } {
+    const timer = setInterval(() => {
+      const r = wave.getBoundingClientRect();
+      const f = fieldEl.getBoundingClientRect();
+      if (r.height < 4) return;
+      for (let i = 0; i < 3; i++) {
+        // Somewhere along the upper crest, mostly near the curling front.
+        const u = 0.45 + Math.random() * 0.5;
+        const x = dir > 0 ? r.left + r.width * u : r.right - r.width * u;
+        const y = r.top + r.height * (0.08 + (1 - u) * 0.45) - f.top;
+        const s = 3 + Math.random() * 4;
+        const drop = document.createElement('div');
+        const streak = Math.random() < 0.35;
+        drop.style.cssText = `position:absolute;width:${s}px;height:${streak ? s * 3 : s}px;border-radius:${s}px;pointer-events:none;background:radial-gradient(circle at 35% 30%,#fff,#D8ECFF);box-shadow:0 0 4px #ffffffaa`;
+        Fx.place(drop, { x: x - f.left, y });
+        fxEl.appendChild(drop);
+        const back = -dir * (10 + Math.random() * 30);
+        const up = 14 + Math.random() * 24;
+        Fx.anim(drop, [
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: `translate(${back * 0.6}px,${-up}px) scale(1)`, opacity: 1, offset: 0.45 },
+          { transform: `translate(${back}px,${-up * 0.3}px) scale(.5)`, opacity: 0 }
+        ], { duration: 420 + Math.random() * 200, easing: 'ease-out' }).then(() => drop.remove());
+      }
+    }, 45);
+    return { stop: () => clearInterval(timer) };
+  }
 
   /**
    * Bubble / Bubble Beam: see-through water bubbles travel to the target,
@@ -300,31 +425,11 @@ export class WaterMoveAnimations {
   }
 
   /**
-   * Waterfall: the field goes black, then a wall of light blue water with
-   * white wave crests rushes upward behind the battle, and the target is
-   * struck by a rising column of blue splashes with white spray streaks.
+   * Water crashing onto the target (Waterfall, Surf): blue splash bursts stack
+   * up from its feet, white spray streaks shoot up and droplets fly.
    */
-  private static async playWaterfall(refs: BattleStageRefs, target: Point) {
+  private static async waterCrash(refs: BattleStageRefs, target: Point, tone: SplashTone) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const black = Fx.backdrop(fieldEl, 'background:#000');
-    await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
-
-    // Rising water: the wave tile scrolls upward, faded in over the black.
-    const water = document.createElement('div');
-    water.style.cssText = `position:absolute;inset:0;background-image:${WATERFALL_WAVES};background-size:80px 48px`;
-    black.appendChild(water);
-    water.animate([{ backgroundPosition: '0 0' }, { backgroundPosition: '0 -48px' }], {
-      duration: 260,
-      iterations: Infinity,
-      easing: 'linear'
-    });
-    await Fx.anim(water, [
-      { transform: 'translateY(100%)', opacity: 0.6 },
-      { transform: 'translateY(0)', opacity: 1 }
-    ], { duration: 420, easing: 'ease-out' });
-    await Fx.wait(350);
-
-    // The hit: blue splashes stacked from the target's feet up, plus white spray.
     const r = targetEl.getBoundingClientRect();
     const h = Math.max(r.height, 50);
     const base = { x: target.x, y: target.y + h * 0.35 };
@@ -332,7 +437,7 @@ export class WaterMoveAnimations {
     const done: Promise<void>[] = [];
     for (let i = 0; i < blobs; i++) {
       const size = Math.max(r.width * 0.55, 34) * (1 - i * 0.1);
-      const blob = FxGlyphs.spikyBurst(size, '#2F52F0', '#6F8CFF', '#E8F0FF');
+      const blob = FxGlyphs.spikyBurst(size, tone.outer, tone.inner, '#E8F0FF');
       Fx.place(blob, { x: base.x + (Math.random() * 10 - 5), y: base.y - (i * h * 0.95) / blobs });
       fxEl.appendChild(blob);
       done.push(
@@ -362,7 +467,7 @@ export class WaterMoveAnimations {
     for (let i = 0; i < 12; i++) {
       const s = 4 + Math.random() * 5;
       const drop = document.createElement('div');
-      drop.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:#2F52F0;box-shadow:0 0 4px #6F8CFF`;
+      drop.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:${tone.outer};box-shadow:0 0 4px ${tone.inner}`;
       Fx.place(drop, { x: target.x + (Math.random() * 2 - 1) * r.width * 0.6, y: target.y + (Math.random() * 2 - 1) * h * 0.5 });
       fxEl.appendChild(drop);
       done.push(
@@ -373,11 +478,50 @@ export class WaterMoveAnimations {
         ], { duration: 600, easing: 'ease-out', delay: Math.random() * 300 }).then(() => drop.remove())
       );
     }
-    Fx.flash(targetEl, '#4F7BFF', 0.7);
+    Fx.flash(targetEl, tone.flash, 0.7);
     Fx.shakeField(fieldEl, 0.4);
     await Promise.all(done);
+
+  }
+
+  /**
+   * Waterfall: the field goes black, then a wall of light blue water with
+   * white wave crests rushes upward behind the battle, and the target is
+   * struck by a rising column of blue splashes with white spray streaks.
+   */
+  private static async playWaterfall(refs: BattleStageRefs, target: Point) {
+    const { fieldEl } = refs;
+    const black = Fx.backdrop(fieldEl, 'background:#000');
+    await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    // Rising water: the wave tile scrolls upward, faded in over the black.
+    const water = document.createElement('div');
+    water.style.cssText = `position:absolute;inset:0;background-image:${WATERFALL_WAVES};background-size:80px 48px`;
+    black.appendChild(water);
+    water.animate([{ backgroundPosition: '0 0' }, { backgroundPosition: '0 -48px' }], {
+      duration: 260,
+      iterations: Infinity,
+      easing: 'linear'
+    });
+    await Fx.anim(water, [
+      { transform: 'translateY(100%)', opacity: 0.6 },
+      { transform: 'translateY(0)', opacity: 1 }
+    ], { duration: 420, easing: 'ease-out' });
+    await Fx.wait(350);
+
+    await WaterMoveAnimations.waterCrash(refs, target, WATERFALL_SPLASH);
 
     await Fx.anim(black, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     black.remove();
   }
 }
+
+/** Colours of a water crash: splash burst edge / core, droplets, target flash. */
+interface SplashTone {
+  outer: string;
+  inner: string;
+  flash: string;
+}
+
+const WATERFALL_SPLASH: SplashTone = { outer: '#2F52F0', inner: '#6F8CFF', flash: '#4F7BFF' };
+const SURF_SPLASH: SplashTone = { outer: '#12357A', inner: '#3F74C8', flash: '#5C8FE0' };

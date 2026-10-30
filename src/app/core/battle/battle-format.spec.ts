@@ -2,6 +2,7 @@ import {
   FieldView,
   Slot,
   applyRedirection,
+  forcesSwitch,
   needsTargetChoice,
   orderActions,
   protectBlocks,
@@ -24,6 +25,15 @@ function field(format: 'singles' | 'doubles', fainted: Slot[] = []): FieldView {
 }
 
 const keys = (r: ReturnType<typeof resolveTargets>) => (r.kind === 'targets' ? r.targets.map(slotKey) : r.kind);
+
+describe('forcesSwitch', () => {
+  it('flags Whirlwind, Roar and Dragon Tail, not Tackle', () => {
+    expect(forcesSwitch(mv('whirlwind'))).toBeTrue();
+    expect(forcesSwitch(mv('roar'))).toBeTrue();
+    expect(forcesSwitch(mv('dragontail'))).toBeTrue();
+    expect(forcesSwitch(mv('tackle'))).toBeFalse();
+  });
+});
 
 describe('battle format targeting', () => {
   it('singles: every attack hits the one foe, no target choice', () => {

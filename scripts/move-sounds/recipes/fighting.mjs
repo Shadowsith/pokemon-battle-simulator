@@ -70,15 +70,21 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee at high power: two crossed chops. */
+  /**
+   * FightingMoveAnimations.playCrossChop: two hands appear (0-0.25 s), chop across
+   * (0.4-0.6 s) and cross at 0.5 s (bursts at 0.5 / 0.58 s), fade by ~0.9 s. Two crossed chops.
+   */
   crosschop: () => {
-    const s = new MoveSfx(0.7, 0xc2cc);
-    s.whoosh(0.0, 0.12, { from: 2000, to: 8000, gain: 0.3 });
-    s.whoosh(0.06, 0.12, { from: 2500, to: 9000, gain: 0.3 });
-    s.thud(0.17, 0.75, 0.8);
-    s.noise(0.17, 0.08, { clock: () => 12000, gain: env.decay(0.35, 1) });
+    const s = new MoveSfx(1.0, 0xc2cc);
+    s.pulse(0.0, 0.15, { freq: env.ramp(500, 900), gain: env.decay(0.1, 1.5), duty: 0.25 });
+    s.whoosh(0.38, 0.12, { from: 2000, to: 8000, gain: 0.3 });
+    s.whoosh(0.42, 0.12, { from: 2500, to: 9000, gain: 0.3 });
+    s.thud(0.5, 0.75, 0.8);
+    s.noise(0.5, 0.08, { clock: () => 12000, gain: env.decay(0.35, 1) });
+    s.thud(0.58, 0.45, 0.5);
     return s;
   },
+
 
   /** Generic melee: braces for the blow, then strikes back twice as hard. */
   counter: () => {
@@ -89,14 +95,20 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic self aura (priority): senses the attack coming - a sharp alert. */
+  /**
+   * FightingMoveAnimations.playDetect: dark (0-0.3 s), the ring sparkle flares at ~0.3-0.55 s
+   * while the caster glows white (0.45-0.85 s), gone by 1.1 s, light back by 1.4 s.
+   * Senses the attack coming - a sharp alert ping.
+   */
   detect: () => {
-    const s = new MoveSfx(0.75, 0xde7e);
-    s.pulse(0.02, 0.08, { freq: () => 2637, gain: env.decay(0.3, 1), duty: 0.25 });
-    s.pulse(0.1, 0.3, { freq: () => 3136, gain: env.decay(0.25, 1.5), duty: 0.25 });
-    s.sparkle(0.12, 0.4, 5, { lo: 4000, hi: 6500, gain: 0.12 });
+    const s = new MoveSfx(1.4, 0xde7e);
+    s.noise(0.0, 0.3, { clock: () => 600, gain: env.swell(0.08) });
+    s.pulse(0.3, 0.08, { freq: () => 2637, gain: env.decay(0.3, 1), duty: 0.25 });
+    s.pulse(0.4, 0.4, { freq: () => 3136, gain: env.decay(0.25, 1.5), duty: 0.25 });
+    s.sparkle(0.45, 0.5, 6, { lo: 4000, hi: 6500, gain: 0.12 });
     return s;
   },
+
 
   /** Generic melee kick, 2 hits (impacts at 0.17 / 0.59 s). */
   doublekick: () => {
@@ -117,16 +129,24 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee punch at high power + confusion fleck: an explosive punch. */
+  /**
+   * FightingMoveAnimations.playDynamicPunch: red burst backdrop (0-0.25 s), the fist slams at
+   * 0.42 s (blast, quake, stones flying to ~1.27 s), backdrop clears (to ~1.57 s), birds circle
+   * the head (~1.57-2.97 s). An explosive punch, tumbling rocks, then the dizzy confusion jingle.
+   */
   dynamicpunch: () => {
-    const s = new MoveSfx(1.2, 0xd9a3);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 6000, gain: 0.35 });
-    s.thud(0.17, 0.85, 1);
-    s.noise(0.17, 0.4, { clock: (u) => 9000 - 7000 * u, gain: env.attackDecay(0.55, 0.02) });
-    s.rumble(0.2, 0.4, { from: 400, to: 150, gain: 0.3 });
-    s.confusion(0.55);
+    const s = new MoveSfx(3.0, 0xd9a3);
+    s.noise(0.0, 0.25, { clock: env.ramp(800, 3000), gain: env.swell(0.15) });
+    s.whoosh(0.25, 0.17, { from: 1500, to: 6000, gain: 0.35 });
+    s.thud(0.42, 0.85, 1);
+    s.noise(0.42, 0.45, { clock: (u) => 9000 - 7000 * u, gain: env.attackDecay(0.55, 0.02) });
+    s.rumble(0.45, 0.6, { from: 400, to: 120, gain: 0.32 });
+    for (let i = 0; i < 6; i++) s.noise(0.55 + i * 0.1, 0.04, { clock: () => 2000 + s.random() * 2000, gain: env.decay(0.18, 1) });
+    s.confusion(1.6);
+    s.wave(1.6, 1.3, { freq: (u) => 1200 + 250 * Math.sin(2 * Math.PI * 3 * u), gain: (u) => 0.08 * Math.sin(Math.PI * u) });
     return s;
   },
+
 
   /** Generic projectile (impact 0.43 s): everything on one blow, then the user's strength drains away. */
   finalgambit: () => {
@@ -375,15 +395,23 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee + recoil (~0.12 s after impact): a reckless rolling tackle and the backlash. */
+  /**
+   * FightingMoveAnimations.playSubmission: both sprites roll two counter-clockwise laps
+   * (0-1.2 s, laps at 0 / 0.6 s) while four hits land (0.25 / 0.5 / 0.75 / 1.0 s), then
+   * dust swirls round the target (1.2-2.0 s). A tumbling scuffle of thumps, then a dusty skid.
+   */
   submission: () => {
-    const s = new MoveSfx(0.75, 0x5b31);
-    s.whoosh(0.0, 0.18, { from: 900, to: 3000, gain: 0.32 });
-    s.thud(0.17, 0.8, 0.8);
-    s.noise(0.2, 0.15, { clock: () => 2500, gain: env.decay(0.2, 1) });
-    s.thud(0.29, 0.4, 0.4);
+    const s = new MoveSfx(2.1, 0x5b31);
+    [0.0, 0.6].forEach((at) => s.whoosh(at, 0.55, { from: 700, to: 2200, gain: 0.22 }));
+    [0.25, 0.5, 0.75, 1.0].forEach((at, i) => {
+      s.thud(at, 0.6 + 0.08 * i, 0.7);
+      s.noise(at, 0.06, { clock: () => 3500, gain: env.decay(0.22, 1.5) });
+    });
+    s.noise(1.2, 0.8, { clock: env.ramp(1400, 500), gain: env.attackDecay(0.28, 0.15) });
+    s.rumble(1.2, 0.6, { from: 260, to: 110, gain: 0.25 });
     return s;
   },
+
 
   /** Generic melee (bp 120): a gathering grunt of power and a crushing blow. */
   superpower: () => {

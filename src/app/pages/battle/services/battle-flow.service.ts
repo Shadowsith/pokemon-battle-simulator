@@ -12,6 +12,7 @@ import {
 } from '../../../core/battle/battle-format';
 import { chooseNpcMove, pickSwitchIn } from '../../../core/battle/npc-ai';
 import { residualItem } from '../../../core/battle/item-effects';
+import { curseDamage } from '../../../core/battle/curse';
 import { AudioService } from '../../../core/services/audio.service';
 import { DamageCalcService } from '../../../core/services/damage-calc.service';
 import { MoveAnimationService } from '../../../core/services/move-animation.service';
@@ -183,7 +184,7 @@ export class BattleFlowService {
     const user = s.monAt(slot)!;
     const ally = livingAlly(slot, s.field());
     const known = s.movesFor('opponent', idx);
-    const allowed = known.filter((m) => !s.itemLockReason('opponent', idx, user, m));
+    const allowed = known.filter((m) => !s.moveLockReason('opponent', idx, user, m));
     const choice = chooseNpcMove({
       calc: this.damageCalc,
       field: s.field(),
@@ -192,7 +193,10 @@ export class BattleFlowService {
       moves: allowed.length ? allowed : known,
       monAt: (x) => s.monAt(x),
       allyMoves: ally ? s.movesFor('opponent', s.partyIdxAt(ally)) : [],
-      protectStreak: s.protectStreak[s.streakKey(slot)] ?? 0
+      protectStreak: s.protectStreak[s.streakKey(slot)] ?? 0,
+      hasSubstitute: s.substituteOf(slot) > 0,
+      foeReserves: s.bench('player').length,
+      ownReserves: s.bench('opponent').length
     });
     return this.moveAction(slot, choice.move, choice.target);
   }
@@ -269,6 +273,7 @@ export class BattleFlowService {
         await this.switchSlot(a.slot, a.switchTo!);
       } else {
         await this.resolver.performMove(a.move!, a.slot, a.target ?? null);
+        await this.switchOutsAfterMove();
       }
       s.moved.add(slotKey(a.slot));
       await this.settleFaints();
@@ -285,6 +290,7 @@ export class BattleFlowService {
     await this.applyResiduals();
     await this.settleFaints();
     if (await this.checkEnd()) return;
+    await this.tickEncores();
 
     await this.replaceFaintedOpponents();
     await this.startReplacements();
@@ -322,6 +328,12 @@ export class BattleFlowService {
           await this.stage.wait(800);
         }
       }
+      // A Ghost's Curse.
+      if (s.cursed.has(slotKey(slot)) && s.alive(slot)) {
+        s.applyHp(slot, -curseDamage(mon));
+        s.log.set(`${mon.name} wird vom Fluch geplagt!`);
+        await this.stage.wait(800);
+      }
       // Leftovers / Black Sludge.
       const now = s.monAt(slot);
       const item = now ? residualItem(now) : null;
@@ -332,6 +344,23 @@ export class BattleFlowService {
         await this.stage.wait(800);
       }
       await this.resolver.runBerryChecks([slot]);
+    }
+  }
+
+  /** Encores count down at the end of each round; the lock lifts after the last one. */
+  private async tickEncores(): Promise<void> {
+    const s = this.state;
+    for (const [key, enc] of Object.entries(s.encores)) {
+      if (enc.turns > 1) {
+        s.encores[key] = { ...enc, turns: enc.turns - 1 };
+        continue;
+      }
+      delete s.encores[key];
+      const mon = s.monAt({ side: key.startsWith('p') ? 'player' : 'opponent', pos: Number(key.slice(1)) as SlotPos });
+      if (mon && mon.currentHp > 0) {
+        s.log.set(`Die Zugabe von ${mon.name} ist vorbei!`);
+        await this.stage.wait(800);
+      }
     }
   }
 
@@ -346,6 +375,11 @@ export class BattleFlowService {
         if (!mon || mon.currentHp > 0 || s.faintDone[key]) continue;
         s.faintDone[key] = true;
         s.setCharge(slot, null); // a fainted Pokémon drops any charge
+        s.cursed.delete(key);
+        s.destinyBonds.delete(key);
+        delete s.lastMoves[key];
+        delete s.encores[key];
+        await this.dropSubstitute(slot); // …and its Substitute, so the Pokémon itself faints
         s.log.set(`${mon.name} wurde besiegt!`);
         await this.stage.wait(250);
         this.audio.playCry(mon.dexId, true);
@@ -393,10 +427,15 @@ export class BattleFlowService {
     s.isAnimating.set(false);
   }
 
-  /** Bring a fresh Pokémon into a slot whose occupant fainted (no recall). */
-  async sendIn(slot: Slot, partyIdx: number): Promise<void> {
+  /** Bring a fresh Pokémon into a slot whose occupant fainted or was dragged out (no recall). */
+  async sendIn(slot: Slot, partyIdx: number, dragged = false): Promise<void> {
     const s = this.state;
     s.setActive(slot.side, slot.pos, partyIdx);
+    s.setSubstitute(slot, 0);
+    s.cursed.delete(slotKey(slot));
+    s.destinyBonds.delete(slotKey(slot));
+    delete s.lastMoves[slotKey(slot)];
+    delete s.encores[slotKey(slot)];
     s.faintDone[slotKey(slot)] = false;
     const el = this.stage.spriteEl(slot);
     el.getAnimations?.().forEach((a) => a.cancel());
@@ -405,7 +444,13 @@ export class BattleFlowService {
     el.style.filter = '';
     await this.stage.wait(60); // let the sprite src rebind before it grows in
     const mon = s.monAt(slot)!;
-    s.log.set(slot.side === 'player' ? `Los, ${mon.name}!` : `${s.npcName()} schickt ${mon.name} in den Kampf!`);
+    s.log.set(
+      dragged
+        ? `${mon.name} wurde in den Kampf gezogen!`
+        : slot.side === 'player'
+          ? `Los, ${mon.name}!`
+          : `${s.npcName()} schickt ${mon.name} in den Kampf!`
+    );
     await this.animation.playSendOut(el, this.stage.fxEl, this.stage.fieldEl, slot.side);
     await this.stage.wait(120);
     this.audio.playCry(mon.dexId);
@@ -417,8 +462,90 @@ export class BattleFlowService {
     const s = this.state;
     const out = s.monAt(slot);
     if (!out || s.teamOf(slot.side)[to]?.currentHp <= 0 || s.activeOf(slot.side).includes(to)) return;
-    // Switching out clears volatiles: confusion ends, the toxic counter resets,
-    // all stat stages are lost, and a two-turn move is cancelled.
+    await this.leaveField(slot);
+    s.log.set(`${out.name}, komm zurück!`);
+    await this.animation.playRecall(this.stage.spriteEl(slot), this.stage.fxEl, this.stage.fieldEl, slot.side);
+    await this.sendIn(slot, to);
+  }
+
+  /**
+   * Switches a move asked for: Pokémon blown / dragged out (Whirlwind …) are
+   * replaced by a random healthy reserve (their sprite is already off-screen);
+   * a Baton Pass user is recalled and a reserve - the player's pick, the
+   * NPC's best matchup - takes over its stat stages, confusion and Substitute.
+   */
+  async switchOutsAfterMove(): Promise<void> {
+    const s = this.state;
+    const drags = s.dragOuts;
+    s.dragOuts = [];
+    for (const slot of drags) {
+      const bench = s.bench(slot.side);
+      if (!bench.length) continue;
+      await this.leaveField(slot);
+      await this.sendIn(slot, bench[Math.floor(Math.random() * bench.length)], true);
+    }
+
+    const passes = s.batonPasses;
+    s.batonPasses = [];
+    for (const slot of passes) {
+      const out = s.monAt(slot);
+      if (!out || out.currentHp <= 0 || !s.bench(slot.side).length) continue;
+      const passed = {
+        boosts: out.boosts,
+        confusionTurns: out.status.confusionTurns,
+        sub: s.substituteOf(slot),
+        cursed: s.cursed.has(slotKey(slot))
+      };
+      const to = slot.side === 'player' ? await this.askBatonTaker(slot) : this.npcBatonTaker();
+      await this.leaveField(slot);
+      s.log.set(`${out.name}, komm zurück!`);
+      await this.animation.playRecall(this.stage.spriteEl(slot), this.stage.fxEl, this.stage.fieldEl, slot.side);
+      await this.sendIn(slot, to);
+      const taker = s.monAt(slot)!;
+      s.patchSlot(slot, { boosts: passed.boosts, status: { ...taker.status, confusionTurns: passed.confusionTurns } });
+      if (passed.cursed) s.cursed.add(slotKey(slot));
+      if (passed.sub > 0) {
+        await this.animation.playSubstitute(this.stage.spriteEl(slot), this.stage.fxEl, this.stage.fieldEl, () =>
+          s.setSubstitute(slot, passed.sub)
+        );
+      }
+      s.log.set(`${taker.name} übernimmt die Stafette!`);
+      await this.stage.wait(700);
+    }
+  }
+
+  /** The player picks who takes the baton, in the party menu (resolved by the battle page). */
+  private askBatonTaker(slot: Slot): Promise<number> {
+    const s = this.state;
+    return new Promise((resolve) => {
+      s.passPicker = (idx) => {
+        s.passPicker = null;
+        resolve(idx);
+      };
+      s.replacingPos.set(slot.pos);
+      s.menuState.set('pokemon');
+      s.log.set('Wer soll die Stafette übernehmen?');
+      s.isAnimating.set(false);
+    });
+  }
+
+  /** The NPC hands the baton to its reserve with the best matchup. */
+  private npcBatonTaker(): number {
+    const s = this.state;
+    const foes = livingSlots('player', s.field()).map((x) => s.monAt(x)!);
+    const best = pickSwitchIn(this.damageCalc, s.opponentTeam(), s.opponentMovesets(), foes.length ? foes : [s.player()], new Set(s.activeOpponent()));
+    return best >= 0 ? best : s.bench('opponent')[0];
+  }
+
+  /**
+   * Leaving the field clears volatiles: confusion ends, the toxic counter
+   * resets, all stat stages are lost, a two-turn move is cancelled, a curse
+   * ends and a Substitute is dropped.
+   */
+  private async leaveField(slot: Slot): Promise<void> {
+    const s = this.state;
+    const out = s.monAt(slot);
+    if (!out) return;
     s.patchSlot(slot, {
       status: { ...out.status, confusionTurns: 0, toxicTurns: out.status.major === 'tox' ? 1 : 0 },
       boosts: freshBoosts()
@@ -426,8 +553,17 @@ export class BattleFlowService {
     s.protectStreak[s.streakKey(slot)] = 0;
     s.clearChoiceLock(slot);
     s.setCharge(slot, null);
-    s.log.set(`${out.name}, komm zurück!`);
-    await this.animation.playRecall(this.stage.spriteEl(slot), this.stage.fxEl, this.stage.fieldEl, slot.side);
-    await this.sendIn(slot, to);
+    s.cursed.delete(slotKey(slot));
+    s.destinyBonds.delete(slotKey(slot));
+    delete s.lastMoves[slotKey(slot)];
+    delete s.encores[slotKey(slot)];
+    await this.dropSubstitute(slot);
+  }
+
+  /** Take down a Substitute without its fade (the Pokémon is leaving or fainting anyway). */
+  private async dropSubstitute(slot: Slot): Promise<void> {
+    if (this.state.substituteOf(slot) <= 0) return;
+    this.state.setSubstitute(slot, 0);
+    await this.stage.wait(60); // let the sprite src rebind to the Pokémon
   }
 }

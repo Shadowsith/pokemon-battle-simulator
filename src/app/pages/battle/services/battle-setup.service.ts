@@ -183,6 +183,11 @@ export class BattleSetupService {
     s.movePp.set({});
     this.applyRunCarry();
     s.charge.set({});
+    s.substitutes.set({});
+    s.cursed = new Set();
+    s.destinyBonds = new Set();
+    s.lastMoves = {};
+    s.encores = {};
     s.protectStreak = {};
     s.choiceLocks.set({});
     s.clearTurnVolatiles();

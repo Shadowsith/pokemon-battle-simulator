@@ -7,6 +7,7 @@ import {
   SIDE_GUARD_MOVES,
   Slot,
   applyRedirection,
+  forcesSwitch,
   isContactMove,
   isSpreadMove,
   livingAlly,
@@ -30,6 +31,10 @@ import {
   retaliation,
   shellBellHeal
 } from '../../../core/battle/item-effects';
+import { bellyDrumCost, canBellyDrum } from '../../../core/battle/belly-drum';
+import { NON_GHOST_CURSE, castsGhostCurse, curseCost } from '../../../core/battle/curse';
+import { ENCORE_TURNS, canEncore } from '../../../core/battle/encore';
+import { bypassesSubstitute, canAffordSubstitute, hitSubstitute, substituteCost } from '../../../core/battle/substitute';
 import { AudioService } from '../../../core/services/audio.service';
 import { DamageCalcService } from '../../../core/services/damage-calc.service';
 import { MoveAnimationService } from '../../../core/services/move-animation.service';
@@ -47,6 +52,14 @@ interface HitContext {
   itemLogs: string[];
   /** The user's own stat changes (Overheat …) apply once, not per target. */
   userChangesDone: boolean;
+}
+
+/** What one target took from a hit; `sub` is set when its Substitute soaked it up. */
+interface HitResult {
+  dealt: number;
+  statusMsg: string | null;
+  lifeOrb: boolean;
+  sub?: 'hit' | 'broke';
 }
 
 /** Plays out a single move: gates, animation, damage, items, status, stats and log lines. */
@@ -83,6 +96,9 @@ export class MoveResolverService {
       return;
     }
 
+    // Destiny Bond only lasts until its user moves again.
+    s.destinyBonds.delete(slotKey(user));
+
     // --- status gate: sleep / freeze / paralysis / confusion may stop the move ---
     const pre = this.status.resolvePreMove(attacker);
     s.patchSlot(user, { status: pre.status });
@@ -96,6 +112,7 @@ export class MoveResolverService {
       return;
     }
     if (!pre.canAct) return;
+    s.lastMoves[slotKey(user)] = id; // the move Encore would lock in
 
     // A Choice item locks its holder into the first move it uses.
     const lockKey = s.streakKey(user);
@@ -109,6 +126,26 @@ export class MoveResolverService {
 
     if (PROTECT_MOVES.has(id) || SIDE_GUARD_MOVES.has(id) || id === 'helpinghand' || REDIRECT_MOVES.has(id)) {
       await this.performSupportMove(move, user, streakKey);
+      return;
+    }
+    if (id === 'substitute') {
+      await this.performSubstitute(move, user);
+      return;
+    }
+    if (id === 'batonpass') {
+      await this.performBatonPass(move, user);
+      return;
+    }
+    if (id === 'bellydrum') {
+      await this.performBellyDrum(move, user);
+      return;
+    }
+    if (id === 'curse') {
+      await this.performCurse(move, user, chosen);
+      return;
+    }
+    if (id === 'destinybond') {
+      await this.performDestinyBond(move, user);
       return;
     }
 
@@ -170,6 +207,26 @@ export class MoveResolverService {
         continue;
       }
       if (await this.blockedByProtection(move, user, t)) continue;
+      // Encore fails on a Pokémon that hasn't moved yet, is already encored, or last used an un-encorable move.
+      if (id === 'encore' && !canEncore(s.lastMoves[slotKey(t)], !!s.encores[slotKey(t)])) {
+        await this.stage.wait(500);
+        s.log.set('Aber es misslang!');
+        await this.stage.wait(700);
+        continue;
+      }
+      // Whirlwind / Roar fail when there's nobody left to drag in.
+      if (this.damageCalc.isStatusMove(move) && forcesSwitch(move) && !s.bench(t.side).length) {
+        await this.stage.wait(500);
+        s.log.set('Aber es misslang!');
+        await this.stage.wait(700);
+        continue;
+      }
+      if (this.damageCalc.isStatusMove(move) && this.behindSubstitute(move, user, t)) {
+        await this.stage.wait(500);
+        s.log.set('Aber es misslang!');
+        await this.stage.wait(700);
+        continue;
+      }
       if (defenseMods(tm, move, this.damageCalc.effectiveness(move, tm)).immune) {
         s.patchSlot(t, { itemRevealed: true });
         await this.stage.wait(500);
@@ -212,7 +269,7 @@ export class MoveResolverService {
       userChangesDone: false
     };
     const { statLogs, itemLogs } = ctx;
-    const results: { slot: Slot; dealt: number; statusMsg: string | null }[] = [];
+    const results: { slot: Slot; dealt: number; statusMsg: string | null; sub?: 'hit' | 'broke' }[] = [];
     let totalDealt = 0;
 
     // A gem boosts the whole move (every target) and is used up afterwards.
@@ -227,7 +284,7 @@ export class MoveResolverService {
       const hit = this.resolveHit(move, user, t, ctx);
       lifeOrb ||= hit.lifeOrb;
       totalDealt += hit.dealt;
-      results.push({ slot: t, dealt: hit.dealt, statusMsg: hit.statusMsg });
+      results.push({ slot: t, dealt: hit.dealt, statusMsg: hit.statusMsg, sub: hit.sub });
     }
 
     const recovery = this.damageCalc.calculateRecovery(move, me(), totalDealt);
@@ -255,7 +312,9 @@ export class MoveResolverService {
     const lines = results.map((r) => {
       const foe = s.monAt(r.slot)!;
       let line: string;
-      if (foe.currentHp <= 0) {
+      if (r.sub) {
+        return `Der Delegator steckt den Treffer für ${foe.name} ein!`;
+      } else if (foe.currentHp <= 0) {
         line = `${foe.name} wurde besiegt!`;
       } else if (recovery.kind === 'drain' && recovery.amount > 0) {
         line = `${move.name} trifft ${foe.name}! ${me().name} saugt Energie ab.`;
@@ -263,6 +322,11 @@ export class MoveResolverService {
         line = `${move.name} trifft ${foe.name}!`;
       } else if (r.statusMsg) {
         return r.statusMsg;
+      } else if (id === 'encore') {
+        s.encores[slotKey(r.slot)] = { move: s.lastMoves[slotKey(r.slot)], turns: ENCORE_TURNS };
+        return `${foe.name} gibt eine Zugabe!`;
+      } else if (forcesSwitch(move)) {
+        return ''; // Whirlwind / Roar: the drag-out below has its own line
       } else if (statLogs.length > 0) {
         line = statLogs.shift() as string; // a pure stat move - lead with the first change
       } else {
@@ -270,7 +334,7 @@ export class MoveResolverService {
       }
       return r.statusMsg ? `${line} ${r.statusMsg}` : line;
     });
-    let line = lines.join(' ');
+    let line = lines.filter(Boolean).join(' ');
 
     const anyAlive = results.some((r) => s.alive(r.slot));
     if (recoil.kind === 'selfKo' && anyAlive) {
@@ -281,9 +345,17 @@ export class MoveResolverService {
           ? ` ${me().name} bricht durch den Rückstoß zusammen.`
           : ` ${me().name} nimmt Rückstoß-Schaden.`;
     }
-    s.log.set(line);
+    if (line) s.log.set(line);
     // A multi-target summary needs a beat to be read before faint messages replace it.
     if (results.length > 1) await this.stage.wait(900);
+
+    // Broken Substitutes vanish and the Pokémon behind them comes back into view.
+    for (const r of results.filter((x) => x.sub === 'broke')) {
+      await this.stage.wait(750);
+      await this.removeSubstitute(r.slot);
+      s.log.set(`Der Delegator von ${s.monAt(r.slot)!.name} verschwindet!`);
+      await this.stage.wait(400);
+    }
 
     const followUps = [...statLogs, ...itemLogs];
     for (const msg of followUps) {
@@ -293,6 +365,8 @@ export class MoveResolverService {
     // Let the last follow-up be read before a faint message replaces it.
     if (followUps.length) await this.stage.wait(850);
     await this.runBerryChecks([...hits, user]);
+    await this.checkDestinyBonds(user, results);
+    if (forcesSwitch(move)) await this.dragOut(move, user, results);
 
     // Hyper Beam & co.: lock the user into a recharge turn (unless it just fainted).
     if (me().currentHp > 0) this.queueRecharge(user, move);
@@ -308,7 +382,7 @@ export class MoveResolverService {
     user: Slot,
     t: Slot,
     ctx: HitContext
-  ): { dealt: number; statusMsg: string | null; lifeOrb: boolean } {
+  ): HitResult {
     const s = this.state;
     const me = () => s.monAt(user)!;
     const defender = s.monAt(t)!;
@@ -325,6 +399,17 @@ export class MoveResolverService {
       defStatMult: dm.defStatMult,
       finalMult: om.finalMult * dm.finalMult
     });
+    // A Substitute takes the hit instead: no HP loss, items, status or stat drops on the target.
+    if (this.behindSubstitute(move, user, t)) {
+      const { absorbed, left } = hitSubstitute(s.substituteOf(t), raw);
+      if (absorbed > 0) {
+        this.audio.playHit(eff);
+        if (left > 0) s.setSubstitute(t, left); // a broken doll is removed after the log line
+      }
+      this.applyStatChanges(move, user, t, absorbed, ctx, false);
+      return { dealt: absorbed, statusMsg: null, lifeOrb: om.lifeOrb, sub: absorbed > 0 ? (left > 0 ? 'hit' : 'broke') : undefined };
+    }
+
     const sash = focusSashCap(defender, raw);
     const dealt = Math.min(sash.damage, defender.currentHp);
     if (dealt > 0) {
@@ -369,21 +454,202 @@ export class MoveResolverService {
       }
     }
 
-    // --- stat-stage changes (Growl, Crunch's chance, Overheat's own drop …) ---
-    const sc = this.statChange.resolve(move, now.types, dealt);
+    this.applyStatChanges(move, user, t, dealt, ctx, true);
+    return { dealt, statusMsg, lifeOrb: om.lifeOrb };
+  }
+
+  /**
+   * Stat-stage changes of a hit (Growl, Crunch's chance, Overheat's own drop …).
+   * The user's own changes apply once per move; the target's only when
+   * `toTarget` (not when a Substitute took the hit).
+   */
+  private applyStatChanges(move: Move, user: Slot, t: Slot, dealt: number, ctx: HitContext, toTarget: boolean): void {
+    const s = this.state;
+    const me = s.monAt(user)!;
+    const sc = this.statChange.resolve(move, s.monAt(t)!.types, dealt);
     if (!ctx.userChangesDone && Object.keys(sc.toUser).length) {
-      const res = this.statChange.apply(me().boosts, sc.toUser);
+      const res = this.statChange.apply(me.boosts, sc.toUser);
       s.patchSlot(user, { boosts: res.boosts });
-      for (const ch of res.changes) ctx.statLogs.push(statChangeMessage(me().name, ch));
+      for (const ch of res.changes) ctx.statLogs.push(statChangeMessage(me.name, ch));
       ctx.userChangesDone = true;
     }
     const tgt = s.monAt(t)!;
-    if (tgt.currentHp > 0 && Object.keys(sc.toTarget).length) {
+    if (toTarget && tgt.currentHp > 0 && Object.keys(sc.toTarget).length) {
       const res = this.statChange.apply(tgt.boosts, sc.toTarget);
       s.patchSlot(t, { boosts: res.boosts });
       for (const ch of res.changes) ctx.statLogs.push(statChangeMessage(tgt.name, ch));
     }
-    return { dealt, statusMsg, lifeOrb: om.lifeOrb };
+  }
+
+  /** `move` from `user` hits the Substitute standing in front of `t` (never the user's own). */
+  private behindSubstitute(move: Move, user: Slot, t: Slot): boolean {
+    return slotKey(t) !== slotKey(user) && this.state.substituteOf(t) > 0 && !bypassesSubstitute(move);
+  }
+
+  /**
+   * Whirlwind / Roar / Dragon Tail / Circle Throw: every target still standing
+   * (and not shielded by a Substitute) is blown off the field; the flow then
+   * drags a random reserve in. Without a reserve nothing happens.
+   */
+  private async dragOut(move: Move, user: Slot, results: { slot: Slot; dealt: number; sub?: 'hit' | 'broke' }[]): Promise<void> {
+    const s = this.state;
+    const damaging = !this.damageCalc.isStatusMove(move);
+    for (const r of results) {
+      if (!s.alive(r.slot) || r.sub || (damaging && r.dealt <= 0) || !s.bench(r.slot.side).length) continue;
+      const name = s.monAt(r.slot)!.name;
+      await this.stage.wait(damaging ? 600 : 200);
+      const away = r.slot.side === 'opponent' ? 1 : -1; // off its own screen edge
+      await this.animation.playBlownAway(this.stage.spriteEl(r.slot), away);
+      s.log.set(move.showdownId === 'whirlwind' ? `${name} wurde weggeweht!` : `${name} wurde aus dem Kampf gedrängt!`);
+      await this.stage.wait(800);
+      s.dragOuts.push(r.slot);
+    }
+  }
+
+  /** A broken Substitute in `slot` fades away and the Pokémon behind it shows again. */
+  private async removeSubstitute(slot: Slot): Promise<void> {
+    if (this.state.substituteOf(slot) <= 0) return;
+    await this.animation.playSubstituteFade(this.stage.spriteEl(slot), this.stage.fxEl, this.stage.fieldEl, () =>
+      this.state.setSubstitute(slot, 0)
+    );
+  }
+
+  /** Destiny Bond: until it moves again, whoever knocks the user out faints with it. */
+  private async performDestinyBond(move: Move, user: Slot): Promise<void> {
+    const s = this.state;
+    const name = s.monAt(user)!.name;
+    s.log.set(`${name} setzt ${move.name} ein...`);
+    this.audio.playMove(move.showdownId);
+    const foe = livingFoes(user, s.field())[0] ?? user;
+    await this.animation.playMove(move, this.stage.refsFor(user, foe));
+    s.destinyBonds.add(slotKey(user));
+    s.log.set(`${name} will den Angreifer mit sich nehmen!`);
+    await this.stage.wait(800);
+  }
+
+  /** A target under Destiny Bond that this hit knocked out takes the attacker down with it. */
+  private async checkDestinyBonds(user: Slot, results: { slot: Slot }[]): Promise<void> {
+    const s = this.state;
+    for (const r of results) {
+      const key = slotKey(r.slot);
+      if (key === slotKey(user) || !s.destinyBonds.has(key) || s.alive(r.slot) || !s.alive(user)) continue;
+      s.destinyBonds.delete(key);
+      await this.stage.wait(700);
+      s.applyHp(user, -s.monAt(user)!.currentHp);
+      s.log.set(`${s.monAt(r.slot)!.name} nimmt ${s.monAt(user)!.name} mit sich!`);
+      await this.stage.wait(900);
+    }
+  }
+
+  /**
+   * Curse: a Ghost-type pays half its max HP to curse a foe (it then loses ¼
+   * of its max HP each turn; fails if it's already cursed). Anyone else raises
+   * Attack and Defense and lowers Speed by one stage.
+   */
+  private async performCurse(move: Move, user: Slot, chosen: Slot | null): Promise<void> {
+    const s = this.state;
+    const mon = s.monAt(user)!;
+    s.log.set(`${mon.name} setzt ${move.name} ein...`);
+    this.audio.playMove(move.showdownId);
+    const foes = livingFoes(user, s.field());
+
+    if (!castsGhostCurse(mon)) {
+      await this.animation.playMove(move, this.stage.refsFor(user, foes[0] ?? user));
+      const res = this.statChange.apply(s.monAt(user)!.boosts, NON_GHOST_CURSE);
+      s.patchSlot(user, { boosts: res.boosts });
+      for (const [i, ch] of res.changes.entries()) {
+        if (i) await this.stage.wait(850);
+        s.log.set(statChangeMessage(mon.name, ch));
+      }
+      await this.stage.wait(700);
+      await this.runBerryChecks([user]); // White Herb resets the Speed drop
+      return;
+    }
+
+    const t = chosen && chosen.side !== user.side && s.alive(chosen) ? chosen : (foes[0] ?? null);
+    if (!t || s.cursed.has(slotKey(t))) {
+      await this.stage.wait(500);
+      s.log.set('Aber es misslang!');
+      await this.stage.wait(700);
+      return;
+    }
+    s.applyHp(user, -curseCost(mon));
+    await this.animation.playMove(move, this.stage.refsFor(user, t));
+    s.cursed.add(slotKey(t));
+    s.log.set(`${mon.name} halbiert seine KP und belegt ${s.monAt(t)!.name} mit einem Fluch!`);
+    await this.stage.wait(800);
+    await this.runBerryChecks([user]);
+  }
+
+  /** Belly Drum: half of max HP for maximum Attack (+6). Fails with too little HP or Attack already maxed. */
+  private async performBellyDrum(move: Move, user: Slot): Promise<void> {
+    const s = this.state;
+    const mon = s.monAt(user)!;
+    s.log.set(`${mon.name} setzt ${move.name} ein...`);
+    this.audio.playMove(move.showdownId);
+    if (!canBellyDrum(mon)) {
+      await this.stage.wait(500);
+      s.log.set('Aber es misslang!');
+      await this.stage.wait(700);
+      return;
+    }
+    s.applyHp(user, -bellyDrumCost(mon));
+    const foe = livingFoes(user, s.field())[0] ?? user;
+    await this.animation.playMove(move, this.stage.refsFor(user, foe));
+    s.patchSlot(user, { boosts: { ...s.monAt(user)!.boosts, atk: 6 } });
+    s.log.set(`${mon.name} halbiert seine KP und maximiert seinen Angriff!`);
+    await this.stage.wait(800);
+    await this.runBerryChecks([user]); // the HP cost can trigger a pinch berry
+  }
+
+  /**
+   * Baton Pass: the baton is tossed and caught, then the flow swaps the user
+   * for a reserve that inherits its stat stages, confusion and Substitute.
+   * Fails without a healthy reserve.
+   */
+  private async performBatonPass(move: Move, user: Slot): Promise<void> {
+    const s = this.state;
+    s.log.set(`${s.monAt(user)!.name} setzt ${move.name} ein...`);
+    this.audio.playMove(move.showdownId);
+    if (!s.bench(user.side).length) {
+      await this.stage.wait(500);
+      s.log.set('Aber es misslang!');
+      await this.stage.wait(700);
+      return;
+    }
+    const foe = livingFoes(user, s.field())[0] ?? user;
+    await this.animation.playMove(move, this.stage.refsFor(user, foe));
+    s.batonPasses.push(user);
+  }
+
+  /**
+   * Substitute: pay a quarter of max HP for a doll with that much HP. Fails
+   * with a doll already up or too little HP left.
+   */
+  private async performSubstitute(move: Move, user: Slot): Promise<void> {
+    const s = this.state;
+    const mon = s.monAt(user)!;
+    s.log.set(`${mon.name} setzt ${move.name} ein...`);
+    this.audio.playMove(move.showdownId);
+
+    let fail: string | null = null;
+    if (s.substituteOf(user) > 0) fail = `${mon.name} hat bereits einen Delegator!`;
+    else if (!canAffordSubstitute(mon)) fail = `Aber ${mon.name} hat zu wenig KP für einen Delegator!`;
+    if (fail) {
+      await this.stage.wait(500);
+      s.log.set(fail);
+      await this.stage.wait(700);
+      return;
+    }
+
+    const cost = substituteCost(mon);
+    s.applyHp(user, -cost);
+    await this.animation.playSubstitute(this.stage.spriteEl(user), this.stage.fxEl, this.stage.fieldEl, () =>
+      s.setSubstitute(user, cost)
+    );
+    s.log.set(`${mon.name} setzt einen Delegator ein!`);
+    await this.stage.wait(700);
+    await this.runBerryChecks([user]); // the HP cost can trigger a pinch berry
   }
 
   /** Let berries / White Herb react to HP, status or stat changes, one log line each. */
@@ -462,12 +728,16 @@ export class MoveResolverService {
       }
       s.protectStreak[streakKey] = streak + 1;
       s.protectedSlots.set(slotKey(user), id);
-      await this.animation.playShield(
-        this.stage.spriteEl(user),
-        fx,
-        fieldEl,
-        id === 'kingsshield' ? '#c9b458' : '#7fd3ff'
-      );
+      if (this.animation.hasCustomAnimation(move)) {
+        await this.animation.playMove(move, this.stage.refsFor(user, livingFoes(user, s.field())[0] ?? user));
+      } else {
+        await this.animation.playShield(
+          this.stage.spriteEl(user),
+          fx,
+          fieldEl,
+          id === 'kingsshield' ? '#c9b458' : '#7fd3ff'
+        );
+      }
       s.log.set(`${name} schützt sich selbst!`);
       await this.stage.wait(700);
       return;

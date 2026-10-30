@@ -53,6 +53,11 @@ export class MoveAnimationService {
     await (custom ? custom(refs, launch, target, v) : DeliveryAnimations.playDelivery(refs, launch, target, v));
   }
 
+  /** Whether `move` has a hand-made animation (Detect uses it instead of the generic shield bubble). */
+  hasCustomAnimation(move: Move): boolean {
+    return !!CUSTOM_MOVE_ANIMATIONS[move.showdownId];
+  }
+
   /** Turn 1 of a two-turn move: a hand-made charge, gather energy, or duck under / fly up out of sight. */
   private async playChargeTurn(move: Move, refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
     const custom = CUSTOM_CHARGE_ANIMATIONS[move.showdownId];
@@ -107,6 +112,61 @@ export class MoveAnimationService {
       { transform: 'scale(1.1)', opacity: 0 }
     ], { duration: 620, easing: 'ease-out' });
     bubble.remove();
+  }
+
+  /**
+   * Substitute: the Pokémon vanishes in a puff of smoke, `swap` turns its
+   * sprite into the doll, and the doll drops onto the spot with a bounce.
+   */
+  async playSubstitute(spriteEl: HTMLElement, fxEl: HTMLElement, fieldEl: HTMLElement, swap: () => void): Promise<void> {
+    const at = Fx.centerOf(spriteEl, fieldEl);
+    const size = Math.max(spriteEl.getBoundingClientRect().height, 60) * 1.1;
+    const puff = FxEffects.smokePuff(fxEl, at, size);
+    await Fx.anim(spriteEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in', fill: 'forwards' });
+    swap();
+    await Fx.wait(100); // let the sprite src rebind before the doll appears
+    spriteEl.style.transformOrigin = 'center bottom';
+    await Fx.anim(spriteEl, [
+      { transform: 'translateY(-36px)', opacity: 0, offset: 0 },
+      { transform: 'translateY(0) scale(1.08,.88)', opacity: 1, offset: 0.65 },
+      { transform: 'translateY(-6px) scale(.97,1.03)', opacity: 1, offset: 0.85 },
+      { transform: 'translateY(0) scale(1)', opacity: 1, offset: 1 }
+    ], { duration: 340, easing: 'ease-in' });
+    spriteEl.getAnimations?.().forEach((a) => a.cancel());
+    spriteEl.style.opacity = '';
+    await puff;
+  }
+
+  /**
+   * The Substitute breaks (or is dropped): the doll fades in a puff of smoke,
+   * `swap` turns the sprite back into the Pokémon, which fades back in.
+   */
+  async playSubstituteFade(spriteEl: HTMLElement, fxEl: HTMLElement, fieldEl: HTMLElement, swap: () => void): Promise<void> {
+    const at = Fx.centerOf(spriteEl, fieldEl);
+    const size = Math.max(spriteEl.getBoundingClientRect().height, 60) * 1.1;
+    const puff = FxEffects.smokePuff(fxEl, at, size);
+    await Fx.anim(spriteEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 280, easing: 'ease-in', fill: 'forwards' });
+    swap();
+    await Fx.wait(100);
+    await Fx.anim(spriteEl, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+    spriteEl.getAnimations?.().forEach((a) => a.cancel());
+    spriteEl.style.opacity = '';
+    await puff;
+  }
+
+  /**
+   * Blown / dragged out of battle (Whirlwind, Roar …): the Pokémon is swept
+   * off toward its own screen edge (`away` 1 = right, -1 = left), tumbling
+   * up a little and fading. It stays hidden until the next send-in resets it.
+   */
+  async playBlownAway(spriteEl: HTMLElement, away: 1 | -1): Promise<void> {
+    spriteEl.getAnimations?.().forEach((a) => a.cancel());
+    await Fx.anim(spriteEl, [
+      { transform: 'translate(0,0)', opacity: 1 },
+      { transform: `translate(${away * 14}px,-6px)`, opacity: 1, offset: 0.25 },
+      { transform: `translate(${away * 160}px,-40px)`, opacity: 0 }
+    ], { duration: 520, easing: 'ease-in', fill: 'forwards' });
+    spriteEl.style.opacity = '0';
   }
 
   /** A short hit flash + shake for the extra targets of a spread move. */

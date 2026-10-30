@@ -5,6 +5,8 @@
 // Run with: node scripts/fetch-sprites.mjs
 //
 // Source: https://github.com/PokeAPI/sprites (sprites/pokemon/other/showdown)
+// Also fetches Showdown's Substitute doll (front + back), shown while a
+// Pokémon hides behind a Substitute.
 
 import { mkdir, writeFile } from 'node:fs/promises';
 import { existsSync } from 'node:fs';
@@ -14,6 +16,7 @@ const LAST_DEX_ID = 721;
 const BASE_URL = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/showdown';
 const OUT_DIR = path.resolve('public/assets/sprites/showdown');
 const OUT_DIR_BACK = path.join(OUT_DIR, 'back');
+const SUBSTITUTE_URL = 'https://play.pokemonshowdown.com/sprites/substitutes';
 
 async function ensureDirs() {
   await mkdir(OUT_DIR, { recursive: true });
@@ -48,6 +51,11 @@ async function main() {
     if (dexId % 50 === 0) {
       console.log(`Progress: ${dexId}/${LAST_DEX_ID}`);
     }
+  }
+
+  for (const [dir, out] of [['gen5', OUT_DIR], ['gen5-back', OUT_DIR_BACK]]) {
+    const result = await download(`${SUBSTITUTE_URL}/${dir}/substitute.png`, path.join(out, 'substitute.png'));
+    if (result.startsWith('missing')) console.log(`Substitute doll (${dir}): ${result}`);
   }
 
   console.log(`Done. Front sprites available for ${ok} Pokémon, ${missing} missing.`);

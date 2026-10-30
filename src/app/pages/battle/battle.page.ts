@@ -11,6 +11,7 @@ import {
   freshBoosts,
   freshStatus,
   frontSpritePath,
+  substituteSpritePath,
   typeColor
 } from '../../core/models/pokemon.model';
 import { trainerAvatarPath } from '../../core/models/trainer.model';
@@ -19,6 +20,7 @@ import { toBattlePokemon } from '../../core/models/battle-pokemon';
 import {
   Side,
   Slot,
+  forcesSwitch,
   livingFoes,
   needsTargetChoice,
   otherSide,
@@ -120,7 +122,7 @@ export class BattlePage implements OnInit, OnDestroy {
     return this.activeMoves().map((move) => {
       const max = this.damageCalc.maxPp(move);
       const key = `${idx}:${move.showdownId}`;
-      const locked = holder ? this.state.itemLockReason('player', idx, holder, move) : null;
+      const locked = holder ? this.state.moveLockReason('player', idx, holder, move) : null;
       return { move, max, cur: pp[key] ?? max, hints: this.moveHints(move, foes), locked };
     });
   });
@@ -230,7 +232,9 @@ export class BattlePage implements OnInit, OnDestroy {
   }
 
   spriteSrc(view: SlotView): string {
-    return view.slot.side === 'player' ? backSpritePath(view.mon.dexId) : frontSpritePath(view.mon.dexId);
+    const back = view.slot.side === 'player';
+    if (this.state.substituteOf(view.slot) > 0) return substituteSpritePath(back);
+    return back ? backSpritePath(view.mon.dexId) : frontSpritePath(view.mon.dexId);
   }
 
   partySpriteSrc(pokemon: BattlePokemon): string {
@@ -276,7 +280,7 @@ export class BattlePage implements OnInit, OnDestroy {
       this.log.set(`${move.name} hat keine AP mehr übrig!`);
       return;
     }
-    const blocked = this.state.itemLockReason('player', this.activePlayerIndex(), this.player(), move);
+    const blocked = this.state.moveLockReason('player', this.activePlayerIndex(), this.player(), move);
     if (blocked) {
       this.log.set(`${this.player().name} kann ${move.name} wegen ${blocked} nicht einsetzen!`);
       return;
@@ -338,6 +342,7 @@ export class BattlePage implements OnInit, OnDestroy {
         // Each side acting once makes a turn: Protect, Helping Hand … end when a side acts again.
         if (this.state.moved.has(slotKey(user))) this.state.clearTurnVolatiles();
         await this.resolver.performMove(this.state.chargeOf(user)?.move ?? e.move, user, foe);
+        await this.flow.switchOutsAfterMove();
         this.state.moved.add(slotKey(user));
       } else {
         this.log.set(`${this.state.monAt(user)!.name} setzt ${e.move.name} ein...`);
@@ -349,6 +354,16 @@ export class BattlePage implements OnInit, OnDestroy {
           await this.animation.playMove(e.move, refs, 'release');
         } else {
           await this.animation.playMove(e.move, refs);
+        }
+        // Whirlwind & co. / Baton Pass: preview the switch, then the same Pokémon comes back.
+        if (e.move.showdownId === 'batonpass') {
+          const el = this.stage.spriteEl(user);
+          await this.animation.playRecall(el, this.stage.fxEl, this.stage.fieldEl, user.side);
+          await this.animation.playSendOut(el, this.stage.fxEl, this.stage.fieldEl, user.side);
+        } else if (forcesSwitch(e.move)) {
+          const el = this.stage.spriteEl(foe);
+          await this.animation.playBlownAway(el, e.side === 'player' ? 1 : -1);
+          await this.animation.playSendOut(el, this.stage.fxEl, this.stage.fieldEl, foe.side);
         }
       }
     } finally {
@@ -390,7 +405,7 @@ export class BattlePage implements OnInit, OnDestroy {
     this.log.set(e.item ? `${mon.name} trägt jetzt ${heldItem(e.item)?.name ?? e.item}.` : `${mon.name} trägt kein Item.`);
   }
 
-  /** Full HP, no status / stat changes / charge / Choice lock on both sides. */
+  /** Full HP, no status / stat changes / charge / Substitute / Choice lock on both sides. */
   debugReset(): void {
     if (!this.debugReady()) return;
     for (const side of ['player', 'opponent'] as const) {
@@ -402,6 +417,11 @@ export class BattlePage implements OnInit, OnDestroy {
       });
     }
     this.state.charge.set({});
+    this.state.substitutes.set({});
+    this.state.cursed = new Set();
+    this.state.destinyBonds = new Set();
+    this.state.lastMoves = {};
+    this.state.encores = {};
     this.state.choiceLocks.set({});
     this.state.protectStreak = {};
     this.state.clearTurnVolatiles();
@@ -487,6 +507,14 @@ export class BattlePage implements OnInit, OnDestroy {
     if (this.isAnimating() || !this.canSwitchTo(index)) return;
 
     const pos = this.replacingPos();
+    if (pos !== null && this.state.passPicker) {
+      // Baton Pass: this Pokémon takes the baton mid-turn.
+      this.isAnimating.set(true);
+      this.menuState.set('main');
+      this.replacingPos.set(null);
+      this.state.passPicker(index);
+      return;
+    }
     if (pos !== null) {
       // Refill a fainted position (free, doesn't use a turn).
       this.isAnimating.set(true);

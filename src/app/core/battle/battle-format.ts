@@ -225,6 +225,11 @@ export function protectBlocks(
   return true;
 }
 
+/** Whirlwind, Roar, Dragon Tail, Circle Throw: the target is dragged out and swapped for a random reserve. */
+export function forcesSwitch(move: Pick<Move, 'showdownId'>): boolean {
+  return !!MOVEDEX.moves.get(move.showdownId)?.forceSwitch;
+}
+
 export function isContactMove(move: Pick<Move, 'showdownId'>): boolean {
   return !!MOVEDEX.moves.get(move.showdownId)?.flags?.['contact'];
 }

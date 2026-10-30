@@ -7,6 +7,7 @@ import { FxEffects } from '../fx-effects';
 export class FlyingMoveAnimations {
   /** Hand-made Flying move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    aeroblast: (refs, launch, target, v) => FlyingMoveAnimations.playAeroblast(refs, launch, target, v),
     drillpeck: (refs, _launch, target, v) => FlyingMoveAnimations.playDrillPeck(refs, target, v),
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target),
     skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target)
@@ -17,6 +18,111 @@ export class FlyingMoveAnimations {
     fly: (refs, launch) => FlyingMoveAnimations.playFlyUp(refs, launch),
     skyattack: (refs, launch) => FlyingMoveAnimations.playSkyAttackCharge(refs, launch)
   };
+
+  /**
+   * Aeroblast: a cyan vortex swirls up behind the battle while streams of air
+   * gather into a white-blue orb in front of the caster; then the orb fires a
+   * coiling beam of air rings into the target.
+   */
+  private static async playAeroblast(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const field = fieldEl.getBoundingClientRect();
+    const lr = launchEl.getBoundingClientRect();
+    const orbAt: Point = { x: launch.x + v.dir * Math.max(lr.width * 0.45, 36), y: launch.y };
+
+    // Cyan vortex backdrop, turning slowly round the orb (0-0.3 s fade in).
+    const bg = Fx.backdrop(fieldEl, 'background:#5CCFE0');
+    const reach = Math.hypot(field.width, field.height);
+    const swirl = document.createElement('div');
+    swirl.style.cssText =
+      `position:absolute;left:${orbAt.x - reach}px;top:${orbAt.y - reach}px;width:${reach * 2}px;height:${reach * 2}px;` +
+      'background:repeating-radial-gradient(circle,#ffffff33 0 5px,#ffffff00 5px 26px),' +
+      'repeating-conic-gradient(from 0deg,#8FE6F2 0 14deg,#3FBCD6 14deg 30deg,#6AD8EA 30deg 45deg)';
+    bg.appendChild(swirl);
+    swirl.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(-120deg)' }], { duration: 2600, easing: 'linear' });
+    await Fx.anim(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+
+    // 1. Air gathers into the orb (0.3-1.2 s).
+    const orbSize = Math.max(lr.height * 0.5, 40);
+    const orb = document.createElement('div');
+    orb.style.cssText = `position:absolute;width:${orbSize}px;height:${orbSize}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0 25%,#DFF6FF 45%,#8FD8F0aa 65%,#5CCFE000 75%);box-shadow:0 0 18px #ffffff`;
+    Fx.place(orb, orbAt);
+    fxEl.appendChild(orb);
+    const rings = [0, 1].map((i) => {
+      const ring = document.createElement('div');
+      ring.style.cssText = `position:absolute;width:${orbSize * 1.3}px;height:${orbSize * 0.45}px;border-radius:50%;pointer-events:none;border:2.5px solid #F0FBFFdd;box-shadow:0 0 6px #BFEFFF`;
+      Fx.place(ring, orbAt);
+      fxEl.appendChild(ring);
+      ring.animate([{ transform: `rotate(${i * 90}deg)` }, { transform: `rotate(${i * 90 + 360}deg)` }], { duration: 700, iterations: Infinity });
+      return ring;
+    });
+    Fx.anim(orb, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 900, easing: 'ease-in', fill: 'forwards' });
+    rings.forEach((ring) => Fx.anim(ring, [{ opacity: 0 }, { opacity: 1 }], { duration: 900, easing: 'ease-in', fill: 'forwards' }));
+    const gather: Promise<void>[] = [];
+    for (let i = 0; i < 16; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const d = orbSize * (1.6 + Math.random() * 1.2);
+      const len = 18 + Math.random() * 16;
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;width:${len}px;height:3px;border-radius:3px;pointer-events:none;background:linear-gradient(90deg,#ffffff00,#ffffff);box-shadow:0 0 4px #BFEFFF`;
+      Fx.place(streak, orbAt);
+      fxEl.appendChild(streak);
+      const deg = (ang * 180) / Math.PI;
+      // Each streak spirals inward along its own line, pointing at the orb.
+      gather.push(
+        Fx.anim(streak, [
+          { transform: `rotate(${deg}deg) translateX(${-d}px)`, opacity: 0 },
+          { transform: `rotate(${deg + 25}deg) translateX(${-d * 0.5}px)`, opacity: 1, offset: 0.5 },
+          { transform: `rotate(${deg + 50}deg) translateX(${-orbSize * 0.2}px) scaleX(.3)`, opacity: 0 }
+        ], { duration: 450, easing: 'ease-in', delay: Math.random() * 450 }).then(() => streak.remove())
+      );
+    }
+    await Promise.all([...gather, Fx.wait(900)]);
+
+    // 2. The coiling air beam (1.2-~2.1 s): rings stream from the orb into the target.
+    const dx = target.x - orbAt.x;
+    const dy = target.y - orbAt.y;
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const count = 22;
+    const gap = 26;
+    const travel = 300;
+    const flights: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const ring = document.createElement('div');
+      ring.style.cssText = `position:absolute;width:16px;height:${orbSize * 0.9}px;border-radius:50%;pointer-events:none;border:2.5px solid #ffffffee;background:radial-gradient(ellipse,#ffffff00 45%,#BFEFFF55);box-shadow:0 0 8px #BFEFFF`;
+      Fx.place(ring, orbAt);
+      fxEl.appendChild(ring);
+      const tilt = (i % 4) * 12 - 18; // the coil: each ring leans a little differently
+      flights.push(
+        Fx.anim(ring, [
+          { transform: `translate(0,0) rotate(${angle + tilt}deg) scale(.5)`, opacity: 0 },
+          { transform: `translate(${dx * 0.15}px,${dy * 0.15}px) rotate(${angle + tilt}deg) scale(.7)`, opacity: 0.95, offset: 0.15 },
+          { transform: `translate(${dx}px,${dy}px) rotate(${angle + tilt}deg) scale(1.5)`, opacity: 0.2 }
+        ], { duration: travel, easing: 'linear', delay: i * gap }).then(() => {
+          ring.remove();
+          if (i % 5 === 0) {
+            Fx.flash(targetEl, '#DFF6FF', 0.6);
+            Fx.shake(targetEl, 5);
+          }
+        })
+      );
+    }
+    // The orb shrinks as it fires.
+    const orbDone = Fx.anim(orb, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.4)', opacity: 0 }], {
+      duration: count * gap,
+      easing: 'ease-in'
+    }).then(() => {
+      orb.remove();
+      rings.forEach((ring) => ring.remove());
+    });
+    rings.forEach((ring) => Fx.anim(ring, [{ opacity: 1 }, { opacity: 0 }], { duration: count * gap, easing: 'ease-in', fill: 'forwards' }));
+    await Promise.all([...flights, orbDone]);
+    Fx.flash(targetEl, '#ffffff', 0.7);
+    await Fx.wait(200);
+
+    await Fx.anim(bg, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    bg.remove();
+  }
 
   /** A glowing blue light orb with a white core (Sky Attack). */
   private static blueOrb(size: number): HTMLElement {

@@ -8,11 +8,76 @@ import { FxEffects } from '../fx-effects';
 export class FightingMoveAnimations {
   /** Hand-made Fighting move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    crosschop: (refs, _launch, target) => FightingMoveAnimations.playCrossChop(refs, target),
+    detect: (refs, launch) => FightingMoveAnimations.playDetect(refs, launch),
+    dynamicpunch: (refs, _launch, target) => FightingMoveAnimations.playDynamicPunch(refs, target),
     highjumpkick: (refs, _launch, target, v) => FightingMoveAnimations.playHighJumpKick(refs, target, v),
     jumpkick: (refs, launch, target) => FightingMoveAnimations.playJumpKick(refs, launch, target),
     lowkick: (refs, _launch, target) => FightingMoveAnimations.playLowKick(refs, target),
-    seismictoss: (refs, _launch, target) => FightingMoveAnimations.playSeismicToss(refs, target)
+    seismictoss: (refs, _launch, target) => FightingMoveAnimations.playSeismicToss(refs, target),
+    submission: (refs, _launch, target) => FightingMoveAnimations.playSubmission(refs, target)
   };
+
+  /**
+   * Submission: caster and target tumble together - both run two laps round
+   * a small counter-clockwise circle - while four quick yellow hits land on
+   * the target; then dust swirls up around it.
+   */
+  private static async playSubmission(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const roll = Promise.all([FxEffects.orbit(launchEl, 16, 2, 1200, 1), FxEffects.orbit(targetEl, 16, 2, 1200, 1)]);
+
+    // Hits at 0.25 / 0.5 / 0.75 / 1.0 s while they roll.
+    const hits: Promise<void>[] = [];
+    for (let i = 0; i < 4; i++) {
+      hits.push(
+        Fx.wait(250 + i * 250).then(() => {
+          const star = FxGlyphs.spikyBurst(Math.max(r.width * 0.3, 28), '#FFD83A', '#FFF3A0', '#ffffff');
+          Fx.place(star, {
+            x: target.x + (Math.random() * 2 - 1) * r.width * 0.25,
+            y: target.y - r.height * (0.05 + Math.random() * 0.25)
+          });
+          fxEl.appendChild(star);
+          Fx.flash(targetEl, '#FFE04A', 0.4);
+          return Fx.anim(star, [
+            { transform: 'scale(.3)', opacity: 1 },
+            { transform: 'scale(1.1)', opacity: 1, offset: 0.4 },
+            { transform: 'scale(.9)', opacity: 0 }
+          ], { duration: 260, easing: 'ease-out' }).then(() => star.remove());
+        })
+      );
+    }
+    await Promise.all([roll, ...hits]);
+
+    // Dust: grey-brown puffs swirl round the target's feet, swell and fade.
+    const f = fieldEl.getBoundingClientRect();
+    const foot = { x: target.x, y: r.bottom - f.top - r.height * 0.15 };
+    const rx = Math.max(r.width * 0.4, 30);
+    const puffs: Promise<void>[] = [];
+    for (let i = 0; i < 10; i++) {
+      const s = 18 + Math.random() * 16;
+      const puff = document.createElement('div');
+      puff.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#D8CBB0cc,#A8987Aaa 50%,#8A7A5C00 72%)`;
+      Fx.place(puff, foot);
+      fxEl.appendChild(puff);
+      const a0 = (i / 10) * Math.PI * 2;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 6; k++) {
+        const t = k / 6;
+        // Counter-clockwise on screen, rising a little as it spreads.
+        const a = a0 - t * Math.PI * 1.2;
+        const d = rx * (0.4 + t * 0.7);
+        frames.push({
+          transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d * 0.35 - t * r.height * 0.35}px) scale(${0.5 + t})`,
+          opacity: k === 0 ? 0 : k === 6 ? 0 : 0.9
+        });
+      }
+      puffs.push(Fx.anim(puff, frames, { duration: 700, easing: 'ease-out', delay: Math.random() * 120 }).then(() => puff.remove()));
+    }
+    Fx.shake(targetEl, 3);
+    await Promise.all(puffs);
+  }
 
   /**
    * High Jump Kick: the caster darts forward and back, then jagged comic-style
@@ -133,6 +198,218 @@ export class FightingMoveAnimations {
 
     await Fx.wait(travel * 0.45);
     await Promise.all([sweep, FightingMoveAnimations.sparkleHit(fxEl, targetEl, target)]);
+  }
+
+  /**
+   * Dynamic Punch: a red backdrop with yellow burst rays flares up round the
+   * target, a big yellow fist slams onto it in an orange blast and stones fly
+   * out in all directions; the backdrop clears and little yellow birds circle
+   * dizzily round the target's head (it's confused).
+   */
+  private static async playDynamicPunch(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const f = fieldEl.getBoundingClientRect();
+
+    // 1. Red burst backdrop (0-0.25 s), flickering behind the sprites.
+    const at = `${target.x}px ${target.y}px`;
+    const red = Fx.backdrop(fieldEl, `background:radial-gradient(circle at ${at},#FF4A1A,#D0140E 35%,#6A0404 85%)`);
+    const rays = document.createElement('div');
+    rays.style.cssText =
+      `position:absolute;inset:0;transform-origin:${at};` +
+      `background:radial-gradient(circle at ${at},#FFE07A 0 6%,#D0140E00 22%),` +
+      `repeating-conic-gradient(from 0deg at ${at},#FFC23A00 0 8deg,#FFB03Add 8deg 10deg,#FFE87A 10deg 11deg,#FFC23A00 11deg 20deg)`;
+    red.appendChild(rays);
+    rays.animate([
+      { transform: 'scale(1) rotate(0deg)', opacity: 0.85 },
+      { transform: 'scale(1.06) rotate(1.5deg)', opacity: 1 },
+      { transform: 'scale(1) rotate(0deg)', opacity: 0.85 }
+    ], { duration: 160, iterations: 8 });
+    await Fx.anim(red, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+
+    // 2. The fist slams in (0.25-0.42 s) over an orange blast; stones fly out.
+    const fistW = Math.max(r.width * 0.55, 44);
+    const fist = FxGlyphs.fistGlyph(fistW);
+    Fx.place(fist, target);
+    fxEl.appendChild(fist);
+    await Fx.anim(fist, [{ transform: 'scale(2.2)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], {
+      duration: 170,
+      easing: 'ease-in',
+      fill: 'forwards'
+    });
+    const blast = FxGlyphs.spikyBurst(fistW * 2, '#FF7A1A', '#FFC23A', '#FFF6C0');
+    Fx.place(blast, target);
+    fxEl.insertBefore(blast, fist);
+    const blastDone = Fx.anim(blast, [
+      { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+      { transform: 'scale(1.1) rotate(10deg)', opacity: 1, offset: 0.35 },
+      { transform: 'scale(1.2) rotate(18deg)', opacity: 0 }
+    ], { duration: 600, easing: 'ease-out' }).then(() => blast.remove());
+    Fx.flash(targetEl, '#FFC23A', 0.8);
+    Fx.shake(targetEl, 7);
+    Fx.shakeField(fieldEl, 1);
+    const stones: Promise<void>[] = [];
+    for (let i = 0; i < 16; i++) {
+      const stone = FxGlyphs.rockChunk(8 + Math.random() * 10);
+      Fx.place(stone, target);
+      fxEl.appendChild(stone);
+      const ang = (Math.PI * 2 * i) / 16 + Math.random() * 0.3;
+      const d = Math.max(f.width * 0.3, fistW * 2.5) * (0.6 + Math.random() * 0.5);
+      stones.push(
+        Fx.anim(stone, [
+          { transform: 'translate(0,0) scale(.5) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) scale(1.1) rotate(${(Math.random() * 2 - 1) * 300}deg)`, opacity: 0 }
+        ], { duration: 650 + Math.random() * 200, easing: 'ease-out' }).then(() => stone.remove())
+      );
+    }
+    const fistDone = Fx.anim(fist, [
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: 'scale(1.05)', opacity: 1, offset: 0.6 },
+      { transform: 'scale(.9)', opacity: 0 }
+    ], { duration: 600, easing: 'ease-in' }).then(() => fist.remove());
+    await Promise.all([blastDone, fistDone, ...stones]);
+
+    // 3. The backdrop clears (~1.27-1.57 s).
+    await Fx.anim(red, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    red.remove();
+
+    // 4. Confused: three little birds circle the target's head, stars twinkle (~1.57-2.97 s).
+    const head: Point = { x: target.x, y: r.top - f.top + r.height * 0.05 };
+    const rx = Math.max(r.width * 0.45, 32);
+    const ry = Math.max(r.height * 0.12, 10);
+    const circle = 1400;
+    const birds = [0, 1, 2].map((i) => {
+      const bird = FxGlyphs.birdGlyph(20);
+      Fx.place(bird, head);
+      fxEl.appendChild(bird);
+      const frames: Keyframe[] = [];
+      const steps = 24;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const a = (Math.PI * 2 * i) / 3 + t * Math.PI * 3;
+        // Facing the way it flies: left along the front (lower) half of the loop, right along the back.
+        const face = Math.sin(a) >= 0 ? -1 : 1;
+        frames.push({
+          transform: `translate(${Math.cos(a) * rx}px,${Math.sin(a) * ry}px) scaleX(${face}) scale(${0.85 + 0.15 * Math.sin(a)})`,
+          opacity: k === 0 || k === steps ? 0 : 1
+        });
+      }
+      return Fx.anim(bird, frames, { duration: circle, easing: 'linear' }).then(() => bird.remove());
+    });
+    for (let i = 0; i < 4; i++) {
+      const star = FxGlyphs.sparkStar(9, '#FFE04A');
+      Fx.place(star, { x: head.x + (i - 1.5) * rx * 0.6, y: head.y - ry - 10 - (i % 2) * 6 });
+      fxEl.appendChild(star);
+      Fx.anim(star, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.3 },
+        { transform: 'scale(.4) rotate(90deg)', opacity: 0.6, offset: 0.6 },
+        { transform: 'scale(1) rotate(135deg)', opacity: 1, offset: 0.8 },
+        { transform: 'scale(0) rotate(180deg)', opacity: 0 }
+      ], { duration: circle - 200, easing: 'ease-in-out', delay: 100 + i * 60 }).then(() => star.remove());
+    }
+    await Promise.all(birds);
+  }
+
+  /**
+   * Detect: the scene goes dark, a single cyan sparkle in a glowing ring
+   * flashes up at the caster's head - its eye catching the attack coming -
+   * and the caster glows white for a moment.
+   */
+  private static async playDetect(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = launchEl.getBoundingClientRect();
+    const head: Point = { x: launch.x + r.width * 0.08, y: r.top - fieldEl.getBoundingClientRect().top + r.height * 0.25 };
+
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // The sparkle flares up (0.3-0.9 s) while the caster glows white (~0.45-0.85 s).
+    const sparkle = FxGlyphs.ringSparkle(Math.max(r.width * 0.45, 40), '#3FD8F0', '#C8F6FF');
+    Fx.place(sparkle, head);
+    fxEl.appendChild(sparkle);
+    const flare = Fx.anim(sparkle, [
+      { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+      { transform: 'scale(1.3) rotate(30deg)', opacity: 1, offset: 0.3 },
+      { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(.4) rotate(70deg)', opacity: 0 }
+    ], { duration: 800, easing: 'ease-out' }).then(() => sparkle.remove());
+    await Fx.wait(150);
+    await Fx.anim(launchEl, [
+      { filter: 'brightness(1)' },
+      { filter: 'brightness(2.4) saturate(0) drop-shadow(0 0 8px #ffffff)', offset: 0.35 },
+      { filter: 'brightness(1)' }
+    ], { duration: 400, easing: 'ease-out', fill: 'none' });
+    await flare;
+
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    dim.remove();
+  }
+
+  /**
+   * Cross Chop: two black, white-outlined hands appear raised on either side
+   * of the target, then chop down across it in an X; where they cross, yellow
+   * impact bursts flare and the target shakes.
+   */
+  private static async playCrossChop(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = targetEl.getBoundingClientRect();
+    const hw = Math.max(r.width * 0.38, 34);
+    const sx = Math.max(r.width * 0.45, 36);
+    const sy = Math.max(r.height * 0.35, 28);
+
+    // 1. The hands appear raised, upper left and upper right (0-0.4 s).
+    const hands = [-1, 1].map((side) => {
+      const hand = FxGlyphs.gloveGlyph(hw, '#141414', '#ffffff');
+      Fx.place(hand, target);
+      fxEl.appendChild(hand);
+      return { hand, side };
+    });
+    const pose = (side: number, x: number, y: number) => `translate(${side * x}px,${y}px) rotate(${side * 20}deg)`;
+    await Promise.all(
+      hands.map(({ hand, side }) =>
+        Fx.anim(hand, [
+          { transform: pose(side, sx, -sy + 10), opacity: 0 },
+          { transform: pose(side, sx, -sy), opacity: 1 }
+        ], { duration: 250, easing: 'ease-out', fill: 'forwards' })
+      )
+    );
+    await Fx.wait(150);
+
+    // 2. The chop (0.4-0.6 s): each hand sweeps down to the opposite side; they cross at ~0.5 s.
+    const chop = Promise.all(
+      hands.map(({ hand, side }) =>
+        Fx.anim(hand, [
+          { transform: pose(side, sx, -sy) },
+          { transform: pose(side, -sx * 0.9, sy * 0.9) }
+        ], { duration: 200, easing: 'ease-in', fill: 'forwards' })
+      )
+    );
+    await Fx.wait(100);
+    const bursts: Promise<void>[] = [];
+    for (const [i, scale] of [[0, 1], [1, 0.7]] as const) {
+      bursts.push(
+        Fx.wait(i * 80).then(() => {
+          const burst = FxGlyphs.spikyBurst(Math.max(r.width * 0.55, 46) * scale, '#E8D020', '#FFF27A');
+          Fx.place(burst, { x: target.x + (i ? sx * 0.3 : 0), y: target.y + (i ? sy * 0.3 : 0) });
+          fxEl.appendChild(burst);
+          Fx.flash(targetEl, '#FFE04A', 0.6);
+          Fx.shake(targetEl, 6);
+          return Fx.anim(burst, [
+            { transform: 'scale(.3)', opacity: 1 },
+            { transform: 'scale(1.1)', opacity: 1, offset: 0.35 },
+            { transform: 'scale(1.15)', opacity: 0 }
+          ], { duration: 380, easing: 'ease-out' }).then(() => burst.remove());
+        })
+      );
+    }
+    await chop;
+
+    // 3. The hands fade (0.6-0.85 s).
+    await Promise.all([
+      ...bursts,
+      ...hands.map(({ hand }) => Fx.anim(hand, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' }).then(() => hand.remove()))
+    ]);
   }
 
   /**

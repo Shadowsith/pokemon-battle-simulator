@@ -23,26 +23,40 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura: the baton is twirled and handed over. */
+  /**
+   * NormalStatusMoveAnimations.playBatonPass: the baton is tossed up (0-0.43 s), falls back
+   * (to 0.85 s) into the glove that rises at 0.45-0.7 s, caught at 0.85 s, fades by ~1.5 s.
+   * (The recall and send-in that follow have their own ball sounds.) A twirling toss, a catch.
+   */
   batonpass: () => {
-    const s = new MoveSfx(1.1, 0xba70);
-    s.pulse(0.02, 0.5, { freq: env.ramp(500, 900), gain: (u) => 0.18 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 10 * u)), duty: 0.25 });
-    s.whoosh(0.05, 0.45, { from: 2000, to: 6000, gain: 0.2 });
-    s.arpeggio(0.55, [79, 84], 0.1, { gain: 0.25, voice: 'wave', hold: 0.2 });
-    s.pulse(0.8, 0.25, { freq: (u) => 1200 * Math.pow(0.3, u), gain: env.decay(0.14, 1), duty: 0.5 });
+    const s = new MoveSfx(1.2, 0xba70);
+    s.pulse(0.02, 0.8, { freq: (u) => 700 + 400 * Math.sin(Math.PI * u), gain: (u) => 0.16 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 10 * u)), duty: 0.25 });
+    s.whoosh(0.02, 0.4, { from: 2000, to: 6000, gain: 0.2 });
+    s.whoosh(0.45, 0.4, { from: 6000, to: 2000, gain: 0.15 });
+    s.thud(0.85, 0.4, 0.3);
+    s.arpeggio(0.87, [79, 84], 0.1, { gain: 0.25, voice: 'wave', hold: 0.2 });
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: drumming on the belly, faster and faster. */
+
+  /**
+   * NormalStatusMoveAnimations.playBellyDrum: six belly beats speeding up (0, 0.17, 0.31,
+   * 0.43, 0.53, 0.63 s), each with a rising note bubble; hands fade, orange stat sparkles
+   * from ~0.95 s (to ~2.15 s). Drumming on the belly, faster and faster, then the stat-up jingle.
+   */
   bellydrum: () => {
-    const s = new MoveSfx(1.5, 0xbe11);
-    for (const [at, g] of [[0.03, 0.45], [0.2, 0.45], [0.34, 0.5], [0.46, 0.5], [0.56, 0.55], [0.66, 0.7]]) {
+    const s = new MoveSfx(2.2, 0xbe11);
+    const notes = [72, 76, 79, 76, 79, 84];
+    [0, 0.17, 0.31, 0.43, 0.53, 0.63].forEach((at, i) => {
+      const g = 0.45 + i * 0.05;
       s.pulse(at, 0.1, { freq: (u) => 140 * Math.pow(0.55, u), gain: env.decay(g, 2), duty: 0.5 });
       s.noise(at, 0.03, { clock: () => 3000, gain: env.decay(g * 0.4, 1) });
-    }
-    s.statUp(0.85);
+      s.arpeggio(at + 0.05, [notes[i]], 0.1, { gain: 0.1, voice: 'wave', hold: 0.12 });
+    });
+    s.statUp(0.95);
     return s;
   },
+
 
   /** Generic self aura: the body fades into its surroundings. */
   camouflage: () => {
@@ -394,13 +408,18 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): a puff of smoke, then the decoy doll pops into place. */
+  /**
+   * MoveAnimationService.playSubstitute (played by the move resolver, not the move
+   * registry): smoke puffs (0-0.58 s) while the Pokémon fades (0-0.3 s), the doll
+   * swaps in and drops (0.4 s), lands at 0.62 s and settles by 0.74 s.
+   * A puff of smoke, then the decoy doll pops into place.
+   */
   substitute: () => {
     const s = new MoveSfx(1.0, 0x5ab5);
-    s.noise(0.02, 0.35, { clock: env.ramp(3000, 900), gain: env.attackDecay(0.32, 0.1) });
+    s.noise(0.02, 0.4, { clock: env.ramp(3000, 900), gain: env.attackDecay(0.32, 0.1) });
     s.pulse(0.3, 0.12, { freq: env.ramp(200, 500), gain: env.decay(0.4, 1), duty: 0.5 });
-    s.arpeggio(0.45, [67, 72, 79], 0.08, { gain: 0.24, voice: 'wave', hold: 0.15 });
-    s.pulse(0.7, 0.18, { freq: () => 260, gain: env.decay(0.25, 2), duty: 0.25 });
+    s.arpeggio(0.42, [67, 72, 79], 0.08, { gain: 0.24, voice: 'wave', hold: 0.15 });
+    s.pulse(0.62, 0.18, { freq: () => 260, gain: env.decay(0.25, 2), duty: 0.25 });
     return s;
   },
 
@@ -413,17 +432,24 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck (~0.85 s): blades whirl in a dance, ringing as they cross. */
+  /**
+   * NormalStatusMoveAnimations.playSwordsDance: six swords pop in (0-0.25 s), circle the
+   * caster once (0.25-1.45 s), fade (1.45-1.7 s), then orange stat sparkles (1.7-2.9 s).
+   * Blades whirl in a dance, ringing as they pass, then the stat-up jingle.
+   */
   swordsdance: () => {
-    const s = new MoveSfx(1.5, 0x5d0d);
-    for (let i = 0; i < 4; i++) {
-      const at = 0.02 + i * 0.18;
-      s.whoosh(at, 0.14, { from: 3000, to: 9000, gain: 0.2 });
-      s.pulse(at + 0.12, 0.2, { freq: () => (i % 2 ? 2093 : 1760), gain: env.decay(0.16, 1.5), duty: 0.125 });
+    const s = new MoveSfx(2.9, 0x5d0d);
+    s.pulse(0.02, 0.2, { freq: (u) => 1200 + 1200 * u, gain: env.decay(0.14, 1.5), duty: 0.125 });
+    for (let i = 0; i < 6; i++) {
+      const at = 0.25 + i * 0.2;
+      s.whoosh(at, 0.16, { from: 3000, to: 9000, gain: 0.18 });
+      s.pulse(at + 0.12, 0.2, { freq: () => (i % 2 ? 2093 : 1760), gain: env.decay(0.15, 1.5), duty: 0.125 });
     }
-    s.statUp(0.85);
+    s.sparkle(0.3, 1.1, 10, { lo: 3500, hi: 6500, gain: 0.1 });
+    s.statUp(1.7);
     return s;
   },
+
 
   /** Generic self aura (~0.8 s, no fleck): a wish rises to the stars - a soft twinkling run with a glimmer. */
   wish: () => {

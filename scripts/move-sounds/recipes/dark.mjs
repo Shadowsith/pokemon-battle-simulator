@@ -32,15 +32,22 @@ export const DARK = {
     return s;
   },
 
-  /** Generic melee bite + Defense drop fleck: sharp fangs crunch down. */
+  /**
+   * DarkMoveAnimations.playCrunch: black (0-0.25 s), purple swirl (0.25-0.55 s), the jaw
+   * opens and snaps shut at ~1.0 s, grinds at ~1.25 / ~1.5 s, lets go by ~1.95 s, the
+   * backdrop clears by ~2.3 s. A low growl, then sharp fangs crunching down three times.
+   */
   crunch: () => {
-    const s = new MoveSfx(0.95, 0xc2a7);
-    s.pulse(0.0, 0.17, { freq: env.ramp(120, 220), gain: env.ramp(0.05, 0.2), duty: 0.125 });
-    for (const [at, g] of [[0.17, 0.55], [0.23, 0.4], [0.29, 0.3]]) s.noise(at, 0.05, { clock: () => 9000, gain: env.decay(g, 1) });
-    s.thud(0.17, 0.5, 0.4);
-    s.statDown(0.5);
+    const s = new MoveSfx(2.3, 0xc2a7);
+    s.noise(0.25, 0.75, { clock: () => 700, gain: env.swell(0.12) });
+    s.pulse(0.55, 0.45, { freq: env.ramp(110, 200), gain: env.ramp(0.05, 0.2), duty: 0.125 });
+    [[1.0, 0.6], [1.25, 0.45], [1.5, 0.45]].forEach(([at, g]) => {
+      s.noise(at, 0.06, { clock: () => 9000, gain: env.decay(g, 1) });
+      s.thud(at, g * 0.9, 0.45);
+    });
     return s;
   },
+
 
   /**
    * DarkMoveAnimations.playDarkPulse: the scene greys out (0.28 s), five dark

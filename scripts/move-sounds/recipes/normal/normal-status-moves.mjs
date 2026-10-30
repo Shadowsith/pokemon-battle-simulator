@@ -79,14 +79,22 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura: a cheerful clapping cheer that demands an encore. */
+  /**
+   * NormalStatusMoveAnimations.playEncore: dark stage (0-0.3 s), spotlight on at ~0.3 s (to
+   * ~1.8 s), confetti flutters (0.4-1.8 s), lights up again by ~2.1 s. A spotlight clunk,
+   * then a cheerful clapping cheer that demands an encore.
+   */
   encore: () => {
-    const s = new MoveSfx(1.2, 0xe2c0);
-    for (let i = 0; i < 6; i++) s.noise(0.05 + i * 0.12, 0.05, { clock: () => 9000, gain: env.decay(0.35, 1.5) });
-    s.arpeggio(0.1, [72, 76, 79, 76, 79, 84], 0.12, { gain: 0.2, duty: 0.25, hold: 0.1 });
-    s.wave(0.82, 0.3, { freq: () => 1046.5, gain: env.decay(0.18, 1.5) });
+    const s = new MoveSfx(2.1, 0xe2c0);
+    s.thud(0.3, 0.3, 0.2);
+    s.pulse(0.3, 0.06, { freq: () => 1800, gain: env.decay(0.15, 1), duty: 0.25 });
+    for (let i = 0; i < 10; i++) s.noise(0.45 + i * 0.12, 0.05, { clock: () => 9000, gain: env.decay(0.3, 1.5) });
+    s.arpeggio(0.45, [72, 76, 79, 76, 79, 84], 0.12, { gain: 0.2, duty: 0.25, hold: 0.1 });
+    s.sparkle(0.5, 1.2, 10, { lo: 3000, hi: 6000, gain: 0.08 });
+    s.wave(1.2, 0.5, { freq: () => 1046.5, gain: env.decay(0.18, 1.5) });
     return s;
   },
+
 
   /** Generic target aura: a bouncy dance rhythm the target falls in step with. */
   entrainment: () => {
@@ -443,13 +451,19 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a howling gust swells and blows the target away. */
+  /**
+   * NormalStatusMoveAnimations.playWhirlwind: flakes and wind streaks sweep past the target
+   * (0-1.0 s); when the move works, the resolver then blows the target away (~1.2-1.7 s).
+   * A howling gust swells and sweeps the target off.
+   */
   whirlwind: () => {
-    const s = new MoveSfx(1.15, 0x3e1d);
-    s.noise(0.0, 0.95, { clock: (u) => 2000 + 4000 * u + 1200 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.38 * Math.min(1, u * 3) * Math.pow(1 - u, 0.7) });
-    s.wave(0.05, 0.85, { freq: (u) => 600 + 500 * u + 120 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.1 * Math.sin(Math.PI * u) });
+    const s = new MoveSfx(1.75, 0x3e1d);
+    s.noise(0.0, 1.05, { clock: (u) => 2000 + 4000 * u + 1200 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.38 * Math.min(1, u * 3) * Math.pow(1 - u, 0.5) });
+    s.wave(0.05, 0.95, { freq: (u) => 600 + 500 * u + 120 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.1 * Math.sin(Math.PI * u) });
+    s.whoosh(1.2, 0.5, { from: 2500, to: 9000, gain: 0.3 });
     return s;
   },
+
 
   /** Generic target aura (~0.8 s, no fleck – sleep comes next turn): a big lazy yawn, a slow falling sigh. */
   yawn: () => {

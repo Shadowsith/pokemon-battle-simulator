@@ -25,16 +25,23 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): a roaring blast of air. */
+  /**
+   * FlyingMoveAnimations.playAeroblast: cyan vortex fades in (0-0.3 s), air gathers into
+   * the orb (0.3-1.2 s), the ring beam fires (1.2-~2.07 s, first ring hits ~1.5 s), flash
+   * at ~2.07 s, vortex fades by ~2.6 s. A swirling intake, then a roaring blast of air.
+   */
   aeroblast: () => {
-    const s = new MoveSfx(1.25, 0xae2b);
-    s.whoosh(0.0, 0.48, { from: 800, to: 9000, gain: 0.5 });
-    s.pulse(0.0, 0.45, { freq: env.ramp(80, 130), gain: env.ramp(0.05, 0.25), duty: 0.25 });
-    s.noise(0.43, 0.3, { clock: (u) => 14000 - 9000 * u, gain: env.attackDecay(0.6, 0.03) });
-    s.thud(0.43, 0.6, 0.8);
-    s.noise(0.5, 0.7, { clock: env.ramp(6000, 1500), gain: env.decay(0.25, 1.5) });
+    const s = new MoveSfx(2.6, 0xae2b);
+    s.noise(0.0, 1.2, { clock: (u) => 1500 + 3500 * u + 800 * Math.sin(2 * Math.PI * 5 * u), gain: (u) => 0.28 * Math.min(1, u * 2) });
+    s.wave(0.3, 0.9, { freq: env.ramp(300, 900), gain: env.swell(0.12) });
+    s.whoosh(1.2, 0.4, { from: 1500, to: 11000, gain: 0.5 });
+    s.noise(1.2, 0.9, { clock: (u) => 9000 + 2000 * Math.sin(2 * Math.PI * 8 * u), gain: (u) => 0.3 * Math.min(1, u * 6) * Math.pow(1 - u, 0.4) });
+    s.thud(1.5, 0.6, 0.7);
+    s.noise(2.07, 0.4, { clock: env.ramp(9000, 1500), gain: env.attackDecay(0.4, 0.03) });
+    s.thud(2.07, 0.5, 0.6);
     return s;
   },
+
 
   /** Generic field move (0.62 s waves) hitting both foes: two crossing gusts. */
   aircutter: () => {

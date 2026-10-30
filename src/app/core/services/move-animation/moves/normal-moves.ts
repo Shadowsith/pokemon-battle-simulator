@@ -1,4 +1,5 @@
 import { MoveAnimRegistry } from '../animation.types';
+import { NormalBlowMoveAnimations } from './normal/normal-blow-moves';
 import { NormalRangedMoveAnimations } from './normal/normal-ranged-moves';
 import { NormalStatusMoveAnimations } from './normal/normal-status-moves';
 import { NormalStrikeMoveAnimations } from './normal/normal-strike-moves';
@@ -11,6 +12,7 @@ export class NormalMoveAnimations {
   /** Hand-made Normal move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     ...NormalStrikeMoveAnimations.anims,
+    ...NormalBlowMoveAnimations.anims,
     ...NormalRangedMoveAnimations.anims,
     ...NormalStatusMoveAnimations.anims
   };

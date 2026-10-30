@@ -94,11 +94,32 @@ export class BattleStateService {
   /** Two-turn / recharge locks, keyed by slot ("p0", "o1" …). */
   readonly charge = signal<Record<string, ChargeState | null>>({});
 
+  /** HP left on each slot's Substitute doll, keyed by slot ("p0", "o1" …); missing = none. */
+  readonly substitutes = signal<Record<string, number>>({});
+
   /** Successful protection moves in a row, keyed "<side>:<party index>". */
   protectStreak: Record<string, number> = {};
 
   /** Choice Band / Specs / Scarf: the move each holder is locked into, keyed "<side>:<party index>". */
   readonly choiceLocks = signal<Record<string, string>>({});
+
+  /** The move each active Pokémon used last (Encore repeats it), keyed by slot "p0", "o1" … */
+  lastMoves: Record<string, string> = {};
+  /** Encored slots: the move they're locked into and the turns left, keyed by slot. */
+  encores: Record<string, { move: string; turns: number }> = {};
+
+  /** Slots whose Pokémon is under Destiny Bond until its next move, keyed "p0", "o1" … */
+  destinyBonds = new Set<string>();
+
+  /** Slots whose Pokémon is cursed by a Ghost's Curse (loses ¼ max HP each turn), keyed "p0", "o1" … */
+  cursed = new Set<string>();
+
+  /** Slots whose Pokémon was just blown / dragged out (Whirlwind …); the flow sends a random reserve in. */
+  dragOuts: Slot[] = [];
+  /** Slots whose Pokémon just used Baton Pass; the flow switches it for a chosen reserve. */
+  batonPasses: Slot[] = [];
+  /** Set while the player picks who takes the baton; the party menu hands the pick to it. */
+  passPicker: ((partyIdx: number) => void) | null = null;
 
   /** Which slot's active sprite has already played its faint animation. */
   faintDone: Record<string, boolean> = {};
@@ -140,10 +161,14 @@ export class BattleStateService {
   }
 
   /**
-   * Why a held item forbids `move` right now: a Choice item locked into another
-   * move, or an Assault Vest blocking status moves. null when it's allowed.
+   * Why `move` is forbidden right now: an Encore locking the Pokémon into
+   * another move, a Choice item locked into another move, or an Assault Vest
+   * blocking status moves. null when it's allowed.
    */
-  itemLockReason(side: Side, partyIdx: number, mon: BattlePokemon, move: Move): string | null {
+  moveLockReason(side: Side, partyIdx: number, mon: BattlePokemon, move: Move): string | null {
+    const pos = this.activeOf(side).indexOf(partyIdx);
+    const encore = pos >= 0 ? this.encores[slotKey({ side, pos: pos as SlotPos })] : undefined;
+    if (encore && encore.move !== move.showdownId) return 'Zugabe';
     const lock = this.choiceLocks()[`${side}:${partyIdx}`];
     if (lock && lock !== move.showdownId && isChoiceItem(mon)) return 'Wahl-Item';
     if (blocksStatusMoves(mon) && this.damageCalc.isStatusMove(move)) return 'Offensivweste';
@@ -218,6 +243,17 @@ export class BattleStateService {
 
   setCharge(slot: Slot, state: ChargeState | null): void {
     this.charge.update((c) => ({ ...c, [slotKey(slot)]: state }));
+  }
+
+  /** HP left on the Substitute in `slot` (0 = none). */
+  substituteOf(slot: Slot): number {
+    return this.substitutes()[slotKey(slot)] ?? 0;
+  }
+
+  /** Put up, wear down (hp > 0) or remove (hp 0) the Substitute in `slot`. */
+  setSubstitute(slot: Slot, hp: number): void {
+    const key = slotKey(slot);
+    this.substitutes.update(({ [key]: _old, ...rest }) => (hp > 0 ? { ...rest, [key]: hp } : rest));
   }
 
   /** Key for per-Pokémon counters ("<side>:<party index>"). */

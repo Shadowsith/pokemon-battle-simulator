@@ -164,15 +164,25 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee, priority (impact 0.12 s): a blinding dash that cuts the air. */
+  /**
+   * NormalBlowMoveAnimations.playExtremeSpeed: dark (0-0.25 s), speed rush from 0.25 s, the
+   * caster shoots up in dust (0.45-0.75 s), strikes at ~0.85 / ~1.1 s, drops back in
+   * (~1.45-1.7 s), the scene clears by ~2.05 s. A rushing wind, a vanishing zip, two blinding hits.
+   */
   extremespeed: () => {
-    const s = new MoveSfx(0.7, 0xe75d);
-    s.whoosh(0.0, 0.13, { from: 4000, to: 16000, gain: 0.4 });
-    s.pulse(0.0, 0.12, { freq: env.ramp(800, 2400), gain: env.ramp(0.05, 0.18), duty: 0.125 });
-    s.thud(0.12, 0.6, 0.5);
-    s.whoosh(0.14, 0.3, { from: 10000, to: 2000, gain: 0.18 });
+    const s = new MoveSfx(2.1, 0xe75d);
+    s.noise(0.25, 1.5, { clock: (u) => 6000 + 2000 * Math.sin(2 * Math.PI * 6 * u), gain: (u) => 0.16 * Math.min(1, u * 8) * Math.min(1, (1 - u) * 5) });
+    s.whoosh(0.45, 0.3, { from: 3000, to: 14000, gain: 0.35 });
+    s.noise(0.45, 0.2, { clock: () => 1500, gain: env.decay(0.18, 1) });
+    for (const at of [0.85, 1.1]) {
+      s.whoosh(at - 0.06, 0.08, { from: 6000, to: 16000, gain: 0.3 });
+      s.thud(at, 0.6, 0.5);
+      s.noise(at, 0.06, { clock: () => 12000, gain: env.decay(0.3, 1) });
+    }
+    s.whoosh(1.45, 0.25, { from: 9000, to: 2500, gain: 0.2 });
     return s;
   },
+
 
   /** Generic melee (impact 0.17 s): a gutsy, angry body slam. */
   facade: () => {
@@ -556,14 +566,20 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee: big fangs snap shut with a sharp double crunch. */
+  /**
+   * NormalStrikeMoveAnimations.playSuperFang: small incisors drop (0-0.13 s) and clamp,
+   * the red-pink starburst flares at 0.3 s and sparks fly out until ~0.9 s.
+   * A quick, sharp nibble, then a stinging crunch.
+   */
   superfang: () => {
-    const s = new MoveSfx(0.65, 0x5f46);
-    s.whoosh(0.0, 0.18, { from: 2000, to: 6000, gain: 0.25 });
-    s.noise(0.17, 0.05, { clock: () => 14000, gain: env.decay(0.35, 1) });
-    s.thud(0.17, 0.6, 0.3);
-    s.noise(0.25, 0.06, { clock: () => 9000, gain: env.decay(0.3, 1) });
-    s.pulse(0.25, 0.1, { freq: env.ramp(900, 500), gain: env.decay(0.2, 1), duty: 0.125 });
+    const s = new MoveSfx(1.0, 0x5f46);
+    s.whoosh(0.0, 0.13, { from: 2500, to: 8000, gain: 0.22 });
+    s.noise(0.13, 0.05, { clock: () => 14000, gain: env.decay(0.35, 1) });
+    s.pulse(0.13, 0.06, { freq: () => 1600, gain: env.decay(0.18, 1), duty: 0.25 });
+    s.thud(0.3, 0.7, 0.4);
+    s.noise(0.3, 0.12, { clock: () => 9000, gain: env.attackDecay(0.4, 0.05), short: true });
+    s.pulse(0.3, 0.12, { freq: env.ramp(900, 500), gain: env.decay(0.2, 1), duty: 0.125 });
+    s.sparkle(0.35, 0.55, 8, { lo: 3000, hi: 6000, gain: 0.14 });
     return s;
   },
 
@@ -589,15 +605,22 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee at high power (impact 0.17 s) + recoil (~0.29 s): a reckless full-body charge, then the user's own jolt. */
+  /**
+   * NormalStrikeMoveAnimations.playTakeDown: the caster darts in (contact 0.12 s) - flash,
+   * golden dust and sparkles to ~1.0 s - and jolts from the recoil at ~0.5 s.
+   * A reckless full-body charge, a dusty crash, then the user's own jolt.
+   */
   takedown: () => {
-    const s = new MoveSfx(0.85, 0x7a4d);
-    s.whoosh(0.0, 0.18, { from: 800, to: 3000, gain: 0.4 });
-    s.thud(0.17, 0.85, 0.9);
-    s.rumble(0.19, 0.3, { from: 400, to: 150, gain: 0.25 });
-    s.thud(0.29, 0.35, 0.4);
+    const s = new MoveSfx(1.1, 0x7a4d);
+    s.whoosh(0.0, 0.12, { from: 800, to: 3000, gain: 0.4 });
+    s.thud(0.12, 0.85, 0.9);
+    s.noise(0.12, 0.6, { clock: env.ramp(1800, 500), gain: env.attackDecay(0.25, 0.08) });
+    s.rumble(0.14, 0.35, { from: 400, to: 150, gain: 0.25 });
+    s.sparkle(0.2, 0.75, 8, { lo: 2500, hi: 5000, gain: 0.12 });
+    s.thud(0.5, 0.35, 0.4);
     return s;
   },
+
 
   /** Generic melee (impact 0.17 s): a sneaky swipe - quick slap, then a little "snatched it" pickup jingle. */
   thief: () => {
@@ -610,18 +633,21 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee at max power (impact 0.17 s): a wild rampage - heavy blow followed by a flurry of flailing hits. */
+  /**
+   * NormalBlowMoveAnimations.playThrash: six fists / feet slam onto the target 0.15 s apart
+   * (0-0.75 s), the last fades by ~1.1 s. A wild rampage of flailing hits.
+   */
   thrash: () => {
-    const s = new MoveSfx(1.05, 0x7a5f);
-    s.whoosh(0.0, 0.18, { from: 1000, to: 4000, gain: 0.4 });
-    s.thud(0.17, 0.85, 1);
-    for (const [at, g] of [[0.36, 0.45], [0.5, 0.38], [0.63, 0.3]]) {
-      s.thud(at, g, 0.4);
-      s.noise(at, 0.04, { clock: () => 12000, gain: env.decay(g * 0.6, 1) });
+    const s = new MoveSfx(1.15, 0x7a5f);
+    for (let i = 0; i < 6; i++) {
+      const at = i * 0.15;
+      s.thud(at, i === 0 || i === 5 ? 0.85 : 0.55, i % 2 ? 0.5 : 0.8);
+      s.noise(at, 0.05, { clock: () => 9000 + s.random() * 4000, gain: env.decay(0.28, 1) });
     }
-    s.rumble(0.2, 0.7, { from: 450, to: 150, gain: 0.2 });
+    s.rumble(0.05, 0.9, { from: 450, to: 150, gain: 0.2 });
     return s;
   },
+
 
   /** Generic melee (impact 0.17 s): pincers swing in and clamp shut with a hard metallic snap. */
   visegrip: () => {

@@ -216,6 +216,70 @@ export class FxEffects {
     return Promise.all(zs).then(() => void 0);
   }
 
+  /**
+   * The sprite runs `laps` times round a small circle that starts and ends at
+   * its spot. Only its position moves, so it keeps facing its opponent.
+   * `spin` 1 runs counter-clockwise on screen, -1 clockwise (Agility, Submission).
+   */
+  static async orbit(el: HTMLElement, radius: number, laps: number, duration: number, spin: 1 | -1) {
+    const original = el.style.transform;
+    const steps = 12 * laps;
+    const path: Keyframe[] = [];
+    for (let k = 0; k <= steps; k++) {
+      const a = (k / steps) * Math.PI * 2 * laps;
+      path.push({ transform: `${original} translate(${radius * Math.sin(a) * spin}px,${-radius * (1 - Math.cos(a))}px)` });
+    }
+    await Fx.anim(el, path, { duration, easing: 'ease-in-out' });
+    el.getAnimations?.().forEach((a) => a.cancel());
+    el.style.transform = original;
+  }
+
+  /**
+   * Endless speed lines rushing across `layer` (`W` x `H` px) in direction
+   * `flow` (1 = to the right), in the given colours (Agility, Extreme Speed).
+   * They stop when the layer is removed.
+   */
+  static speedLines(layer: HTMLElement, W: number, H: number, flow: 1 | -1, colors: [string, string]): void {
+    for (let i = 0; i < 34; i++) {
+      const line = document.createElement('div');
+      const len = W * (0.2 + Math.random() * 0.45);
+      const thick = 1 + Math.random() * 4;
+      const color = Math.random() < 0.6 ? colors[0] : colors[1];
+      line.style.cssText = `position:absolute;left:0;top:${Math.random() * H}px;width:${len}px;height:${thick}px;border-radius:${thick}px;background:linear-gradient(90deg,transparent,${color},transparent);opacity:${0.5 + Math.random() * 0.5}`;
+      layer.appendChild(line);
+      line.animate(
+        [
+          { transform: `translateX(${flow > 0 ? -len : W}px)` },
+          { transform: `translateX(${flow > 0 ? W : -len}px)` }
+        ],
+        { duration: 220 + Math.random() * 300, delay: -Math.random() * 500, iterations: Infinity, easing: 'linear' }
+      );
+    }
+  }
+
+  /** A burst of smoke puffs swelling out from `at` and fading: white by default (Substitute), grey dust (Extreme Speed). */
+  static smokePuff(fxEl: HTMLElement, at: Point, size: number, tone: [string, string] = ['#ECEEF2', '#D4D8E0']): Promise<void> {
+    const puffs: Promise<void>[] = [];
+    for (let i = 0; i < 9; i++) {
+      const s = size * (0.35 + Math.random() * 0.3);
+      const puff = document.createElement('div');
+      puff.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 40% 35%,#fff,${tone[0]} 55%,${tone[1]}00 75%)`;
+      Fx.place(puff, at);
+      fxEl.appendChild(puff);
+      const ang = (Math.PI * 2 * i) / 9 + Math.random() * 0.5;
+      const d = size * (0.25 + Math.random() * 0.2);
+      const end = `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d * 0.8}px)`;
+      puffs.push(
+        Fx.anim(puff, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `${end} scale(1)`, opacity: 1, offset: 0.35 },
+          { transform: `${end} translateY(-8px) scale(1.3)`, opacity: 0 }
+        ], { duration: 520, easing: 'ease-out', delay: Math.random() * 60 }).then(() => puff.remove())
+      );
+    }
+    return Promise.all(puffs).then(() => void 0);
+  }
+
   /** HP gain: twinkling green stars and a soft green glow around the caster (drain moves). */
   static async healSparkles(refs: BattleStageRefs, launch: Point) {
     const { fxEl, launchEl } = refs;

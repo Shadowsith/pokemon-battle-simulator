@@ -138,26 +138,11 @@ export class PsychicMoveAnimations {
     const H = fieldEl.clientHeight;
     const total = 1400;
     // Agility targets the caster itself, so derive facing from its side of the field.
-    const facing = launch.x < W / 2 ? 1 : -1;
+    const facing: 1 | -1 = launch.x < W / 2 ? 1 : -1;
 
     const bg = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#0B3E9E,#1E8BE8 30%,#57C8FF 50%,#1E8BE8 70%,#0B3E9E)');
     // Lines rush past opposite to the way the caster faces, as if it is dashing forward.
-    const flow = -facing;
-    for (let i = 0; i < 34; i++) {
-      const line = document.createElement('div');
-      const len = W * (0.2 + Math.random() * 0.45);
-      const thick = 1 + Math.random() * 4;
-      const color = Math.random() < 0.6 ? '#FFFFFF' : '#9BE7FF';
-      line.style.cssText = `position:absolute;left:0;top:${Math.random() * H}px;width:${len}px;height:${thick}px;border-radius:${thick}px;background:linear-gradient(90deg,transparent,${color},transparent);opacity:${0.5 + Math.random() * 0.5}`;
-      bg.appendChild(line);
-      line.animate(
-        [
-          { transform: `translateX(${flow > 0 ? -len : W}px)` },
-          { transform: `translateX(${flow > 0 ? W : -len}px)` }
-        ],
-        { duration: 220 + Math.random() * 300, delay: -Math.random() * 500, iterations: Infinity, easing: 'linear' }
-      );
-    }
+    FxEffects.speedLines(bg, W, H, facing > 0 ? -1 : 1, ['#FFFFFF', '#9BE7FF']);
     const bgDone = Fx.anim(bg, [
       { opacity: 0 },
       { opacity: 1, offset: 0.12 },
@@ -166,19 +151,8 @@ export class PsychicMoveAnimations {
     ], { duration: total, easing: 'linear' }).then(() => bg.remove());
 
     // Two quick laps around a small circle that starts and ends at the sprite's spot.
-    const original = launchEl.style.transform;
-    const r = 14;
-    const laps = 2;
-    const steps = 24;
-    const circle: Keyframe[] = [];
-    for (let k = 0; k <= steps; k++) {
-      const a = (k / steps) * Math.PI * 2 * laps;
-      circle.push({ transform: `${original} translate(${r * Math.sin(a) * facing}px,${-r * (1 - Math.cos(a))}px)` });
-    }
     await Fx.wait(180);
-    await Fx.anim(launchEl, circle, { duration: 900, easing: 'ease-in-out' });
-    launchEl.getAnimations?.().forEach((a) => a.cancel());
-    launchEl.style.transform = original;
+    await FxEffects.orbit(launchEl, 14, 2, 900, facing);
     await bgDone;
   }
 

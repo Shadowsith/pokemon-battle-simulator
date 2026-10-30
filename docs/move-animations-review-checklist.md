@@ -183,18 +183,18 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **String Shot** / Fadenschuss — `stringshot` · Bug · Status · `selfAura`
 - [ ] **Struggle** / Verzweifler — `struggle` · Normal · Physical · `melee`
 - [ ] **Stun Spore** / Stachelspore — `stunspore` · Grass · Status · `powder`
-- [ ] ⭐ **Submission** / Überroller — `submission` · Fighting · Physical · `melee`
-- [ ] ⭐ **Substitute** / Delegator — `substitute` · Normal · Status · `selfAura`
-- [ ] ⭐ **Super Fang** / Superzahn — `superfang` · Normal · Physical · `melee`
+- [x] ⭐ **Submission** / Überroller — `submission` · Fighting · Physical · both sprites roll counter-clockwise while 4 yellow hits land, then dust swirls round the target (custom, needs review)
+- [x] ⭐ **Substitute** / Delegator — `substitute` · Normal · Status · smoke puff, the sprite turns into the Substitute doll until it breaks (doll fades in smoke); played by the move resolver, needs battle logic in the Debug-Kampf (custom, needs review)
+- [x] ⭐ **Super Fang** / Superzahn — `superfang` · Normal · Physical · small incisors bite, then red-pink starburst + white/pink sparks (custom, needs review)
 - [ ] **Supersonic** / Superschall — `supersonic` · Normal · Status · `targetAura`
-- [ ] ⭐ **Surf** / Surfer — `surf` · Water · Special · `field`
+- [x] ⭐ **Surf** / Surfer — `surf` · Water · Special · curling dark blue wave (moving water, foam crest throwing spray) rises in front of caster, field floods, wave swells and crashes onto target in Waterfall-style splashes (custom, needs review)
 - [ ] **Swift** / Sternschauer — `swift` · Normal · Special · `field`
-- [ ] ⭐ **Swords Dance** / Schwerttanz — `swordsdance` · Normal · Status · `selfAura`
+- [x] ⭐ **Swords Dance** / Schwerttanz — `swordsdance` · Normal · Status · six teal swords dance round the caster with cyan sparkles, then orange stat sparkles (custom, needs review)
 - [ ] **Tackle** / Tackle — `tackle` · Normal · Physical · `melee`
 - [ ] **Tail Whip** / Rutenschlag — `tailwhip` · Normal · Status · `selfAura`
-- [ ] ⭐ **Take Down** / Bodycheck — `takedown` · Normal · Physical · `melee`
+- [x] ⭐ **Take Down** / Bodycheck — `takedown` · Normal · Physical · charge + white-gold flash, golden dust and gold sparkles, recoil jolt (custom, needs review)
 - [ ] **Teleport** / Teleport — `teleport` · Psychic · Status · `selfAura`
-- [ ] ⭐ **Thrash** / Fuchtler — `thrash` · Normal · Physical · `melee`
+- [x] ⭐ **Thrash** / Fuchtler — `thrash` · Normal · Physical · six dark fists / feet slam the target over yellow and white impact bursts (custom, needs review)
 - [x] ⭐ **Thunder** / Donner — `thunder` · Electric · Special · dark storm clouds + lightning strike from above (custom, needs review)
 - [x] ⭐ **Thunder Punch** / Donnerschlag — `thunderpunch` · Electric · Physical · like Ice Punch: yellow fist slams in, small lightning bolts burst around the target (custom, needs review)
 - [ ] **Thunder Shock** / Donnerschock — `thundershock` · Electric · Special · `projectile`
@@ -208,33 +208,33 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Vise Grip** / Klammer — `visegrip` · Normal · Physical · `melee`
 - [ ] **Water Gun** / Aquaknarre — `watergun` · Water · Special · `projectile`
 - [x] ⭐ **Waterfall** / Kaskade — `waterfall` · Water · Physical · black backdrop → rising wave backdrop + blue splash column hit (custom, needs review)
-- [ ] ⭐ **Whirlwind** / Wirbelwind — `whirlwind` · Normal · Status · `targetAura`
+- [x] ⭐ **Whirlwind** / Wirbelwind — `whirlwind` · Normal · Status · white/grey flakes and wind streaks sweep past the leaning target, which is then blown away (move resolver) and a reserve is dragged in (custom, needs review)
 - [ ] **Wing Attack** / Flügelschlag — `wingattack` · Flying · Physical · `melee`
 - [ ] **Withdraw** / Panzerschutz — `withdraw` · Water · Status · `selfAura`
 - [ ] **Wrap** / Wickel — `wrap` · Normal · Physical · `melee`
 
 ## Gen 2 (86)
 
-- [ ] ⭐ **Aeroblast** / Luftstoß — `aeroblast` · Flying · Special · `projectile`
+- [x] ⭐ **Aeroblast** / Luftstoß — `aeroblast` · Flying · Special · cyan vortex, air gathers into a white-blue orb, coiling ring beam hits the target (custom, needs review)
 - [ ] **Ancient Power** / Antik-Kraft — `ancientpower` · Rock · Special · `projectile`
 - [ ] **Attract** / Anziehung — `attract` · Normal · Status · `targetAura`
-- [ ] ⭐ **Baton Pass** / Stafette — `batonpass` · Normal · Status · `selfAura`
+- [x] ⭐ **Baton Pass** / Stafette — `batonpass` · Normal · Status · red baton tossed up and caught by a white glove, then the user is recalled and the chosen reserve takes over (battle flow) (custom, needs review)
 - [ ] **Beat Up** / Prügler — `beatup` · Dark · Physical · `projectile`
-- [ ] ⭐ **Belly Drum** / Bauchtrommel — `bellydrum` · Normal · Status · `selfAura`
+- [x] ⭐ **Belly Drum** / Bauchtrommel — `bellydrum` · Normal · Status · two dark hands drum the belly, white music-note bubbles float up, then orange stat sparkles (custom, needs review)
 - [ ] **Bone Rush** / Knochenhatz — `bonerush` · Ground · Physical · `projectile`
 - [ ] **Charm** / Charme — `charm` · Fairy · Status · `selfAura`
 - [ ] **Conversion 2** / Umwandlung2 — `conversion2` · Normal · Status · `targetAura`
 - [ ] **Cotton Spore** / Baumwollsaat — `cottonspore` · Grass · Status · `selfAura`
-- [ ] ⭐ **Cross Chop** / Kreuzhieb — `crosschop` · Fighting · Physical · `melee`
-- [ ] ⭐ **Crunch** / Knirscher — `crunch` · Dark · Physical · `melee`
-- [ ] ⭐ **Curse** / Fluch — `curse` · Ghost · Status · `targetAura`
-- [ ] ⭐ **Destiny Bond** / Abgangsbund — `destinybond` · Ghost · Status · `selfAura`
-- [ ] ⭐ **Detect** / Scanner — `detect` · Fighting · Status · `selfAura`
+- [x] ⭐ **Cross Chop** / Kreuzhieb — `crosschop` · Fighting · Physical · two black hands chop across the target in an X, yellow bursts where they cross (custom, needs review)
+- [x] ⭐ **Crunch** / Knirscher — `crunch` · Dark · Physical · black, then dark purple swirl; big tilted jaw snaps shut with white impact rays and grinds twice (custom, needs review)
+- [x] ⭐ **Curse** / Fluch — `curse` · Ghost · Status · dark purple circle behind the caster, a nail is hammered into it (same animation for the Ghost and non-Ghost version) (custom, needs review)
+- [x] ⭐ **Destiny Bond** / Abgangsbund — `destinybond` · Ghost · Status · ghostly red-purple haze, a white ground disc glides to the foe, which glows white (custom, needs review)
+- [x] ⭐ **Detect** / Scanner — `detect` · Fighting · Status · dark, a cyan ring sparkle flares at the caster's head, caster glows white (custom, needs review)
 - [ ] **Dragon Breath** / Feuerodem — `dragonbreath` · Dragon · Special · `projectile`
-- [ ] ⭐ **Dynamic Punch** / Wuchtschlag — `dynamicpunch` · Fighting · Physical · `melee`
-- [ ] ⭐ **Encore** / Zugabe — `encore` · Normal · Status · `targetAura`
+- [x] ⭐ **Dynamic Punch** / Wuchtschlag — `dynamicpunch` · Fighting · Physical · red burst backdrop, yellow fist blast with flying stones, then little birds circle the target's head (custom, needs review)
+- [x] ⭐ **Encore** / Zugabe — `encore` · Normal · Status · dark stage, pink-white spotlight on the target, confetti flutters down (custom, needs review)
 - [ ] **Endure** / Ausdauer — `endure` · Normal · Status · `selfAura`
-- [ ] ⭐ **Extreme Speed** / Turbotempo — `extremespeed` · Normal · Physical · `melee`
+- [x] ⭐ **Extreme Speed** / Turbotempo — `extremespeed` · Normal · Physical · dark, green-cyan speed lines, caster vanishes upward in grey dust, two yellow strikes, caster drops back in (custom, needs review)
 - [ ] **False Swipe** / Trugschlag — `falseswipe` · Normal · Physical · `melee`
 - [ ] **Feint Attack** / Finte — `feintattack` · Dark · Physical · `melee`
 - [ ] **Flail** / Dreschflegel — `flail` · Normal · Physical · `melee`

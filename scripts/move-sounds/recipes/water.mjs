@@ -230,15 +230,24 @@ export const WATER = {
     return s;
   },
 
-  /** Generic field (shake + waves ~0.6 s, all adjacent): a big wave surges in and crashes down. */
+  /**
+   * WaterMoveAnimations.playSurf: the curling wave rises (0-0.45 s) with spray, the field
+   * floods and the wave swells and rolls to the target (0.57-1.3 s), crashes at 1.3 s
+   * (splashes and spray to ~2.2 s), the water drains by 2.55 s. A rising swell, a roaring
+   * surge and a crash.
+   */
   surf: () => {
-    const s = new MoveSfx(1.15, 0x5af7);
-    s.noise(0.0, 0.8, { clock: (u) => 1500 + 4500 * Math.sin(Math.PI * u), gain: (u) => 0.42 * Math.min(1, u * 3) * Math.pow(1 - u, 0.7) });
-    s.rumble(0.0, 0.7, { from: 250, to: 450, gain: 0.22 });
-    s.splash(0.45, 0.45);
-    s.bubbles(0.55, 0.4, 6, { gain: 0.14 });
+    const s = new MoveSfx(2.6, 0x5af7);
+    s.noise(0.0, 0.57, { clock: env.ramp(800, 2200), gain: env.swell(0.2) });
+    s.noise(0.57, 0.75, { clock: (u) => 1500 + 4500 * u, gain: (u) => 0.42 * Math.min(1, u * 3) });
+    s.rumble(0.57, 0.75, { from: 220, to: 450, gain: 0.25 });
+    s.splash(1.3, 0.5);
+    s.noise(1.3, 0.8, { clock: env.ramp(6000, 1200), gain: env.attackDecay(0.35, 0.05) });
+    s.bubbles(1.4, 0.8, 8, { gain: 0.14 });
+    s.noise(2.15, 0.4, { clock: () => 900, gain: env.decay(0.12, 1) });
     return s;
   },
+
 
   /**
    * WaterMoveAnimations.playWaterfall: the field goes black (0-0.25 s), a wall of water rushes up

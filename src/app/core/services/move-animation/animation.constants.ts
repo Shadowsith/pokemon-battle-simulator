@@ -92,11 +92,12 @@ export const WATERFALL_WAVES =
   ) +
   '")';
 
-/** Colours for the cartoon fist (Dizzy Punch, Fire Punch, Ice Punch, Thunder Punch). */
+/** Colours for the cartoon fist (Dizzy Punch, Fire Punch, Ice Punch, Thunder Punch, Thrash). */
 export const FIST_TONES = {
   yellow: { fill: '#FFD84A', edge: '#B8860B', lines: '#C9971A', glow: '#FFE04A' },
   red: { fill: '#D8342A', edge: '#6E1010', lines: '#8E1A14', glow: '#FF8A3C' },
-  ice: { fill: '#8FD4FF', edge: '#2A6CB5', lines: '#4A90D0', glow: '#CFF0FF' }
+  ice: { fill: '#8FD4FF', edge: '#2A6CB5', lines: '#4A90D0', glow: '#CFF0FF' },
+  dark: { fill: '#262626', edge: '#0A0A0A', lines: '#5A5A5A', glow: '#FFF3A0' }
 };
 
 export const WEATHER_COLOR: Record<Exclude<Weather, null>, string> = {

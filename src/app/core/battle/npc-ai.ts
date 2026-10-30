@@ -5,12 +5,15 @@ import {
   PROTECT_MOVES,
   REDIRECT_MOVES,
   Slot,
+  forcesSwitch,
   isSpreadMove,
   livingAlly,
   livingFoes,
   moveTarget
 } from './battle-format';
 import { itemScoreMult } from './item-effects';
+import { canAffordSubstitute } from './substitute';
+import { canBellyDrum } from './belly-drum';
 
 /** The slice of DamageCalcService the AI scores with (kept small so it can be stubbed). */
 export interface AiCalc {
@@ -48,6 +51,12 @@ export interface NpcContext {
   allyMoves: Move[];
   /** Successful protection moves in a row for this Pokémon. */
   protectStreak: number;
+  /** The user already hides behind a Substitute. */
+  hasSubstitute?: boolean;
+  /** Healthy reserves on the foe's bench (Whirlwind / Roar fail without any). */
+  foeReserves?: number;
+  /** Healthy reserves on the NPC's own bench (Baton Pass fails without any). */
+  ownReserves?: number;
   rng?: () => number;
 }
 
@@ -97,6 +106,11 @@ export function chooseNpcMove(ctx: NpcContext): NpcChoice {
   function evaluate(move: Move): { move: Move; target: Slot | null; score: number } {
     const id = move.showdownId;
     if (PROTECT_MOVES.has(id) || REDIRECT_MOVES.has(id)) return { move, target: null, score: 0 };
+    // Substitute only while there's no doll yet and the HP to pay for one.
+    if (id === 'substitute' && (ctx.hasSubstitute || !canAffordSubstitute(user))) return { move, target: null, score: 0 };
+    if (forcesSwitch(move) && calc.isStatusMove(move) && ctx.foeReserves === 0) return { move, target: null, score: 0 };
+    if (id === 'batonpass' && ctx.ownReserves === 0) return { move, target: null, score: 0 };
+    if (id === 'bellydrum' && !canBellyDrum(user)) return { move, target: null, score: 0 };
 
     if (id === 'helpinghand') {
       if (!ally) return { move, target: null, score: 0 };

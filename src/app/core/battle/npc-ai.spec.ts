@@ -80,6 +80,26 @@ describe('NPC AI', () => {
     expect(chooseNpcMove(ctx(mons, 'doubles', O0, ['earthquake', 'rockslide'])).move.showdownId).toBe('earthquake');
   });
 
+  it('skips Substitute with a doll already up or too little HP', () => {
+    const mons = { o0: mon(9, ['water']), p0: mon(3, ['grass', 'poison']) };
+    const withDoll = chooseNpcMove({ ...ctx(mons, 'singles', O0, ['substitute', 'growl']), hasSubstitute: true });
+    expect(withDoll.move.showdownId).toBe('growl');
+    const low = { o0: mon(9, ['water'], 0.2), p0: mon(3, ['grass', 'poison']) };
+    expect(chooseNpcMove(ctx(low, 'singles', O0, ['substitute', 'growl'])).move.showdownId).toBe('growl');
+  });
+
+  it('skips Baton Pass without a reserve to pass to', () => {
+    const mons = { o0: mon(9, ['water']), p0: mon(3, ['grass', 'poison']) };
+    const last = chooseNpcMove({ ...ctx(mons, 'singles', O0, ['batonpass', 'growl']), ownReserves: 0 });
+    expect(last.move.showdownId).toBe('growl');
+  });
+
+  it('skips Whirlwind when the foe has no reserves left', () => {
+    const mons = { o0: mon(9, ['water']), p0: mon(3, ['grass', 'poison']) };
+    const last = chooseNpcMove({ ...ctx(mons, 'singles', O0, ['whirlwind', 'growl']), foeReserves: 0 });
+    expect(last.move.showdownId).toBe('growl');
+  });
+
   it('picks the best switch-in against the remaining foes', () => {
     const team = [mon(6, ['fire', 'flying'], 0), mon(9, ['water']), mon(3, ['grass', 'poison'])];
     const sets = [[move('flamethrower')], [move('surf')], [move('gigadrain')]];
