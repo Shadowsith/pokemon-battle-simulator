@@ -7,6 +7,7 @@ import { germanSpeciesName } from '../../../core/models/species-names.de';
 import { DexDataService } from '../../../core/services/dex-data.service';
 import { MUSIC_TRACKS } from '../../../core/services/audio.service';
 import type { Side } from '../../../core/battle/battle-format';
+import { BattleBackground, SCENES, SceneId, background } from '../../../core/battle/battle-background';
 import { SearchOption, SearchSelectComponent } from '../../../shared/search-select/search-select.component';
 import { ItemPickerComponent } from '../../../shared/item-picker/item-picker.component';
 import { ItemIconComponent } from '../../../shared/item-icon/item-icon.component';
@@ -35,11 +36,14 @@ export class DebugPanelComponent {
   readonly opponent = input.required<BattlePokemon>();
   /** True while an animation runs; action buttons are disabled. */
   readonly busy = input(false);
+  /** The field's current scene, shown in the background picker. */
+  readonly background = input.required<BattleBackground>();
 
   readonly useMove = output<{ side: Side; move: Move; logic: boolean }>();
   readonly setPokemon = output<{ side: Side; species: SpeciesInfo }>();
   readonly setItem = output<{ side: Side; item: string | null }>();
   readonly playMusic = output<string>();
+  readonly setBackground = output<BattleBackground>();
   readonly reset = output<void>();
   readonly leave = output<void>();
 
@@ -48,6 +52,7 @@ export class DebugPanelComponent {
     { side: 'opponent', label: 'Gegner' }
   ];
   readonly musicTracks = MUSIC_TRACKS;
+  readonly scenes = SCENES;
   readonly moveOptions = MOVE_OPTIONS;
 
   readonly useLogic = signal(false);
@@ -96,6 +101,17 @@ export class DebugPanelComponent {
     const side = this.itemPickerFor();
     this.itemPickerFor.set(null);
     if (side) this.setItem.emit({ side, item });
+  }
+
+  pickScene(scene: SceneId): void {
+    this.setBackground.emit(background(scene, this.background().time));
+  }
+
+  /** Night only exists for outdoor scenes; the checkbox is disabled otherwise. */
+  readonly hasNight = computed(() => SCENES.find((s) => s.id === this.background().scene)?.hasNight ?? false);
+
+  pickNight(night: boolean): void {
+    this.setBackground.emit(background(this.background().scene, night ? 'night' : 'day'));
   }
 
   pickMusic(track: string): void {

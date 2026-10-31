@@ -57,6 +57,23 @@
     }
   </section>
 
+  <!-- ---------- background ---------- -->
+  <section class="cb-section">
+    <label class="cb-label" for="cb-background">Hintergrund</label>
+    <select
+      id="cb-background"
+      class="cb-select"
+      [value]="config().background"
+      (change)="setBackground($any($event.target).value)"
+    >
+      <option value="random">Zufällig (draußen)</option>
+      @for (s of scenes; track s.id) {
+        <option [value]="s.id">{{ s.label }}</option>
+      }
+    </select>
+    <p class="cb-hint">Tag oder Nacht richtet sich nach der Uhrzeit (Nacht von 20 bis 6 Uhr).</p>
+  </section>
+
   <!-- ---------- opponent count ---------- -->
   <section class="cb-section">
     <span class="cb-label">Anzahl gegnerischer Pokémon</span>

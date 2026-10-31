@@ -9,6 +9,7 @@ describe('custom-battle.model', () => {
     const c = defaultCustomBattleConfig();
     expect(c.opponentCount).toBe(3);
     expect(c.mode).toBe('random');
+    expect(c.background).toBe('random');
     expect(configToNpcOptions(c)).toEqual({});
   });
 

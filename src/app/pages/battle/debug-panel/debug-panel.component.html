@@ -45,6 +45,25 @@
     </label>
 
     <label class="music">
+      Hintergrund
+      <select [value]="background().scene" (change)="pickScene($any($event.target).value)">
+        @for (sc of scenes; track sc.id) {
+          <option [value]="sc.id">{{ sc.label }}</option>
+        }
+      </select>
+    </label>
+
+    <label class="check">
+      <input
+        type="checkbox"
+        [checked]="background().time === 'night'"
+        [disabled]="!hasNight()"
+        (change)="pickNight($any($event.target).checked)"
+      />
+      Nacht
+    </label>
+
+    <label class="music">
       Musik
       <select [value]="music()" (change)="pickMusic($any($event.target).value)">
         <option value="">— wählen —</option>

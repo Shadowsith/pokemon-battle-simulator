@@ -15,6 +15,7 @@ import {
   slotKey
 } from '../../../core/battle/battle-format';
 import { blocksStatusMoves, isChoiceItem } from '../../../core/battle/item-effects';
+import { BattleBackground } from '../../../core/battle/battle-background';
 import { DamageCalcService } from '../../../core/services/damage-calc.service';
 import { TeamService } from '../../../core/services/team.service';
 import { BattlePhase, ChargeState, Command, MenuState } from '../battle.types';
@@ -52,6 +53,9 @@ export class BattleStateService {
   /** Singles (1 vs 1) or doubles (2 vs 2); decided at the start of each battle. */
   readonly format = signal<BattleFormat>('singles');
   readonly isDoubles = computed(() => this.format() === 'doubles');
+
+  /** Scene + day/night the field is drawn on; decided at the start of each battle. */
+  readonly background = signal<BattleBackground>({ scene: 'grass', time: 'day' });
 
   readonly playerTeam = signal<BattlePokemon[]>(this.derivePlayerTeam());
   /** Party index standing in each player position (−1 = empty). */

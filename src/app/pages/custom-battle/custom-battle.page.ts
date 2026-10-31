@@ -23,6 +23,7 @@ import { heldItem, knownItemId } from '../../core/models/item.model';
 import { ItemIconComponent } from '../../shared/item-icon/item-icon.component';
 import { ItemPickerComponent } from '../../shared/item-picker/item-picker.component';
 import type { BattleFormat } from '../../core/battle/battle-format';
+import { SCENES, SceneId, isSceneId } from '../../core/battle/battle-background';
 
 type Picker = { kind: 'species' } | { kind: 'move'; pokeIndex: number; slot: number };
 
@@ -41,6 +42,7 @@ export class CustomBattlePage {
 
   readonly types = POKEMON_TYPES;
   readonly avatars = TRAINER_AVATARS;
+  readonly scenes = SCENES;
   readonly avatarPath = trainerAvatarPath;
   readonly spritePath = frontSpritePath;
   readonly typeColor = typeColor;
@@ -134,6 +136,11 @@ export class CustomBattlePage {
 
   /** Doubles needs at least two Pokémon in the player's active team. */
   readonly canDouble = computed(() => (this.teamService.activeTeam()?.pokemon.length ?? 0) >= 2);
+
+  setBackground(value: string): void {
+    const background: SceneId | 'random' = isSceneId(value) ? value : 'random';
+    this.patch((c) => ({ ...c, background }));
+  }
 
   setFormat(format: BattleFormat): void {
     if (format === 'doubles' && !this.canDouble()) return;

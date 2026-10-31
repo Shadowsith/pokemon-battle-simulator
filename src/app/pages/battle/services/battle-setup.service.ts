@@ -2,6 +2,14 @@ import { Injectable, inject } from '@angular/core';
 import { freshBoosts, freshStatus } from '../../../core/models/pokemon.model';
 import { toBattlePokemon } from '../../../core/models/battle-pokemon';
 import { BattleFormat } from '../../../core/battle/battle-format';
+import {
+  BattleBackground,
+  SceneId,
+  background,
+  randomOutdoorScene,
+  sceneForGymType,
+  timeOfDay
+} from '../../../core/battle/battle-background';
 import { CustomBattleConfig, configToNpcOptions } from '../../../core/models/custom-battle.model';
 import type { GymLeader, RunMember } from '../../../core/models/trainer-run.model';
 import { AudioService } from '../../../core/services/audio.service';
@@ -63,6 +71,7 @@ export class BattleSetupService {
   async prepare(): Promise<number> {
     const s = this.state;
     s.format.set(this.pickFormat());
+    s.background.set(this.pickBackground());
     this.resetTeams();
     s.outcome.set(null);
     s.log.set('');
@@ -119,6 +128,27 @@ export class BattleSetupService {
     if (this.customBattle) return this.customBattle.format;
     if (this.challenge) return this.challenge.svc.run()?.format ?? 'singles';
     return this.settings.allowDoubleBattles() && Math.random() < 0.5 ? 'doubles' : 'singles';
+  }
+
+  /**
+   * Scene for this battle (day/night from the device clock). The debug battle
+   * keeps whatever the debug panel last chose.
+   */
+  private pickBackground(): BattleBackground {
+    if (this.state.debug) return this.state.background();
+    return background(this.pickScene(), timeOfDay(new Date()));
+  }
+
+  private pickScene(): SceneId {
+    const custom = this.customBattle?.background;
+    if (custom) return custom === 'random' ? randomOutdoorScene() : custom;
+    if (this.challenge) {
+      // Gym leaders fight on their type's scene, the Elite Four in their hall.
+      return this.challenge.svc === this.gymSvc
+        ? sceneForGymType((this.challenge.member as GymLeader).type)
+        : 'elite-four';
+    }
+    return randomOutdoorScene();
   }
 
   /**

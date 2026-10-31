@@ -53,7 +53,14 @@
     </div>
   }
 
-  <div class="field" #field [class.doubles]="isDoubles()">
+  <div
+    class="field"
+    #field
+    [class.doubles]="isDoubles()"
+    [class.night]="background().time === 'night'"
+    [attr.data-scene]="background().scene"
+    [style.background-image]="backgroundImage()"
+  >
     <div class="platform opponent-platform pos0"></div>
     <div class="platform player-platform pos0"></div>
     @if (isDoubles()) {
@@ -199,6 +206,8 @@
         (setPokemon)="debugSetPokemon($event)"
         (setItem)="debugSetItem($event)"
         (playMusic)="debugPlayMusic($event)"
+        [background]="background()"
+        (setBackground)="debugSetBackground($event)"
         (reset)="debugReset()"
         (leave)="toTeamSelect()"
       />

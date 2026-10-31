@@ -1,4 +1,5 @@
 import type { BattleFormat } from '../battle/battle-format';
+import type { SceneId } from '../battle/battle-background';
 import type { NpcTeamOptions } from '../services/npc-team.service';
 import { POKEMON_TYPES } from './pokemon.model';
 import { MAX_TEAM_SIZE, type TeamPokemon } from './team.model';
@@ -29,6 +30,9 @@ export interface CustomBattleConfig {
 
   /** Fixed NPC avatar sprite id, or null for a random one. */
   avatarId: string | null;
+
+  /** Battle field scene, or 'random' for a random outdoor scene. */
+  background: SceneId | 'random';
 }
 
 export interface SavedCustomBattle {
@@ -47,7 +51,8 @@ export function defaultCustomBattleConfig(): CustomBattleConfig {
     distinctTypes: [],
     forceSingleType: false,
     singleType: null,
-    avatarId: null
+    avatarId: null,
+    background: 'random'
   };
 }
 

@@ -7,6 +7,7 @@ import {
 } from '../models/custom-battle.model';
 import { MAX_TEAM_SIZE, MOVES_PER_POKEMON, TeamPokemon } from '../models/team.model';
 import { knownItemId } from '../models/item.model';
+import { isSceneId } from '../battle/battle-background';
 
 const STORE_KEY = 'pbs.customBattles';
 
@@ -106,7 +107,8 @@ function sanitize(v: unknown): SavedCustomBattle | null {
       : [],
     forceSingleType: c['forceSingleType'] === true,
     singleType: typeof c['singleType'] === 'string' ? (c['singleType'] as string) : null,
-    avatarId: typeof c['avatarId'] === 'string' ? (c['avatarId'] as string) : null
+    avatarId: typeof c['avatarId'] === 'string' ? (c['avatarId'] as string) : null,
+    background: isSceneId(c['background']) ? c['background'] : 'random'
   });
   return { id: s['id'], name: s['name'], config };
 }

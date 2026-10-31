@@ -30,6 +30,7 @@ import {
 } from '../../core/battle/battle-format';
 import { heldItem } from '../../core/models/item.model';
 import { ItemIconComponent } from '../../shared/item-icon/item-icon.component';
+import { BattleBackground, backgroundUrl } from '../../core/battle/battle-background';
 import { DebugPanelComponent } from './debug-panel/debug-panel.component';
 import { AudioService } from '../../core/services/audio.service';
 import { DamageCalcService } from '../../core/services/damage-calc.service';
@@ -53,7 +54,7 @@ import { MoveResolverService } from './services/move-resolver.service';
   imports: [IonContent, IonButton, ItemIconComponent, DebugPanelComponent],
   providers: [BattleStateService, BattleStageService, BattleSetupService, MoveResolverService, BattleFlowService],
   templateUrl: './battle.page.html',
-  styleUrls: ['./battle.page.scss', './battle-portrait.scss']
+  styleUrls: ['./battle.page.scss', './battle-portrait.scss', './battle-backgrounds.scss']
 })
 export class BattlePage implements OnInit, OnDestroy {
   @ViewChild('field', { static: true }) fieldRef!: ElementRef<HTMLElement>;
@@ -92,6 +93,9 @@ export class BattlePage implements OnInit, OnDestroy {
   readonly outcome = this.state.outcome;
   readonly format = this.state.format;
   readonly isDoubles = this.state.isDoubles;
+  readonly background = this.state.background;
+  /** CSS `background-image` for the field; white shows through if the file is missing. */
+  readonly backgroundImage = computed(() => `url(${backgroundUrl(this.background())})`);
   readonly playerTeam = this.state.playerTeam;
   readonly activePlayer = this.state.activePlayer;
   readonly opponentTeam = this.state.opponentTeam;
@@ -430,6 +434,10 @@ export class BattlePage implements OnInit, OnDestroy {
 
   debugPlayMusic(track: string): void {
     this.audio.playMusicTrack(track);
+  }
+
+  debugSetBackground(bg: BattleBackground): void {
+    if (this.debug) this.state.background.set(bg);
   }
 
   // --- template helpers -------------------------------------------------

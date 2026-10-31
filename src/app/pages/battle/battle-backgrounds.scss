@@ -1,0 +1,52 @@
+/* --- battle field scenes ---------------------------------------------------
+   The scene image is set inline on .field (see battle-background.ts); here the
+   platforms get a look that matches it. Platforms stay separate elements
+   because their positions differ between singles, doubles and portrait. */
+
+.field[data-scene] .platform {
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+}
+
+.field[data-scene='grass'] .platform {
+  background: radial-gradient(ellipse at center, #a9d97a 0 55%, #7fbf55 56% 100%);
+}
+
+.field[data-scene='forest'] .platform {
+  background: radial-gradient(ellipse at center, #b59a6a 0 50%, #6f9a4c 51% 100%);
+}
+
+.field[data-scene='water'] .platform {
+  background: radial-gradient(ellipse at center, #8fd0ee 0 45%, #ffffff 46% 62%, #b9e4f7 63% 100%);
+  box-shadow: none;
+}
+
+.field[data-scene='city'] .platform {
+  background: radial-gradient(ellipse at center, #c8c8c4 0 55%, #a3a39e 56% 100%);
+}
+
+.field[data-scene='cave'] .platform {
+  background: radial-gradient(ellipse at center, #a08a72 0 55%, #7a6652 56% 100%);
+}
+
+.field[data-scene='indoor'] .platform {
+  background: radial-gradient(ellipse at center, #f2e6c8 0 40%, #d9534f 41% 50%, #f2e6c8 51% 100%);
+}
+
+.field[data-scene='beach'] .platform {
+  background: radial-gradient(ellipse at center, #fbecc0 0 55%, #e2c47e 56% 100%);
+}
+
+.field[data-scene='arena'] .platform {
+  background: radial-gradient(ellipse at center, #e8b688 0 46%, #ffffff 47% 56%, #d39a68 57% 100%);
+}
+
+.field[data-scene='elite-four'] .platform {
+  background: radial-gradient(ellipse at center, #4a3f6a 0 48%, #d9b25a 49% 58%, #3a3058 59% 100%);
+  box-shadow: 0 0 12px rgba(246, 215, 122, 0.45);
+}
+
+/* Night: the ground is moonlit, slightly darker and bluer, but still bright
+   enough that sprites read clearly. */
+.field.night .platform {
+  filter: brightness(0.8) saturate(0.85) hue-rotate(-8deg);
+}
