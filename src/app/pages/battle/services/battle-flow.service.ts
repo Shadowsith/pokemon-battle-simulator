@@ -195,6 +195,7 @@ export class BattleFlowService {
       allyMoves: ally ? s.movesFor('opponent', s.partyIdxAt(ally)) : [],
       protectStreak: s.protectStreak[s.streakKey(slot)] ?? 0,
       hasSubstitute: s.substituteOf(slot) > 0,
+      foreseen: new Set(Object.keys(s.futureAttacks)),
       foeReserves: s.bench('player').length,
       ownReserves: s.bench('opponent').length
     });
@@ -282,8 +283,12 @@ export class BattleFlowService {
     await this.finishRound();
   }
 
-  /** End-of-turn status damage, then win / loss / replacements / the next turn. */
+  /** End-of-turn foreseen attacks and status damage, then win / loss / replacements / the next turn. */
   private async finishRound(): Promise<void> {
+    await this.settleFaints();
+    if (await this.checkEnd()) return;
+
+    await this.landFutureAttacks();
     await this.settleFaints();
     if (await this.checkEnd()) return;
 
@@ -344,6 +349,20 @@ export class BattleFlowService {
         await this.stage.wait(800);
       }
       await this.resolver.runBerryChecks([slot]);
+    }
+  }
+
+  /** Foreseen attacks (Future Sight, Doom Desire) count down at the end of each round and land at 0. */
+  private async landFutureAttacks(): Promise<void> {
+    const s = this.state;
+    for (const [key, attack] of Object.entries(s.futureAttacks)) {
+      if (attack.turns > 1) {
+        s.futureAttacks[key] = { ...attack, turns: attack.turns - 1 };
+        continue;
+      }
+      delete s.futureAttacks[key];
+      if (s.battleDecided()) continue;
+      await this.resolver.performFutureHit(attack);
     }
   }
 

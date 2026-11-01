@@ -34,6 +34,9 @@ import {
 import { bellyDrumCost, canBellyDrum } from '../../../core/battle/belly-drum';
 import { NON_GHOST_CURSE, castsGhostCurse, curseCost } from '../../../core/battle/curse';
 import { ENCORE_TURNS, canEncore } from '../../../core/battle/encore';
+import { TEAM_CURE_MOVES, cureTeamStatus } from '../../../core/battle/heal-bell';
+import { painSplitHp } from '../../../core/battle/pain-split';
+import { FUTURE_ATTACK_TURNS, FutureAttack, isFutureMove } from '../../../core/battle/future-sight';
 import { bypassesSubstitute, canAffordSubstitute, hitSubstitute, substituteCost } from '../../../core/battle/substitute';
 import { AudioService } from '../../../core/services/audio.service';
 import { DamageCalcService } from '../../../core/services/damage-calc.service';
@@ -146,6 +149,10 @@ export class MoveResolverService {
     }
     if (id === 'destinybond') {
       await this.performDestinyBond(move, user);
+      return;
+    }
+    if (isFutureMove(move)) {
+      await this.performFutureSight(move, user, chosen);
       return;
     }
 
@@ -386,6 +393,12 @@ export class MoveResolverService {
     const s = this.state;
     const me = () => s.monAt(user)!;
     const defender = s.monAt(t)!;
+    if (move.showdownId === 'painsplit') {
+      const hp = painSplitHp(me(), defender);
+      s.applyHp(user, hp.user - me().currentHp);
+      s.applyHp(t, hp.target - defender.currentHp);
+      return { dealt: 0, statusMsg: 'Die Pokémon teilen ihre Schmerzen!', lifeOrb: false };
+    }
     const eff = this.damageCalc.effectiveness(move, defender);
     const om = offenseMods(me(), move, eff);
     const dm = defenseMods(defender, move, eff);
@@ -512,6 +525,106 @@ export class MoveResolverService {
     await this.animation.playSubstituteFade(this.stage.spriteEl(slot), this.stage.fxEl, this.stage.fieldEl, () =>
       this.state.setSubstitute(slot, 0)
     );
+  }
+
+  /**
+   * Future Sight / Doom Desire, the turn it's used: the user foresees an
+   * attack on the target's position (fails if one is already coming there).
+   */
+  private async performFutureSight(move: Move, user: Slot, chosen: Slot | null): Promise<void> {
+    const s = this.state;
+    const name = s.monAt(user)!.name;
+    s.log.set(`${name} setzt ${move.name} ein...`);
+    this.audio.playMove(move.showdownId);
+    const res = resolveTargets(move, user, chosen, s.field());
+    const target = res.kind === 'targets' ? res.targets[0] : undefined;
+    if (!target || s.futureAttacks[slotKey(target)]) {
+      await this.stage.wait(650);
+      s.log.set('Aber es misslang!');
+      await this.stage.wait(700);
+      return;
+    }
+    await this.animation.playMove(move, this.stage.refsFor(user, target), 'charge');
+    s.futureAttacks[slotKey(target)] = {
+      move,
+      target,
+      side: user.side,
+      partyIdx: s.partyIdxAt(user),
+      turns: FUTURE_ATTACK_TURNS
+    };
+    s.log.set(move.showdownId === 'doomdesire' ? `${name} beschwört Kismetwunsch herauf!` : `${name} sah eine Attacke voraus!`);
+    await this.stage.wait(850);
+  }
+
+  /**
+   * A foreseen attack lands (end of round): it strikes whoever now stands in
+   * the targeted position, with damage worked out from the user's current
+   * stats - even if the user has left the field or fainted. An empty or
+   * fainted position lets it fizzle.
+   */
+  async performFutureHit(attack: FutureAttack): Promise<void> {
+    const s = this.state;
+    const t = attack.target;
+    const defender = s.monAt(t);
+    if (!defender || defender.currentHp <= 0) return;
+    const { move } = attack;
+    const attacker = s.teamOf(attack.side)[attack.partyIdx];
+    s.log.set(`${defender.name} wird von ${move.name} getroffen!`);
+    const eff = this.damageCalc.effectiveness(move, defender);
+    if (!attacker || eff === 0) {
+      await this.stage.wait(650);
+      s.log.set(`${move.name} zeigt keine Wirkung …`);
+      await this.stage.wait(750);
+      return;
+    }
+    await this.animation.playMove(move, this.stage.refsFor(t, t), 'release');
+
+    const dm = defenseMods(defender, move, eff);
+    const raw = this.damageCalc.calculateDamage(attacker, defender, move, {
+      defStatMult: dm.defStatMult,
+      finalMult: dm.finalMult
+    });
+
+    // A Substitute takes the hit instead.
+    if (s.substituteOf(t) > 0 && !bypassesSubstitute(move)) {
+      const { absorbed, left } = hitSubstitute(s.substituteOf(t), raw);
+      if (absorbed <= 0) return;
+      this.audio.playHit(eff);
+      s.log.set(`Der Delegator steckt den Treffer für ${defender.name} ein!`);
+      if (left > 0) {
+        s.setSubstitute(t, left);
+        await this.stage.wait(800);
+        return;
+      }
+      await this.stage.wait(750);
+      await this.removeSubstitute(t);
+      s.log.set(`Der Delegator von ${defender.name} verschwindet!`);
+      await this.stage.wait(600);
+      return;
+    }
+
+    const sash = focusSashCap(defender, raw);
+    const dealt = Math.min(sash.damage, defender.currentHp);
+    if (dealt > 0) {
+      s.applyHp(t, -dealt);
+      this.audio.playHit(eff);
+    }
+    const itemLogs: string[] = [];
+    if (dm.berry && dealt > 0) {
+      s.consumeItem(t);
+      itemLogs.push(`${defender.name} isst seine ${dm.berry.name} und schwächt den Treffer ab!`);
+    }
+    if (sash.used) {
+      s.consumeItem(t);
+      itemLogs.push(`${defender.name} hält dank Fokusgurt durch!`);
+    }
+    if (!s.alive(t)) s.log.set(`${defender.name} wurde besiegt!`);
+    for (const msg of itemLogs) {
+      await this.stage.wait(850);
+      s.log.set(msg);
+    }
+    await this.stage.wait(850);
+    await this.runBerryChecks([t]);
   }
 
   /** Destiny Bond: until it moves again, whoever knocks the user out faints with it. */
@@ -793,6 +906,15 @@ export class MoveResolverService {
       s.patchSlot(user, { status: { ...me().status, major: 'slp', sleepTurns: 3, toxicTurns: 0 } });
     }
 
+    // Heal Bell / Aromatherapy: the whole party's status is cured.
+    let teamCure: string | null = null;
+    if (TEAM_CURE_MOVES.has(move.showdownId)) {
+      const { team, cured } = cureTeamStatus(s.teamOf(user.side));
+      s.setTeam(user.side, team);
+      const sound = move.showdownId === 'healbell' ? 'Ein Glockenläuten erklingt!' : 'Ein beruhigender Duft breitet sich aus!';
+      teamCure = cured ? `${sound} Das Team ist von allen Statusproblemen geheilt!` : sound;
+    }
+
     const statLogs: string[] = [];
     const sc = this.statChange.resolve(move, me().types, 0);
     if (Object.keys(sc.toUser).length) {
@@ -802,7 +924,8 @@ export class MoveResolverService {
     }
 
     let line: string;
-    if (recovery.kind === 'selfHeal' && recovery.amount > 0) line = `${me().name} füllt seine KP auf!`;
+    if (teamCure) line = teamCure;
+    else if (recovery.kind === 'selfHeal' && recovery.amount > 0) line = `${me().name} füllt seine KP auf!`;
     else if (recovery.kind === 'selfHeal') line = 'Aber es misslang!';
     else if (statLogs.length) line = statLogs.shift() as string;
     else line = `${move.name} zeigt keine Wirkung …`;

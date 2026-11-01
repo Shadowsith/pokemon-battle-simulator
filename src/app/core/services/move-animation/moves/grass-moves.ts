@@ -9,6 +9,7 @@ export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     absorb: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target),
+    gigadrain: (refs, launch, target) => GrassMoveAnimations.playGigaDrain(refs, launch, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     sleeppowder: (refs, _launch, target, v) => GrassMoveAnimations.playSleepPowder(refs, target, v),
@@ -179,36 +180,80 @@ export class GrassMoveAnimations {
     target: Point,
     [main, light]: [string, string] = [FLECK_COLOR.statUp, '#E6FFB0']
   ) {
-    const { fxEl, targetEl } = refs;
+    Fx.flash(refs.targetEl, main, 0.4);
+    Fx.shake(refs.targetEl, 3);
+    await GrassMoveAnimations.drainStream(refs, launch, target, {
+      count: 22,
+      travel: 900,
+      spread: 1100,
+      bend: 45,
+      scatter: 20,
+      spin: 240,
+      make: (i) => FxGlyphs.sparkStar(8 + Math.random() * 7, i % 3 ? main : light)
+    });
+    await FxEffects.healSparkles(refs, launch);
+  }
+
+  /**
+   * Giga Drain: a mightier Absorb. The target flares green and trembles while
+   * big glowing green energy orbs swarm out of it on wide arcs to the caster,
+   * which then sparkles with the HP it gained.
+   */
+  private static async playGigaDrain(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { targetEl } = refs;
+    for (let i = 0; i < 4; i++) setTimeout(() => Fx.flash(targetEl, FLECK_COLOR.statUp, 0.7), i * 260);
+    for (let i = 0; i < 3; i++) setTimeout(() => Fx.shake(targetEl, 4), i * 320);
+    await GrassMoveAnimations.drainStream(refs, launch, target, {
+      count: 26,
+      travel: 1050,
+      spread: 1200,
+      bend: 85,
+      scatter: 34,
+      spin: 0,
+      make: () => GrassMoveAnimations.energyOrb(14 + Math.random() * 14)
+    });
+    await FxEffects.healSparkles(refs, launch);
+  }
+
+  /** A big, soft, glowing green ball of drained energy with a bright core. */
+  private static energyOrb(s: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#F4FFE8,#B8F58A 30%,#5FD84A 58%,#3FC03A00 74%);box-shadow:0 0 ${s * 0.8}px #7CF0607A`;
+    return el;
+  }
+
+  /**
+   * The drain stream shared by Absorb and Giga Drain: `count` particles leave
+   * the target in a steady trickle over `spread` ms and float to the caster
+   * on wavy arcs (up to `bend` px off the straight line), each in `travel` ms.
+   * Resolves once nearly all of them have arrived.
+   */
+  private static async drainStream(
+    refs: BattleStageRefs,
+    launch: Point,
+    target: Point,
+    o: { count: number; travel: number; spread: number; bend: number; scatter: number; spin: number; make: (i: number) => HTMLElement }
+  ) {
     const dx = launch.x - target.x;
     const dy = launch.y - target.y;
-
-    Fx.flash(targetEl, main, 0.4);
-    Fx.shake(targetEl, 3);
-
-    // Stream: stars leave the target in a steady trickle and float to the caster.
-    const count = 22;
-    const travel = 900;
-    const spread = 1100;
-    for (let i = 0; i < count; i++) {
-      const star = FxGlyphs.sparkStar(8 + Math.random() * 7, i % 3 ? main : light);
-      Fx.place(star, { x: target.x + (Math.random() * 40 - 20), y: target.y + (Math.random() * 40 - 20) });
-      fxEl.appendChild(star);
-      const bend = (Math.random() * 2 - 1) * 45;
+    for (let i = 0; i < o.count; i++) {
+      const p = o.make(i);
+      Fx.place(p, { x: target.x + (Math.random() * 2 - 1) * o.scatter, y: target.y + (Math.random() * 2 - 1) * o.scatter });
+      refs.fxEl.appendChild(p);
+      const bend = (Math.random() * 2 - 1) * o.bend;
       const frames: Keyframe[] = [];
       const steps = 8;
       for (let k = 0; k <= steps; k++) {
         const t = k / steps;
         const ease = t * t * (3 - 2 * t);
         frames.push({
-          transform: `translate(${dx * ease}px,${dy * ease + Math.sin(t * Math.PI) * bend}px) rotate(${t * 240}deg) scale(${0.4 + Math.sin(t * Math.PI) * 0.8})`,
+          transform: `translate(${dx * ease}px,${dy * ease + Math.sin(t * Math.PI) * bend}px) rotate(${t * o.spin}deg) scale(${0.4 + Math.sin(t * Math.PI) * 0.8})`,
           opacity: Math.min(1, t * 5, (1 - t) * 4 + 0.2)
         });
       }
-      Fx.anim(star, frames, { duration: travel, easing: 'linear', delay: (i / count) * spread }).then(() => star.remove());
+      Fx.anim(p, frames, { duration: o.travel, easing: 'linear', delay: (i / o.count) * o.spread }).then(() => p.remove());
     }
-    await Fx.wait(travel + spread * 0.8);
-    await FxEffects.healSparkles(refs, launch);
+    await Fx.wait(o.travel + o.spread * 0.8);
   }
 
   /**

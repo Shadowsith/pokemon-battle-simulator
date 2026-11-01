@@ -9,10 +9,12 @@ import {
   isSpreadMove,
   livingAlly,
   livingFoes,
-  moveTarget
+  moveTarget,
+  slotKey
 } from './battle-format';
 import { itemScoreMult } from './item-effects';
 import { canAffordSubstitute } from './substitute';
+import { isFutureMove } from './future-sight';
 import { canBellyDrum } from './belly-drum';
 
 /** The slice of DamageCalcService the AI scores with (kept small so it can be stubbed). */
@@ -53,6 +55,8 @@ export interface NpcContext {
   protectStreak: number;
   /** The user already hides behind a Substitute. */
   hasSubstitute?: boolean;
+  /** Slot keys ("p0" …) that already have a Future Sight / Doom Desire coming. */
+  foreseen?: ReadonlySet<string>;
   /** Healthy reserves on the foe's bench (Whirlwind / Roar fail without any). */
   foeReserves?: number;
   /** Healthy reserves on the NPC's own bench (Baton Pass fails without any). */
@@ -134,7 +138,9 @@ export function chooseNpcMove(ctx: NpcContext): NpcChoice {
     const t = moveTarget(move);
     if (t === 'normal' || t === 'any' || t === 'adjacentFoe' || t === 'scripted' || t === 'randomNormal') {
       let bestFoe: { slot: Slot; score: number } | null = null;
+      const future = isFutureMove(move);
       for (const f of foes) {
+        if (future && ctx.foreseen?.has(slotKey(f.slot))) continue; // would fail
         const s = scoreMove(calc, move, user, f.mon);
         if (!bestFoe || s > bestFoe.score) bestFoe = { slot: f.slot, score: s };
       }

@@ -18,6 +18,7 @@ import { blocksStatusMoves, isChoiceItem } from '../../../core/battle/item-effec
 import { BattleBackground } from '../../../core/battle/battle-background';
 import { DamageCalcService } from '../../../core/services/damage-calc.service';
 import { TeamService } from '../../../core/services/team.service';
+import { FutureAttack } from '../../../core/battle/future-sight';
 import { BattlePhase, ChargeState, Command, MenuState } from '../battle.types';
 import { derivePlayerTeam, fallbackOpponentMoves, makeGlurak, movesByIds } from '../battle-defaults';
 
@@ -117,6 +118,9 @@ export class BattleStateService {
 
   /** Slots whose Pokémon is cursed by a Ghost's Curse (loses ¼ max HP each turn), keyed "p0", "o1" … */
   cursed = new Set<string>();
+
+  /** Future Sight / Doom Desire on their way, keyed by the targeted slot "p0", "o1" … */
+  futureAttacks: Record<string, FutureAttack> = {};
 
   /** Slots whose Pokémon was just blown / dragged out (Whirlwind …); the flow sends a random reserve in. */
   dragOuts: Slot[] = [];
@@ -225,6 +229,12 @@ export class BattleStateService {
     const upd = (team: BattlePokemon[]) => team.map((p, i) => (i === idx ? { ...p, ...patch } : p));
     if (slot.side === 'player') this.playerTeam.update(upd);
     else this.opponentTeam.update(upd);
+  }
+
+  /** Replace a whole party (Heal Bell curing everyone, benched included). */
+  setTeam(side: Side, team: BattlePokemon[]): void {
+    if (side === 'player') this.playerTeam.set(team);
+    else this.opponentTeam.set(team);
   }
 
   /** Add (heal) or subtract (damage) HP on the Pokémon in a slot, clamped. */

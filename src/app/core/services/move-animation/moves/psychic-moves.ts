@@ -15,8 +15,67 @@ export class PsychicMoveAnimations {
     lightscreen: (refs, launch, _target, v) => PsychicMoveAnimations.playScreen(refs, launch, v, PsychicMoveAnimations.LIGHT_SCREEN),
     rest: (refs, launch, _target, v) => PsychicMoveAnimations.playRest(refs, launch, v),
     reflect: (refs, launch, _target, v) => PsychicMoveAnimations.playScreen(refs, launch, v, PsychicMoveAnimations.REFLECT),
+    futuresight: (refs) => PsychicMoveAnimations.playFutureSightHit(refs),
     psychic: (refs) => PsychicMoveAnimations.playPsychic(refs)
   };
+
+  /** Turn-1 animations of Psychic moves that don't hit right away. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    futuresight: (refs) => PsychicMoveAnimations.playFutureSightForesee(refs)
+  };
+
+  /** Future Sight, the turn it's used: the scene dims for a moment while the user trembles. */
+  private static async playFutureSightForesee(refs: BattleStageRefs) {
+    const dim = await PsychicMoveAnimations.dimIn(refs.fieldEl);
+    await PsychicMoveAnimations.tremble(refs.launchEl, 700, 3);
+    await PsychicMoveAnimations.dimOut(dim);
+  }
+
+  /**
+   * Future Sight, two turns later: the scene dims, the target trembles while
+   * it blanks out white, then the field jolts and the target blinks as it's hit.
+   */
+  private static async playFutureSightHit(refs: BattleStageRefs) {
+    const { fieldEl, targetEl } = refs;
+    const dim = await PsychicMoveAnimations.dimIn(fieldEl);
+    const white = 'brightness(0) invert(1)';
+    await Promise.all([
+      PsychicMoveAnimations.tremble(targetEl, 800, 5),
+      Fx.anim(targetEl, [
+        { filter: 'brightness(1) invert(0)' },
+        { filter: white, offset: 0.25 },
+        { filter: white, offset: 0.75 },
+        { filter: 'brightness(1) invert(0)' }
+      ], { duration: 800, easing: 'ease-in-out', fill: 'none' })
+    ]);
+    Fx.shakeField(fieldEl, 0.7);
+    await Fx.blink(targetEl, 3);
+    await PsychicMoveAnimations.dimOut(dim);
+  }
+
+  /** Fades the dark backdrop in and hands it back for {@link dimOut}. */
+  private static async dimIn(fieldEl: HTMLElement): Promise<HTMLElement> {
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 280, easing: 'ease-out' });
+    return dim;
+  }
+
+  private static async dimOut(dim: HTMLElement) {
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'ease-in' });
+    dim.remove();
+  }
+
+  /** A quick side-to-side tremble in place (`amp` px); the sprite keeps facing its foe. */
+  private static tremble(el: HTMLElement, duration: number, amp: number): Promise<void> {
+    const original = el.style.transform;
+    const frames: Keyframe[] = [];
+    const n = Math.round(duration / 45);
+    for (let k = 0; k <= n; k++) {
+      const x = k === 0 || k === n ? 0 : (k % 2 ? amp : -amp);
+      frames.push({ transform: `${original} translateX(${x}px)` });
+    }
+    return Fx.anim(el, frames, { duration, easing: 'linear', fill: 'none' });
+  }
 
   /**
    * Psychic: the backdrop goes dark, then a moving psychedelic wave pattern

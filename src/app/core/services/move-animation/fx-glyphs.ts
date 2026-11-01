@@ -331,6 +331,40 @@ export class FxGlyphs {
     return el;
   }
 
+  /** Counter for unique SVG gradient ids of the bell glyph. */
+  private static bellId = 0;
+
+  /** A golden hand bell, `w` px wide, hanging from a loop with its clapper showing (Heal Bell). */
+  static bellGlyph(w: number): HTMLElement {
+    const id = `bel${FxGlyphs.bellId++}`;
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${w * 1.1}px;pointer-events:none;filter:drop-shadow(0 0 5px #FFE48A)`;
+    el.innerHTML = `<svg viewBox="0 0 40 44" width="100%" height="100%"><defs><linearGradient id="${id}" x1="0" x2="1"><stop offset="0" stop-color="#C98512"/><stop offset=".35" stop-color="#FFE77A"/><stop offset=".6" stop-color="#F7C232"/><stop offset="1" stop-color="#B8740C"/></linearGradient></defs><circle cx="20" cy="5" r="3.2" fill="none" stroke="#8A5A10" stroke-width="2"/><circle cx="20" cy="38.5" r="4" fill="#5A3A0C"/><path d="M20 7.5C11.5 7.5 9.5 16 9.5 23.5c0 6-3 9.5-6 11.5h33c-3-2-6-5.5-6-11.5C30.5 16 28.5 7.5 20 7.5z" fill="url(#${id})" stroke="#8A5A10" stroke-width="1.5" stroke-linejoin="round"/><rect x="3" y="33.5" width="34" height="3.5" rx="1.75" fill="#E9A922" stroke="#8A5A10" stroke-width="1.3"/><path d="M14 13c-1.6 2.6-2.2 6-2.2 9" stroke="#FFF6C8" stroke-width="2" fill="none" stroke-linecap="round" opacity=".8"/></svg>`;
+    return el;
+  }
+
+  /** A glass milk bottle, `w` px wide: white milk, a pink-grey cap and a dark band on the neck (Milk Drink). */
+  static milkBottleGlyph(w: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${w * 2}px;pointer-events:none;filter:drop-shadow(0 1px 2px #0006)`;
+    el.innerHTML =
+      '<svg viewBox="0 0 20 40" width="100%" height="100%">' +
+      '<rect x="6" y="1" width="8" height="5" rx="1.5" fill="#C9C2CC" stroke="#4A4650" stroke-width="1"/>' +
+      '<path d="M6.5 6h7v5c0 2 4.5 4 4.5 8v17a3 3 0 0 1-3 3H5a3 3 0 0 1-3-3V19c0-4 4.5-6 4.5-8z" fill="#FBFBFF" stroke="#5A5A66" stroke-width="1.2" stroke-linejoin="round"/>' +
+      '<rect x="6.5" y="8" width="7" height="3" fill="#2E2E36"/>' +
+      '<path d="M4.5 21v13" stroke="#ffffff" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>' +
+      '<path d="M15.5 21v13" stroke="#D8DCEA" stroke-width="1.4" stroke-linecap="round"/></svg>';
+    return el;
+  }
+
+  /** A plain music note in `color` with a dark outline (Heal Bell). */
+  static musicNote(size: number, color: string, note = '♪'): HTMLElement {
+    const el = document.createElement('div');
+    el.textContent = note;
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;text-align:center;font:bold ${size}px/${size}px sans-serif;color:${color};text-shadow:0 0 1px #222,1px 1px 0 #333,-1px -1px 0 #333,1px -1px 0 #333,-1px 1px 0 #333`;
+    return el;
+  }
+
   static pokeball(size: number): HTMLElement {
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;

@@ -434,6 +434,7 @@ export class BattlePage implements OnInit, OnDestroy {
     this.state.charge.set({});
     this.state.substitutes.set({});
     this.state.cursed = new Set();
+    this.state.futureAttacks = {};
     this.state.destinyBonds = new Set();
     this.state.lastMoves = {};
     this.state.encores = {};

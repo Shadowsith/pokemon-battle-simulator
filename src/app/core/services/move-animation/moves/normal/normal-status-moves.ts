@@ -10,11 +10,316 @@ export class NormalStatusMoveAnimations {
     batonpass: (refs, launch) => NormalStatusMoveAnimations.playBatonPass(refs, launch),
     bellydrum: (refs, launch) => NormalStatusMoveAnimations.playBellyDrum(refs, launch),
     encore: (refs, _launch, target) => NormalStatusMoveAnimations.playEncore(refs, target),
+    healbell: (refs, launch) => NormalStatusMoveAnimations.playHealBell(refs, launch),
+    milkdrink: (refs, launch) => NormalStatusMoveAnimations.playMilkDrink(refs, launch),
+    morningsun: (refs, launch) => NormalStatusMoveAnimations.playMorningSun(refs, launch),
+    painsplit: (refs, launch, target) => NormalStatusMoveAnimations.playPainSplit(refs, launch, target),
+    protect: (refs, launch) => NormalStatusMoveAnimations.playProtect(refs, launch),
     recover: (refs, launch) => NormalStatusMoveAnimations.playRecover(refs, launch),
     softboiled: (refs, launch) => NormalStatusMoveAnimations.playSoftBoiled(refs, launch),
     swordsdance: (refs, launch) => NormalStatusMoveAnimations.playSwordsDance(refs, launch),
     whirlwind: (refs, _launch, target, v) => NormalStatusMoveAnimations.playWhirlwind(refs, target, v)
   };
+
+  /** Particle colours of Protect's barrier: green, white, light blue. */
+  private static readonly PROTECT_COLORS = ['#86E8A8', '#FFFFFF', '#8FD0FF', '#B8F0D0', '#CFE8FF'];
+
+  /**
+   * Protect: a barrier of tightly packed green, white and light-blue
+   * particles gathers over the caster, shimmers for a moment, then breaks up.
+   */
+  private static async playProtect(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const rx = Math.max(r.width * 0.58, 36);
+    const ry = Math.max(r.height * 0.5, 32);
+    const colors = NormalStatusMoveAnimations.PROTECT_COLORS;
+    const hold = 1100;
+
+    const parts: Promise<void>[] = [];
+    for (let i = 0; i < 80; i++) {
+      // Spread evenly over an ellipse round the caster.
+      const ang = Math.random() * Math.PI * 2;
+      const d = Math.sqrt(Math.random());
+      const at = { x: launch.x + Math.cos(ang) * d * rx, y: launch.y + Math.sin(ang) * d * ry };
+      const s = 5 + Math.random() * 7;
+      const c = colors[i % colors.length];
+      const p = document.createElement('div');
+      p.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:${s * 0.3}px;pointer-events:none;background:${c};box-shadow:0 0 ${s * 0.8}px ${c};opacity:0`;
+      Fx.place(p, at);
+      fxEl.appendChild(p);
+      // Gather in from slightly outside, shimmer in place, then scatter outward.
+      const inX = Math.cos(ang) * rx * 0.25;
+      const inY = Math.sin(ang) * ry * 0.25;
+      const jx = (Math.random() * 2 - 1) * 2;
+      const jy = (Math.random() * 2 - 1) * 2;
+      parts.push(
+        Fx.anim(p, [
+          { transform: `translate(${inX}px,${inY}px) scale(.3)`, opacity: 0 },
+          { transform: 'translate(0,0) scale(1)', opacity: 0.9, offset: 0.2 },
+          { transform: `translate(${jx}px,${jy}px) scale(.8)`, opacity: 0.55, offset: 0.4 },
+          { transform: 'translate(0,0) scale(1.05)', opacity: 0.95, offset: 0.6 },
+          { transform: `translate(${-jx}px,${-jy}px) scale(.85)`, opacity: 0.6, offset: 0.78 },
+          { transform: `translate(${inX * 1.4}px,${inY * 1.4}px) scale(.4)`, opacity: 0 }
+        ], { duration: hold, easing: 'ease-in-out', delay: Math.random() * 180 }).then(() => p.remove())
+      );
+    }
+    await Promise.all(parts);
+  }
+
+  /** Pain Split: the same orange hit bursts strike the caster and the target at once. */
+  private static async playPainSplit(refs: BattleStageRefs, launch: Point, target: Point) {
+    await Promise.all([
+      NormalStatusMoveAnimations.painBursts(refs.fxEl, refs.launchEl, launch),
+      NormalStatusMoveAnimations.painBursts(refs.fxEl, refs.targetEl, target)
+    ]);
+  }
+
+  /** Three orange spiky bursts, each with a white ring, pop on one Pokémon as it flashes and shakes. */
+  private static async painBursts(fxEl: HTMLElement, el: HTMLElement, at: Point): Promise<void> {
+    const r = Fx.rect(el);
+    const size = Math.max(r.width * 0.75, 56);
+    const pops: Promise<void>[] = [];
+    for (let i = 0; i < 3; i++) {
+      await Fx.wait(i ? 230 : 0);
+      const p = { x: at.x + (Math.random() * 2 - 1) * r.width * 0.2, y: at.y + (Math.random() * 2 - 1) * r.height * 0.2 };
+      const burst = FxGlyphs.spikyBurst(size, '#FF7A1A', '#FFB040', '#FFF6E0');
+      const ring = document.createElement('div');
+      const rs = size * 0.5;
+      ring.style.cssText = `position:absolute;width:${rs}px;height:${rs}px;border-radius:50%;pointer-events:none;border:${Math.max(rs * 0.12, 3)}px dashed #ffffff;box-shadow:0 0 4px #ffffffaa`;
+      for (const e of [burst, ring]) {
+        Fx.place(e, p);
+        fxEl.appendChild(e);
+      }
+      pops.push(
+        Fx.anim(burst, [
+          { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+          { transform: 'scale(1) rotate(12deg)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(1.1) rotate(18deg)', opacity: 0 }
+        ], { duration: 420, easing: 'ease-out' }).then(() => burst.remove()),
+        Fx.anim(ring, [
+          { transform: 'scale(.4) rotate(0deg)', opacity: 1 },
+          { transform: 'scale(1.3) rotate(40deg)', opacity: 0 }
+        ], { duration: 420, easing: 'ease-out' }).then(() => ring.remove())
+      );
+      Fx.flash(el, '#FF9A3A', 0.6);
+      Fx.shake(el, 4);
+    }
+    await Promise.all(pops);
+  }
+
+  /**
+   * Morning Sun: the morning sun glows and pulses in the top-left corner,
+   * light rays fan out of it, yellow sparkles twinkle round it and soft white
+   * light pulses drift from it toward the caster; then green HP sparkles.
+   */
+  private static async playMorningSun(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const sun: Point = { x: W * 0.03, y: H * 0.04 };
+    const total = 1700;
+    const effects: Promise<void>[] = [];
+
+    // The sun: a white-yellow glow that pulses three times.
+    const size = H * 0.6;
+    const glow = document.createElement('div');
+    glow.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFFF4,#FFF6B0 25%,#FFE45A88 45%,#FFE45A00 70%)`;
+    Fx.place(glow, sun);
+    fxEl.appendChild(glow);
+    effects.push(
+      Fx.anim(glow, [
+        { transform: 'scale(.4)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.12 },
+        { transform: 'scale(.82)', opacity: 0.85, offset: 0.3 },
+        { transform: 'scale(1.12)', opacity: 1, offset: 0.48 },
+        { transform: 'scale(.85)', opacity: 0.85, offset: 0.66 },
+        { transform: 'scale(1.15)', opacity: 1, offset: 0.84 },
+        { transform: 'scale(1.2)', opacity: 0 }
+      ], { duration: total, easing: 'ease-in-out' }).then(() => glow.remove())
+    );
+
+    // Light rays fanning down-right out of the corner.
+    const reach = Math.hypot(W, H) * 0.45;
+    for (let i = 0; i < 6; i++) {
+      const ang = 18 + i * 11 + Math.random() * 5;
+      const ray = document.createElement('div');
+      ray.style.cssText = `position:absolute;left:${sun.x}px;top:${sun.y - 2}px;width:${reach}px;height:${i % 2 ? 3 : 5}px;transform-origin:0 50%;pointer-events:none;background:linear-gradient(90deg,#FFFDE8,#FFE45Acc 40%,#FFE45A00);filter:drop-shadow(0 0 3px #FFE45A)`;
+      fxEl.appendChild(ray);
+      effects.push(
+        Fx.anim(ray, [
+          { transform: `rotate(${ang}deg) scaleX(0)`, opacity: 0 },
+          { transform: `rotate(${ang}deg) scaleX(1)`, opacity: 1, offset: 0.4 },
+          { transform: `rotate(${ang + 3}deg) scaleX(1)`, opacity: 0 }
+        ], { duration: 900, easing: 'ease-out', delay: 150 + i * 110 }).then(() => ray.remove())
+      );
+    }
+
+    // Soft white light pulses drift from the sun toward the caster.
+    const dx = (launch.x - sun.x) * 0.55;
+    const dy = (launch.y - sun.y) * 0.55;
+    for (let i = 0; i < 4; i++) {
+      const s = H * 0.12;
+      const orb = document.createElement('div');
+      orb.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFFFF,#FFFFFFcc 40%,#FFFFFF00 70%)`;
+      Fx.place(orb, sun);
+      fxEl.appendChild(orb);
+      effects.push(
+        Fx.anim(orb, [
+          { transform: 'translate(0,0) scale(.5)', opacity: 0 },
+          { transform: `translate(${dx * 0.3}px,${dy * 0.3}px) scale(1)`, opacity: 0.95, offset: 0.3 },
+          { transform: `translate(${dx}px,${dy}px) scale(1.5)`, opacity: 0 }
+        ], { duration: 900, easing: 'ease-out', delay: 300 + i * 260 }).then(() => orb.remove())
+      );
+    }
+
+    // Yellow sparkles twinkle round the sun.
+    for (let i = 0; i < 10; i++) {
+      const star = FxGlyphs.sparkStar(10 + Math.random() * 10, '#FFE45A');
+      Fx.place(star, { x: sun.x + Math.random() * size * 0.55, y: sun.y + Math.random() * size * 0.45 });
+      fxEl.appendChild(star);
+      effects.push(
+        Fx.anim(star, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(20deg)', opacity: 1, offset: 0.45 },
+          { transform: 'scale(0) rotate(40deg)', opacity: 0 }
+        ], { duration: 500, easing: 'ease-in-out', delay: 150 + Math.random() * (total - 700) }).then(() => star.remove())
+      );
+    }
+    await Promise.all(effects);
+    await FxEffects.healSparkles(refs, launch);
+  }
+
+  /**
+   * Milk Drink: a milk bottle drops in from above the caster and shakes left
+   * and right while blue sparkles twinkle in a small blue ring round the
+   * caster; bottle and ring fade, then green HP sparkles show the heal.
+   */
+  private static async playMilkDrink(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const w = Math.max(r.width * 0.2, 18);
+    const at = { x: launch.x, y: launch.y - r.height * 0.1 };
+
+    // Blue ring round the caster.
+    const size = Math.max(r.width, r.height) * 0.95;
+    const ring = document.createElement('div');
+    ring.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;border:2.5px solid #8EE0FF;background:radial-gradient(circle,#8EE0FF00 60%,#8EE0FF33 72%,#8EE0FF00 74%);box-shadow:0 0 8px #6FC8FF,inset 0 0 6px #6FC8FF`;
+    Fx.place(ring, launch);
+    fxEl.appendChild(ring);
+    Fx.anim(ring, [{ transform: 'scale(.7)', opacity: 0 }, { transform: 'scale(1)', opacity: 0.9 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+
+    // The bottle drops in from above.
+    const bottle = FxGlyphs.milkBottleGlyph(w);
+    bottle.style.transformOrigin = '50% 90%';
+    Fx.place(bottle, at);
+    fxEl.appendChild(bottle);
+    await Fx.anim(bottle, [
+      { transform: `translateY(${-r.height * 0.6}px)`, opacity: 0 },
+      { transform: 'translateY(0)', opacity: 1 }
+    ], { duration: 320, easing: 'ease-out', fill: 'forwards' });
+
+    // It shakes left and right while blue sparkles twinkle inside the ring.
+    const shakes = 6;
+    const shake = Fx.anim(bottle, [
+      { transform: 'translateX(0) rotate(0deg)' },
+      ...Array.from({ length: shakes }, (_, k) => ({ transform: `translateX(${k % 2 ? -w * 0.4 : w * 0.4}px) rotate(${k % 2 ? -14 : 14}deg)` })),
+      { transform: 'translateX(0) rotate(0deg)' }
+    ], { duration: 950, easing: 'ease-in-out', fill: 'forwards' });
+    const sparkles: Promise<void>[] = [];
+    for (let i = 0; i < 9; i++) {
+      const star = FxGlyphs.sparkStar(10 + Math.random() * 10, i % 3 ? '#6FC8FF' : '#E8F8FF');
+      const ang = Math.random() * Math.PI * 2;
+      const d = size * (0.2 + Math.random() * 0.32);
+      Fx.place(star, { x: launch.x + Math.cos(ang) * d, y: launch.y + Math.sin(ang) * d });
+      fxEl.appendChild(star);
+      sparkles.push(
+        Fx.anim(star, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(20deg)', opacity: 1, offset: 0.45 },
+          { transform: 'scale(0) rotate(40deg)', opacity: 0 }
+        ], { duration: 480, easing: 'ease-in-out', delay: i * 95 }).then(() => star.remove())
+      );
+    }
+    await Promise.all([shake, ...sparkles]);
+
+    await Promise.all(
+      [bottle, ring].map((el) => Fx.anim(el, [{ opacity: el === ring ? 0.9 : 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' }).then(() => el.remove()))
+    );
+    await FxEffects.healSparkles(refs, launch);
+  }
+
+  /** Note colours of Heal Bell: yellow, red, green, blue. */
+  private static readonly BELL_NOTE_COLORS = ['#F6D33C', '#E8443A', '#3DBA4E', '#3C7CE8'];
+
+  /**
+   * Heal Bell: a golden bell pops up in front of the caster and swings,
+   * sending out pulsing yellow rings and music notes in yellow, red, green
+   * and blue, then fades away.
+   */
+  private static async playHealBell(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const w = Math.max(r.width * 0.32, 28);
+    const at = { x: launch.x, y: launch.y + r.height * 0.05 };
+
+    const bell = FxGlyphs.bellGlyph(w);
+    bell.style.transformOrigin = '50% 8%';
+    Fx.place(bell, at);
+    fxEl.appendChild(bell);
+    await Fx.anim(bell, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 220, easing: 'ease-out' });
+
+    // The bell swings to and fro; each swing sends out a ring and a few notes.
+    const swings = 4;
+    const swing = 320;
+    const swingAnim = Fx.anim(bell, [
+      { transform: 'rotate(0deg)' },
+      ...Array.from({ length: swings }, (_, k) => ({ transform: `rotate(${k % 2 ? -20 : 20}deg)` })),
+      { transform: 'rotate(0deg)' }
+    ], { duration: swing * (swings + 1), easing: 'ease-in-out' });
+
+    const effects: Promise<void>[] = [];
+    for (let k = 0; k < swings; k++) {
+      effects.push(NormalStatusMoveAnimations.bellRing(fxEl, at, w));
+      for (let n = 0; n < 3; n++) effects.push(NormalStatusMoveAnimations.bellNote(fxEl, at, w, k * 3 + n));
+      await Fx.wait(swing);
+    }
+    await swingAnim;
+    await Fx.anim(bell, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    bell.remove();
+    await Promise.all(effects);
+  }
+
+  /** One pulsing yellow ring growing out of the bell and fading. */
+  private static bellRing(fxEl: HTMLElement, at: Point, w: number): Promise<void> {
+    const size = w * 1.3;
+    const ring = document.createElement('div');
+    ring.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;border:3px solid #F6D33C;box-shadow:0 0 8px #FFE48A,inset 0 0 6px #FFE48A`;
+    Fx.place(ring, at);
+    fxEl.appendChild(ring);
+    return Fx.anim(ring, [
+      { transform: 'scale(.6)', opacity: 0 },
+      { transform: 'scale(1.2)', opacity: 0.95, offset: 0.2 },
+      { transform: 'scale(3.4)', opacity: 0 }
+    ], { duration: 900, easing: 'ease-out' }).then(() => ring.remove());
+  }
+
+  /** One music note floating out of the bell in a random direction, drifting up as it fades. */
+  private static bellNote(fxEl: HTMLElement, at: Point, w: number, i: number): Promise<void> {
+    const colors = NormalStatusMoveAnimations.BELL_NOTE_COLORS;
+    const note = FxGlyphs.musicNote(w * (0.55 + Math.random() * 0.25), colors[i % colors.length], i % 3 ? '♪' : '♫');
+    Fx.place(note, at);
+    fxEl.appendChild(note);
+    const ang = Math.random() * Math.PI * 2;
+    const d = w * (1.6 + Math.random() * 1.4);
+    const x = Math.cos(ang) * d;
+    const y = Math.sin(ang) * d * 0.75 - w * 0.6;
+    return Fx.anim(note, [
+      { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+      { transform: `translate(${x * 0.35}px,${y * 0.35}px) scale(1)`, opacity: 1, offset: 0.25 },
+      { transform: `translate(${x}px,${y - w * 0.4}px) scale(1)`, opacity: 0 }
+    ], { duration: 1100, easing: 'ease-out', delay: Math.random() * 120 }).then(() => note.remove());
+  }
 
   /**
    * Whirlwind: a gust sweeps over the target - white and grey flakes tumble

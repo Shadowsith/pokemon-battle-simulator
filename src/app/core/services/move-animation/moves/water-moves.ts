@@ -11,9 +11,52 @@ export class WaterMoveAnimations {
     bubblebeam: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_BEAM),
     crabhammer: (refs, _launch, target) => WaterMoveAnimations.playCrabhammer(refs, target),
     hydropump: (refs, launch, target) => WaterMoveAnimations.playHydroPump(refs, launch, target),
+    raindance: (refs) => WaterMoveAnimations.playRainDance(refs),
     surf: (refs, launch, target, v) => WaterMoveAnimations.playSurf(refs, launch, target, v),
     waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target)
   };
+
+  /**
+   * Rain Dance: the scene darkens under heavy clouds and slanted streaks of
+   * rain pour down over the whole field, then the sky clears again.
+   */
+  private static async playRainDance(refs: BattleStageRefs) {
+    const { fieldEl, fxEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const pour = 1900;
+
+    const gloom = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#0E1A22,#1A2A26 70%);opacity:0');
+    await Fx.anim(gloom, [{ opacity: 0 }, { opacity: 0.6 }], { duration: 350, easing: 'ease-out', fill: 'forwards' });
+
+    // Rain falls in front of the sprites; each streak loops until the shower ends.
+    const rain = document.createElement('div');
+    rain.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fxEl.appendChild(rain);
+    const slant = 14; // degrees: the top leans right, so streaks fall toward the left
+    const drift = Math.tan((slant * Math.PI) / 180);
+    for (let i = 0; i < 80; i++) {
+      const len = 16 + Math.random() * 16;
+      const drop = document.createElement('div');
+      const x = Math.random() * (W + H * drift);
+      drop.style.cssText = `position:absolute;left:${x}px;top:${-len}px;width:1.5px;height:${len}px;border-radius:1px;background:linear-gradient(180deg,#ffffff00,#E8F2FFcc);transform-origin:50% 100%`;
+      rain.appendChild(drop);
+      const fall = H + len * 2;
+      drop.animate([
+        { transform: `translate(0,0) rotate(${slant}deg)` },
+        { transform: `translate(${-fall * drift}px,${fall}px) rotate(${slant}deg)` }
+      ], { duration: 420 + Math.random() * 220, iterations: Infinity, easing: 'linear', delay: -Math.random() * 600 });
+    }
+    await Fx.anim(rain, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+    await Fx.wait(pour);
+
+    await Promise.all([
+      Fx.anim(rain, [{ opacity: 1 }, { opacity: 0 }], { duration: 400, easing: 'ease-in', fill: 'forwards' }),
+      Fx.anim(gloom, [{ opacity: 0.6 }, { opacity: 0 }], { duration: 450, easing: 'ease-in', fill: 'forwards' })
+    ]);
+    rain.remove();
+    gloom.remove();
+  }
 
   /**
    * Surf: a curling dark blue wave - moving water inside, a white foam crest

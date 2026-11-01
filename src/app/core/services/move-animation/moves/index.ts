@@ -1,7 +1,9 @@
 import { MoveAnimRegistry } from '../animation.types';
 import { BugMoveAnimations } from './bug-moves';
 import { DarkMoveAnimations } from './dark-moves';
+import { DragonMoveAnimations } from './dragon-moves';
 import { ElectricMoveAnimations } from './electric-moves';
+import { FairyMoveAnimations } from './fairy-moves';
 import { FightingMoveAnimations } from './fighting-moves';
 import { FireMoveAnimations } from './fire-moves';
 import { FlyingMoveAnimations } from './flying-moves';
@@ -13,6 +15,7 @@ import { NormalMoveAnimations } from './normal-moves';
 import { PoisonMoveAnimations } from './poison-moves';
 import { PsychicMoveAnimations } from './psychic-moves';
 import { RockMoveAnimations } from './rock-moves';
+import { SteelMoveAnimations } from './steel-moves';
 import { WaterMoveAnimations } from './water-moves';
 
 /**
@@ -21,7 +24,7 @@ import { WaterMoveAnimations } from './water-moves';
  */
 export const MOVE_ANIMATION_GROUPS: readonly {
   readonly anims: MoveAnimRegistry;
-  /** Turn-1 animations of two-turn moves (Dig, Fly, Razor Wind …). */
+  /** Turn-1 animations of two-turn moves (Dig, Fly, Razor Wind …) and delayed attacks (Future Sight). */
   readonly chargeAnims?: MoveAnimRegistry;
 }[] = [
   NormalMoveAnimations,
@@ -38,7 +41,10 @@ export const MOVE_ANIMATION_GROUPS: readonly {
   BugMoveAnimations,
   RockMoveAnimations,
   GhostMoveAnimations,
-  DarkMoveAnimations
+  DarkMoveAnimations,
+  SteelMoveAnimations,
+  FairyMoveAnimations,
+  DragonMoveAnimations
 ];
 
 /** All hand-made animations that replace the derived one, by @pkmn/sim move id. */

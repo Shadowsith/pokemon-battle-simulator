@@ -24,8 +24,11 @@ describe('move animation registry', () => {
     expect(unknown).toEqual([]);
   });
 
-  it('only registers turn-1 animations for real two-turn moves', () => {
-    const wrong = Object.keys(CUSTOM_CHARGE_ANIMATIONS).filter((id) => !Dex.moves.get(id).flags.charge);
+  it('only registers turn-1 animations for two-turn and delayed moves', () => {
+    const wrong = Object.keys(CUSTOM_CHARGE_ANIMATIONS).filter((id) => {
+      const flags = Dex.moves.get(id).flags;
+      return !flags.charge && !flags.futuremove;
+    });
     expect(wrong).toEqual([]);
     expect(Object.keys(CUSTOM_CHARGE_ANIMATIONS)).toEqual(jasmine.arrayContaining(['dig', 'fly', 'razorwind']));
   });

@@ -280,6 +280,29 @@ export class FxEffects {
     return Promise.all(puffs).then(() => void 0);
   }
 
+  /**
+   * A red backdrop with flickering yellow burst rays centred on `at`, behind
+   * the sprites (Dynamic Punch, Megahorn). Resolves once it has faded in;
+   * the caller fades it out and removes it.
+   */
+  static async redBurstBackdrop(fieldEl: HTMLElement, at: Point): Promise<HTMLElement> {
+    const c = `${at.x}px ${at.y}px`;
+    const red = Fx.backdrop(fieldEl, `background:radial-gradient(circle at ${c},#FF4A1A,#D0140E 35%,#6A0404 85%)`);
+    const rays = document.createElement('div');
+    rays.style.cssText =
+      `position:absolute;inset:0;transform-origin:${c};` +
+      `background:radial-gradient(circle at ${c},#FFE07A 0 6%,#D0140E00 22%),` +
+      `repeating-conic-gradient(from 0deg at ${c},#FFC23A00 0 8deg,#FFB03Add 8deg 10deg,#FFE87A 10deg 11deg,#FFC23A00 11deg 20deg)`;
+    red.appendChild(rays);
+    rays.animate([
+      { transform: 'scale(1) rotate(0deg)', opacity: 0.85 },
+      { transform: 'scale(1.06) rotate(1.5deg)', opacity: 1 },
+      { transform: 'scale(1) rotate(0deg)', opacity: 0.85 }
+    ], { duration: 160, iterations: 8 });
+    await Fx.anim(red, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+    return red;
+  }
+
   /** HP gain: twinkling green stars and a soft green glow around the caster (drain moves). */
   static async healSparkles(refs: BattleStageRefs, launch: Point) {
     const { fxEl, launchEl } = refs;

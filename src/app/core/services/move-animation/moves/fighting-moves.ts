@@ -212,20 +212,7 @@ export class FightingMoveAnimations {
     const f = Fx.rect(fieldEl);
 
     // 1. Red burst backdrop (0-0.25 s), flickering behind the sprites.
-    const at = `${target.x}px ${target.y}px`;
-    const red = Fx.backdrop(fieldEl, `background:radial-gradient(circle at ${at},#FF4A1A,#D0140E 35%,#6A0404 85%)`);
-    const rays = document.createElement('div');
-    rays.style.cssText =
-      `position:absolute;inset:0;transform-origin:${at};` +
-      `background:radial-gradient(circle at ${at},#FFE07A 0 6%,#D0140E00 22%),` +
-      `repeating-conic-gradient(from 0deg at ${at},#FFC23A00 0 8deg,#FFB03Add 8deg 10deg,#FFE87A 10deg 11deg,#FFC23A00 11deg 20deg)`;
-    red.appendChild(rays);
-    rays.animate([
-      { transform: 'scale(1) rotate(0deg)', opacity: 0.85 },
-      { transform: 'scale(1.06) rotate(1.5deg)', opacity: 1 },
-      { transform: 'scale(1) rotate(0deg)', opacity: 0.85 }
-    ], { duration: 160, iterations: 8 });
-    await Fx.anim(red, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+    const red = await FxEffects.redBurstBackdrop(fieldEl, target);
 
     // 2. The fist slams in (0.25-0.42 s) over an orange blast; stones fly out.
     const fistW = Math.max(r.width * 0.55, 44);

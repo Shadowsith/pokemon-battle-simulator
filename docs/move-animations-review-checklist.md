@@ -242,35 +242,35 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Foresight** / Scharfblick — `foresight` · Normal · Status · `targetAura`
 - [ ] **Frustration** / Frustration — `frustration` · Normal · Physical · `melee`
 - [ ] **Fury Cutter** / Zornklinge — `furycutter` · Bug · Physical · `melee`
-- [ ] ⭐ **Future Sight** / Seher — `futuresight` · Psychic · Special · `projectile`
-- [ ] ⭐ **Giga Drain** / Gigasauger — `gigadrain` · Grass · Special · `projectile`
-- [ ] ⭐ **Heal Bell** / Vitalglocke — `healbell` · Normal · Status · `targetAura`
+- [x] ⭐ **Future Sight** / Seher — `futuresight` · Psychic · Special · turn 1: brief dim + caster trembles; hit 2 turns later: dim + target trembles and blanks white, field jolt + blink (custom, needs review)
+- [x] ⭐ **Giga Drain** / Gigasauger — `gigadrain` · Grass · Special · like Absorb but mightier: target flares green, big glowing green energy orbs swarm to caster on wide arcs, then green HP sparkles (custom, needs review)
+- [x] ⭐ **Heal Bell** / Vitalglocke — `healbell` · Normal · Status · golden bell swings in front of the caster, pulsing yellow rings + yellow/red/green/blue music notes, bell fades (custom, needs review)
 - [ ] **Hidden Power** / Kraftreserve — `hiddenpower` · Normal · Special · `projectile`
 - [ ] **Icy Wind** / Eissturm — `icywind` · Ice · Special · `field`
-- [ ] ⭐ **Iron Tail** / Eisenschweif — `irontail` · Steel · Physical · `melee`
+- [x] ⭐ **Iron Tail** / Eisenschweif — `irontail` · Steel · Physical · caster glints with silver sparkles, then a wide silver swipe sweeps across the target (attack direction) with glittering iron dust clouds (custom, needs review)
 - [ ] **Lock-On** / Zielschuss — `lockon` · Normal · Status · `targetAura`
 - [ ] **Mach Punch** / Tempohieb — `machpunch` · Fighting · Physical · `melee`
 - [ ] **Magnitude** / Intensität — `magnitude` · Ground · Physical · `field`
 - [ ] **Mean Look** / Horrorblick — `meanlook` · Normal · Status · `targetAura`
-- [ ] ⭐ **Megahorn** / Vielender — `megahorn` · Bug · Physical · `melee`
+- [x] ⭐ **Megahorn** / Vielender — `megahorn` · Bug · Physical · black horn shoots at the target with red streaks, then red burst backdrop + yellow blast + yellow sparkle stripes (custom, needs review)
 - [ ] **Metal Claw** / Metallklaue — `metalclaw` · Steel · Physical · `melee`
-- [ ] ⭐ **Milk Drink** / Milchgetränk — `milkdrink` · Normal · Status · `selfAura`
+- [x] ⭐ **Milk Drink** / Milchgetränk — `milkdrink` · Normal · Status · milk bottle drops in and shakes left/right, blue sparkles in a small blue ring, then green HP sparkles (custom, needs review)
 - [ ] **Mind Reader** / Willensleser — `mindreader` · Normal · Status · `targetAura`
 - [ ] **Mirror Coat** / Spiegelcape — `mirrorcoat` · Psychic · Special · `projectile`
-- [ ] ⭐ **Moonlight** / Mondschein — `moonlight` · Fairy · Status · `selfAura`
-- [ ] ⭐ **Morning Sun** / Morgengrauen — `morningsun` · Normal · Status · `selfAura`
+- [x] ⭐ **Moonlight** / Mondschein — `moonlight` · Fairy · Status · scene goes dark, dark-grey night sky with a rising full moon and falling yellow stars, then green HP sparkles (custom, needs review)
+- [x] ⭐ **Morning Sun** / Morgengrauen — `morningsun` · Normal · Status · pulsing sun glow in the top-left corner, light rays + yellow sparkles, white light pulses drift toward the caster, then green HP sparkles (custom, needs review)
 - [ ] **Mud-Slap** / Lehmschelle — `mudslap` · Ground · Special · `projectile`
 - [ ] **Nightmare** / Nachtmahr — `nightmare` · Ghost · Status · `targetAura`
 - [ ] **Octazooka** / Octazooka — `octazooka` · Water · Special · `lob`
-- [ ] ⭐ **Outrage** / Wutanfall — `outrage` · Dragon · Physical · `melee`
-- [ ] ⭐ **Pain Split** / Leidteiler — `painsplit` · Normal · Status · `targetAura`
+- [x] ⭐ **Outrage** / Wutanfall — `outrage` · Dragon · Physical · scene goes dark, then purple/magenta dragon fire rolls left to right across the background, caster flares with pulsing orange sparkles, target shakes (custom, needs review)
+- [x] ⭐ **Pain Split** / Leidteiler — `painsplit` · Normal · Status · three orange spiky bursts with white rings hit caster and target at the same time (custom, needs review)
 - [ ] **Perish Song** / Abgesang — `perishsong` · Normal · Status · `targetAura`
 - [ ] **Powder Snow** / Pulverschnee — `powdersnow` · Ice · Special · `field`
 - [ ] **Present** / Geschenk — `present` · Normal · Physical · `projectile`
-- [ ] ⭐ **Protect** / Schutzschild — `protect` · Normal · Status · `selfAura`
+- [x] ⭐ **Protect** / Schutzschild — `protect` · Normal · Status · barrier of tightly packed green, white and light-blue particles gathers over the caster, shimmers, then breaks up (custom, needs review)
 - [ ] **Psych Up** / Psycho-Plus — `psychup` · Normal · Status · `targetAura`
 - [ ] **Pursuit** / Verfolgung — `pursuit` · Dark · Physical · `melee`
-- [ ] ⭐ **Rain Dance** / Regentanz — `raindance` · Water · Status · `weather`
+- [x] ⭐ **Rain Dance** / Regentanz — `raindance` · Water · Status · scene darkens under clouds, slanted rain streaks pour down over the field, then the sky clears (custom, needs review)
 - [ ] **Rapid Spin** / Turbodreher — `rapidspin` · Normal · Physical · `melee`
 - [ ] **Return** / Rückkehr — `return` · Normal · Physical · `melee`
 - [ ] **Reversal** / Gegenschlag — `reversal` · Fighting · Physical · `melee`

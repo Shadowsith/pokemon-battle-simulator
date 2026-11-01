@@ -215,6 +215,7 @@ export class BattleSetupService {
     s.charge.set({});
     s.substitutes.set({});
     s.cursed = new Set();
+    s.futureAttacks = {};
     s.destinyBonds = new Set();
     s.lastMoves = {};
     s.encores = {};
