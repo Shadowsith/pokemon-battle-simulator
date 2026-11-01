@@ -100,7 +100,7 @@ export class PsychicMoveAnimations {
     await Fx.wait(travel + spread * 0.85);
 
     // 3. The caster glows while purple psychic sparkles twinkle over it.
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const rad = Math.max(r.width * 0.45, 28);
     const glow = Fx.anim(launchEl, [
       { filter: 'brightness(1)' },
@@ -163,8 +163,8 @@ export class PsychicMoveAnimations {
    */
   private static async playAmnesia(refs: BattleStageRefs, launch: Point) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
+    const f = Fx.rect(fieldEl);
     const head: Point = { x: launch.x, y: r.top - f.top + r.height * 0.15 };
 
     const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
@@ -230,7 +230,7 @@ export class PsychicMoveAnimations {
    */
   private static async playBarrier(refs: BattleStageRefs, launch: Point) {
     const { fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const w = Math.max(r.width * 0.9, 60);
     const h = Math.max(r.height * 1.0, 70);
 
@@ -285,8 +285,8 @@ export class PsychicMoveAnimations {
    */
   private static async playRest(refs: BattleStageRefs, launch: Point, v: MoveVisual) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
+    const f = Fx.rect(fieldEl);
     // The bubble and the Zs sit at the head, drifting away from the foe.
     const away = -v.dir;
     const head: Point = { x: launch.x + away * r.width * 0.15, y: r.top - f.top + r.height * 0.2 };
@@ -339,7 +339,7 @@ export class PsychicMoveAnimations {
   private static async playScreen(refs: BattleStageRefs, launch: Point, v: MoveVisual, style: ScreenStyle) {
     const { fxEl, launchEl } = refs;
     const { rim, glow } = style;
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const h = Math.max(r.height * 1.15, 80);
     const w = h * 0.5;
     const at = { x: launch.x + v.dir * Math.max(r.width * 0.5, 34), y: launch.y - h * 0.05 };

@@ -25,7 +25,7 @@ export class NormalStatusMoveAnimations {
   private static async playWhirlwind(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { fieldEl, fxEl, targetEl } = refs;
     const W = fieldEl.clientWidth;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const span = Math.max(W * 0.35, r.width * 1.6);
     const band = Math.max(r.height * 0.6, 40);
     const gust = 1000;
@@ -85,8 +85,8 @@ export class NormalStatusMoveAnimations {
    */
   private static async playSwordsDance(refs: BattleStageRefs, launch: Point) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
+    const f = Fx.rect(fieldEl);
     const rx = Math.max(r.width * 0.65, 46);
     const ry = Math.max(r.height * 0.2, 14);
     const centre: Point = { x: launch.x, y: launch.y + r.height * 0.05 };
@@ -150,8 +150,8 @@ export class NormalStatusMoveAnimations {
    */
   private static async playEncore(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const f = fieldEl.getBoundingClientRect();
-    const r = targetEl.getBoundingClientRect();
+    const f = Fx.rect(fieldEl);
+    const r = Fx.rect(targetEl);
     const foot = r.bottom - f.top - r.height * 0.06;
 
     // 1. Dark stage (0-0.3 s).
@@ -215,8 +215,8 @@ export class NormalStatusMoveAnimations {
    */
   private static async playBellyDrum(refs: BattleStageRefs, launch: Point) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
-    const top = r.top - fieldEl.getBoundingClientRect().top;
+    const r = Fx.rect(launchEl);
+    const top = r.top - Fx.rect(fieldEl).top;
     const belly: Point = { x: launch.x, y: launch.y + r.height * 0.12 };
     const head: Point = { x: launch.x, y: top + r.height * 0.15 };
     const hw = Math.max(r.width * 0.3, 28);
@@ -271,8 +271,8 @@ export class NormalStatusMoveAnimations {
    */
   private static async playBatonPass(refs: BattleStageRefs, launch: Point) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
-    const top = r.top - fieldEl.getBoundingClientRect().top;
+    const r = Fx.rect(launchEl);
+    const top = r.top - Fx.rect(fieldEl).top;
     const catchAt: Point = { x: launch.x, y: top + r.height * 0.2 };
     const bw = Math.max(r.width * 0.35, 30);
     const rise = Math.max(r.height * 0.9, 70);
@@ -319,8 +319,8 @@ export class NormalStatusMoveAnimations {
    */
   private static async playSoftBoiled(refs: BattleStageRefs, launch: Point) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
+    const f = Fx.rect(fieldEl);
     const head: Point = { x: launch.x, y: r.top - f.top + r.height * 0.15 };
 
     // 1. The egg drops onto the head.
@@ -385,7 +385,7 @@ export class NormalStatusMoveAnimations {
    */
   private static async playRecover(refs: BattleStageRefs, launch: Point) {
     const { fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const rx = Math.max(r.width * 0.5, 30);
     const ry = Math.max(r.height * 0.45, 28);
     const colors = ['#FFA62B', '#FFD34D', '#FF8A1F'];

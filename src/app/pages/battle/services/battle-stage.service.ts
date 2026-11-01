@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Slot, slotKey } from '../../../core/battle/battle-format';
+import { FieldScaler } from './field-scaler';
 
 /**
  * The battle page's DOM as seen by the battle logic: the field and effect
@@ -11,11 +12,21 @@ export class BattleStageService {
   private fieldNode: HTMLElement | null = null;
   private fxNode: HTMLElement | null = null;
   private screenFxNode: HTMLElement | null = null;
+  private readonly scaler = new FieldScaler();
 
   attach(field: HTMLElement, fx: HTMLElement, screenFx: HTMLElement): void {
     this.fieldNode = field;
     this.fxNode = fx;
     this.screenFxNode = screenFx;
+  }
+
+  /** Zoom the field to fill `area` on wide screens; `layout` receives `--field-scale`. */
+  fitField(area: HTMLElement, layout: HTMLElement): void {
+    this.scaler.start(area, layout);
+  }
+
+  detach(): void {
+    this.scaler.stop();
   }
 
   get fieldEl(): HTMLElement {

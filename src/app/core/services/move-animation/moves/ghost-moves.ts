@@ -18,9 +18,9 @@ export class GhostMoveAnimations {
    */
   private static async playDestinyBond(refs: BattleStageRefs, launch: Point, target: Point) {
     const { fieldEl, fxEl, launchEl, targetEl } = refs;
-    const f = fieldEl.getBoundingClientRect();
-    const lr = launchEl.getBoundingClientRect();
-    const tr = targetEl.getBoundingClientRect();
+    const f = Fx.rect(fieldEl);
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
 
     // 1. Ghostly red-purple haze, drifting slowly (0-0.35 s).
     const haze = Fx.backdrop(
@@ -73,7 +73,7 @@ export class GhostMoveAnimations {
    */
   private static async playCurse(refs: BattleStageRefs, launch: Point) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const size = Math.max(r.width, r.height) * 1.05;
 
     // 1. The circle, behind the sprites (0-0.35 s).
@@ -147,7 +147,7 @@ export class GhostMoveAnimations {
     await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-out' });
 
     // 1. The caster brightens inside a soft, fuzzy pink-white halo.
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const size = Math.max(r.width, r.height, 60) * 1.25;
     const halo = document.createElement('div');
     halo.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF0FF55 0%,#F2C8EE66 45%,#E8B0E433 62%,#E8B0E400 72%);filter:blur(3px)`;

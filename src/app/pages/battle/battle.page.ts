@@ -60,6 +60,8 @@ export class BattlePage implements OnInit, OnDestroy {
   @ViewChild('field', { static: true }) fieldRef!: ElementRef<HTMLElement>;
   @ViewChild('fx', { static: true }) fxRef!: ElementRef<HTMLElement>;
   @ViewChild('screenFx', { static: true }) screenFxRef!: ElementRef<HTMLElement>;
+  @ViewChild('fieldSlot', { static: true }) fieldSlotRef!: ElementRef<HTMLElement>;
+  @ViewChild('layout', { static: true }) layoutRef!: ElementRef<HTMLElement>;
 
   private readonly router = inject(Router);
   private readonly settings = inject(SettingsService);
@@ -178,10 +180,12 @@ export class BattlePage implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.stage.attach(this.fieldRef.nativeElement, this.fxRef.nativeElement, this.screenFxRef.nativeElement);
+    this.stage.fitField(this.fieldSlotRef.nativeElement, this.layoutRef.nativeElement);
     this.flow.startBattle();
   }
 
   ngOnDestroy(): void {
+    this.stage.detach();
     this.flow.dispose();
   }
 

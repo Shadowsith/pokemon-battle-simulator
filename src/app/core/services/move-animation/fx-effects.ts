@@ -178,7 +178,7 @@ export class FxEffects {
   /** Glowing orange sparkles drift down over the caster, from `top` downward (Amnesia, Skull Bash). */
   static async orangeSparkles(refs: BattleStageRefs, launch: Point, top: number) {
     const { fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const spread = Math.max(r.width * 0.45, 30);
     for (let i = 0; i < 16; i++) {
       const s = 6 + Math.random() * 6;
@@ -284,7 +284,7 @@ export class FxEffects {
   static async healSparkles(refs: BattleStageRefs, launch: Point) {
     const { fxEl, launchEl } = refs;
     const green = FLECK_COLOR.statUp;
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const rad = Math.max(r.width * 0.45, 28);
     for (let i = 0; i < 12; i++) {
       const star = FxGlyphs.sparkStar(9 + Math.random() * 8, i % 2 ? green : '#fff');
@@ -352,7 +352,7 @@ export class FxEffects {
     particle: () => HTMLElement
   ) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
 
     const fist = FxGlyphs.fistGlyph(Math.max(r.width * 0.45, 36), tone);
     Fx.place(fist, target);

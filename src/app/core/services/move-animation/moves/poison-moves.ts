@@ -18,7 +18,7 @@ export class PoisonMoveAnimations {
     const purple = '#7A2E9E';
     const dark = '#3A0F55';
     const bubbleColor = '#D77CF0';
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const spreadX = Math.max(r.width * 0.55, 30);
     const spreadY = Math.max(r.height * 0.5, 28);
 

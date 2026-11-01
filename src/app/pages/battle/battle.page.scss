@@ -1,9 +1,54 @@
+/* --- page layout -----------------------------------------------------
+   The field is a 640 × 300 stage (all positions below use that coordinate
+   system). On wide screens FieldScaler zooms it with CSS `scale` to fill the
+   space above the controls (`--field-scale`); `.field-frame` reserves the
+   zoomed size, since `scale` does not affect layout. The controls get a fixed
+   height so switching menus doesn't resize the field. Effects measure through
+   Fx.rect(), which converts back to field pixels. */
+
+.battle-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.field-slot {
+  flex: 1 1 0;
+  min-height: 300px;
+  overflow: hidden;
+}
+
+.field-frame {
+  width: calc(640px * var(--field-scale, 1));
+  height: calc(300px * var(--field-scale, 1));
+  margin: 0 auto;
+}
+
+.controls {
+  flex: none;
+
+  @media (min-width: 640px) {
+    &.fixed {
+      /* Room for the doubles command prompt, so it doesn't push the field. */
+      .field-caption {
+        min-height: 76px;
+      }
+
+      /* Tallest regular menu: doubles main menu with the undo button. */
+      .action-panel {
+        height: 166px;
+        overflow-y: auto;
+      }
+    }
+  }
+}
+
 .field {
   position: relative;
-  width: 100%;
-  max-width: 640px;
+  width: 640px;
   height: 300px;
-  margin: 0 auto;
+  scale: var(--field-scale, 1);
+  transform-origin: top left;
   background-color: #fff;
   background-size: cover;
   background-position: center bottom;
@@ -224,7 +269,7 @@
 /* Party balls, log and prompt below the field: same column as the field so
    they stay under the player HUD on wide screens. */
 .field-caption {
-  max-width: 640px;
+  max-width: calc(640px * var(--field-scale, 1));
   margin: 0 auto;
 }
 
@@ -423,6 +468,14 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+}
+
+/* Wide screens: the party side by side, so the menu fits the fixed control height. */
+@media (min-width: 640px) {
+  .party-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  }
 }
 
 .party-entry {

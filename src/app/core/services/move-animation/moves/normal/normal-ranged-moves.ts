@@ -62,7 +62,7 @@ export class NormalRangedMoveAnimations {
    */
   private static async playEggBomb(refs: BattleStageRefs, launch: Point, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
 
     // 1. The egg flies in a high arc and lands on the target.
     const egg = FxGlyphs.eggGlyph(20);
@@ -97,8 +97,8 @@ export class NormalRangedMoveAnimations {
    */
   private static async playExplosion(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
     const { fieldEl, fxEl, launchEl, targetEl, screenFxEl } = refs;
-    const field = fieldEl.getBoundingClientRect();
-    const r = launchEl.getBoundingClientRect();
+    const field = Fx.rect(fieldEl);
+    const r = Fx.rect(launchEl);
 
     // 1. Orange sparks drift in from all around and gather on the caster.
     const gather = 900;
@@ -153,8 +153,8 @@ export class NormalRangedMoveAnimations {
    */
   private static async playSelfDestruct(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
     const { fieldEl, fxEl, launchEl, targetEl } = refs;
-    const field = fieldEl.getBoundingClientRect();
-    const r = launchEl.getBoundingClientRect();
+    const field = Fx.rect(fieldEl);
+    const r = Fx.rect(launchEl);
 
     // 1. Darkness.
     const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
@@ -209,7 +209,7 @@ export class NormalRangedMoveAnimations {
    */
   private static async playGlare(refs: BattleStageRefs, launch: Point, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const field = fieldEl.getBoundingClientRect();
+    const field = Fx.rect(fieldEl);
 
     const dark = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 45% 40%,#4A1A12,#24080A 60%,#120404)');
     await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
@@ -248,7 +248,7 @@ export class NormalRangedMoveAnimations {
     );
 
     // 2. Shock: the target goes dark and twitches while sparks crackle round it.
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const darken = Fx.anim(targetEl, [
       { filter: 'brightness(1)' },
       { filter: 'brightness(.35) saturate(.6)', offset: 0.15 },
@@ -418,7 +418,7 @@ export class NormalRangedMoveAnimations {
       { color: '#FFD83A', core: '#FFFBE0', burst: NormalRangedMoveAnimations.triIce },
       { color: '#FF3B3B', core: '#FFE2DC', burst: NormalRangedMoveAnimations.triFire }
     ];
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const rx = Math.max(r.width * 0.75, 44);
     const ry = rx * 0.3;
     const center = { x: launch.x, y: launch.y + r.height * 0.15 };
@@ -529,7 +529,7 @@ export class NormalRangedMoveAnimations {
   }
   /** Tri Attack hit 3: fire puffs flare up around the target. */
   private static triFire(fxEl: HTMLElement, at: Point, targetEl: HTMLElement): Promise<void> {
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const spread = Math.max(r.width * 0.45, 26);
     const done: Promise<void>[] = [];
     for (let i = 0; i < 8; i++) {
@@ -553,7 +553,7 @@ export class NormalRangedMoveAnimations {
    */
   private static async playRazorWhirlwind(refs: BattleStageRefs, launch: Point) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const foot = Fx.footOf(launchEl, fieldEl);
     const h = Math.max(r.height * 1.3, 70);
     const base = Math.max(r.width * 0.9, 56);
@@ -599,7 +599,7 @@ export class NormalRangedMoveAnimations {
    */
   private static async playRazorBlades(refs: BattleStageRefs, target: Point) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const len = Math.max(r.width * 1.5, 90);
     const slashes = 5;
     const gap = 120;

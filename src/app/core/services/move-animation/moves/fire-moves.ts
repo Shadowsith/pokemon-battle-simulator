@@ -22,7 +22,7 @@ export class FireMoveAnimations {
   /** A single small flame that flares up at the target's feet and flickers out (Ember). */
   private static async playGroundFlame(refs: BattleStageRefs, v: MoveVisual) {
     const { fxEl, fieldEl, targetEl } = refs;
-    const w = Math.min(Math.max(targetEl.getBoundingClientRect().width * 0.28, 22), 36);
+    const w = Math.min(Math.max(Fx.rect(targetEl).width * 0.28, 22), 36);
     const done = FireMoveAnimations.burnFlame(fxEl, Fx.footOf(targetEl, fieldEl), w, v.color, 900);
     await Fx.wait(200);
     Fx.flash(targetEl, v.color, 0.35);
@@ -89,7 +89,7 @@ export class FireMoveAnimations {
     await stream;
 
     // Burning: a few flames flicker over the reddened target.
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const foot = Fx.footOf(targetEl, fieldEl);
     const fw = Math.min(Math.max(r.width * 0.26, 20), 34);
     const burns: Promise<void>[] = [];
@@ -113,7 +113,7 @@ export class FireMoveAnimations {
    */
   private static async playFirePunch(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
 
     // 1. Red-hot backdrop.
     const heat = Fx.backdrop(fieldEl, HEAT_BACKDROP);
@@ -162,7 +162,7 @@ export class FireMoveAnimations {
     const { fieldEl, fxEl, launchEl, targetEl } = refs;
     const W = fieldEl.clientWidth;
     const H = fieldEl.clientHeight;
-    const lr = launchEl.getBoundingClientRect();
+    const lr = Fx.rect(launchEl);
 
     // --- phase 1: gather -------------------------------------------------
     const ringR = Math.max(lr.width * 0.65, 46);
@@ -286,8 +286,8 @@ export class FireMoveAnimations {
    */
   private static async playFlareBlitz(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
     const { fieldEl, fxEl, launchEl, targetEl } = refs;
-    const lr = launchEl.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const lr = Fx.rect(launchEl);
+    const f = Fx.rect(fieldEl);
 
     // --- phase 1: flames rise off the caster ------------------------------
     const rise: Promise<void>[] = [];
@@ -338,7 +338,7 @@ export class FireMoveAnimations {
     Fx.shakeField(fieldEl, 0.9);
 
     // The blast: red flame bursting outward in every direction, plus a burning core.
-    const tr = targetEl.getBoundingClientRect();
+    const tr = Fx.rect(targetEl);
     const reach = Math.max(tr.width * 0.75, 55);
     const blast: Promise<void>[] = [];
     for (let i = 0; i < 14; i++) {
@@ -457,7 +457,7 @@ export class FireMoveAnimations {
    */
   private static async playVortex(refs: BattleStageRefs, v: MoveVisual) {
     const { fxEl, fieldEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const ground = Fx.footOf(targetEl, fieldEl);
     const rx = Math.max(r.width * 0.55, 34);
     const ry = rx * 0.3;

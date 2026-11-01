@@ -16,7 +16,7 @@ export class RockMoveAnimations {
    */
   private static async playRockSlide(refs: BattleStageRefs, target: Point) {
     const { fxEl, fieldEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const spreadX = Math.max(r.width * 0.5, 34);
     const spreadY = Math.max(r.height * 0.4, 28);
     const count = 26;

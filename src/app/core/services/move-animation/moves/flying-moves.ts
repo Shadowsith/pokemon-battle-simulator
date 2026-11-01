@@ -26,8 +26,8 @@ export class FlyingMoveAnimations {
    */
   private static async playAeroblast(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
     const { fieldEl, fxEl, launchEl, targetEl } = refs;
-    const field = fieldEl.getBoundingClientRect();
-    const lr = launchEl.getBoundingClientRect();
+    const field = Fx.rect(fieldEl);
+    const lr = Fx.rect(launchEl);
     const orbAt: Point = { x: launch.x + v.dir * Math.max(lr.width * 0.45, 36), y: launch.y };
 
     // Cyan vortex backdrop, turning slowly round the orb (0-0.3 s fade in).
@@ -140,7 +140,7 @@ export class FlyingMoveAnimations {
     const dim = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 45%,#232A3C,#0C0F18)');
     await Fx.anim(dim, [{ opacity: 0 }, { opacity: 0.92 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
 
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const rx = Math.max(r.width * 0.5, 32);
     const ry = Math.max(r.height * 0.5, 32);
     const lights: Promise<void>[] = [];
@@ -208,7 +208,7 @@ export class FlyingMoveAnimations {
     black.style.cssText = 'position:absolute;inset:0;background:#000';
     sky.appendChild(black);
     Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 120, easing: 'ease-out', fill: 'forwards' });
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const rad = Math.max(r.width * 0.45, 34);
     const burst: Promise<void>[] = [];
     for (let i = 0; i < 14; i++) {
@@ -234,7 +234,7 @@ export class FlyingMoveAnimations {
 
   /** Blue streaks race leftward along the top and bottom edges of `layer` for `duration` ms. */
   private static edgeStreaks(layer: HTMLElement, duration: number): Promise<void> {
-    const { width, height } = layer.getBoundingClientRect();
+    const { width, height } = Fx.rect(layer);
     const runs: Promise<void>[] = [];
     const count = 26;
     for (let i = 0; i < count; i++) {
@@ -263,7 +263,7 @@ export class FlyingMoveAnimations {
   static async playFlyUp(refs: BattleStageRefs, launch: Point) {
     const { launchEl: el, fieldEl, fxEl } = refs;
     el.getAnimations?.().forEach((a) => a.cancel());
-    const r = el.getBoundingClientRect();
+    const r = Fx.rect(el);
     const sky = FlyingMoveAnimations.skyBackdrop(fieldEl, 'up');
     await Fx.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
 
@@ -304,7 +304,7 @@ export class FlyingMoveAnimations {
     // Away in the sky until the end (also when Power Herb skipped turn 1).
     launchEl.getAnimations?.().forEach((a) => a.cancel());
     launchEl.style.opacity = '0';
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const sky = FlyingMoveAnimations.skyBackdrop(fieldEl, 'down');
     await Fx.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
     await Fx.wait(150);
@@ -356,7 +356,7 @@ export class FlyingMoveAnimations {
       fieldEl,
       'background:linear-gradient(90deg,#1A56C8,#3E8CEA 22%,#A8D4FF 42%,#E4F2FF 50%,#A8D4FF 58%,#3E8CEA 78%,#1A56C8)'
     );
-    const { width, height } = fieldEl.getBoundingClientRect();
+    const { width, height } = Fx.rect(fieldEl);
     for (let i = 0; i < 26; i++) {
       const w = 5 + Math.random() * 9;
       const h = 30 + Math.random() * 50;
@@ -383,7 +383,7 @@ export class FlyingMoveAnimations {
    */
   private static async playDrillPeck(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { launchEl, targetEl, fxEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const fwd = v.dir * 30;
 
     // 1. Step forward.

@@ -30,9 +30,9 @@ export class NormalBlowMoveAnimations {
     const { fieldEl, fxEl, launchEl, targetEl } = refs;
     const W = fieldEl.clientWidth;
     const H = fieldEl.clientHeight;
-    const f = fieldEl.getBoundingClientRect();
-    const lr = launchEl.getBoundingClientRect();
-    const tr = targetEl.getBoundingClientRect();
+    const f = Fx.rect(fieldEl);
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
 
     // 1. Dark (0-0.25 s), then the green-cyan speed rush (0.25-0.45 s).
     const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
@@ -100,7 +100,7 @@ export class NormalBlowMoveAnimations {
    */
   private static async playThrash(refs: BattleStageRefs, target: Point) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const size = Math.max(r.width * 0.5, 44);
     const hits: Promise<void>[] = [];
     for (let i = 0; i < 6; i++) {
@@ -148,7 +148,7 @@ export class NormalBlowMoveAnimations {
    */
   private static async playTakeDown(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { fxEl, launchEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
 
     // 1. The charge: contact at ~0.12 s.
     const charge = FxEffects.dart(launchEl, v.dir);
@@ -237,7 +237,7 @@ export class NormalBlowMoveAnimations {
     await Promise.all([tint, Fx.anim(launchEl, tremble, { duration: 800, easing: 'linear', fill: 'none' })]);
 
     // 2. Six bursts pound the target one after another.
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const size = Math.max(r.width * 0.4, 36);
     const hits: Promise<void>[] = [];
     for (let i = 0; i < 6; i++) {
@@ -284,7 +284,7 @@ export class NormalBlowMoveAnimations {
    */
   private static async playSlam(refs: BattleStageRefs, target: Point) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
 
     const size = Math.max(r.width * 0.75, 52);
     const flash = document.createElement('div');
@@ -341,7 +341,7 @@ export class NormalBlowMoveAnimations {
    */
   private static async playDizzyPunch(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { launchEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
 
     // Lunge in.
     const original = launchEl.style.transform;
@@ -533,7 +533,7 @@ export class NormalBlowMoveAnimations {
    */
   private static async playHeadbutt(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { launchEl, targetEl, fxEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
 
     // 1. Quick dart forward and back.
     await FxEffects.dart(launchEl, v.dir);
@@ -604,7 +604,7 @@ export class NormalBlowMoveAnimations {
     ], { duration: 160, iterations: Infinity });
 
     // The big foot: pops in over the target, vibrates, then stamps down.
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const w = Math.max(r.width * 0.85, 70);
     const foot = FxGlyphs.footGlyph(w, '#7A1410');
     foot.style.filter = 'drop-shadow(0 0 1px #000) drop-shadow(0 0 1px #000) drop-shadow(0 0 6px #00000088)';
@@ -649,7 +649,7 @@ export class NormalBlowMoveAnimations {
     const black = Fx.backdrop(fieldEl, DIM_BACKDROP);
     await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
 
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const fistW = Math.max(r.width * 0.6, 46);
 
     // The fist comes in big from the front and slams onto the target.

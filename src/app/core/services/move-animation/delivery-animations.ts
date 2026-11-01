@@ -151,7 +151,7 @@ export class DeliveryAnimations {
 
   private static async playField(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { fieldEl, fxEl, screenFxEl, targetEl } = refs;
-    const rect = fieldEl.getBoundingClientRect();
+    const rect = Fx.rect(fieldEl);
     Fx.screenWash(screenFxEl, `${v.color}55`, 150, 460, v.dir === 1 ? '65%' : '35%');
     Fx.shakeField(fieldEl, 0.7 + v.power * 0.6);
 
@@ -245,7 +245,7 @@ export class DeliveryAnimations {
 
   private static async playWeather(refs: BattleStageRefs, v: MoveVisual) {
     const { fieldEl, fxEl, screenFxEl } = refs;
-    const rect = fieldEl.getBoundingClientRect();
+    const rect = Fx.rect(fieldEl);
     const color = WEATHER_COLOR[v.weather ?? 'sun'];
     screenFxEl.style.background = `linear-gradient(${v.weather === 'sun' ? '180deg' : '200deg'},${color}55,transparent 70%)`;
     screenFxEl.style.transition = 'opacity 300ms ease-out';

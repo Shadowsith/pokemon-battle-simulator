@@ -16,7 +16,7 @@ export class DarkMoveAnimations {
    * snaps shut on it, stopping just before the teeth touch.
    */
   private static async playBite(refs: BattleStageRefs, target: Point) {
-    const r = refs.targetEl.getBoundingClientRect();
+    const r = Fx.rect(refs.targetEl);
     await DarkMoveAnimations.chomp(refs, target, { w: Math.max(r.width * 1.1, 72), tilt: 0, grinds: 0, rays: false });
   }
 
@@ -31,7 +31,7 @@ export class DarkMoveAnimations {
     await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
 
     // Dark purple swirl over the black, still behind platforms and sprites.
-    const field = fieldEl.getBoundingClientRect();
+    const field = Fx.rect(fieldEl);
     const reach = Math.hypot(field.width, field.height);
     const purple = document.createElement('div');
     purple.style.cssText = 'position:absolute;inset:0;overflow:hidden;background:radial-gradient(circle at 50% 45%,#7A1E6E,#3E0E4A 55%,#1A0622)';
@@ -42,7 +42,7 @@ export class DarkMoveAnimations {
     swirl.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(60deg)' }], { duration: 1800, easing: 'linear' });
     await Fx.anim(purple, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
 
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     await DarkMoveAnimations.chomp(refs, target, { w: Math.max(r.width * 1.35, 90), tilt: -22, grinds: 2, rays: true });
 
     await Fx.anim(black, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
@@ -57,7 +57,7 @@ export class DarkMoveAnimations {
    */
   private static async chomp(refs: BattleStageRefs, target: Point, o: { w: number; tilt: number; grinds: number; rays: boolean }) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const { w } = o;
     const h = w * 0.46;
     // Tooth tips sit at 45/46 of the glyph height; stop them a few px apart so the halves never touch.
@@ -173,7 +173,7 @@ export class DarkMoveAnimations {
     }
 
     // Dark sparks: short smoky streaks flying out around the caster.
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const rad = Math.max(r.width * 0.4, 28);
     for (let i = 0; i < 22; i++) {
       const ang = Math.random() * Math.PI * 2;

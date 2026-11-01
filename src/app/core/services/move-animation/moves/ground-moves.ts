@@ -133,7 +133,7 @@ export class GroundMoveAnimations {
     const quake = Fx.anim(fieldEl, shake, { duration: total, easing: 'linear', fill: 'none' });
 
     // Rocks pop out of the ground left and right of the target.
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const foot = Fx.footOf(targetEl, fieldEl);
     const side = Math.max(r.width * 0.5, 30);
     const rocks = 16;
@@ -169,7 +169,7 @@ export class GroundMoveAnimations {
   static async playDigDown(refs: BattleStageRefs) {
     const { launchEl: el, fieldEl, fxEl } = refs;
     el.getAnimations?.().forEach((a) => a.cancel());
-    const r = el.getBoundingClientRect();
+    const r = Fx.rect(el);
     const foot = Fx.footOf(el, fieldEl);
     const dur = 1000;
 
@@ -195,7 +195,7 @@ export class GroundMoveAnimations {
     const { launchEl: el, fieldEl, fxEl, targetEl } = refs;
     el.getAnimations?.().forEach((a) => a.cancel());
     el.style.opacity = '1';
-    const r = el.getBoundingClientRect();
+    const r = Fx.rect(el);
     const foot = Fx.footOf(el, fieldEl);
 
     GroundMoveAnimations.kickUpDirt(fxEl, foot, Math.max(r.width * 0.6, 34), 700, '#D8CBB0');
@@ -206,7 +206,7 @@ export class GroundMoveAnimations {
     ], { duration: 520, easing: 'ease-out', fill: 'none' });
 
     // Hit: the target shakes and white dust specks rise up around it.
-    const tr = targetEl.getBoundingClientRect();
+    const tr = Fx.rect(targetEl);
     Fx.flash(targetEl, '#F6F3EA', 0.6);
     Fx.shake(targetEl, 6);
     Fx.shakeField(fieldEl, 0.4);

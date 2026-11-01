@@ -22,7 +22,7 @@ export class NormalStrikeMoveAnimations {
    */
   private static async playSuperFang(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { targetEl, fxEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const h = Math.max(r.height * 0.35, 28);
     const tilt = `rotate(${-v.dir * 35}deg)`;
 
@@ -86,7 +86,7 @@ export class NormalStrikeMoveAnimations {
    */
   private static async playSlash(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const len = Math.max(r.width * 1.1, 80);
     // Top-back to bottom-front of the target, mirrored with the attack direction.
     const angle = v.dir > 0 ? 35 : 145;
@@ -158,7 +158,7 @@ export class NormalStrikeMoveAnimations {
         { transform: 'translate(0,0)' }
       ], { duration: 280, easing: 'ease-in-out', fill: 'none' });
     }
-    const top = launchEl.getBoundingClientRect().top - fieldEl.getBoundingClientRect().top;
+    const top = Fx.rect(launchEl).top - Fx.rect(fieldEl).top;
     await FxEffects.orangeSparkles(refs, launch, top);
   }
 
@@ -182,7 +182,7 @@ export class NormalStrikeMoveAnimations {
       { transform: 'translateX(0)' }
     ], { duration: 420, easing: 'linear', fill: 'none' });
 
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const blast = FxEffects.fireBlastCloud(fxEl, target, Math.max(r.width * 0.5, 42), 10, '#FFE04A');
     Fx.flash(targetEl, '#FFB13C', 0.7);
     Fx.shake(targetEl, 6);
@@ -199,7 +199,7 @@ export class NormalStrikeMoveAnimations {
    */
   private static async playBind(refs: BattleStageRefs, target: Point) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const baseW = Math.max(r.width * 0.95, 60);
     const baseH = Math.max(r.height * 0.8, 50);
     const squeezes = 6;
@@ -263,7 +263,7 @@ export class NormalStrikeMoveAnimations {
    */
   private static async playHyperFang(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { targetEl, fxEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const h = Math.max(r.height * 0.55, 40);
     // Tilted toward the caster's side, like a bite from that direction.
     const tilt = `rotate(${-v.dir * 35}deg)`;

@@ -9,8 +9,21 @@
    Loaded after battle.page.scss, so these rules override it. */
 
 @media (max-width: 639px) {
+  /* No zoom here: the field takes the screen width and its own height. */
+  .field-slot {
+    flex: none;
+    min-height: 0;
+  }
+
+  .field-frame {
+    width: auto;
+    height: auto;
+  }
+
   .field {
+    width: 100%;
     height: 340px;
+    scale: none;
   }
 
   /* Move buttons reserve room on the right for the hint badge; two per row

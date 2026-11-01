@@ -22,9 +22,9 @@ export class WaterMoveAnimations {
    */
   private static async playSurf(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
     const { fieldEl, fxEl, launchEl, targetEl } = refs;
-    const f = fieldEl.getBoundingClientRect();
-    const lr = launchEl.getBoundingClientRect();
-    const tr = targetEl.getBoundingClientRect();
+    const f = Fx.rect(fieldEl);
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
 
     // 1. A wave rises in front of the caster, on its foe's side (0-0.5 s).
     const w = Math.max(lr.width * 1.3, 100);
@@ -113,8 +113,8 @@ export class WaterMoveAnimations {
    */
   private static crestSpray(fxEl: HTMLElement, fieldEl: HTMLElement, wave: HTMLElement, dir: 1 | -1): { stop: () => void } {
     const timer = setInterval(() => {
-      const r = wave.getBoundingClientRect();
-      const f = fieldEl.getBoundingClientRect();
+      const r = Fx.rect(wave);
+      const f = Fx.rect(fieldEl);
       if (r.height < 4) return;
       for (let i = 0; i < 3; i++) {
         // Somewhere along the upper crest, mostly near the curling front.
@@ -146,7 +146,7 @@ export class WaterMoveAnimations {
    */
   private static async playBubbles(refs: BattleStageRefs, launch: Point, target: Point, style: BubbleStyle) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const spreadX = Math.max(r.width * 0.45, 28);
     const spreadY = Math.max(r.height * 0.4, 24);
     const { count, travel, stagger, wobble, jitter } = style;
@@ -331,7 +331,7 @@ export class WaterMoveAnimations {
    */
   private static async playCrabhammer(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const hit: Point = { x: target.x, y: target.y - r.height * 0.15 };
     const fall = hit.y + 60; // starts just above the top edge of the field
 
@@ -430,7 +430,7 @@ export class WaterMoveAnimations {
    */
   private static async waterCrash(refs: BattleStageRefs, target: Point, tone: SplashTone) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const h = Math.max(r.height, 50);
     const base = { x: target.x, y: target.y + h * 0.35 };
     const blobs = 5;

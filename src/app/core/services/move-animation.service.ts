@@ -101,7 +101,7 @@ export class MoveAnimationService {
   /** Protect / Detect / King's Shield: a translucent bubble pops up around the Pokémon. */
   async playShield(spriteEl: HTMLElement, fxEl: HTMLElement, fieldEl: HTMLElement, color = '#7fd3ff'): Promise<void> {
     const at = Fx.centerOf(spriteEl, fieldEl);
-    const size = Math.max(spriteEl.getBoundingClientRect().height, 60) * 1.15;
+    const size = Math.max(Fx.rect(spriteEl).height, 60) * 1.15;
     const bubble = document.createElement('div');
     bubble.style.cssText = `position:absolute;left:${at.x - size / 2}px;top:${at.y - size / 2}px;width:${size}px;height:${size}px;border-radius:50%;border:3px solid ${color};background:radial-gradient(circle at 35% 30%,rgba(255,255,255,.55),${color}33 60%,transparent 75%);pointer-events:none`;
     fxEl.appendChild(bubble);
@@ -120,7 +120,7 @@ export class MoveAnimationService {
    */
   async playSubstitute(spriteEl: HTMLElement, fxEl: HTMLElement, fieldEl: HTMLElement, swap: () => void): Promise<void> {
     const at = Fx.centerOf(spriteEl, fieldEl);
-    const size = Math.max(spriteEl.getBoundingClientRect().height, 60) * 1.1;
+    const size = Math.max(Fx.rect(spriteEl).height, 60) * 1.1;
     const puff = FxEffects.smokePuff(fxEl, at, size);
     await Fx.anim(spriteEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in', fill: 'forwards' });
     swap();
@@ -143,7 +143,7 @@ export class MoveAnimationService {
    */
   async playSubstituteFade(spriteEl: HTMLElement, fxEl: HTMLElement, fieldEl: HTMLElement, swap: () => void): Promise<void> {
     const at = Fx.centerOf(spriteEl, fieldEl);
-    const size = Math.max(spriteEl.getBoundingClientRect().height, 60) * 1.1;
+    const size = Math.max(Fx.rect(spriteEl).height, 60) * 1.1;
     const puff = FxEffects.smokePuff(fxEl, at, size);
     await Fx.anim(spriteEl, [{ opacity: 1 }, { opacity: 0 }], { duration: 280, easing: 'ease-in', fill: 'forwards' });
     swap();
@@ -197,7 +197,7 @@ export class MoveAnimationService {
     side: 'player' | 'opponent'
   ): Promise<void> {
     spriteEl.getAnimations?.().forEach((a) => a.cancel());
-    const rect = fieldEl.getBoundingClientRect();
+    const rect = Fx.rect(fieldEl);
     const sprite = Fx.centerOf(spriteEl, fieldEl);
     const home = this.ballHome(rect, side);
     const point = { x: sprite.x, y: sprite.y + 16 };
@@ -255,7 +255,7 @@ export class MoveAnimationService {
     spriteEl.style.filter = 'none';
     spriteEl.style.opacity = '0';
 
-    const rect = fieldEl.getBoundingClientRect();
+    const rect = Fx.rect(fieldEl);
     const target = Fx.centerOf(spriteEl, fieldEl);
     const home = this.ballHome(rect, side);
     const midX = home.x + (target.x - home.x) * 0.55;

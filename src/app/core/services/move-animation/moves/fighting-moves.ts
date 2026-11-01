@@ -25,7 +25,7 @@ export class FightingMoveAnimations {
    */
   private static async playSubmission(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, launchEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const roll = Promise.all([FxEffects.orbit(launchEl, 16, 2, 1200, 1), FxEffects.orbit(targetEl, 16, 2, 1200, 1)]);
 
     // Hits at 0.25 / 0.5 / 0.75 / 1.0 s while they roll.
@@ -51,7 +51,7 @@ export class FightingMoveAnimations {
     await Promise.all([roll, ...hits]);
 
     // Dust: grey-brown puffs swirl round the target's feet, swell and fade.
-    const f = fieldEl.getBoundingClientRect();
+    const f = Fx.rect(fieldEl);
     const foot = { x: target.x, y: r.bottom - f.top - r.height * 0.15 };
     const rx = Math.max(r.width * 0.4, 30);
     const puffs: Promise<void>[] = [];
@@ -86,7 +86,7 @@ export class FightingMoveAnimations {
    */
   private static async playHighJumpKick(refs: BattleStageRefs, target: Point, v: MoveVisual) {
     const { launchEl, targetEl, fieldEl, fxEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const size = Math.max(r.width * 0.9, 64);
 
     await FxEffects.dart(launchEl, v.dir);
@@ -140,7 +140,7 @@ export class FightingMoveAnimations {
    */
   private static async playJumpKick(refs: BattleStageRefs, launch: Point, target: Point) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const w = Math.max(r.width * 0.32, 22);
     const spread = Math.max(r.width * 0.3, 18);
     // Feet come in from the caster's side, a bit short of the caster itself.
@@ -178,7 +178,7 @@ export class FightingMoveAnimations {
    */
   private static async playLowKick(refs: BattleStageRefs, target: Point) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const w = Math.max(r.width * 0.32, 22);
     const reach = Math.max(r.width * 0.9, 60);
     const y = target.y + Math.max(r.height * 0.15, 8);
@@ -208,8 +208,8 @@ export class FightingMoveAnimations {
    */
   private static async playDynamicPunch(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
+    const f = Fx.rect(fieldEl);
 
     // 1. Red burst backdrop (0-0.25 s), flickering behind the sprites.
     const at = `${target.x}px ${target.y}px`;
@@ -318,8 +318,8 @@ export class FightingMoveAnimations {
    */
   private static async playDetect(refs: BattleStageRefs, launch: Point) {
     const { fieldEl, fxEl, launchEl } = refs;
-    const r = launchEl.getBoundingClientRect();
-    const head: Point = { x: launch.x + r.width * 0.08, y: r.top - fieldEl.getBoundingClientRect().top + r.height * 0.25 };
+    const r = Fx.rect(launchEl);
+    const head: Point = { x: launch.x + r.width * 0.08, y: r.top - Fx.rect(fieldEl).top + r.height * 0.25 };
 
     const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
     await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
@@ -353,7 +353,7 @@ export class FightingMoveAnimations {
    */
   private static async playCrossChop(refs: BattleStageRefs, target: Point) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const hw = Math.max(r.width * 0.38, 34);
     const sx = Math.max(r.width * 0.45, 36);
     const sy = Math.max(r.height * 0.35, 28);
@@ -434,7 +434,7 @@ export class FightingMoveAnimations {
     await FightingMoveAnimations.rushStreaks(sky, 1, 700);
 
     // Impact: yellow burst on the target, the ground shakes, stones fly out sideways.
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const burstSize = Math.max(r.width * 0.6, 50);
     const burst = FxGlyphs.spikyBurst(burstSize, '#FFB020', '#FFE04A');
     Fx.place(burst, { x: target.x, y: target.y + r.height * 0.15 });
@@ -470,7 +470,7 @@ export class FightingMoveAnimations {
 
   /** Glowing yellow-orange streaks rush across `layer` for `duration` ms: up (-1) or down (1). */
   private static rushStreaks(layer: HTMLElement, dir: 1 | -1, duration: number): Promise<void> {
-    const { width, height } = layer.getBoundingClientRect();
+    const { width, height } = Fx.rect(layer);
     const runs: Promise<void>[] = [];
     const count = 22;
     for (let i = 0; i < count; i++) {
@@ -494,7 +494,7 @@ export class FightingMoveAnimations {
 
   /** A kick lands: a white flash on the target with yellow sparkles flying out (Jump Kick, Low Kick). */
   private static sparkleHit(fxEl: HTMLElement, targetEl: HTMLElement, target: Point): Promise<void> {
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const flashSize = Math.max(r.width * 0.7, 48);
     const flash = document.createElement('div');
     flash.style.cssText = `position:absolute;width:${flashSize}px;height:${flashSize}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff,#FFF3A0 40%,#FFE04A00 72%)`;

@@ -64,7 +64,7 @@ export class ElectricMoveAnimations {
     fxEl.appendChild(svg);
 
     // Ground glow where the bolt lands.
-    const rr = targetEl.getBoundingClientRect();
+    const rr = Fx.rect(targetEl);
     const gw = Math.max(rr.width * 1.3, 80);
     const glow = document.createElement('div');
     glow.style.cssText = `position:absolute;width:${gw}px;height:${gw * 0.32}px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,#FFFBE0,#E8F04Acc 35%,#9CD62A55 65%,transparent 75%)`;
@@ -128,7 +128,7 @@ export class ElectricMoveAnimations {
     const { fieldEl, fxEl, targetEl } = refs;
     const W = fieldEl.clientWidth;
     const H = fieldEl.clientHeight;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const bolt = '#E4F44A';
     const strikes = 4;
     const gap = 230;
@@ -206,7 +206,7 @@ export class ElectricMoveAnimations {
    */
   private static async playThunderWave(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
 
     // 1. Darkness.
     const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);

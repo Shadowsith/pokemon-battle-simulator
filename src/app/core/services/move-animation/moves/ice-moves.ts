@@ -112,7 +112,7 @@ export class IceMoveAnimations {
     const stormDone = Fx.anim(storm, fade, { duration: total, easing: 'linear' }).then(() => storm.remove());
 
     // Ice crystals build up on the target while it is battered.
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const spread = Math.max(r.width * 0.5, 30);
     for (let i = 0; i < 12; i++) {
       const shard = FxGlyphs.iceShard(10 + Math.random() * 10);
@@ -209,7 +209,7 @@ export class IceMoveAnimations {
     // Impact: the target turns icy blue and ice crystals form on it while it shakes.
     await Fx.wait(grow);
     targetEl.style.filter = `sepia(1) saturate(2.5) hue-rotate(165deg) brightness(1.2) drop-shadow(0 0 6px ${ice})`;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const spread = Math.max(r.width * 0.45, 26);
     for (let i = 0; i < 10; i++) {
       const shard = FxGlyphs.iceShard(9 + Math.random() * 9);

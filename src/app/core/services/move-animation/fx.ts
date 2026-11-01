@@ -77,16 +77,28 @@ export class Fx {
     return bg;
   }
 
-  static centerOf(el: HTMLElement, fieldEl: HTMLElement): Point {
+  /**
+   * `el`'s bounding box in battle-field pixels. The field is zoomed with CSS
+   * `scale` on wide screens, while effects are placed in its unscaled
+   * 640 × 300 coordinates, so every screen measurement goes through here.
+   */
+  static rect(el: Element): DOMRect {
     const r = el.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const field = el.closest<HTMLElement>('.field');
+    const k = field && field.offsetWidth ? field.getBoundingClientRect().width / field.offsetWidth : 1;
+    return k === 1 ? r : new DOMRect(r.x / k, r.y / k, r.width / k, r.height / k);
+  }
+
+  static centerOf(el: HTMLElement, fieldEl: HTMLElement): Point {
+    const r = Fx.rect(el);
+    const f = Fx.rect(fieldEl);
     return { x: r.left - f.left + r.width / 2, y: r.top - f.top + r.height / 2 };
   }
 
   /** Bottom-centre of a sprite (where it stands), in field coordinates. */
   static footOf(el: HTMLElement, fieldEl: HTMLElement): Point {
-    const r = el.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const r = Fx.rect(el);
+    const f = Fx.rect(fieldEl);
     return { x: r.left - f.left + r.width / 2, y: r.bottom - f.top - 6 };
   }
 

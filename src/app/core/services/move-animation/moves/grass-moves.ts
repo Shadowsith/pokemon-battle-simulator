@@ -38,7 +38,7 @@ export class GrassMoveAnimations {
     const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
     await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
 
-    const r = launchEl.getBoundingClientRect();
+    const r = Fx.rect(launchEl);
     const reach = Math.max(r.width, r.height) * 1.1;
     const motes: Promise<void>[] = [];
     for (let i = 0; i < 18; i++) {
@@ -69,8 +69,8 @@ export class GrassMoveAnimations {
    */
   private static async playSolarBeam(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
-    const f = fieldEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
+    const f = Fx.rect(fieldEl);
     const foot = r.bottom - f.top - r.height * 0.08;
     const w = Math.max(r.width * 0.16, 16);
 
@@ -133,8 +133,8 @@ export class GrassMoveAnimations {
   /** Glowing powder drifts down from above onto the target, swaying; grains cycle through `colors`. */
   private static async powderFall(refs: BattleStageRefs, target: Point, colors: GrainColors[]) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
-    const top = r.top - fieldEl.getBoundingClientRect().top;
+    const r = Fx.rect(targetEl);
+    const top = r.top - Fx.rect(fieldEl).top;
     const spread = Math.max(r.width * 0.6, 40);
 
     const grains: Promise<void>[] = [];
@@ -162,8 +162,8 @@ export class GrassMoveAnimations {
 
   /** Purple "Z"s float up from the target's head as it falls asleep. */
   private static sleepOnTarget(refs: BattleStageRefs, target: Point, v: MoveVisual): Promise<void> {
-    const r = refs.targetEl.getBoundingClientRect();
-    const top = r.top - refs.fieldEl.getBoundingClientRect().top;
+    const r = Fx.rect(refs.targetEl);
+    const top = r.top - Fx.rect(refs.fieldEl).top;
     return FxEffects.sleepZs(refs.fxEl, { x: target.x, y: top + r.height * 0.15 }, -v.dir, ['#9C7CE8', '#B59CF2']);
   }
 
@@ -217,7 +217,7 @@ export class GrassMoveAnimations {
    */
   private static async playLeechSeed(refs: BattleStageRefs, launch: Point, target: Point) {
     const { fxEl, targetEl } = refs;
-    const r = targetEl.getBoundingClientRect();
+    const r = Fx.rect(targetEl);
     const spreadX = Math.max(r.width * 0.3, 18);
     const lowY = target.y + Math.max(r.height * 0.2, 10);
     const seeds = 3;
@@ -293,8 +293,8 @@ export class GrassMoveAnimations {
   private static async playPetalDance(refs: BattleStageRefs, launch: Point, target: Point) {
     const { fxEl, launchEl, targetEl } = refs;
     const pink = '#F27A9A';
-    const lr = launchEl.getBoundingClientRect();
-    const tr = targetEl.getBoundingClientRect();
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
     const casterRx = Math.max(lr.width * 0.6, 36);
     const casterH = Math.max(lr.height, 50);
     const targetRx = Math.max(tr.width * 0.65, 38);
