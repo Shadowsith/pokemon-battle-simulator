@@ -20,9 +20,12 @@ export class BattleStageService {
     this.screenFxNode = screenFx;
   }
 
-  /** Zoom the field to fill `area` on wide screens; `layout` receives `--field-scale`. */
-  fitField(area: HTMLElement, layout: HTMLElement): void {
-    this.scaler.start(area, layout);
+  /**
+   * Zoom the field to fill `area` on wide screens, leaving room for the
+   * `beside` elements (trainer panels); `layout` receives `--field-scale`.
+   */
+  fitField(area: HTMLElement, layout: HTMLElement, beside: HTMLElement[] = []): void {
+    this.scaler.start(area, layout, beside);
   }
 
   detach(): void {

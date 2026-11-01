@@ -1,0 +1,46 @@
+/* Shown only on large screens; the battle page decides when (display) and
+   reserves the panel width when zooming the field. */
+:host {
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 170px;
+  flex: none;
+  padding: 12px 0;
+  box-sizing: border-box;
+}
+
+/* Game perspective: the foe stands top-right, the player bottom-left. */
+:host(.opponent) {
+  justify-content: flex-start;
+}
+
+:host(.player) {
+  justify-content: flex-end;
+}
+
+.trainer-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ion-color-medium, #666);
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+.trainer-sprite {
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
+  image-rendering: pixelated;
+
+  &.flip {
+    transform: scaleX(-1);
+  }
+}
+
+app-party-balls {
+  --ball-size: 20px;
+  display: grid;
+  grid-template-columns: repeat(3, var(--ball-size));
+  gap: 8px;
+}

@@ -11,6 +11,7 @@
 @media (max-width: 639px) {
   /* No zoom here: the field takes the screen width and its own height. */
   .field-slot {
+    display: block;
     flex: none;
     min-height: 0;
   }

@@ -14,11 +14,15 @@ const PORTRAIT_QUERY = '(max-width: 639px)';
 export class FieldScaler {
   private observer: ResizeObserver | null = null;
 
-  /** Start watching `area` and write `--field-scale` onto `target`. */
-  start(area: HTMLElement, target: HTMLElement): void {
+  /**
+   * Start watching `area` and write `--field-scale` onto `target`. `beside`
+   * are fixed-width elements sharing the row with the field (hidden ones
+   * measure 0), so their width is not available to the field.
+   */
+  start(area: HTMLElement, target: HTMLElement, beside: HTMLElement[] = []): void {
     this.stop();
     if (typeof ResizeObserver === 'undefined') return;
-    this.observer = new ResizeObserver(() => this.update(area, target));
+    this.observer = new ResizeObserver(() => this.update(area, target, beside));
     this.observer.observe(area);
   }
 
@@ -27,13 +31,14 @@ export class FieldScaler {
     this.observer = null;
   }
 
-  private update(area: HTMLElement, target: HTMLElement): void {
-    target.style.setProperty('--field-scale', String(this.scaleFor(area)));
+  private update(area: HTMLElement, target: HTMLElement, beside: HTMLElement[]): void {
+    target.style.setProperty('--field-scale', String(this.scaleFor(area, beside)));
   }
 
-  private scaleFor(area: HTMLElement): number {
+  private scaleFor(area: HTMLElement, beside: HTMLElement[]): number {
     if (window.matchMedia(PORTRAIT_QUERY).matches) return 1;
-    const k = Math.min(area.clientWidth / FIELD_WIDTH, area.clientHeight / FIELD_HEIGHT);
+    const width = area.clientWidth - beside.reduce((sum, el) => sum + el.offsetWidth, 0);
+    const k = Math.min(width / FIELD_WIDTH, area.clientHeight / FIELD_HEIGHT);
     // Two decimals: stable values, no sub-pixel jitter from tiny resizes.
     return Math.max(1, Math.floor(k * 100) / 100);
   }

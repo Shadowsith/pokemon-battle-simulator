@@ -44,3 +44,10 @@ export interface MoveHint {
   short: string;
   foe: string | null;
 }
+
+/** One of a trainer's six Poké Ball emblems: owned / on the field / knocked out. */
+export interface PartyEmblem {
+  owned: boolean;
+  active: boolean;
+  fainted: boolean;
+}

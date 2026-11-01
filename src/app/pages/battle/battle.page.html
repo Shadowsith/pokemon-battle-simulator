@@ -55,6 +55,7 @@
 
   <div class="battle-layout" #layout>
     <div class="field-slot" #fieldSlot>
+      <app-trainer-panel #playerPanel side="player" name="Du" [avatar]="playerAvatar()" [emblems]="playerEmblems()" />
       <div class="field-frame">
         <div
           class="field"
@@ -71,16 +72,7 @@
             <div class="platform player-platform pos1"></div>
           }
 
-          <div class="party-indicator opp">
-            @for (e of opponentEmblems(); track $index) {
-              <span
-                class="party-ball"
-                [class.owned]="e.owned"
-                [class.active]="e.active"
-                [class.fainted]="e.fainted"
-              ></span>
-            }
-          </div>
+          <app-party-balls class="party-indicator opp" [emblems]="opponentEmblems()" />
 
           @for (v of opponentSlotViews(); track v.key) {
             <div class="hud opponent-hud pos{{ v.slot.pos }}" [class.acting]="v.acting" [class.down]="v.mon.currentHp <= 0">
@@ -181,20 +173,18 @@
           <div #screenFx class="screen-fx-layer"></div>
         </div>
       </div>
+      <app-trainer-panel
+        #opponentPanel
+        side="opponent"
+        [name]="npcName()"
+        [avatar]="npcAvatar()"
+        [emblems]="opponentEmblems()"
+      />
     </div>
 
     <div class="controls" [class.fixed]="!debug">
       <div class="field-caption">
-        <div class="party-indicator">
-          @for (e of playerEmblems(); track $index) {
-            <span
-              class="party-ball"
-              [class.owned]="e.owned"
-              [class.active]="e.active"
-              [class.fainted]="e.fainted"
-            ></span>
-          }
-        </div>
+        <app-party-balls class="party-indicator" [emblems]="playerEmblems()" />
 
         <p class="battle-log">{{ log() }}</p>
         @if (commandPrompt(); as prompt) {

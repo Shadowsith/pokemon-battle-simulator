@@ -16,12 +16,32 @@
   flex: 1 1 0;
   min-height: 300px;
   overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Trainer panels left and right of the field, large screens only. While they
+   show, they carry the party balls, so the in-field / caption rows hide. */
+app-trainer-panel {
+  display: none;
+  height: calc(300px * var(--field-scale, 1));
+}
+
+@media (min-width: 1024px) {
+  app-trainer-panel {
+    display: flex;
+  }
+
+  .party-indicator {
+    display: none;
+  }
 }
 
 .field-frame {
+  flex: none;
   width: calc(640px * var(--field-scale, 1));
   height: calc(300px * var(--field-scale, 1));
-  margin: 0 auto;
 }
 
 .controls {
@@ -199,8 +219,6 @@
 }
 
 .party-indicator {
-  display: flex;
-  gap: 5px;
   padding: 8px 16px 0;
 
   &.opp {
@@ -209,53 +227,6 @@
     left: 462px;
     padding: 0;
     z-index: 2;
-  }
-}
-
-.party-ball {
-  position: relative;
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid #1c1c1c;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
-  opacity: 0.25; /* empty slot */
-  transition: opacity 0.2s;
-  background:
-    radial-gradient(circle at 50% 50%, #f4f4f4 0 20%, #1c1c1c 20% 34%, rgba(0, 0, 0, 0) 34%) no-repeat,
-    linear-gradient(180deg, #e23b2e 0 44%, #1c1c1c 44% 56%, #f4f4f4 56% 100%);
-
-  &.owned {
-    opacity: 1;
-  }
-
-  &.active {
-    outline: 2px solid #333;
-    outline-offset: 1px;
-  }
-
-  &.fainted {
-    filter: grayscale(0.9) brightness(0.75);
-
-    &::before,
-    &::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 150%;
-      height: 2px;
-      background: #111;
-      border-radius: 2px;
-    }
-
-    &::before {
-      transform: translate(-50%, -50%) rotate(45deg);
-    }
-
-    &::after {
-      transform: translate(-50%, -50%) rotate(-45deg);
-    }
   }
 }
 

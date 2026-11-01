@@ -32,12 +32,14 @@ import { heldItem } from '../../core/models/item.model';
 import { ItemIconComponent } from '../../shared/item-icon/item-icon.component';
 import { BattleBackground, backgroundUrl } from '../../core/battle/battle-background';
 import { DebugPanelComponent } from './debug-panel/debug-panel.component';
+import { PartyBallsComponent } from './party-balls/party-balls.component';
+import { TrainerPanelComponent } from './trainer-panel/trainer-panel.component';
 import { AudioService } from '../../core/services/audio.service';
 import { DamageCalcService } from '../../core/services/damage-calc.service';
 import { MoveAnimationService } from '../../core/services/move-animation.service';
 import { SettingsService } from '../../core/services/settings.service';
 import { TeamService } from '../../core/services/team.service';
-import { MoveHint, SlotView } from './battle.types';
+import { MoveHint, PartyEmblem, SlotView } from './battle.types';
 import { BattleFlowService } from './services/battle-flow.service';
 import { BattleSetupService } from './services/battle-setup.service';
 import { BattleStageService } from './services/battle-stage.service';
@@ -51,7 +53,7 @@ import { MoveResolverService } from './services/move-resolver.service';
 @Component({
   selector: 'app-battle',
   standalone: true,
-  imports: [IonContent, IonButton, ItemIconComponent, DebugPanelComponent],
+  imports: [IonContent, IonButton, ItemIconComponent, DebugPanelComponent, PartyBallsComponent, TrainerPanelComponent],
   providers: [BattleStateService, BattleStageService, BattleSetupService, MoveResolverService, BattleFlowService],
   templateUrl: './battle.page.html',
   styleUrls: ['./battle.page.scss', './battle-portrait.scss', './battle-backgrounds.scss']
@@ -62,6 +64,8 @@ export class BattlePage implements OnInit, OnDestroy {
   @ViewChild('screenFx', { static: true }) screenFxRef!: ElementRef<HTMLElement>;
   @ViewChild('fieldSlot', { static: true }) fieldSlotRef!: ElementRef<HTMLElement>;
   @ViewChild('layout', { static: true }) layoutRef!: ElementRef<HTMLElement>;
+  @ViewChild('playerPanel', { static: true, read: ElementRef }) playerPanelRef!: ElementRef<HTMLElement>;
+  @ViewChild('opponentPanel', { static: true, read: ElementRef }) opponentPanelRef!: ElementRef<HTMLElement>;
 
   private readonly router = inject(Router);
   private readonly settings = inject(SettingsService);
@@ -180,7 +184,10 @@ export class BattlePage implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.stage.attach(this.fieldRef.nativeElement, this.fxRef.nativeElement, this.screenFxRef.nativeElement);
-    this.stage.fitField(this.fieldSlotRef.nativeElement, this.layoutRef.nativeElement);
+    this.stage.fitField(this.fieldSlotRef.nativeElement, this.layoutRef.nativeElement, [
+      this.playerPanelRef.nativeElement,
+      this.opponentPanelRef.nativeElement
+    ]);
     this.flow.startBattle();
   }
 
@@ -232,7 +239,7 @@ export class BattlePage implements OnInit, OnDestroy {
     return hints.length ? hints : [{ kind: 'neutral', label: 'Effektiv', short: 'Normal', foe: null }];
   }
 
-  private emblems(team: BattlePokemon[], active: number[]) {
+  private emblems(team: BattlePokemon[], active: number[]): PartyEmblem[] {
     return Array.from({ length: 6 }, (_, i) => {
       const mon = team[i];
       return { owned: !!mon, fainted: !!mon && mon.currentHp <= 0, active: !!mon && active.includes(i) };
