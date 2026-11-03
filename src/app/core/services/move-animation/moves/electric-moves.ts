@@ -1,4 +1,4 @@
-import { Point, BattleStageRefs, MoveAnimRegistry } from '../animation.types';
+import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../animation.types';
 import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
@@ -11,6 +11,7 @@ export class ElectricMoveAnimations {
     thunder: (refs, _launch, target) => ElectricMoveAnimations.playThunder(refs, target),
     thunderbolt: (refs, _launch, target) => ElectricMoveAnimations.playThunderbolt(refs, target),
     thunderwave: (refs, _launch, target) => ElectricMoveAnimations.playThunderWave(refs, target),
+    zapcannon: (refs, launch, target, v) => ElectricMoveAnimations.playZapCannon(refs, launch, target, v),
     thunderpunch: (refs, _launch, target) =>
       FxEffects.playElementalPunch(refs, target, 'yellow', '#FFE04A', () => FxGlyphs.sparkBolt())
   };
@@ -270,5 +271,172 @@ export class ElectricMoveAnimations {
 
     await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     dim.remove();
+  }
+
+  /**
+   * Zap Cannon: the scene turns into a blue tunnel of rays round the target.
+   * A crackling yellow ball of electricity charges up in front of the caster
+   * and shoots across, then bursts on the target into several yellow balls
+   * scarred with black zap marks while the target is paralysed.
+   */
+  private static async playZapCannon(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, screenFxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+    const r = Fx.rect(targetEl);
+    const yellow = '#FFE84A';
+
+    // 1. Blue backdrop: slowly turning rays and drifting light dots, centred on the target.
+    const bg = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 50%,#3A78E0,#1E4FB8 60%,#0E2C80)');
+    const reach = Math.hypot(W, H);
+    const rays = document.createElement('div');
+    rays.style.cssText =
+      `position:absolute;left:${target.x - reach}px;top:${target.y - reach}px;width:${reach * 2}px;height:${reach * 2}px;` +
+      'background:radial-gradient(circle,#BFE0FF 0,#7FB4F2 6%,#7FB4F200 22%),' +
+      'radial-gradient(circle,#0E2C8000 30%,#0E2C80cc 48%),' +
+      'repeating-conic-gradient(from 0deg,#2A62D2 0 7deg,#5C9AEE 7deg 10deg,#3A74DC 10deg 16deg,#2A62D2 16deg 23deg)';
+    bg.appendChild(rays);
+    rays.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(35deg)' }], { duration: 1900, easing: 'linear' });
+    for (let i = 0; i < 14; i++) {
+      const dot = document.createElement('div');
+      const sz = 3 + Math.random() * 3;
+      dot.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;background:#CFE6FF;box-shadow:0 0 4px #9CC8FF`;
+      Fx.place(dot, { x: target.x, y: target.y });
+      bg.appendChild(dot);
+      const ang = Math.random() * Math.PI * 2;
+      const d0 = 30 + Math.random() * 120;
+      const d1 = d0 + 80 + Math.random() * 120;
+      dot.animate([
+        { transform: `translate(${Math.cos(ang) * d0}px,${Math.sin(ang) * d0}px)`, opacity: 0 },
+        { opacity: 1, offset: 0.3 },
+        { transform: `translate(${Math.cos(ang) * d1}px,${Math.sin(ang) * d1}px)`, opacity: 0 }
+      ], { duration: 1500, delay: Math.random() * 400, easing: 'ease-out', fill: 'both' });
+    }
+    const bgIn = Fx.anim(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 260, easing: 'ease-out' });
+
+    // 2. The ball charges in front of the caster (0 - 0.26 s) ...
+    const muzzle: Point = { x: launch.x + v.dir * Math.max(lr.width * 0.4, 30), y: launch.y };
+    const size = 34;
+    const ball = document.createElement('div');
+    ball.style.cssText =
+      `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;overflow:visible;` +
+      `background:radial-gradient(circle,#fff 0 22%,#FFF6A0 40%,${yellow} 62%,#E8B42A00 72%);filter:drop-shadow(0 0 6px ${yellow})`;
+    Fx.place(ball, muzzle);
+    fxEl.appendChild(ball);
+    const stopCrackle = ElectricMoveAnimations.crackle(ball, size);
+    await Promise.all([
+      bgIn,
+      Fx.anim(ball, [{ transform: 'scale(.1)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 260, easing: 'ease-out' })
+    ]);
+
+    // ... then shoots across to the target.
+    await Fx.anim(ball, [
+      { transform: 'translate(0,0) scale(1)' },
+      { transform: `translate(${target.x - muzzle.x}px,${target.y - muzzle.y}px) scale(1.25)` }
+    ], { duration: 280, easing: 'ease-in' });
+    stopCrackle();
+    ball.remove();
+
+    // 3. Impact: flash, then yellow balls with black zap marks pop up over the target.
+    Fx.screenWash(screenFxEl, '#FFF6B088', 50, 120, `${((target.x / W) * 100).toFixed(0)}%`);
+    Fx.flash(targetEl, yellow, 0.9);
+    Fx.shake(targetEl, 6);
+    Fx.shakeField(fieldEl, 0.6);
+    const spread = Math.max(r.width * 0.42, 26);
+    const blobs: Promise<void>[] = [];
+    for (let i = 0; i < 5; i++) {
+      const bs = Math.max(r.width * 0.42, 34) * (0.8 + Math.random() * 0.4);
+      const blob = ElectricMoveAnimations.zapBall(bs);
+      const ang = (i / 5) * Math.PI * 2 + Math.random() * 0.6;
+      Fx.place(blob, { x: target.x + Math.cos(ang) * spread * (i ? 1 : 0.2), y: target.y + Math.sin(ang) * spread * 0.8 * (i ? 1 : 0.2) });
+      fxEl.appendChild(blob);
+      blobs.push(
+        Fx.anim(blob, [
+          { transform: 'scale(.2)', opacity: 0 },
+          { transform: 'scale(1.1)', opacity: 1, offset: 0.2 },
+          { transform: 'scale(.95)', opacity: 0.6, offset: 0.45 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.6 },
+          { transform: 'scale(1.15)', opacity: 0 }
+        ], { duration: 520, delay: i * 70, easing: 'ease-out' }).then(() => blob.remove())
+      );
+    }
+    setTimeout(() => Fx.shake(targetEl, 4), 180);
+
+    // 4. Paralysis (~0.82 s): the target turns yellow while sparks crackle around it.
+    await Fx.wait(260);
+    const tint = Fx.anim(targetEl, [
+      { filter: 'none' },
+      { filter: 'sepia(1) saturate(4) hue-rotate(8deg) brightness(1.25)', offset: 0.2 },
+      { filter: 'sepia(1) saturate(4) hue-rotate(8deg) brightness(1.1)', offset: 0.8 },
+      { filter: 'none' }
+    ], { duration: 650, easing: 'ease-in-out', fill: 'none' });
+    for (let i = 0; i < 8; i++) {
+      setTimeout(() => {
+        const b = FxGlyphs.sparkBolt();
+        Fx.place(b, {
+          x: target.x + (Math.random() * 2 - 1) * Math.max(r.width * 0.55, 28),
+          y: target.y + (Math.random() * 2 - 1) * Math.max(r.height * 0.45, 24)
+        });
+        fxEl.appendChild(b);
+        const rot = Math.random() * 60 - 30;
+        Fx.anim(b, [
+          { transform: `rotate(${rot}deg) scale(.4)`, opacity: 0 },
+          { transform: `rotate(${rot}deg) scale(1.1)`, opacity: 1, offset: 0.3 },
+          { transform: `rotate(${rot}deg) scale(1)`, opacity: 0 }
+        ], { duration: 220, easing: 'ease-out' }).then(() => b.remove());
+      }, i * 65);
+    }
+    await Promise.all([...blobs, tint]);
+
+    await Fx.anim(bg, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    bg.remove();
+  }
+
+  /** Keeps short jagged sparks flickering off the edge of `el` (a ball of `size` px); returns a stop function. */
+  private static crackle(el: HTMLElement, size: number): () => void {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('width', `${size}`);
+    svg.setAttribute('height', `${size}`);
+    svg.setAttribute('style', 'position:absolute;left:0;top:0;overflow:visible;pointer-events:none');
+    el.appendChild(svg);
+    const c = size / 2;
+    const draw = () => {
+      let html = '';
+      for (let k = 0; k < 3; k++) {
+        const ang = Math.random() * 360;
+        const len = size * (0.35 + Math.random() * 0.4);
+        const pts = Fx.zigzagPoints(0, c * 0.7, 0, c * 0.7 + len, 4);
+        html += `<polyline points="${pts}" fill="none" stroke="#FFF6A0" stroke-width="1.8" transform="translate(${c},${c}) rotate(${ang})"/>`;
+      }
+      svg.innerHTML = html;
+    };
+    draw();
+    const t = setInterval(draw, 60);
+    return () => clearInterval(t);
+  }
+
+  /** A glowing yellow ball of electricity scarred with black spiky zap marks (Zap Cannon impact). */
+  private static zapBall(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText =
+      `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(circle at 45% 40%,#FFFBD0 0 18%,#FFE84A 45%,#F2C81E 68%,#F2C81E00 72%);filter:drop-shadow(0 0 5px #FFE84A)';
+    let marks = '';
+    for (let m = 0; m < 2; m++) {
+      const cx = 30 + Math.random() * 40;
+      const cy = 30 + Math.random() * 40;
+      const spikes = 6 + Math.floor(Math.random() * 3);
+      const pts: string[] = [];
+      for (let i = 0; i < spikes * 2; i++) {
+        const a = (Math.PI * 2 * i) / (spikes * 2) + Math.random() * 0.3;
+        const rad = i % 2 ? 4 + Math.random() * 2 : 11 + Math.random() * 9;
+        pts.push(`${(cx + Math.cos(a) * rad).toFixed(1)},${(cy + Math.sin(a) * rad).toFixed(1)}`);
+      }
+      marks += `<polygon points="${pts.join(' ')}" fill="#1A1A1A"/>`;
+    }
+    el.innerHTML = `<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block;overflow:visible">${marks}</svg>`;
+    return el;
   }
 }

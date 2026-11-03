@@ -361,12 +361,14 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): a drowsy mumble, then a move is picked in the sleep. */
+  /** Custom: a drowsy mumble while Zs float up (0 - 1.1 s), then a sleepy tackle lands (1.27 s). */
   sleeptalk: () => {
-    const s = new MoveSfx(1.05, 0x5137);
-    s.wave(0.02, 0.55, { freq: (u) => 220 - 40 * u + 25 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.35) });
-    s.pulse(0.02, 0.55, { freq: () => 110, gain: env.swell(0.12), duty: 0.25 });
-    s.arpeggio(0.6, [72, 79], 0.1, { gain: 0.22, voice: 'wave', hold: 0.25 });
+    const s = new MoveSfx(1.7, 0x5137);
+    s.wave(0.02, 1.0, { freq: (u) => 220 - 40 * u + 25 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.35) });
+    s.pulse(0.02, 1.0, { freq: () => 110, gain: env.swell(0.12), duty: 0.25 });
+    s.whoosh(1.1, 0.17, { from: 1500, to: 5000, gain: 0.3 });
+    s.thud(1.27, 0.7, 0.6);
+    s.noise(1.27, 0.08, { clock: () => 8000, gain: env.decay(0.3, 1), short: true });
     return s;
   },
 

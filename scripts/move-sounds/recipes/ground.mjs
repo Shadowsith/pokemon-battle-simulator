@@ -224,7 +224,7 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), on the foe side: a handful of spikes is scattered and lands with clinks. */
+  /** Custom: five caltrops tossed in arcs (whoosh) land round the target with a clink each (0.28 - 0.68 s). */
   spikes: () => {
     const s = new MoveSfx(1.0, 0x5b1c);
     s.whoosh(0.02, 0.25, { from: 2000, to: 6000, gain: 0.2 });

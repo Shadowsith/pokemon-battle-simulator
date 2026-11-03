@@ -124,7 +124,7 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic weather (particles ~1.1 s, glow 0.9 s, clip ~1.45 s): a gritty, howling sandstorm. */
+  /** Custom (sandy haze swells in and clears over ~1.5 s): a gritty, howling sandstorm. */
   sandstorm: () => {
     const s = new MoveSfx(1.5, 0x5a57);
     s.noise(0.0, 1.4, { clock: (u) => 3000 + 2000 * Math.sin(2 * Math.PI * 1.5 * u), gain: env.swell(0.3) });

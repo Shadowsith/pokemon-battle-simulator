@@ -9,12 +9,14 @@ export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     absorb: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target),
+    aromatherapy: (refs, launch) => GrassMoveAnimations.playAromatherapy(refs, launch),
     gigadrain: (refs, launch, target) => GrassMoveAnimations.playGigaDrain(refs, launch, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     sleeppowder: (refs, _launch, target, v) => GrassMoveAnimations.playSleepPowder(refs, target, v),
     solarbeam: (refs, _launch, target) => GrassMoveAnimations.playSolarBeam(refs, target),
-    spore: (refs, _launch, target, v) => GrassMoveAnimations.playSpore(refs, target, v)
+    spore: (refs, _launch, target, v) => GrassMoveAnimations.playSpore(refs, target, v),
+    synthesis: (refs, launch) => GrassMoveAnimations.playSynthesis(refs, launch)
   };
 
   /** Turn-1 animations of two-turn Grass moves, by @pkmn/sim move id. */
@@ -27,6 +29,137 @@ export class GrassMoveAnimations {
     const el = document.createElement('div');
     el.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFDE0,#F4F07A 40%,#E8E04A00 72%);box-shadow:0 0 ${s}px #F4F07A88`;
     return el;
+  }
+
+  /**
+   * Aromatherapy: the backdrop turns a soft green while pink petals and
+   * glowing green motes drift and tumble across the field; then glowing green
+   * rings pulse out round the caster amid twinkling sparkles.
+   */
+  private static async playAromatherapy(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const total = 1600;
+
+    const bg = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 55%,#5AA048,#2E6A2A 55%,#163E18)');
+    const effects: Promise<void>[] = [
+      Fx.anim(bg, [
+        { opacity: 0 },
+        { opacity: 1, offset: 0.18 },
+        { opacity: 1, offset: 0.8 },
+        { opacity: 0 }
+      ], { duration: total, easing: 'ease-in-out' }).then(() => bg.remove())
+    ];
+
+    // Pink petals and green motes drift across the field on a gentle breeze.
+    for (let i = 0; i < 34; i++) {
+      const petal = i % 2 === 0;
+      const el = petal ? GrassMoveAnimations.petalGlyph(8 + Math.random() * 6, '#F27A9C') : document.createElement('div');
+      if (!petal) {
+        const sz = 4 + Math.random() * 4;
+        el.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#F0FFE8,#8CE85A 50%,#5ACB3A00 75%);box-shadow:0 0 6px #8CE85A`;
+      }
+      const from: Point = { x: Math.random() * W, y: Math.random() * H };
+      Fx.place(el, from);
+      fxEl.appendChild(el);
+      const dx = 40 + Math.random() * 60;
+      const dy = (Math.random() * 2 - 1) * 30 + (petal ? 20 : -15);
+      const spin = petal ? (Math.random() < 0.5 ? -1 : 1) * (200 + Math.random() * 200) : 0;
+      effects.push(
+        Fx.anim(el, [
+          { transform: 'translate(0,0) rotate(0deg) scaleX(1)', opacity: 0 },
+          { transform: `translate(${dx * 0.3}px,${dy * 0.3 - 8}px) rotate(${spin * 0.3}deg) scaleX(.4)`, opacity: 1, offset: 0.25 },
+          { transform: `translate(${dx * 0.65}px,${dy * 0.65 + 6}px) rotate(${spin * 0.65}deg) scaleX(1)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(${dx}px,${dy}px) rotate(${spin}deg) scaleX(.5)`, opacity: 0 }
+        ], { duration: 900 + Math.random() * 400, delay: 100 + Math.random() * 300, easing: 'ease-in-out' }).then(() => el.remove())
+      );
+    }
+
+    // Glowing green rings pulse out round the caster (from ~0.55 s), with sparkles.
+    await Fx.wait(550);
+    const r = Fx.rect(launchEl);
+    const size = Math.max(r.width, r.height) * 1.1;
+    const rings = document.createElement('div');
+    rings.style.cssText =
+      `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(circle,#E8FFD8cc 0 8%,#E8FFD800 30%),repeating-radial-gradient(circle,#7CF05A00 0 6%,#7CF05Acc 9%,#7CF05A00 13%),radial-gradient(circle,#5ADC3A88,#5ADC3A00 70%);' +
+      'box-shadow:0 0 20px #7CF05A;filter:blur(.5px)';
+    Fx.place(rings, launch);
+    fxEl.appendChild(rings);
+    effects.push(
+      Fx.anim(rings, [
+        { transform: 'scale(.2)', opacity: 0 },
+        { transform: 'scale(.9)', opacity: 1, offset: 0.3 },
+        { transform: 'scale(1)', opacity: 0.85, offset: 0.55 },
+        { transform: 'scale(1.1)', opacity: 1, offset: 0.75 },
+        { transform: 'scale(1.25)', opacity: 0 }
+      ], { duration: 850, easing: 'ease-out' }).then(() => rings.remove())
+    );
+    for (let i = 0; i < 12; i++) {
+      const star = FxGlyphs.sparkStar(8 + Math.random() * 9, i % 2 ? '#B8FF9A' : '#ffffff');
+      Fx.place(star, {
+        x: launch.x + (Math.random() * 2 - 1) * size * 0.65,
+        y: launch.y + (Math.random() * 2 - 1) * size * 0.55
+      });
+      fxEl.appendChild(star);
+      effects.push(
+        Fx.anim(star, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1.1) rotate(45deg)', opacity: 1, offset: 0.45 },
+          { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+        ], { duration: 450, easing: 'ease-in-out', delay: Math.random() * 500 }).then(() => star.remove())
+      );
+    }
+    Fx.flash(launchEl, '#8CE85A', 0.5);
+    setTimeout(() => Fx.flash(launchEl, '#8CE85A', 0.35), 350);
+    await Promise.all(effects);
+  }
+
+  /**
+   * Synthesis: a blazing sun-like orb lights up on the caster, white rays of
+   * light fanning out from it, then the caster regains HP in green sparkles.
+   */
+  private static async playSynthesis(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const size = Math.max(Math.max(r.width, r.height) * 0.8, 60);
+
+    // Rays: a slowly turning fan of white light streaks, fading out with distance.
+    const rays = document.createElement('div');
+    const rs = size * 4;
+    rays.style.cssText =
+      `position:absolute;width:${rs}px;height:${rs}px;pointer-events:none;` +
+      'background:repeating-conic-gradient(from 0deg,#FFFFF000 0 9deg,#FFFFF0cc 11deg 14deg,#FFFFF000 16deg 30deg);' +
+      '-webkit-mask-image:radial-gradient(circle,#000 12%,transparent 62%);mask-image:radial-gradient(circle,#000 12%,transparent 62%)';
+    Fx.place(rays, launch);
+    fxEl.appendChild(rays);
+    const raysDone = Fx.anim(rays, [
+      { transform: 'scale(.4) rotate(0deg)', opacity: 0 },
+      { transform: 'scale(1) rotate(8deg)', opacity: 1, offset: 0.3 },
+      { transform: 'scale(1.05) rotate(20deg)', opacity: 1, offset: 0.75 },
+      { transform: 'scale(1.1) rotate(26deg)', opacity: 0 }
+    ], { duration: 700, easing: 'ease-out' }).then(() => rays.remove());
+
+    // The sun orb: white-hot core with a yellow-green glow, pulsing once.
+    const orb = document.createElement('div');
+    orb.style.cssText =
+      `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(circle,#fff 0 28%,#FFFDE0 40%,#E8F47A 58%,#C8E84A00 72%);box-shadow:0 0 30px #F4F8A0';
+    Fx.place(orb, launch);
+    fxEl.appendChild(orb);
+    const orbDone = Fx.anim(orb, [
+      { transform: 'scale(.2)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.3 },
+      { transform: 'scale(.9)', opacity: 0.9, offset: 0.55 },
+      { transform: 'scale(1.1)', opacity: 1, offset: 0.75 },
+      { transform: 'scale(1.3)', opacity: 0 }
+    ], { duration: 700, easing: 'ease-in-out' }).then(() => orb.remove());
+    setTimeout(() => Fx.flash(launchEl, '#F4F8A0', 0.7), 200);
+
+    // HP gain starts with the sound's chime (~0.6 s), while the orb fades.
+    await Fx.wait(600);
+    await Promise.all([raysDone, orbDone, FxEffects.healSparkles(refs, launch)]);
   }
 
   /**

@@ -10,13 +10,82 @@ export class GroundMoveAnimations {
     boneclub: (refs, launch, target, v) => GroundMoveAnimations.playBoneClub(refs, launch, target, v),
     bonemerang: (refs, launch, target, v) => GroundMoveAnimations.playBonemerang(refs, launch, target, v),
     dig: (refs, _launch, target) => GroundMoveAnimations.playDigUp(refs, target),
-    earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs)
+    earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs),
+    spikes: (refs, launch) => GroundMoveAnimations.playSpikes(refs, launch)
   };
 
   /** Turn-1 animations of two-turn Ground moves, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {
     dig: (refs) => GroundMoveAnimations.playDigDown(refs)
   };
+
+  /**
+   * Spikes: small metal caltrops are tossed one after another in high arcs
+   * onto the ground round the target, land with a little bounce, lie there
+   * for a moment and fade.
+   */
+  private static async playSpikes(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+    const size = Math.min(Math.max(r.width * 0.22, 16), 26);
+    const flight = 260;
+    const count = 5;
+    const lastLanding = 20 + (count - 1) * 100 + flight;
+
+    const spikes: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const spike = GroundMoveAnimations.caltrop(size);
+      Fx.place(spike, launch);
+      fxEl.appendChild(spike);
+      // Spread over the ground in front of and beside the target, left to right.
+      const land: Point = {
+        x: foot.x + ((i / (count - 1)) * 2 - 1) * Math.max(r.width * 0.6, 40) + (Math.random() * 2 - 1) * 6,
+        y: foot.y + (Math.random() * 2 - 1) * 6
+      };
+      const dx = land.x - launch.x;
+      const dy = land.y - launch.y;
+      const peak = Math.max(60, Math.abs(dx) * 0.3);
+      const spin = (Math.random() < 0.5 ? -1 : 1) * (240 + Math.random() * 180);
+      const arc: Keyframe[] = [];
+      for (let k = 0; k <= 8; k++) {
+        const t = k / 8;
+        arc.push({
+          transform: `translate(${dx * t}px,${dy * t - 4 * peak * t * (1 - t)}px) rotate(${spin * t}deg)`,
+          opacity: t === 0 ? 0 : 1
+        });
+      }
+      const delay = 20 + i * 100;
+      spikes.push(
+        Fx.anim(spike, arc, { duration: flight, delay, easing: 'linear' })
+          .then(() =>
+            // Small bounce on landing, a short rest, then fade away.
+            Fx.anim(spike, [
+              { transform: `translate(${dx}px,${dy}px) rotate(${spin}deg)`, opacity: 1 },
+              { transform: `translate(${dx}px,${dy - 6}px) rotate(${spin}deg)`, opacity: 1, offset: 0.12 },
+              { transform: `translate(${dx}px,${dy}px) rotate(${spin}deg)`, opacity: 1, offset: 0.24 },
+              { transform: `translate(${dx}px,${dy}px) rotate(${spin}deg)`, opacity: 1, offset: 0.75 },
+              { transform: `translate(${dx}px,${dy}px) rotate(${spin}deg)`, opacity: 0 }
+            ], { duration: lastLanding - delay - flight + 750, easing: 'ease-out' })
+          )
+          .then(() => spike.remove())
+      );
+    }
+    await Promise.all(spikes);
+  }
+
+  /** A small grey metal caltrop: three sharp prongs round a hub, seen from the side. */
+  private static caltrop(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(1px 2px 1px #00000055)`;
+    el.innerHTML =
+      '<svg viewBox="0 0 20 20" width="100%" height="100%" style="display:block;overflow:visible">' +
+      '<path d="M10 1 L12 10 L8 10 Z" fill="#B8BCC6" stroke="#4E525C" stroke-width=".7"/>' +
+      '<path d="M1.5 17 L9 9 L11 12 Z" fill="#8E929C" stroke="#4E525C" stroke-width=".7"/>' +
+      '<path d="M18.5 17 L11 9 L9 12 Z" fill="#A4A8B2" stroke="#4E525C" stroke-width=".7"/>' +
+      '<circle cx="10" cy="10.5" r="2.2" fill="#D8DCE4" stroke="#4E525C" stroke-width=".7"/></svg>';
+    return el;
+  }
 
   /**
    * Bone Club: a spinning bone is thrown high and drops onto the target from

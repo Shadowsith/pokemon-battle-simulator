@@ -276,42 +276,42 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Reversal** / Gegenschlag — `reversal` · Fighting · Physical · `melee`
 - [ ] **Rock Smash** / Zertrümmerer — `rocksmash` · Fighting · Physical · `melee`
 - [ ] **Rollout** / Walzer — `rollout` · Rock · Physical · `melee`
-- [ ] ⭐ **Sacred Fire** / Läuterfeuer — `sacredfire` · Fire · Physical · `projectile`
+- [x] ⭐ **Sacred Fire** / Läuterfeuer — `sacredfire` · Fire · Physical · scene goes dark, cool blue fire backdrop, purple orb on the target with a closing purple ring, then it bursts into many small purple flames (custom, needs review)
 - [ ] **Safeguard** / Bodyguard — `safeguard` · Normal · Status · `selfAura`
-- [ ] ⭐ **Sandstorm** / Sandsturm — `sandstorm` · Rock · Status · `weather`
+- [x] ⭐ **Sandstorm** / Sandsturm — `sandstorm` · Rock · Status · sandy haze over the whole scene with wind streaks, rolling dust clouds and whipping sand grains (custom, needs review)
 - [ ] **Scary Face** / Grimasse — `scaryface` · Normal · Status · `selfAura`
-- [ ] ⭐ **Shadow Ball** / Spukball — `shadowball` · Ghost · Special · `lob`
+- [x] ⭐ **Shadow Ball** / Spukball — `shadowball` · Ghost · Special · dark purple wispy ball gathers before the caster and is hurled at the target, dark purple shadow puffs + darkening on hit (custom, needs review)
 - [ ] **Sketch** / Nachahmer — `sketch` · Normal · Status · `targetAura`
-- [ ] ⭐ **Sleep Talk** / Schlafrede — `sleeptalk` · Normal · Status · `selfAura`
-- [ ] ⭐ **Sludge Bomb** / Matschbombe — `sludgebomb` · Poison · Special · `lob`
+- [x] ⭐ **Sleep Talk** / Schlafrede — `sleeptalk` · Normal · Status · pale blue rings + blue "Z"s round the sleeping caster, tackle-like lunge, yellow burst + sparkles on the target (custom, needs review)
+- [x] ⭐ **Sludge Bomb** / Matschbombe — `sludgebomb` · Poison · Special · trail of lumpy purple sludge globs hurled in an arc, bursts into a wobbling sludge mass with poison bubbles + purple tint (custom, needs review)
 - [ ] **Snore** / Schnarcher — `snore` · Normal · Special · `sonic`
 - [ ] **Spark** / Funkensprung — `spark` · Electric · Physical · `melee`
 - [ ] **Spider Web** / Spinnennetz — `spiderweb` · Bug · Status · `targetAura`
-- [ ] ⭐ **Spikes** / Stachler — `spikes` · Ground · Status · `targetAura`
+- [x] ⭐ **Spikes** / Stachler — `spikes` · Ground · Status · five metal caltrops tossed in arcs onto the ground round the target, bounce, rest briefly and fade (custom, needs review)
 - [ ] **Spite** / Groll — `spite` · Ghost · Status · `targetAura`
-- [ ] ⭐ **Steel Wing** / Stahlflügel — `steelwing` · Steel · Physical · `melee`
-- [ ] ⭐ **Sunny Day** / Sonnentag — `sunnyday` · Fire · Status · `weather`
+- [x] ⭐ **Steel Wing** / Stahlflügel — `steelwing` · Steel · Physical · three steel feathers appear on the caster, fly at the target one by one and strike with silver slash streaks + sparkles (custom, needs review)
+- [x] ⭐ **Sunny Day** / Sonnentag — `sunnyday` · Fire · Status · warm bright backdrop, pulsing sun with sparkles in the top-left corner, broad sun shafts slanting across the field (custom, needs review)
 - [ ] **Swagger** / Angeberei — `swagger` · Normal · Status · `selfAura`
 - [ ] **Sweet Kiss** / Bitterkuss — `sweetkiss` · Fairy · Status · `targetAura`
 - [ ] **Sweet Scent** / Lockduft — `sweetscent` · Normal · Status · `selfAura`
-- [ ] ⭐ **Synthesis** / Synthese — `synthesis` · Grass · Status · `selfAura`
+- [x] ⭐ **Synthesis** / Synthese — `synthesis` · Grass · Status · bright sun orb with white light rays on the caster, then green HP sparkles (custom, needs review)
 - [ ] **Thief** / Raub — `thief` · Dark · Physical · `melee`
 - [ ] **Triple Kick** / Dreifachkick — `triplekick` · Fighting · Physical · `melee`
 - [ ] **Twister** / Windhose — `twister` · Dragon · Special · `field`
-- [ ] ⭐ **Vital Throw** / Überwurf — `vitalthrow` · Fighting · Physical · `melee`
+- [x] ⭐ **Vital Throw** / Überwurf — `vitalthrow` · Fighting · Physical · clockwise circle lap + orange hit flash + orange orbs flying away (custom, needs review)
 - [ ] **Whirlpool** / Whirlpool — `whirlpool` · Water · Special · `projectile`
-- [ ] ⭐ **Zap Cannon** / Blitzkanone — `zapcannon` · Electric · Special · `beam`
+- [x] ⭐ **Zap Cannon** / Blitzkanone — `zapcannon` · Electric · Special · blue ray-tunnel backdrop + crackling yellow ball shot + yellow balls with black zap marks + paralysis tint (custom, needs review)
 
 ## Gen 3 (103)
 
 - [ ] **Aerial Ace** / Aero-Ass — `aerialace` · Flying · Physical · `melee`
 - [ ] **Air Cutter** / Windschnitt — `aircutter` · Flying · Special · `field`
 - [ ] **Arm Thrust** / Armstoß — `armthrust` · Fighting · Physical · `melee`
-- [ ] ⭐ **Aromatherapy** / Aromakur — `aromatherapy` · Grass · Status · `targetAura`
+- [x] ⭐ **Aromatherapy** / Aromakur — `aromatherapy` · Grass · Status · green backdrop, drifting pink petals + green motes, glowing green rings + sparkles round the caster (custom, needs review)
 - [ ] **Assist** / Zuschuss — `assist` · Normal · Status · `selfAura`
 - [ ] **Astonish** / Erstauner — `astonish` · Ghost · Physical · `melee`
-- [ ] ⭐ **Blast Burn** / Lohekanonade — `blastburn` · Fire · Special · `projectile`
-- [ ] ⭐ **Blaze Kick** / Feuerfeger — `blazekick` · Fire · Physical · `melee`
+- [x] ⭐ **Blast Burn** / Lohekanonade — `blastburn` · Fire · Special · red-hot backdrop, fire jets shoot up in a circle round the caster, flame ring flares round the target, then two fire rings whirl round it in opposite directions (custom, needs review)
+- [x] ⭐ **Blaze Kick** / Feuerfeger — `blazekick` · Fire · Physical · black foot stamps onto the target, fire puffs flicker all round it with yellow sparkles (custom, needs review)
 - [ ] **Block** / Rückentzug — `block` · Normal · Status · `targetAura`
 - [ ] ⭐ **Bounce** / Sprungfeder — `bounce` · Flying · Physical · `beam`
 - [ ] ⭐ **Brick Break** / Durchbruch — `brickbreak` · Fighting · Physical · `melee`

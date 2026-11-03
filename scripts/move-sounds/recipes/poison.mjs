@@ -172,7 +172,7 @@ export const POISON = {
     return s;
   },
 
-  /** Generic lob (impact 0.52 s) + poison fleck (0.65 s): a heavy sludge bomb arcs over and bursts. */
+  /** Custom (impact 0.52 s, purple tint 0.65 s): a heavy sludge bomb arcs over and bursts. */
   sludgebomb: () => {
     const s = new MoveSfx(1.15, 0x5b0b);
     s.pulse(0.0, 0.06, { freq: (u) => 300 + 500 * u, gain: env.decay(0.3, 1), duty: 0.5 });

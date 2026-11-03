@@ -45,19 +45,22 @@ export const FIRE = {
     return t;
   },
 
-  /** Generic projectile at full power (0.43 s): a roaring blast and a huge explosion. */
+  /** Custom: heat swells (0-0.3 s), roaring fire jets (0.3-1.0 s), flame ring flares (1.0 s), whirling fire rings explode (1.5-2.3 s). */
   blastburn: () => {
-    const s = new MoveSfx(1.7, 0xb1a5);
-    s.whoosh(0.0, 0.46, { from: 600, to: 4000, gain: 0.45 });
-    s.noise(0.0, 0.45, { clock: () => 500, gain: env.ramp(0.1, 0.4) });
-    s.thud(0.43, 0.9, 1);
-    s.noise(0.43, 0.35, { clock: (u) => 12000 - 9000 * u, gain: env.attackDecay(0.7, 0.02) });
-    s.rumble(0.45, 1.2, { from: 700, to: 150, gain: 0.5 });
-    s.sparkle(0.6, 0.8, 8, { lo: 6000, hi: 9000, gain: 0.15 });
+    const s = new MoveSfx(2.6, 0xb1a5);
+    s.noise(0.0, 0.3, { clock: () => 400, gain: env.ramp(0.05, 0.2) });
+    s.whoosh(0.3, 0.7, { from: 600, to: 4000, gain: 0.4 });
+    s.noise(0.3, 0.7, { clock: () => 500, gain: env.swell(0.35) });
+    s.thud(1.0, 0.7, 0.8);
+    s.noise(1.0, 0.4, { clock: (u) => 9000 - 6000 * u, gain: env.attackDecay(0.5, 0.02) });
+    s.thud(1.5, 0.9, 1);
+    s.noise(1.5, 0.7, { clock: (u) => 12000 - 9000 * u, gain: env.attackDecay(0.6, 0.03) });
+    s.rumble(1.5, 0.9, { from: 700, to: 150, gain: 0.5 });
+    s.sparkle(1.6, 0.7, 8, { lo: 6000, hi: 9000, gain: 0.15 });
     return s;
   },
 
-  /** Generic melee kick + burn fleck: a flaming kick. */
+  /** Custom (foot stamps in, impact 0.17 s, fire puffs flicker round it) + burn fleck: a flaming kick. */
   blazekick: () => {
     const s = new MoveSfx(1.0, 0xb1a2);
     s.noise(0.0, 0.18, { clock: env.ramp(400, 1500), gain: env.ramp(0.15, 0.4) });
@@ -340,14 +343,15 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + burn fleck (0.55 s): a mystic flame – a holy chime rides a warm fire roar into a blaze. */
+  /** Custom: dark hush (0-0.3 s), holy chime over a swelling blue blaze while the ring closes (0.3-1.1 s), burst into purple flames (1.1 s). */
   sacredfire: () => {
-    const s = new MoveSfx(1.15, 0x5acf);
-    s.noise(0.0, 0.45, { clock: env.ramp(800, 1600), gain: env.swell(0.3) });
-    s.chord(0.0, 0.45, [76, 81, 85], { rate: 0.04, gain: 0.14 });
-    s.thud(0.43, 0.6, 0.6);
-    s.noise(0.43, 0.35, { clock: (u) => 1800 - 800 * u, gain: env.attackDecay(0.4, 0.08) });
-    s.burn(0.55, 0.3);
+    const s = new MoveSfx(2.0, 0x5acf);
+    s.noise(0.0, 0.3, { clock: () => 400, gain: env.swell(0.08) });
+    s.noise(0.3, 0.8, { clock: env.ramp(800, 1600), gain: env.swell(0.25) });
+    s.chord(0.3, 0.8, [76, 81, 85], { rate: 0.04, gain: 0.14 });
+    s.thud(1.1, 0.6, 0.6);
+    s.noise(1.1, 0.6, { clock: (u) => 1800 - 800 * u, gain: env.attackDecay(0.4, 0.08) });
+    s.burn(1.3, 0.3);
     return s;
   },
 

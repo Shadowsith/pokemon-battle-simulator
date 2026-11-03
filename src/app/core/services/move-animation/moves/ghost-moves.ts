@@ -1,4 +1,4 @@
-import { BattleStageRefs, MoveAnimRegistry, Point } from '../animation.types';
+import { BattleStageRefs, MoveAnimRegistry, MoveVisual, Point } from '../animation.types';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 
@@ -8,8 +8,107 @@ export class GhostMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     curse: (refs, launch) => GhostMoveAnimations.playCurse(refs, launch),
     destinybond: (refs, launch, target) => GhostMoveAnimations.playDestinyBond(refs, launch, target),
-    nightshade: (refs, launch) => GhostMoveAnimations.playNightShade(refs, launch)
+    nightshade: (refs, launch) => GhostMoveAnimations.playNightShade(refs, launch),
+    shadowball: (refs, launch, target, v) => GhostMoveAnimations.playShadowBall(refs, launch, target, v)
   };
+
+  /**
+   * Shadow Ball: a dark purple ball of shadow with a wispy, flickering edge
+   * gathers in front of the caster (0 - 0.25 s) and is hurled at the target,
+   * trailing wisps; on impact (0.52 s) the target is swallowed by dark purple
+   * shadow puffs that drift off it while it darkens.
+   */
+  private static async playShadowBall(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const size = Math.max(lr.width * 0.5, 40);
+    const from: Point = { x: launch.x + v.dir * Math.max(lr.width * 0.55, 36), y: launch.y - lr.height * 0.05 };
+
+    // Phase 1: the ball gathers before the caster ...
+    const ball = document.createElement('div');
+    ball.style.cssText = `width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 6px #6A1E9A) blur(.5px)`;
+    const pts: string[] = [];
+    for (let i = 0; i < 28; i++) {
+      const a = (Math.PI * 2 * i) / 28;
+      const rad = i % 2 ? 40 + Math.random() * 4 : 47 + Math.random() * 3;
+      pts.push(`${(50 + Math.cos(a) * rad).toFixed(1)}% ${(50 + Math.sin(a) * rad).toFixed(1)}%`);
+    }
+    const core = document.createElement('div');
+    core.style.cssText = `width:100%;height:100%;clip-path:polygon(${pts.join(',')});background:radial-gradient(circle,#2A0838 0 30%,#4A1266 55%,#8A3AC0 78%,#B070E0 90%)`;
+    ball.appendChild(core);
+    core.animate([{ transform: 'rotate(0deg)' }, { transform: 'rotate(180deg)' }], { duration: 520, iterations: 2 });
+    Fx.place(ball, from);
+    fxEl.appendChild(ball);
+    await Fx.anim(ball, [
+      { transform: 'scale(.1)', opacity: 0 },
+      { transform: 'scale(1.1)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], { duration: 250, easing: 'ease-out' });
+
+    // ... and is hurled at the target, shedding wisps on the way.
+    const dx = target.x - from.x;
+    const dy = target.y - from.y;
+    const travel = 270;
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => {
+        const t = i / 6;
+        GhostMoveAnimations.shadowPuff(fxEl, { x: from.x + dx * t, y: from.y + dy * t }, size * 0.45, 380, 8);
+      }, (i / 6) * travel);
+    }
+    await Fx.anim(ball, [
+      { transform: 'translate(0,0) scale(1)' },
+      { transform: `translate(${dx}px,${dy}px) scale(1.15)` }
+    ], { duration: travel, easing: 'ease-in' });
+    ball.remove();
+
+    // Phase 2: dark purple hit.
+    Fx.flash(targetEl, '#6A1E9A', 0.6);
+    Fx.shake(targetEl, 6);
+    const effects: Promise<void>[] = [
+      Fx.anim(targetEl, [
+        { filter: 'none' },
+        { filter: 'sepia(1) saturate(3) hue-rotate(230deg) brightness(.55)', offset: 0.15 },
+        { filter: 'sepia(1) saturate(3) hue-rotate(230deg) brightness(.6)', offset: 0.6 },
+        { filter: 'none' }
+      ], { duration: 750, easing: 'ease-in-out', fill: 'none' })
+    ];
+    const burst = Math.max(tr.width * 0.75, 56);
+    for (let i = 0; i < 12; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const d = burst * (0.1 + Math.random() * 0.3);
+      effects.push(
+        GhostMoveAnimations.shadowPuff(
+          fxEl,
+          { x: target.x + Math.cos(ang) * d, y: target.y + Math.sin(ang) * d * 0.8 },
+          burst * (0.3 + Math.random() * 0.3),
+          600 + Math.random() * 250,
+          burst * (0.35 + Math.random() * 0.4),
+          ang,
+          i * 25
+        )
+      );
+    }
+    await Promise.all(effects);
+  }
+
+  /**
+   * A soft, blurred dark purple puff of shadow at `at` that swells, drifts
+   * `drift` px in direction `ang` (radians, default random) and fades.
+   */
+  private static shadowPuff(fxEl: HTMLElement, at: Point, size: number, duration: number, drift: number, ang = Math.random() * Math.PI * 2, delay = 0): Promise<void> {
+    const puff = document.createElement('div');
+    puff.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#5A1680,#6E2A9Acc 45%,#8A3AC000 72%);filter:blur(1.5px)`;
+    Fx.place(puff, at);
+    fxEl.appendChild(puff);
+    const x = Math.cos(ang) * drift;
+    const y = Math.sin(ang) * drift - drift * 0.3;
+    return Fx.anim(puff, [
+      { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+      { transform: `translate(${x * 0.3}px,${y * 0.3}px) scale(1)`, opacity: 0.95, offset: 0.25 },
+      { transform: `translate(${x}px,${y}px) scale(1.3)`, opacity: 0 }
+    ], { duration, delay, easing: 'ease-out' }).then(() => puff.remove());
+  }
 
   /**
    * Destiny Bond: the scene turns into a ghostly, blotchy red and purple haze;

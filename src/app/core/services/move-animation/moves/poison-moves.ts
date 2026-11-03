@@ -6,8 +6,129 @@ export class PoisonMoveAnimations {
   /** Hand-made Poison move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     acid: (refs, launch, target) => PoisonMoveAnimations.playAcidSpit(refs, launch, target),
+    sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
     toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target)
   };
+
+  /** Poison palette: body, shadow, bubble highlight. */
+  private static readonly PURPLE = '#7A2E9E';
+  private static readonly DARK = '#3A0F55';
+  private static readonly BUBBLE = '#D77CF0';
+
+  /** A glossy pink-purple poison bubble (Toxic, Sludge Bomb). */
+  private static poisonBubble(size: number): HTMLElement {
+    const { PURPLE, BUBBLE } = PoisonMoveAnimations;
+    const b = document.createElement('div');
+    b.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#FFF3FF,${BUBBLE} 40%,${PURPLE}CC 85%);box-shadow:0 0 6px ${BUBBLE}`;
+    return b;
+  }
+
+  /** A lumpy, cloud-like glob of purple sludge, `size` px across. */
+  private static sludgeGlob(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText =
+      `position:absolute;width:${size}px;height:${size}px;pointer-events:none;border-radius:46% 54% 50% 50%/52% 48% 52% 48%;` +
+      'background:radial-gradient(circle at 30% 32%,#C88AE6 0 16%,#C88AE600 30%),' +
+      'radial-gradient(circle at 68% 40%,#B474D8 0 12%,#B474D800 26%),' +
+      'radial-gradient(circle at 45% 70%,#8A3AB0 0 20%,#8A3AB000 36%),' +
+      `radial-gradient(circle,#9A4CC2,${PoisonMoveAnimations.PURPLE} 55%,${PoisonMoveAnimations.DARK}cc 72%,${PoisonMoveAnimations.DARK}00 74%);` +
+      'filter:blur(.4px)';
+    return el;
+  }
+
+  /**
+   * Sludge Bomb: a trail of lumpy purple sludge globs is hurled in an arc at
+   * the target and bursts there (0.52 s) into a wobbling mass of sludge,
+   * with poison bubbles bobbing around it while the target turns purple.
+   */
+  private static async playSludgeBomb(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const { PURPLE } = PoisonMoveAnimations;
+    const r = Fx.rect(targetEl);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const lift = 50 + Math.abs(dx) * 0.12;
+    const travel = 440;
+
+    // 1. The bomb: a lead glob with smaller globs trailing behind it.
+    const flights: Promise<void>[] = [];
+    for (let i = 0; i < 5; i++) {
+      const size = (30 - i * 4) * (0.9 + Math.random() * 0.2);
+      const glob = PoisonMoveAnimations.sludgeGlob(size);
+      Fx.place(glob, launch);
+      fxEl.appendChild(glob);
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 8; k++) {
+        const t = k / 8;
+        const wob = k % 2 ? 1.12 : 0.9;
+        frames.push({
+          transform: `translate(${dx * t}px,${dy * t - Math.sin(t * Math.PI) * lift}px) scale(${(0.5 + t * 0.6) * wob},${(0.5 + t * 0.6) / wob})`,
+          opacity: t === 0 ? 0 : 1 - i * 0.12
+        });
+      }
+      flights.push(Fx.anim(glob, frames, { duration: travel, delay: 40 + i * 45, easing: 'linear' }).then(() => glob.remove()));
+    }
+    await Fx.wait(40 + travel);
+
+    // 2. Burst (0.52 s): a wobbling mass of sludge covers the target.
+    Fx.flash(targetEl, PURPLE, 0.5);
+    Fx.shake(targetEl, 5);
+    const effects: Promise<void>[] = [...flights];
+    const spreadX = Math.max(r.width * 0.42, 26);
+    const spreadY = Math.max(r.height * 0.35, 22);
+    for (let i = 0; i < 8; i++) {
+      const size = Math.max(r.width * 0.5, 36) * (0.75 + Math.random() * 0.5);
+      const glob = PoisonMoveAnimations.sludgeGlob(size);
+      Fx.place(glob, {
+        x: target.x + (Math.random() * 2 - 1) * spreadX * 0.7,
+        y: target.y + (Math.random() * 2 - 1) * spreadY * 0.6
+      });
+      fxEl.appendChild(glob);
+      const frames: Keyframe[] = [{ transform: 'scale(.2)', opacity: 0 }];
+      for (let k = 1; k <= 6; k++) {
+        const wob = k % 2 ? 1.1 : 0.92;
+        frames.push({ transform: `scale(${wob},${2 - wob})`, opacity: 0.95, offset: 0.1 + k * 0.12 });
+      }
+      frames.push({ transform: 'scale(1.15,.8)', opacity: 0 });
+      effects.push(Fx.anim(glob, frames, { duration: 950, delay: i * 25, easing: 'ease-in-out' }).then(() => glob.remove()));
+    }
+
+    // Poison bubbles bob up and wobble around the sludge.
+    for (let i = 0; i < 14; i++) {
+      const size = 8 + Math.random() * 12;
+      const b = PoisonMoveAnimations.poisonBubble(size);
+      const ang = Math.random() * Math.PI * 2;
+      Fx.place(b, {
+        x: target.x + Math.cos(ang) * spreadX * (0.8 + Math.random() * 0.5),
+        y: target.y + Math.sin(ang) * spreadY * (0.8 + Math.random() * 0.5)
+      });
+      fxEl.appendChild(b);
+      const rise = 14 + Math.random() * 18;
+      const sway = 4 + Math.random() * 5;
+      effects.push(
+        Fx.anim(b, [
+          { transform: 'translate(0,0) scale(.2)', opacity: 0 },
+          { transform: `translate(${sway}px,${-rise * 0.3}px) scale(1)`, opacity: 0.95, offset: 0.25 },
+          { transform: `translate(${-sway}px,${-rise * 0.6}px) scale(1.1,.9)`, opacity: 0.95, offset: 0.55 },
+          { transform: `translate(${sway * 0.5}px,${-rise * 0.85}px) scale(.95,1.05)`, opacity: 0.85, offset: 0.8 },
+          { transform: `translate(0,${-rise}px) scale(1.3)`, opacity: 0 }
+        ], { duration: 800 + Math.random() * 300, easing: 'ease-in-out', delay: 60 + Math.random() * 300 }).then(() => b.remove())
+      );
+    }
+
+    // Poisoned (0.65 s): the sprite turns purple for a moment.
+    await Fx.wait(130);
+    effects.push(
+      Fx.anim(targetEl, [
+        { filter: 'none' },
+        { filter: 'sepia(1) saturate(3.5) hue-rotate(240deg) brightness(1.05)', offset: 0.2 },
+        { filter: 'sepia(1) saturate(3.5) hue-rotate(240deg) brightness(.95)', offset: 0.8 },
+        { filter: 'none' }
+      ], { duration: 800, easing: 'ease-in-out', fill: 'none' })
+    );
+    setTimeout(() => Fx.shake(targetEl, 2), 250);
+    await Promise.all(effects);
+  }
 
   /**
    * Toxic: a glowing purple poison pool spreads on the ground under the target,
@@ -15,9 +136,8 @@ export class PoisonMoveAnimations {
    */
   private static async playToxic(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
-    const purple = '#7A2E9E';
-    const dark = '#3A0F55';
-    const bubbleColor = '#D77CF0';
+    const purple = PoisonMoveAnimations.PURPLE;
+    const dark = PoisonMoveAnimations.DARK;
     const r = Fx.rect(targetEl);
     const spreadX = Math.max(r.width * 0.55, 30);
     const spreadY = Math.max(r.height * 0.5, 28);
@@ -52,8 +172,7 @@ export class PoisonMoveAnimations {
     const bubbles: Promise<void>[] = [];
     for (let i = 0; i < 16; i++) {
       const size = 9 + Math.random() * 14;
-      const b = document.createElement('div');
-      b.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#FFF3FF,${bubbleColor} 40%,${purple}CC 85%);box-shadow:0 0 6px ${bubbleColor}`;
+      const b = PoisonMoveAnimations.poisonBubble(size);
       Fx.place(b, {
         x: target.x + (Math.random() * 2 - 1) * spreadX,
         y: target.y + (0.2 + Math.random() * 0.8) * spreadY

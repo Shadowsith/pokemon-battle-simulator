@@ -303,6 +303,43 @@ export class FxEffects {
     return red;
   }
 
+  /**
+   * A sun glowing in a corner at `sun`: a white-yellow glow `size` px wide
+   * pulses three times over `total` ms while yellow sparkles twinkle round it
+   * (Morning Sun, Sunny Day).
+   */
+  static cornerSun(fxEl: HTMLElement, sun: Point, size: number, total: number): Promise<void> {
+    const effects: Promise<void>[] = [];
+    const glow = document.createElement('div');
+    glow.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFFF4,#FFF6B0 25%,#FFE45A88 45%,#FFE45A00 70%)`;
+    Fx.place(glow, sun);
+    fxEl.appendChild(glow);
+    effects.push(
+      Fx.anim(glow, [
+        { transform: 'scale(.4)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.12 },
+        { transform: 'scale(.82)', opacity: 0.85, offset: 0.3 },
+        { transform: 'scale(1.12)', opacity: 1, offset: 0.48 },
+        { transform: 'scale(.85)', opacity: 0.85, offset: 0.66 },
+        { transform: 'scale(1.15)', opacity: 1, offset: 0.84 },
+        { transform: 'scale(1.2)', opacity: 0 }
+      ], { duration: total, easing: 'ease-in-out' }).then(() => glow.remove())
+    );
+    for (let i = 0; i < 10; i++) {
+      const star = FxGlyphs.sparkStar(10 + Math.random() * 10, '#FFE45A');
+      Fx.place(star, { x: sun.x + Math.random() * size * 0.55, y: sun.y + Math.random() * size * 0.45 });
+      fxEl.appendChild(star);
+      effects.push(
+        Fx.anim(star, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(20deg)', opacity: 1, offset: 0.45 },
+          { transform: 'scale(0) rotate(40deg)', opacity: 0 }
+        ], { duration: 500, easing: 'ease-in-out', delay: 150 + Math.random() * (total - 700) }).then(() => star.remove())
+      );
+    }
+    return Promise.all(effects).then(() => void 0);
+  }
+
   /** HP gain: twinkling green stars and a soft green glow around the caster (drain moves). */
   static async healSparkles(refs: BattleStageRefs, launch: Point) {
     const { fxEl, launchEl } = refs;

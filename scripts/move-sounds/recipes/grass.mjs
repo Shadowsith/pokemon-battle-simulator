@@ -21,7 +21,7 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), cast on the whole team: a calming scent. */
+  /** Custom (petals drift from ~0.1 s, green rings round the caster from ~0.55 s, ~1.6 s): a calming scent. */
   aromatherapy: () => {
     const s = new MoveSfx(1.5, 0xa307);
     s.noise(0.02, 1.0, { clock: () => 2200, gain: env.swell(0.07) });

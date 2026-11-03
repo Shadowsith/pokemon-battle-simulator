@@ -15,7 +15,8 @@ export class FightingMoveAnimations {
     jumpkick: (refs, launch, target) => FightingMoveAnimations.playJumpKick(refs, launch, target),
     lowkick: (refs, _launch, target) => FightingMoveAnimations.playLowKick(refs, target),
     seismictoss: (refs, _launch, target) => FightingMoveAnimations.playSeismicToss(refs, target),
-    submission: (refs, _launch, target) => FightingMoveAnimations.playSubmission(refs, target)
+    submission: (refs, _launch, target) => FightingMoveAnimations.playSubmission(refs, target),
+    vitalthrow: (refs, _launch, target) => FightingMoveAnimations.playVitalThrow(refs, target)
   };
 
   /**
@@ -453,6 +454,62 @@ export class FightingMoveAnimations {
 
     await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in' });
     dim.remove();
+  }
+
+  /**
+   * Vital Throw: the caster runs one quick clockwise lap round a small circle
+   * (sizing the target up), then the throw lands - an orange flash on the
+   * target while glowing orange orbs fly away from it.
+   */
+  private static async playVitalThrow(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+
+    // Phase 1: one clockwise lap, ending on the big thud of the sound (~0.5 s).
+    await FxEffects.orbit(launchEl, 18, 1, 480, -1);
+
+    // Phase 2: orange hit.
+    const r = Fx.rect(targetEl);
+    const size = Math.max(r.width * 0.75, 52);
+    const flash = document.createElement('div');
+    flash.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff,#FFD27A 35%,#FF9A2A 55%,#FF8A1F00 72%)`;
+    Fx.place(flash, target);
+    fxEl.appendChild(flash);
+    const flashDone = Fx.anim(flash, [
+      { transform: 'scale(.3)', opacity: 1 },
+      { transform: 'scale(1.15)', opacity: 0.9, offset: 0.4 },
+      { transform: 'scale(1.3)', opacity: 0 }
+    ], { duration: 380, easing: 'ease-out' }).then(() => flash.remove());
+    const burst = FxGlyphs.spikyBurst(size * 0.8, '#FF8A1F', '#FFC04A');
+    Fx.place(burst, target);
+    fxEl.appendChild(burst);
+    const burstDone = Fx.anim(burst, [
+      { transform: 'scale(.3)', opacity: 1 },
+      { transform: 'scale(1.1)', opacity: 1, offset: 0.35 },
+      { transform: 'scale(1.2)', opacity: 0 }
+    ], { duration: 420, easing: 'ease-out' }).then(() => burst.remove());
+    Fx.flash(targetEl, '#FF9A2A', 0.8);
+    Fx.shake(targetEl, 6);
+    Fx.shakeField(fieldEl, 0.5);
+
+    // Glowing orange orbs fly away from the target in every direction.
+    const orbs: Promise<void>[] = [];
+    for (let i = 0; i < 12; i++) {
+      const sz = 8 + Math.random() * 8;
+      const orb = document.createElement('div');
+      orb.style.cssText = `width:${sz}px;height:${sz}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFBE0,#FFD04A 45%,#FF9A2A00 75%);box-shadow:0 0 10px #FFB43A`;
+      Fx.place(orb, target);
+      fxEl.appendChild(orb);
+      const ang = (i / 12) * Math.PI * 2 + Math.random() * 0.4;
+      const dist = size * (0.9 + Math.random() * 0.8);
+      orbs.push(
+        Fx.anim(orb, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${Math.cos(ang) * dist * 0.35}px,${Math.sin(ang) * dist * 0.35}px) scale(1.1)`, opacity: 1, offset: 0.2 },
+          { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist}px) scale(.8)`, opacity: 0 }
+        ], { duration: 650 + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 60 }).then(() => orb.remove())
+      );
+    }
+    await Promise.all([flashDone, burstDone, ...orbs]);
   }
 
   /** Glowing yellow-orange streaks rush across `layer` for `duration` ms: up (-1) or down (1). */

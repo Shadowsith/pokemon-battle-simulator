@@ -16,6 +16,7 @@ export class NormalStatusMoveAnimations {
     painsplit: (refs, launch, target) => NormalStatusMoveAnimations.playPainSplit(refs, launch, target),
     protect: (refs, launch) => NormalStatusMoveAnimations.playProtect(refs, launch),
     recover: (refs, launch) => NormalStatusMoveAnimations.playRecover(refs, launch),
+    sleeptalk: (refs, launch, target, v) => NormalStatusMoveAnimations.playSleepTalk(refs, launch, target, v),
     softboiled: (refs, launch) => NormalStatusMoveAnimations.playSoftBoiled(refs, launch),
     swordsdance: (refs, launch) => NormalStatusMoveAnimations.playSwordsDance(refs, launch),
     whirlwind: (refs, _launch, target, v) => NormalStatusMoveAnimations.playWhirlwind(refs, target, v)
@@ -65,6 +66,80 @@ export class NormalStatusMoveAnimations {
       );
     }
     await Promise.all(parts);
+  }
+
+  /**
+   * Sleep Talk: pale blue rings pulse out round the sleeping caster while blue
+   * "Z"s float up from its head (0 - 1.1 s); then it lunges at the foe like a
+   * tackle and a yellow burst lands on the target (~1.27 s).
+   */
+  private static async playSleepTalk(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const r = Fx.rect(launchEl);
+    const f = Fx.rect(fieldEl);
+
+    // Phase 1: rings and Zs.
+    const effects: Promise<void>[] = [];
+    const ring = Math.max(r.width, r.height) * 0.9;
+    for (let i = 0; i < 3; i++) {
+      const c = document.createElement('div');
+      c.style.cssText = `width:${ring}px;height:${ring}px;border-radius:50%;pointer-events:none;border:3px solid #BFE4FFcc;background:radial-gradient(circle,#9CD4FF00 55%,#9CD4FF44 72%,#9CD4FF00 76%);box-shadow:0 0 8px #9CD4FF88`;
+      Fx.place(c, launch);
+      fxEl.appendChild(c);
+      effects.push(
+        Fx.anim(c, [
+          { transform: 'scale(.4)', opacity: 0 },
+          { transform: 'scale(.8)', opacity: 0.9, offset: 0.35 },
+          { transform: 'scale(1.25)', opacity: 0 }
+        ], { duration: 750, delay: i * 220, easing: 'ease-out' }).then(() => c.remove())
+      );
+    }
+    const away = -v.dir;
+    const head: Point = { x: launch.x + away * r.width * 0.15, y: r.top - f.top + r.height * 0.2 };
+    effects.push(FxEffects.sleepZs(fxEl, head, away, ['#8FC8FF', '#BFE0FF']));
+    await Fx.wait(1100);
+
+    // Phase 2: a tackle-like lunge at the foe.
+    const original = launchEl.style.transform;
+    await Fx.anim(launchEl, [
+      { transform: `${original} translateX(${v.dir * -10}px)` },
+      { transform: `${original} translateX(${v.dir * 42}px)` }
+    ], { duration: 170, easing: 'ease-in' });
+
+    // Phase 3: yellow hit on the target.
+    const tr = Fx.rect(targetEl);
+    const size = Math.max(tr.width * 0.7, 52);
+    const burst = FxGlyphs.spikyBurst(size, '#FFD83A', '#FFF3A0', '#ffffff');
+    Fx.place(burst, target);
+    fxEl.appendChild(burst);
+    effects.push(
+      Fx.anim(burst, [
+        { transform: 'scale(.3)', opacity: 1 },
+        { transform: 'scale(1.1)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(1.25)', opacity: 0 }
+      ], { duration: 420, easing: 'ease-out' }).then(() => burst.remove())
+    );
+    for (let i = 0; i < 8; i++) {
+      const star = FxGlyphs.sparkStar(8 + Math.random() * 8, '#FFE04A');
+      Fx.place(star, target);
+      fxEl.appendChild(star);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = size * (0.45 + Math.random() * 0.4);
+      effects.push(
+        Fx.anim(star, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist}px) scale(1) rotate(60deg)`, opacity: 0 }
+        ], { duration: 450 + Math.random() * 150, easing: 'ease-out' }).then(() => star.remove())
+      );
+    }
+    Fx.flash(targetEl, '#FFE04A', 0.7);
+    Fx.shake(targetEl, 6);
+    await Fx.anim(launchEl, [{ transform: `${original} translateX(${v.dir * 42}px)` }, { transform: original }], {
+      duration: 110,
+      easing: 'ease-out'
+    });
+    launchEl.style.transform = original;
+    await Promise.all(effects);
   }
 
   /** Pain Split: the same orange hit bursts strike the caster and the target at once. */
@@ -121,23 +196,9 @@ export class NormalStatusMoveAnimations {
     const total = 1700;
     const effects: Promise<void>[] = [];
 
-    // The sun: a white-yellow glow that pulses three times.
+    // The sun: a white-yellow glow that pulses three times, with sparkles round it.
     const size = H * 0.6;
-    const glow = document.createElement('div');
-    glow.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFFF4,#FFF6B0 25%,#FFE45A88 45%,#FFE45A00 70%)`;
-    Fx.place(glow, sun);
-    fxEl.appendChild(glow);
-    effects.push(
-      Fx.anim(glow, [
-        { transform: 'scale(.4)', opacity: 0 },
-        { transform: 'scale(1)', opacity: 1, offset: 0.12 },
-        { transform: 'scale(.82)', opacity: 0.85, offset: 0.3 },
-        { transform: 'scale(1.12)', opacity: 1, offset: 0.48 },
-        { transform: 'scale(.85)', opacity: 0.85, offset: 0.66 },
-        { transform: 'scale(1.15)', opacity: 1, offset: 0.84 },
-        { transform: 'scale(1.2)', opacity: 0 }
-      ], { duration: total, easing: 'ease-in-out' }).then(() => glow.remove())
-    );
+    effects.push(FxEffects.cornerSun(fxEl, sun, size, total));
 
     // Light rays fanning down-right out of the corner.
     const reach = Math.hypot(W, H) * 0.45;
@@ -173,19 +234,6 @@ export class NormalStatusMoveAnimations {
       );
     }
 
-    // Yellow sparkles twinkle round the sun.
-    for (let i = 0; i < 10; i++) {
-      const star = FxGlyphs.sparkStar(10 + Math.random() * 10, '#FFE45A');
-      Fx.place(star, { x: sun.x + Math.random() * size * 0.55, y: sun.y + Math.random() * size * 0.45 });
-      fxEl.appendChild(star);
-      effects.push(
-        Fx.anim(star, [
-          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
-          { transform: 'scale(1) rotate(20deg)', opacity: 1, offset: 0.45 },
-          { transform: 'scale(0) rotate(40deg)', opacity: 0 }
-        ], { duration: 500, easing: 'ease-in-out', delay: 150 + Math.random() * (total - 700) }).then(() => star.remove())
-      );
-    }
     await Promise.all(effects);
     await FxEffects.healSparkles(refs, launch);
   }

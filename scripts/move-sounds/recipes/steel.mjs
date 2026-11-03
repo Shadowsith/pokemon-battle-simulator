@@ -200,14 +200,18 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic melee (slash style, impact 0.17 s): hard steel wings swipe past with a ringing clang. */
+  /** Custom: steel feathers shimmer into being (0-0.4 s), whoosh off and strike three times (0.64 / 0.73 / 0.82 s). */
   steelwing: () => {
-    const s = new MoveSfx(0.75, 0x57e1);
-    s.whoosh(0.0, 0.18, { from: 2500, to: 9000, gain: 0.3 });
-    s.slash(0.17, 0.5);
-    s.pulse(0.17, 0.4, { freq: () => 1568, gain: env.decay(0.18, 1.5), duty: 0.125 });
-    s.pulse(0.17, 0.45, { freq: () => 2349, gain: env.decay(0.1, 1.3), duty: 0.25 });
-    s.noise(0.17, 0.05, { clock: () => 12000, gain: env.decay(0.3, 1), short: true });
+    const s = new MoveSfx(1.2, 0x57e1);
+    s.sparkle(0.0, 0.4, 4, { lo: 3500, hi: 6000, gain: 0.12 });
+    s.pulse(0.05, 0.35, { freq: env.ramp(1200, 2000), gain: env.swell(0.08), duty: 0.125 });
+    s.whoosh(0.4, 0.24, { from: 2500, to: 9000, gain: 0.3 });
+    s.slash(0.64, 0.45);
+    for (const [i, at] of [0.64, 0.73, 0.82].entries()) {
+      s.noise(at, 0.05, { clock: () => 12000, gain: env.decay(0.28, 1), short: true });
+      s.pulse(at, 0.35, { freq: () => [1568, 1760, 2093][i], gain: env.decay(0.14, 1.5), duty: 0.125 });
+    }
+    s.pulse(0.82, 0.4, { freq: () => 2349, gain: env.decay(0.1, 1.3), duty: 0.25 });
     return s;
   },
 

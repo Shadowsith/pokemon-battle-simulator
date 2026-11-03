@@ -140,7 +140,7 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic lob (0.52 s) + Sp. Def drop fleck (~0.65 s): a dark, wobbling orb of shadow that lands with a hollow boom. */
+  /** Custom (ball gathers 0-0.25 s, hurled, impact 0.52 s) + Sp. Def drop fleck (~0.65 s): a dark, wobbling orb of shadow that lands with a hollow boom. */
   shadowball: () => {
     const s = new MoveSfx(1.15, 0x5ba1);
     s.wave(0.0, 0.52, { freq: (u) => (200 + 150 * Math.sin(Math.PI * u)) * (1 + 0.06 * Math.sin(2 * Math.PI * 8 * u)), gain: env.ramp(0.12, 0.28) });
