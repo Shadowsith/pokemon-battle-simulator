@@ -313,22 +313,22 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [x] ⭐ **Blast Burn** / Lohekanonade — `blastburn` · Fire · Special · red-hot backdrop, fire jets shoot up in a circle round the caster, flame ring flares round the target, then two fire rings whirl round it in opposite directions (custom, needs review)
 - [x] ⭐ **Blaze Kick** / Feuerfeger — `blazekick` · Fire · Physical · black foot stamps onto the target, fire puffs flicker all round it with yellow sparkles (custom, needs review)
 - [ ] **Block** / Rückentzug — `block` · Normal · Status · `targetAura`
-- [ ] ⭐ **Bounce** / Sprungfeder — `bounce` · Flying · Physical · `beam`
-- [ ] ⭐ **Brick Break** / Durchbruch — `brickbreak` · Fighting · Physical · `melee`
-- [ ] ⭐ **Bulk Up** / Protzer — `bulkup` · Fighting · Status · `selfAura`
+- [x] ⭐ **Bounce** / Sprungfeder — `bounce` · Flying · Physical · turn 1 user hops up out of the screen in a light-blue bubble, turn 2 the bubble drops onto the target, squashes and bursts into white sparkles (custom, needs review)
+- [x] ⭐ **Brick Break** / Durchbruch — `brickbreak` · Fighting · Physical · grey glass pane in front of the target, slim black karate-chop hand chops straight down through it, pane shatters into white-outlined shards with a glass-breaking sound (custom, needs review)
+- [x] ⭐ **Bulk Up** / Protzer — `bulkup` · Fighting · Status · user swells up in three flex pumps and shrinks back, then orange stat sparkles drift down over it (custom, needs review)
 - [ ] **Bullet Seed** / Kugelsaat — `bulletseed` · Grass · Physical · `lob`
-- [ ] ⭐ **Calm Mind** / Gedankengut — `calmmind` · Psychic · Status · `selfAura`
+- [x] ⭐ **Calm Mind** / Gedankengut — `calmmind` · Psychic · Status · dark backdrop, white starburst on the user while three pale red rings shrink in onto it, then orange stat sparkles (custom, needs review)
 - [ ] **Camouflage** / Tarnung — `camouflage` · Normal · Status · `selfAura`
 - [ ] **Charge** / Ladevorgang — `charge` · Electric · Status · `selfAura`
-- [ ] ⭐ **Cosmic Power** / Kosmik-Kraft — `cosmicpower` · Psychic · Status · `selfAura`
+- [x] ⭐ **Cosmic Power** / Kosmik-Kraft — `cosmicpower` · Psychic · Status · deep purple starry sky with twinkling specks and violet light streaks, white stars stream up from the user, then orange stat sparkles (custom, needs review)
 - [ ] **Covet** / Bezirzer — `covet` · Normal · Physical · `melee`
-- [ ] ⭐ **Crush Claw** / Zermalmklaue — `crushclaw` · Normal · Physical · `melee`
-- [ ] ⭐ **Dive** / Taucher — `dive` · Water · Physical · `beam`
-- [ ] ⭐ **Doom Desire** / Kismetwunsch — `doomdesire` · Steel · Special · `projectile`
-- [ ] ⭐ **Dragon Claw** / Drachenklaue — `dragonclaw` · Dragon · Physical · `melee`
-- [ ] ⭐ **Dragon Dance** / Drachentanz — `dragondance` · Dragon · Status · `selfAura`
+- [x] ⭐ **Crush Claw** / Zermalmklaue — `crushclaw` · Normal · Physical · two parallel black claw marks with a red glow rip down the left side of the target, then two down its right side (custom, needs review)
+- [x] ⭐ **Dive** / Taucher — `dive` · Water · Physical · turn 1 user sinks while cyan water jets shoot up from its spot, turn 2 bubbles under the target, three light-blue water bursts hit it, user rises back up (custom, needs review)
+- [x] ⭐ **Doom Desire** / Kismetwunsch — `doomdesire` · Steel · Special · used: dark scene, user swells twice with a white glow; hit: pale violet scene with magenta/purple streaks raining down, dark purple orbs fall, dark purple blasts with yellow cores (custom, needs review)
+- [x] ⭐ **Dragon Claw** / Drachenklaue — `dragonclaw` · Dragon · Physical · user glows magenta red with pink streaks + white sparkles rising, then two rakes of three black claw marks with white edges and blue tips on the target (custom, needs review)
+- [x] ⭐ **Dragon Dance** / Drachentanz — `dragondance` · Dragon · Status · user turns magenta red inside a swirling dark red storm with small cyan lightning flickers, then orange stat sparkles (custom, needs review)
 - [ ] **Endeavor** / Notsituation — `endeavor` · Normal · Physical · `melee`
-- [ ] ⭐ **Eruption** / Eruption — `eruption` · Fire · Special · `field`
+- [x] ⭐ **Eruption** / Eruption — `eruption` · Fire · Special · red-hot backdrop, a fountain of fire, embers and stones erupts from the user's top, then hot stones rain down round the target with smoke puffs and flames (custom, needs review)
 - [ ] ⭐ **Extrasensory** / Sondersensor — `extrasensory` · Psychic · Special · `projectile`
 - [ ] ⭐ **Facade** / Fassade — `facade` · Normal · Physical · `melee`
 - [ ] **Fake Out** / Mogelhieb — `fakeout` · Normal · Physical · `melee`

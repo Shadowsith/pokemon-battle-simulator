@@ -11,9 +11,120 @@ const DUST: [string, string] = ['#E4E8F0', '#A9B0BE'];
 export class SteelMoveAnimations {
   /** Hand-made Steel move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    doomdesire: (refs) => SteelMoveAnimations.playDoomDesireHit(refs),
     irontail: (refs, launch, target, v) => SteelMoveAnimations.playIronTail(refs, launch, target, v),
     steelwing: (refs, launch, target, v) => SteelMoveAnimations.playSteelWing(refs, launch, target, v)
   };
+
+  /** Animations of the turn a delayed Steel attack is used, by @pkmn/sim move id. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    doomdesire: (refs) => SteelMoveAnimations.playDoomDesireWish(refs)
+  };
+
+  /**
+   * Doom Desire, the turn it's used (sound: hum from 0 s, glints 0.35 / 0.8 s):
+   * the scene goes dark, then the user swells up twice, glowing white each time.
+   */
+  private static async playDoomDesireWish(refs: BattleStageRefs) {
+    const { fieldEl, launchEl } = refs;
+    const dim = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 45%,#1E1E2A,#050508)');
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+    launchEl.style.transformOrigin = 'center bottom';
+    for (let i = 0; i < 2; i++) {
+      await Fx.anim(launchEl, [
+        { transform: 'scale(1)', filter: 'brightness(1) drop-shadow(0 0 0 #fff0)' },
+        { transform: 'scale(1.15)', filter: 'brightness(2.2) drop-shadow(0 0 10px #ffffff)', offset: 0.4 },
+        { transform: 'scale(1)', filter: 'brightness(1) drop-shadow(0 0 0 #fff0)' }
+      ], { duration: 420, easing: 'ease-in-out' });
+      await Fx.wait(30);
+    }
+    launchEl.style.transformOrigin = '';
+    await Fx.wait(150);
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'ease-in' });
+    dim.remove();
+  }
+
+  /**
+   * Doom Desire, two turns later: a pale violet scene with magenta and purple
+   * light streaks raining down from above; dark purple orbs fall onto the
+   * target, then it is rocked by dark purple blasts with glowing yellow cores.
+   */
+  private static async playDoomDesireHit(refs: BattleStageRefs) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const target = Fx.centerOf(targetEl, fieldEl);
+    const r = Fx.rect(targetEl);
+    const sky = Fx.backdrop(fieldEl, 'overflow:hidden;background:linear-gradient(160deg,#B8A8C4,#DCD2E2 50%,#C4B6CE)');
+    const tilt = 25;
+    const rain = document.createElement('div');
+    rain.style.cssText = `position:absolute;inset:-50%;transform:rotate(${-tilt}deg)`;
+    sky.appendChild(rain);
+    const { width: rw, height: rh } = Fx.rect(fieldEl);
+    for (let i = 0; i < 16; i++) {
+      const w = 14 + Math.random() * 40;
+      const len = rh * (0.6 + Math.random() * 0.8);
+      const c = i % 2 ? '#D048B8' : '#7A3CB8';
+      const bar = document.createElement('div');
+      bar.style.cssText = `position:absolute;top:0;width:${w}px;height:${len}px;pointer-events:none;background:linear-gradient(180deg,${c}00,${c}aa 40%,${c}88 70%,${c}00);filter:blur(3px)`;
+      bar.style.left = `${(Math.random() * 2 * rw).toFixed(0)}px`;
+      rain.appendChild(bar);
+      const dur = 380 + Math.random() * 320;
+      bar.animate([{ transform: `translateY(${-len}px)` }, { transform: `translateY(${rh * 2}px)` }], {
+        duration: dur, iterations: Infinity, delay: -Math.random() * dur, easing: 'linear'
+      });
+    }
+    await Fx.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // Dark purple orbs fall onto the target along the streaks.
+    const rad = (tilt * Math.PI) / 180;
+    const drop = target.y + 60;
+    const orbs: Promise<void>[] = [];
+    for (let i = 0; i < 3; i++) {
+      const size = Math.max(r.width * 0.22, 18);
+      const orb = document.createElement('div');
+      orb.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 40% 35%,#7A3A90,#3A0E4E 60%,#2A0838);box-shadow:0 0 8px #5A1A70`;
+      const at = { x: target.x + (i - 1) * r.width * 0.25, y: target.y + (i % 2 ? -0.1 : 0.15) * r.height };
+      Fx.place(orb, at);
+      fxEl.appendChild(orb);
+      orbs.push(
+        Fx.anim(orb, [
+          { transform: `translate(${Math.tan(rad) * drop}px,${-drop}px)`, opacity: 0 },
+          { transform: `translate(${Math.tan(rad) * drop * 0.7}px,${-drop * 0.7}px)`, opacity: 1, offset: 0.3 },
+          { transform: 'translate(0,0)', opacity: 1 }
+        ], { duration: 380, easing: 'ease-in', delay: i * 140, fill: 'backwards' }).then(() => orb.remove())
+      );
+    }
+    await Promise.all(orbs);
+
+    // Dark purple blasts with yellow cores, one after another round the target.
+    const blasts: Promise<void>[] = [];
+    for (let i = 0; i < 6; i++) {
+      const size = Math.max(r.width * 0.7, 56) * (0.75 + Math.random() * 0.4);
+      const blast = document.createElement('div');
+      blast.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF8C8 0 10%,#F2D84A 20%,#6A2A80 34%,#3A0E4A 58%,#2A083800 72%);filter:blur(2px)`;
+      Fx.place(blast, {
+        x: target.x + (Math.random() * 2 - 1) * r.width * 0.55,
+        y: target.y + r.height * (0.05 + Math.random() * 0.35)
+      });
+      fxEl.appendChild(blast);
+      blasts.push(
+        Fx.anim(blast, [
+          { transform: 'scale(.2)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.3 },
+          { transform: 'scale(1.25)', opacity: 0 }
+        ], { duration: 560, easing: 'ease-out', delay: i * 110, fill: 'backwards' }).then(() => blast.remove())
+      );
+      setTimeout(() => {
+        Fx.flash(targetEl, '#C060E0', 0.5);
+        Fx.shake(targetEl, 6);
+      }, i * 110);
+    }
+    Fx.shakeField(fieldEl, 0.7);
+    await Promise.all(blasts);
+    await Fx.blink(targetEl, 3);
+
+    await Fx.anim(sky, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    sky.remove();
+  }
 
   /**
    * Iron Tail: the caster glints with silver sparkles, then a wide silver

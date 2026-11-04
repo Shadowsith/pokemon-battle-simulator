@@ -96,13 +96,23 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic field move (bp 150): the ground bursts with a huge volcanic roar. */
+  /**
+   * Custom (heat 0-0.3 s, eruption 0.3-1.1 s, stones land 1.45-2.05 s): a rumble,
+   * a huge volcanic roar, then hot stones whistling down and crashing.
+   */
   eruption: () => {
-    const s = new MoveSfx(1.45, 0xe7a1);
-    s.thud(0.02, 0.8, 1);
-    s.noise(0.02, 1.2, { clock: (u) => 2500 - 2000 * u, gain: (u) => 0.55 * Math.min(1, u * 10) * Math.pow(1 - u, 1.1) });
-    s.pulse(0.02, 0.9, { freq: env.ramp(80, 40), gain: env.decay(0.4, 1.2), duty: 0.5 });
-    for (let i = 0; i < 6; i++) s.noise(0.15 + i * 0.1 + s.random() * 0.04, 0.06, { clock: () => 3000 + s.random() * 3000, gain: env.decay(0.25, 1) });
+    const s = new MoveSfx(2.5, 0xe7a1);
+    s.rumble(0.0, 0.35, { from: 300, to: 500, gain: 0.25 });
+    s.thud(0.3, 0.8, 1);
+    s.noise(0.3, 1.0, { clock: (u) => 2500 - 2000 * u, gain: (u) => 0.55 * Math.min(1, u * 10) * Math.pow(1 - u, 1.1) });
+    s.pulse(0.3, 0.8, { freq: env.ramp(80, 40), gain: env.decay(0.4, 1.2), duty: 0.5 });
+    for (let i = 0; i < 6; i++) s.noise(0.4 + i * 0.1 + s.random() * 0.04, 0.06, { clock: () => 3000 + s.random() * 3000, gain: env.decay(0.25, 1) });
+    for (let i = 0; i < 5; i++) {
+      const land = 1.45 + i * 0.15;
+      s.pulse(land - 0.3, 0.3, { freq: (u) => 1800 - 1100 * u, gain: env.ramp(0.03, 0.09), duty: 0.125 });
+      s.thud(land, 0.55, 0.7);
+      s.noise(land, 0.15, { clock: (u) => 5000 - 3000 * u, gain: env.attackDecay(0.2, 0.05) });
+    }
     return s;
   },
 

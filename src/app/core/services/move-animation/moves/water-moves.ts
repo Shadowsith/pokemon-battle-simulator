@@ -10,11 +10,159 @@ export class WaterMoveAnimations {
     bubble: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_DRIFT),
     bubblebeam: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_BEAM),
     crabhammer: (refs, _launch, target) => WaterMoveAnimations.playCrabhammer(refs, target),
+    dive: (refs, _launch, target) => WaterMoveAnimations.playDiveHit(refs, target),
     hydropump: (refs, launch, target) => WaterMoveAnimations.playHydroPump(refs, launch, target),
     raindance: (refs) => WaterMoveAnimations.playRainDance(refs),
     surf: (refs, launch, target, v) => WaterMoveAnimations.playSurf(refs, launch, target, v),
     waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target)
   };
+
+  /** Turn-1 animations of two-turn Water moves, by @pkmn/sim move id. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    dive: (refs) => WaterMoveAnimations.playDiveUnder(refs)
+  };
+
+  /**
+   * Dive, turn 1 (sound: splash 0.02 s, surge 0.68 s): the user sinks out of
+   * sight while cyan water jets shoot up from its spot with white spray; a
+   * second, smaller surge follows, then the water settles. The user stays away until turn 2.
+   */
+  private static async playDiveUnder(refs: BattleStageRefs) {
+    const { launchEl: el, fieldEl, fxEl } = refs;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    const r = Fx.rect(el);
+    const foot = Fx.footOf(el, fieldEl);
+    el.style.transformOrigin = 'center bottom';
+    const sink = Fx.anim(el, [
+      { transform: 'translateY(0) scale(1)', opacity: 1 },
+      { transform: 'translateY(40px) scale(.75)', opacity: 0 }
+    ], { duration: 320, easing: 'ease-in', fill: 'forwards' });
+    const first = WaterMoveAnimations.waterJets(fxEl, foot, r, 1);
+    await sink;
+    el.style.opacity = '0';
+    el.style.transformOrigin = '';
+    await Fx.wait(330);
+    await Promise.all([first, WaterMoveAnimations.waterJets(fxEl, foot, r, 0.6)]);
+  }
+
+  /**
+   * Dive, turn 2 (sound: splash 0.02 s, hits 0.68 / 0.82 / 0.96 s): bubbles
+   * well up under the target, then three light-blue water bursts with white
+   * droplets hit it in different spots; the user rises back up into its place.
+   */
+  private static async playDiveHit(refs: BattleStageRefs, target: Point) {
+    const { launchEl, fieldEl, fxEl, targetEl } = refs;
+    // Under water until the end (also when Power Herb skipped turn 1).
+    launchEl.getAnimations?.().forEach((a) => a.cancel());
+    launchEl.style.opacity = '0';
+    const r = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+
+    // Bubbles well up round the target's feet (0-0.6 s).
+    for (let i = 0; i < 10; i++) {
+      const b = FxGlyphs.bubbleGlyph(6 + Math.random() * 8);
+      Fx.place(b, { x: foot.x + (Math.random() * 2 - 1) * r.width * 0.45, y: foot.y - Math.random() * 8 });
+      fxEl.appendChild(b);
+      Fx.anim(b, [
+        { transform: 'translateY(0) scale(.4)', opacity: 0 },
+        { transform: 'translateY(-10px) scale(1)', opacity: 0.9, offset: 0.4 },
+        { transform: `translateY(${-24 - Math.random() * 20}px) scale(1.1)`, opacity: 0 }
+      ], { duration: 450, easing: 'ease-out', delay: 50 + Math.random() * 300 }).then(() => b.remove());
+    }
+    await Fx.wait(680);
+
+    // Three water hits.
+    const spots = [
+      { x: -0.2, y: -0.15 },
+      { x: 0.22, y: 0.05 },
+      { x: -0.05, y: -0.3 }
+    ];
+    const hits: Promise<void>[] = [];
+    for (const spot of spots) {
+      const at = { x: target.x + spot.x * r.width, y: target.y + spot.y * r.height };
+      const burst = FxGlyphs.spikyBurst(Math.max(r.width * 0.42, 36), '#5FB8F0', '#A8E0FF', '#F0FAFF');
+      Fx.place(burst, at);
+      fxEl.appendChild(burst);
+      hits.push(
+        Fx.anim(burst, [
+          { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+          { transform: 'scale(1.05) rotate(15deg)', opacity: 1, offset: 0.35 },
+          { transform: 'scale(1.15) rotate(25deg)', opacity: 0 }
+        ], { duration: 360, easing: 'ease-out' }).then(() => burst.remove())
+      );
+      WaterMoveAnimations.waterSplash(fxEl, at);
+      Fx.flash(targetEl, '#A8E0FF', 0.5);
+      Fx.shake(targetEl, 5);
+      await Fx.wait(140);
+    }
+    Fx.shakeField(fieldEl, 0.3);
+    await Promise.all(hits);
+
+    // White droplets twinkle round the target as the water clears.
+    for (let i = 0; i < 10; i++) {
+      const s = 3 + Math.random() * 3;
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:#fff;box-shadow:0 0 4px #E8F6FF`;
+      Fx.place(d, { x: target.x + (Math.random() * 2 - 1) * r.width * 0.6, y: target.y + (Math.random() * 2 - 1) * r.height * 0.5 });
+      fxEl.appendChild(d);
+      Fx.anim(d, [
+        { transform: 'translateY(0)', opacity: 0 },
+        { transform: 'translateY(4px)', opacity: 1, offset: 0.3 },
+        { transform: 'translateY(14px)', opacity: 0 }
+      ], { duration: 500, easing: 'ease-out', delay: Math.random() * 200 }).then(() => d.remove());
+    }
+
+    // The user rises back up from below.
+    launchEl.style.opacity = '1';
+    launchEl.style.transformOrigin = 'center bottom';
+    await Fx.anim(launchEl, [
+      { transform: 'translateY(40px) scale(.75)', opacity: 0 },
+      { transform: 'translateY(0) scale(1)', opacity: 1 }
+    ], { duration: 300, easing: 'ease-out' });
+    launchEl.style.transformOrigin = '';
+    launchEl.style.transform = '';
+  }
+
+  /**
+   * Three tall, soft cyan water jets shoot up from `foot` (sized to the
+   * sprite `r`, scaled by `power`) with white spray, then fade upward.
+   */
+  private static waterJets(fxEl: HTMLElement, foot: Point, r: DOMRect, power: number): Promise<void> {
+    const done: Promise<void>[] = [];
+    const h = Math.max(r.height * 1.5, 90) * power;
+    for (const [k, i] of [[-0.28, 0], [0.1, 1], [0.32, 2]] as const) {
+      const w = Math.max(r.width * 0.3, 22) * (i === 1 ? 1.2 : 1);
+      const jh = h * (i === 1 ? 1 : 0.75);
+      const jet = document.createElement('div');
+      jet.style.cssText = `position:absolute;left:${foot.x + k * r.width - w / 2}px;top:${foot.y - jh}px;width:${w}px;height:${jh}px;pointer-events:none;transform-origin:center bottom;border-radius:50% 50% 35% 35% / 70% 70% 30% 30%;background:linear-gradient(0deg,#E8FFFFee,#7FEAF4dd 30%,#4FD0E8aa 70%,#9CF4FF00);filter:blur(2.5px)`;
+      fxEl.appendChild(jet);
+      done.push(
+        Fx.anim(jet, [
+          { transform: 'scale(.6,0)', opacity: 0.9 },
+          { transform: 'scale(1,1.05)', opacity: 0.95, offset: 0.35 },
+          { transform: 'translateY(-10px) scale(.8,1)', opacity: 0.7, offset: 0.7 },
+          { transform: `translateY(${-jh * 0.25}px) scale(.5,.9)`, opacity: 0 }
+        ], { duration: 700, easing: 'ease-out', delay: i * 70 }).then(() => jet.remove())
+      );
+    }
+    for (let i = 0; i < 12 * power; i++) {
+      const s = 3 + Math.random() * 4;
+      const d = document.createElement('div');
+      d.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:#fff;box-shadow:0 0 4px #BFF6FF`;
+      Fx.place(d, { x: foot.x + (Math.random() * 2 - 1) * r.width * 0.45, y: foot.y - Math.random() * 10 });
+      fxEl.appendChild(d);
+      const up = h * (0.4 + Math.random() * 0.6);
+      const side = (Math.random() * 2 - 1) * 30;
+      done.push(
+        Fx.anim(d, [
+          { transform: 'translate(0,0)', opacity: 1 },
+          { transform: `translate(${side * 0.7}px,${-up}px)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(${side}px,${-up * 0.8}px)`, opacity: 0 }
+        ], { duration: 650, easing: 'ease-out', delay: Math.random() * 150 }).then(() => d.remove())
+      );
+    }
+    return Promise.all(done).then(() => void 0);
+  }
 
   /**
    * Rain Dance: the scene darkens under heavy clouds and slanted streaks of

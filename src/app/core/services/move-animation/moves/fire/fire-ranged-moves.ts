@@ -3,6 +3,7 @@ import { HEAT_BACKDROP, DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { DeliveryAnimations } from '../../delivery-animations';
+import { FxEffects } from '../../fx-effects';
 import { FireFlames } from './fire-flames';
 
 /** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs. */
@@ -11,6 +12,7 @@ export class FireRangedMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     blastburn: (refs, launch, target) => FireRangedMoveAnimations.playBlastBurn(refs, launch, target),
     ember: (refs, _launch, _target, v) => FireRangedMoveAnimations.playGroundFlame(refs, v),
+    eruption: (refs, launch, target) => FireRangedMoveAnimations.playEruption(refs, launch, target),
     fireblast: (refs, launch, target, v) => FireRangedMoveAnimations.playFireBlast(refs, launch, target, v),
     firespin: async (refs, launch, target, v) => {
       await DeliveryAnimations.playDelivery(refs, launch, target, v);
@@ -19,6 +21,105 @@ export class FireRangedMoveAnimations {
     flamethrower: (refs, launch, target, v) => FireRangedMoveAnimations.playFlamethrower(refs, launch, target, v),
     sacredfire: (refs, _launch, target) => FireRangedMoveAnimations.playSacredFire(refs, target)
   };
+
+  /**
+   * Eruption: the scene glows red-hot (0-0.3 s); a volcano erupts from the
+   * top of the user - a fountain of fire, embers and glowing stones shoots up
+   * out of the screen (0.3-1.1 s); then hot stones rain down round the
+   * target, landing with a puff of white smoke and a flame (1.45-2.05 s).
+   */
+  private static async playEruption(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const heat = Fx.backdrop(fieldEl, HEAT_BACKDROP);
+    await Fx.anim(heat, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // 1. The eruption: fire, embers and stones burst up from the user's top.
+    const vent: Point = { x: launch.x, y: launch.y - lr.height * 0.3 };
+    const up = vent.y + 60;
+    const burst: Promise<void>[] = [];
+    Fx.flash(launchEl, '#FF8A2A', 0.6);
+    Fx.shake(launchEl, 4);
+    for (let i = 0; i < 26; i++) {
+      const kind = i % 6 === 5 ? 'stone' : i % 3 === 2 ? 'ember' : 'fire';
+      const el =
+        kind === 'stone'
+          ? FireRangedMoveAnimations.hotStone(10 + Math.random() * 8)
+          : kind === 'fire'
+            ? FxGlyphs.firePuff(Math.max(lr.width * 0.35, 26) * (0.7 + Math.random() * 0.6), i % 2 ? 'hot' : 'red')
+            : FireRangedMoveAnimations.ember(3 + Math.random() * 3);
+      Fx.place(el, { x: vent.x + (Math.random() * 2 - 1) * lr.width * 0.15, y: vent.y });
+      fxEl.appendChild(el);
+      const dx = (Math.random() * 2 - 1) * lr.width * (kind === 'fire' ? 0.35 : 0.8);
+      const rise = up * (kind === 'fire' ? 0.5 + Math.random() * 0.5 : 1);
+      burst.push(
+        Fx.anim(el, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${dx * 0.3}px,${-rise * 0.25}px) scale(1)`, opacity: 1, offset: 0.2 },
+          { transform: `translate(${dx}px,${-rise}px) scale(${kind === 'fire' ? 1.4 : 1})`, opacity: kind === 'fire' ? 0 : 1 }
+        ], { duration: 550 + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 300, fill: 'backwards' }).then(() => el.remove())
+      );
+    }
+    for (let i = 0; i < 3; i++) setTimeout(() => FxEffects.smokePuff(fxEl, vent, Math.max(lr.width * 0.5, 40), ['#9A8A86', '#6A5A56']), i * 200);
+    // The stones start falling at 1.1 s, while the last of the fountain still rises.
+    await Fx.wait(800);
+
+    // 2. Hot stones rain down round the target, landing at 1.45 / 1.6 / 1.75 / 1.9 / 2.05 s.
+    const ground = target.y + tr.height * 0.35;
+    const spots = [-0.35, 0.3, -0.05, 0.5, -0.55];
+    const falls: Promise<void>[] = [];
+    spots.forEach((k, i) => {
+      const stone = FireRangedMoveAnimations.hotStone(Math.max(tr.width * 0.22, 18));
+      const land: Point = { x: target.x + k * tr.width, y: ground + (i % 2 ? -6 : 6) };
+      Fx.place(stone, land);
+      fxEl.appendChild(stone);
+      const drift = -40 + Math.random() * 20;
+      falls.push(
+        Fx.anim(stone, [
+          { transform: `translate(${drift}px,${-(land.y + 30)}px) rotate(0deg)`, opacity: 1 },
+          { transform: 'translate(0,0) rotate(200deg)', opacity: 1 }
+        ], { duration: 350, easing: 'ease-in', delay: i * 150, fill: 'backwards' }).then(async () => {
+          FxEffects.smokePuff(fxEl, land, Math.max(tr.width * 0.45, 36));
+          const flame = FxGlyphs.firePuff(Math.max(tr.width * 0.3, 24));
+          Fx.place(flame, { x: land.x, y: land.y - 8 });
+          fxEl.appendChild(flame);
+          Fx.anim(flame, [
+            { transform: 'translateY(0) scale(.4)', opacity: 1 },
+            { transform: 'translateY(-16px) scale(1.1)', opacity: 0 }
+          ], { duration: 420, easing: 'ease-out' }).then(() => flame.remove());
+          Fx.flash(targetEl, '#FF8A2A', 0.5);
+          Fx.shake(targetEl, 6);
+          Fx.shakeField(fieldEl, 0.35);
+          // The stone rolls on a little and cools off.
+          await Fx.anim(stone, [
+            { transform: 'translate(0,0) rotate(200deg)', opacity: 1 },
+            { transform: `translate(${k < 0 ? -14 : 14}px,-4px) rotate(260deg)`, opacity: 1, offset: 0.5 },
+            { transform: `translate(${k < 0 ? -20 : 20}px,0) rotate(290deg)`, opacity: 0 }
+          ], { duration: 500, easing: 'ease-out' });
+          stone.remove();
+        })
+      );
+    });
+    await Promise.all([...burst, ...falls]);
+
+    await Fx.anim(heat, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    heat.remove();
+  }
+
+  /** A glowing hot volcanic stone, `size` px wide: brown with a molten orange highlight and glow (Eruption). */
+  private static hotStone(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size * 0.92}px;border-radius:52% 48% 46% 54% / 55% 50% 50% 45%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#FFD27A,#E08A32 30%,#9A5622 60%,#5A3012);box-shadow:0 0 6px #FF8A2A,0 0 12px #FF5A1A88`;
+    return el;
+  }
+
+  /** A tiny glowing ember (Eruption). */
+  private static ember(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFF6C0,#FF9A2A 60%);box-shadow:0 0 4px #FF7A1A`;
+    return el;
+  }
 
   /**
    * Blast Burn: the scene glows red-hot (0 - 0.3 s); jets of fire shoot up one

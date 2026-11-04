@@ -28,18 +28,25 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee: a karate chop that shatters something hard. */
+  /** Custom (chop lands at 0.56 s): a karate chop that shatters a glass pane. */
   brickbreak: () => {
-    const s = new MoveSfx(0.85, 0xb21c);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 7000, gain: 0.35 });
-    s.thud(0.17, 0.7, 0.7);
-    for (let i = 0; i < 6; i++) {
-      s.noise(0.2 + i * 0.05 + s.random() * 0.02, 0.04, { clock: () => 2500 + s.random() * 3000, gain: env.decay(0.3 - i * 0.04, 1) });
+    const s = new MoveSfx(1.25, 0xb21c);
+    s.whoosh(0.4, 0.16, { from: 1500, to: 7000, gain: 0.35 });
+    s.thud(0.56, 0.5, 0.4);
+    // Glass shattering: a bright crash with a metallic ring ...
+    s.noise(0.56, 0.28, { clock: (u) => 22000 - 6000 * u, gain: env.attackDecay(0.6, 0.02) });
+    s.noise(0.56, 0.18, { clock: () => 15000, gain: env.decay(0.25, 2), short: true });
+    // ... then shards tinkling down, thinning out.
+    for (let i = 0; i < 16; i++) {
+      const at = 0.6 + 0.55 * Math.pow(s.random(), 1.6);
+      const f = 3200 + s.random() * 4800;
+      s.wave(at, 0.05 + s.random() * 0.07, { freq: (u) => f * (1 - 0.05 * u), gain: env.decay(0.22 * (1.2 - (at - 0.6) * 1.4), 2) });
     }
+    s.sparkle(0.6, 0.4, 8, { lo: 4000, hi: 8000, gain: 0.12 });
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: flexing muscles, pumping up. */
+  /** Custom (flex pumps 0.03 / 0.28 / 0.53 s, sparkles from 0.8 s): flexing muscles, pumping up, then the stat-up jingle. */
   bulkup: () => {
     const s = new MoveSfx(1.5, 0xb01c);
     for (const [at, f] of [[0.03, 98], [0.28, 110], [0.53, 123]]) {

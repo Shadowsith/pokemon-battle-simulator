@@ -2,13 +2,17 @@ import { Point, BattleStageRefs, MoveVisual, MoveAnimRegistry } from '../../anim
 import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
-import { FxEffects } from '../../fx-effects';
+import { ClawStyle, FxEffects } from '../../fx-effects';
+
+/** Crush Claw's marks: black with a red glow. */
+const CRUSH_CLAW: ClawStyle = { glow: ['#FF2A2A', '#E01818'] };
 
 /** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up. */
 export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     bind: (refs, _launch, target) => NormalStrikeMoveAnimations.playBind(refs, target),
+    crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
     skullbash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSkullBash(refs, target, v),
     slash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v),
@@ -78,6 +82,28 @@ export class NormalStrikeMoveAnimations {
       );
     }
     await Promise.all([teethDone, burstDone, ...sparks]);
+  }
+
+  /**
+   * Crush Claw: two parallel black claw marks with a red glow rip down the
+   * left side of the target (hit at 0.12 s), then two more down its right
+   * side (hit at 0.47 s); the target flashes and shakes on each.
+   */
+  private static async playCrushClaw(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const len = Math.max(r.height * 0.65, 50);
+    const gap = Math.max(r.width * 0.11, 9);
+    const marks: Promise<void>[] = [];
+    for (const side of [-1, 1]) {
+      const centre: Point = { x: target.x + side * r.width * 0.2, y: target.y };
+      marks.push(...[-0.5, 0.5].map((k) => FxEffects.clawMark(fxEl, { x: centre.x + k * gap, y: centre.y + k * gap * 0.4 }, len, 64, CRUSH_CLAW)));
+      await Fx.wait(120);
+      Fx.flash(targetEl, '#FF4A4A', 0.5);
+      Fx.shake(targetEl, 5);
+      await Fx.wait(230);
+    }
+    await Promise.all(marks);
   }
 
   /**

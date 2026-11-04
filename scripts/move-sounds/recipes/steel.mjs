@@ -25,14 +25,19 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): an ominous wish of light that will strike later. */
+  /**
+   * Custom, the turn it's used (dark 0-0.3 s, white swells peak at 0.47 / 0.92 s):
+   * an ominous hum and two bright glints - a wish of light that will strike later.
+   */
   doomdesire: () => {
-    const s = new MoveSfx(1.2, 0xd00d);
-    s.chord(0.0, 0.5, [48, 55, 60], { rate: 0.04, gain: 0.25, voice: 'pulse' });
-    s.whoosh(0.0, 0.45, { from: 2000, to: 7000, gain: 0.2 });
-    s.noise(0.43, 0.05, { clock: () => 9000, gain: env.decay(0.35, 1), short: true });
-    s.pulse(0.43, 0.6, { freq: () => 1568, gain: env.decay(0.18, 2), duty: 0.5 });
-    s.thud(0.43, 0.4, 0.4);
+    const s = new MoveSfx(1.6, 0xd00d);
+    s.chord(0.0, 1.2, [48, 55, 60], { rate: 0.04, gain: 0.22, voice: 'pulse' });
+    for (const at of [0.47, 0.92]) {
+      s.whoosh(at - 0.17, 0.2, { from: 2000, to: 7000, gain: 0.15 });
+      s.noise(at, 0.05, { clock: () => 9000, gain: env.decay(0.3, 1), short: true });
+      s.pulse(at, 0.45, { freq: () => 1568, gain: env.decay(0.16, 2), duty: 0.5 });
+      s.sparkle(at, 0.25, 4, { lo: 3500, hi: 6000, gain: 0.1 });
+    }
     return s;
   },
 

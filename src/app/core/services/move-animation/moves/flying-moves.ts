@@ -8,6 +8,7 @@ export class FlyingMoveAnimations {
   /** Hand-made Flying move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     aeroblast: (refs, launch, target, v) => FlyingMoveAnimations.playAeroblast(refs, launch, target, v),
+    bounce: (refs, _launch, target) => FlyingMoveAnimations.playBounceDown(refs, target),
     drillpeck: (refs, _launch, target, v) => FlyingMoveAnimations.playDrillPeck(refs, target, v),
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target),
     skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target)
@@ -15,6 +16,7 @@ export class FlyingMoveAnimations {
 
   /** Turn-1 animations of two-turn Flying moves, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {
+    bounce: (refs, launch) => FlyingMoveAnimations.playBounceUp(refs, launch),
     fly: (refs, launch) => FlyingMoveAnimations.playFlyUp(refs, launch),
     skyattack: (refs, launch) => FlyingMoveAnimations.playSkyAttackCharge(refs, launch)
   };
@@ -268,8 +270,7 @@ export class FlyingMoveAnimations {
     await Fx.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
 
     const size = Math.max(Math.max(r.width, r.height) * 1.05, 60);
-    const bubble = document.createElement('div');
-    bubble.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 28%,#ffffffdd 0 7%,#C8F6FF 20%,#5CD6F4 62%,#2A9CD8);box-shadow:0 0 12px #A8ECFF;opacity:.92`;
+    const bubble = FlyingMoveAnimations.skyBubble(size);
     Fx.place(bubble, launch);
     fxEl.appendChild(bubble);
     Fx.anim(el, [
@@ -344,6 +345,108 @@ export class FlyingMoveAnimations {
 
     await Fx.anim(sky, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     sky.remove();
+    await FxEffects.dropBackIn(launchEl);
+  }
+
+  /** The glossy light-blue bubble a Pokémon rides into the air in (Fly, Bounce). */
+  private static skyBubble(size: number): HTMLElement {
+    const bubble = document.createElement('div');
+    bubble.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 28%,#ffffffdd 0 7%,#C8F6FF 20%,#5CD6F4 62%,#2A9CD8);box-shadow:0 0 12px #A8ECFF;opacity:.92`;
+    return bubble;
+  }
+
+  /**
+   * Bounce, turn 1: a light-blue bubble forms round the user, which fades
+   * into it; the bubble squats down like a spring and leaps up out of the
+   * top of the screen. The user stays away until turn 2.
+   */
+  private static async playBounceUp(refs: BattleStageRefs, launch: Point) {
+    const { launchEl: el, fxEl } = refs;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    const r = Fx.rect(el);
+    const size = Math.max(Math.max(r.width, r.height) * 1.05, 60);
+    const bubble = FlyingMoveAnimations.skyBubble(size);
+    bubble.style.transformOrigin = 'center bottom';
+    Fx.place(bubble, launch);
+    fxEl.appendChild(bubble);
+
+    Fx.anim(el, [
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: 'scale(.6)', opacity: 0 }
+    ], { duration: 260, easing: 'ease-in', fill: 'forwards' });
+    await Fx.anim(bubble, [
+      { transform: 'scale(0)', opacity: 0 },
+      { transform: 'scale(1.1)', opacity: 0.92, offset: 0.7 },
+      { transform: 'scale(1)', opacity: 0.92 }
+    ], { duration: 260, easing: 'ease-out' });
+    el.style.opacity = '0';
+
+    // Squat, then spring up and out (stretched tall while rising).
+    await Fx.anim(bubble, [
+      { transform: 'translateY(0) scale(1,1)' },
+      { transform: 'translateY(0) scale(1.22,.74)' }
+    ], { duration: 140, easing: 'ease-out', fill: 'forwards' });
+    await Fx.anim(bubble, [
+      { transform: 'translateY(0) scale(1.22,.74)' },
+      { transform: `translateY(${-size * 0.4}px) scale(.86,1.22)`, offset: 0.25 },
+      { transform: `translateY(${-(launch.y + size * 1.5)}px) scale(.9,1.15)` }
+    ], { duration: 480, easing: 'cubic-bezier(.2,.7,.4,1)' });
+    bubble.remove();
+    await Fx.wait(150);
+  }
+
+  /**
+   * Bounce, turn 2: the light-blue bubble drops from above onto the target,
+   * squashes flat on impact and bursts into a shower of white sparkles while
+   * the target shakes; then the user drops back into its place.
+   */
+  private static async playBounceDown(refs: BattleStageRefs, target: Point) {
+    const { launchEl, fieldEl, fxEl, targetEl } = refs;
+    // Away in the air until the end (also when Power Herb skipped turn 1).
+    launchEl.getAnimations?.().forEach((a) => a.cancel());
+    launchEl.style.opacity = '0';
+    const r = Fx.rect(targetEl);
+    const size = Math.max(Math.max(r.width, r.height) * 0.85, 56);
+    const bubble = FlyingMoveAnimations.skyBubble(size);
+    const high = `translateY(${-(target.y + size * 1.5)}px) scale(.88,1.2)`;
+    bubble.style.transformOrigin = 'center bottom';
+    // Start off-screen above, so it never shows on the target before the fall.
+    bubble.style.transform = high;
+    Fx.place(bubble, target);
+    fxEl.appendChild(bubble);
+    await Fx.wait(120);
+    await Fx.anim(bubble, [
+      { transform: high },
+      { transform: 'translateY(0) scale(.9,1.15)' }
+    ], { duration: 420, easing: 'ease-in', fill: 'forwards' });
+
+    // Impact: the bubble squashes and pops into white sparkles.
+    Fx.anim(bubble, [
+      { transform: 'scale(.9,1.15)', opacity: 0.92 },
+      { transform: 'scale(1.35,.7)', opacity: 0.85, offset: 0.4 },
+      { transform: 'scale(1.6,.6)', opacity: 0 }
+    ], { duration: 360, easing: 'ease-out' }).then(() => bubble.remove());
+    for (let i = 0; i < 26; i++) {
+      const s = 3 + Math.random() * 5;
+      const dot = document.createElement('div');
+      dot.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff,#E4ECF4 55%,#C8D2DC00);box-shadow:0 0 4px #ffffffcc`;
+      Fx.place(dot, target);
+      fxEl.appendChild(dot);
+      const ang = Math.random() * Math.PI * 2;
+      const dist = size * (0.35 + Math.random() * 0.45);
+      const dx = Math.cos(ang) * dist;
+      const dy = Math.sin(ang) * dist * 0.8;
+      Fx.anim(dot, [
+        { transform: 'translate(0,0) scale(.4)', opacity: 1 },
+        { transform: `translate(${dx}px,${dy}px) scale(1)`, opacity: 1, offset: 0.55 },
+        { transform: `translate(${dx * 1.15}px,${dy * 1.15 + 10}px) scale(.5)`, opacity: 0 }
+      ], { duration: 520 + Math.random() * 220, easing: 'ease-out', delay: Math.random() * 80 }).then(() => dot.remove());
+    }
+    Fx.flash(targetEl, '#ffffff', 0.6);
+    Fx.shake(targetEl, 6);
+    Fx.shakeField(fieldEl, 0.5);
+    await Fx.blink(targetEl);
+    await Fx.wait(300);
     await FxEffects.dropBackIn(launchEl);
   }
 

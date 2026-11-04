@@ -74,14 +74,16 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee slash + Defense drop fleck: hard claws that crush. */
+  /** Custom (claw pairs hit at 0.12 / 0.47 s) + Defense drop fleck: hard claws that crush. */
   crushclaw: () => {
-    const s = new MoveSfx(1.0, 0xc2c1);
-    s.whoosh(0.0, 0.18, { from: 2000, to: 8000, gain: 0.3 });
-    s.slash(0.17, 0.5);
-    s.thud(0.17, 0.5, 0.6);
-    s.noise(0.22, 0.12, { clock: () => 3000, gain: env.decay(0.2, 1.5) });
-    s.statDown(0.5);
+    const s = new MoveSfx(1.3, 0xc2c1);
+    for (const at of [0.0, 0.35]) {
+      s.whoosh(at, 0.13, { from: 2000, to: 8000, gain: 0.3 });
+      s.slash(at + 0.12, 0.5);
+      s.thud(at + 0.12, 0.45, 0.6);
+      s.noise(at + 0.16, 0.12, { clock: () => 3000, gain: env.decay(0.2, 1.5) });
+    }
+    s.statDown(0.85);
     return s;
   },
 

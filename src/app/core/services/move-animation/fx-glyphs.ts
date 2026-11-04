@@ -78,6 +78,26 @@ export class FxGlyphs {
     return el;
   }
 
+  /**
+   * A flat karate-chop hand seen from the side, `w` px long: fingers held
+   * together pointing right, thumb tucked along the top, a short wrist on the
+   * left; the bottom edge is the striking edge. Black with a white outline by default (Brick Break).
+   */
+  static chopHandGlyph(w: number, fill = '#141414', edge = '#ffffff'): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${w * (22 / 64)}px;pointer-events:none;filter:drop-shadow(0 0 2px #00000077)`;
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 64 22">' +
+      `<g fill="${fill}" stroke="${edge}" stroke-width="1.4" stroke-linejoin="round">` +
+      '<rect x="1.5" y="7.5" width="13" height="8" rx="2"/>' +
+      '<path d="M12,7 C22,5 32,5 42,6 L57,7 C62.5,7.6 62.5,15.4 57,16 L42,17 C32,18 22,18 12,16 Z"/>' +
+      '<path d="M17,8.5 C19,4 29,3 37,5 C39.5,5.7 39.5,8.3 37,8.8 C30,9.8 22,10 17,8.5 Z"/>' +
+      '</g>' +
+      `<path d="M41,9.8 H58 M41,13.3 H57"stroke="${edge}" stroke-width="0.9" stroke-linecap="round" opacity=".8"/>` +
+      '</svg>';
+    return el;
+  }
+
   /** A white bubble with a blue music note in it (Belly Drum). */
   static noteBubble(size: number, note = '♪'): HTMLElement {
     const el = document.createElement('div');
@@ -122,6 +142,17 @@ export class FxGlyphs {
     el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 4px ${color})`;
     const shape = document.createElement('div');
     shape.style.cssText = `width:100%;height:100%;clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);background:radial-gradient(circle,#fff,${color} 60%)`;
+    el.appendChild(shape);
+    return el;
+  }
+
+  /** A classic five-point star, white with a soft `glow` (Cosmic Power). */
+  static fivePointStar(size: number, glow: string): HTMLElement {
+    // The glow sits on a wrapper: clip-path on the same element would cut the drop-shadow off.
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 3px ${glow}) drop-shadow(0 0 6px ${glow})`;
+    const shape = document.createElement('div');
+    shape.style.cssText = 'width:100%;height:100%;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:radial-gradient(circle at 50% 55%,#fff 0 45%,#F0EAFF)';
     el.appendChild(shape);
     return el;
   }

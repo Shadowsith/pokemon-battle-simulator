@@ -60,23 +60,32 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: a calm, focused hum. */
+  /** Custom (dark 0-0.28 s, rings close in 0.38-1.53 s, stat sparkles from 1.85 s): a calm, focused hum, then the stat-up jingle. */
   calmmind: () => {
-    const s = new MoveSfx(1.5, 0xca1a);
-    s.wave(0.02, 0.8, { freq: () => 220, gain: env.swell(0.25) });
-    s.wave(0.02, 0.8, { freq: () => 330, gain: env.swell(0.16) });
-    s.sparkle(0.2, 0.5, 5, { lo: 2500, hi: 4000, gain: 0.1 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.5, 0xca1a);
+    s.wave(0.25, 1.3, { freq: () => 220, gain: env.swell(0.25) });
+    s.wave(0.25, 1.3, { freq: () => 330, gain: env.swell(0.16) });
+    // A soft falling tone as each ring closes in.
+    for (let i = 0; i < 3; i++) {
+      s.wave(0.45 + i * 0.25, 0.6, { freq: (u) => 880 - 300 * u, gain: env.swell(0.08) });
+    }
+    s.sparkle(0.4, 1.1, 7, { lo: 2500, hi: 4000, gain: 0.1 });
+    s.statUp(1.85);
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: starry cosmic shimmer over a deep drone. */
+  /** Custom (starry sky 0-0.35 s, stars stream up 0.35-1.75 s, stat sparkles from 2.1 s): starry cosmic shimmer over a deep drone. */
   cosmicpower: () => {
-    const s = new MoveSfx(1.5, 0xc05a);
-    s.wave(0.02, 0.8, { freq: () => 73.4, gain: env.swell(0.25) });
-    s.chord(0.05, 0.75, [84, 91, 96], { rate: 0.035, gain: 0.18, vibrato: 0.006 });
-    s.sparkle(0.05, 0.7, 10, { lo: 4000, hi: 7000, gain: 0.12 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.7, 0xc05a);
+    s.wave(0.02, 1.9, { freq: () => 73.4, gain: env.swell(0.25) });
+    s.chord(0.3, 1.5, [84, 91, 96], { rate: 0.035, gain: 0.18, vibrato: 0.006 });
+    // Twinkles rising in pitch as the stars stream up.
+    for (let i = 0; i < 18; i++) {
+      const at = 0.4 + (i / 18) * 1.3 + s.random() * 0.05;
+      const f = 3000 + (i / 18) * 3500 + s.random() * 600;
+      s.pulse(at, 0.04, { freq: (u) => f * (1 - 0.2 * u), gain: env.decay(0.1, 1), duty: 0.125 });
+    }
+    s.statUp(2.1);
     return s;
   },
 

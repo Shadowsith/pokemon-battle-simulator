@@ -102,14 +102,20 @@ export const WATER = {
     return s;
   },
 
-  /** Two-turn move (plays on both turns): dives under, then bursts up and hits with a splash. */
+  /**
+   * Custom two-turn move (the same clip plays on both turns): a splash and
+   * bubbles (turn 1 dive / turn 2 bubbles under the foe), then three splashes
+   * at 0.68 / 0.82 / 0.96 s (turn 1 second surge / turn 2 the water hits).
+   */
   dive: () => {
-    const s = new MoveSfx(1.15, 0xd1fe);
+    const s = new MoveSfx(1.4, 0xd1fe);
     s.splash(0.02, 0.45);
     s.bubbles(0.15, 0.4, 8, { lo: 250, hi: 700, gain: 0.18 });
-    s.whoosh(0.5, 0.2, { from: 2000, to: 6000, gain: 0.3 });
-    s.thud(0.68, 0.55, 0.6);
-    s.splash(0.68, 0.55);
+    s.whoosh(0.5, 0.18, { from: 2000, to: 6000, gain: 0.3 });
+    for (const [at, g] of [[0.68, 0.55], [0.82, 0.45], [0.96, 0.4]]) {
+      s.splash(at, g);
+      s.thud(at, g * 0.5, 0.3);
+    }
     return s;
   },
 

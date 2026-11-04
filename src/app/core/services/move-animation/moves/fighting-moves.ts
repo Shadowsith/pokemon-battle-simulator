@@ -8,6 +8,8 @@ import { FxEffects } from '../fx-effects';
 export class FightingMoveAnimations {
   /** Hand-made Fighting move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    brickbreak: (refs, _launch, target) => FightingMoveAnimations.playBrickBreak(refs, target),
+    bulkup: (refs, launch) => FightingMoveAnimations.playBulkUp(refs, launch),
     crosschop: (refs, _launch, target) => FightingMoveAnimations.playCrossChop(refs, target),
     detect: (refs, launch) => FightingMoveAnimations.playDetect(refs, launch),
     dynamicpunch: (refs, _launch, target) => FightingMoveAnimations.playDynamicPunch(refs, target),
@@ -332,6 +334,125 @@ export class FightingMoveAnimations {
 
     await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     dim.remove();
+  }
+
+  /**
+   * Bulk Up: the user swells up, pumping on each flex beat of the sound
+   * (0.03 / 0.28 / 0.53 s), shrinks back, then orange stat sparkles drift
+   * down over it (from 0.8 s, with the stat-up jingle).
+   */
+  private static async playBulkUp(refs: BattleStageRefs, launch: Point) {
+    const { launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    launchEl.style.transformOrigin = 'center bottom';
+    await Fx.anim(launchEl, [
+      { transform: 'scale(1)' },
+      { transform: 'scale(1.14)', offset: 0.18 },
+      { transform: 'scale(1.1)', offset: 0.3 },
+      { transform: 'scale(1.17)', offset: 0.45 },
+      { transform: 'scale(1.13)', offset: 0.6 },
+      { transform: 'scale(1.2)', offset: 0.75 },
+      { transform: 'scale(1)' }
+    ], { duration: 800, easing: 'ease-in-out' });
+    launchEl.style.transformOrigin = '';
+    await FxEffects.orangeSparkles(refs, launch, launch.y - r.height / 2);
+  }
+
+  /**
+   * Brick Break: a grey glass pane appears in front of the target, a black,
+   * white-outlined hand rises above it and chops straight down; on impact
+   * the pane shatters into outlined glass shards that fly out and fade.
+   */
+  private static async playBrickBreak(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const w = Math.max(r.width * 0.9, 60);
+    const h = Math.max(r.height * 0.95, 64);
+
+    // 1. The glass pane opens in front of the target (0-0.25 s), a sheen runs over it.
+    const pane = document.createElement('div');
+    pane.style.cssText = `position:absolute;width:${w}px;height:${h}px;pointer-events:none;overflow:hidden;border:2px solid #ffffffdd;border-radius:2px;background:linear-gradient(150deg,#F4F6FA99,#B8C0CC77 45%,#8E98A866);box-shadow:0 0 8px #ffffff88,inset 0 0 12px #ffffff66`;
+    const sheen = document.createElement('div');
+    sheen.style.cssText = `position:absolute;top:-20%;left:0;width:${w * 0.3}px;height:140%;background:linear-gradient(90deg,transparent,#ffffffdd,transparent);transform:skewX(-25deg)`;
+    pane.appendChild(sheen);
+    Fx.place(pane, target);
+    fxEl.appendChild(pane);
+    Fx.anim(sheen, [
+      { transform: `translateX(${-w * 0.4}px) skewX(-25deg)` },
+      { transform: `translateX(${w * 1.2}px) skewX(-25deg)` }
+    ], { duration: 500, easing: 'ease-in-out', delay: 100 });
+    await Fx.anim(pane, [
+      { transform: 'scale(1,.05)', opacity: 0 },
+      { transform: 'scale(1,1)', opacity: 1 }
+    ], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+
+    // 2. The flat hand appears above the pane, edge down (0.25-0.4 s) ...
+    const hw = Math.max(r.width * 0.7, 60);
+    const hand = FxGlyphs.chopHandGlyph(hw);
+    Fx.place(hand, target);
+    fxEl.appendChild(hand);
+    const above = -h / 2 - hw * 0.35;
+    const pose = (y: number) => `translate(0,${y}px) rotate(-6deg)`;
+    await Fx.anim(hand, [
+      { transform: pose(above - 12), opacity: 0 },
+      { transform: pose(above), opacity: 1 }
+    ], { duration: 150, easing: 'ease-out', fill: 'forwards' });
+
+    // ... and chops straight down through it (0.4-0.56 s).
+    await Fx.anim(hand, [
+      { transform: pose(above) },
+      { transform: pose(0) }
+    ], { duration: 160, easing: 'ease-in', fill: 'forwards' });
+
+    // 3. Impact: the pane shatters, the target shakes, the hand fades.
+    pane.remove();
+    const shards: Promise<void>[] = [];
+    for (let i = 0; i < 12; i++) {
+      const shard = FightingMoveAnimations.glassShard(14 + Math.random() * 18);
+      Fx.place(shard, {
+        x: target.x + (Math.random() * 2 - 1) * w * 0.35,
+        y: target.y + (Math.random() * 2 - 1) * h * 0.35
+      });
+      fxEl.appendChild(shard);
+      const ang = (i / 12) * Math.PI * 2 + Math.random() * 0.4;
+      const dist = Math.max(w, h) * (0.45 + Math.random() * 0.4);
+      const dx = Math.cos(ang) * dist;
+      const dy = Math.sin(ang) * dist * 0.75;
+      const spin = (Math.random() * 2 - 1) * 200;
+      shards.push(
+        Fx.anim(shard, [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${dx * 0.7}px,${dy * 0.7}px) rotate(${spin * 0.6}deg)`, opacity: 1, offset: 0.55 },
+          { transform: `translate(${dx}px,${dy + 14}px) rotate(${spin}deg)`, opacity: 0 }
+        ], { duration: 650 + Math.random() * 200, easing: 'ease-out' }).then(() => shard.remove())
+      );
+    }
+    Fx.flash(targetEl, '#ffffff', 0.6);
+    Fx.shake(targetEl, 6);
+    Fx.shakeField(fieldEl, 0.4);
+    const fade = Fx.anim(hand, [
+      { transform: pose(0), opacity: 1 },
+      { transform: pose(12), opacity: 0 }
+    ], { duration: 300, easing: 'ease-in' }).then(() => hand.remove());
+    await Promise.all([Fx.blink(targetEl), fade, ...shards]);
+  }
+
+  /** A jagged piece of broken glass, `s` px wide: pale translucent fill with a white edge (Brick Break). */
+  private static glassShard(s: number): HTMLElement {
+    const pts = [0, 1, 2, 3, 4]
+      .slice(0, 3 + Math.floor(Math.random() * 2))
+      .map((i, _, all) => {
+        const a = (i / all.length) * Math.PI * 2 + Math.random() * 0.8;
+        const d = 0.55 + Math.random() * 0.45;
+        return `${(50 + Math.cos(a) * 48 * d).toFixed(1)},${(50 + Math.sin(a) * 48 * d).toFixed(1)}`;
+      })
+      .join(' ');
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${s}px;height:${s}px;pointer-events:none;filter:drop-shadow(0 0 2px #ffffffaa)`;
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 100 100">' +
+      `<polygon points="${pts}" fill="#E8EEF655" stroke="#ffffff" stroke-width="7" stroke-linejoin="round"/></svg>`;
+    return el;
   }
 
   /**

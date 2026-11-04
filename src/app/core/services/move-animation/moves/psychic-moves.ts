@@ -11,6 +11,8 @@ export class PsychicMoveAnimations {
     agility: (refs, launch) => PsychicMoveAnimations.playAgility(refs, launch),
     amnesia: (refs, launch) => PsychicMoveAnimations.playAmnesia(refs, launch),
     barrier: (refs, launch) => PsychicMoveAnimations.playBarrier(refs, launch),
+    calmmind: (refs, launch) => PsychicMoveAnimations.playCalmMind(refs, launch),
+    cosmicpower: (refs, launch) => PsychicMoveAnimations.playCosmicPower(refs, launch),
     dreameater: (refs, launch, target, v) => PsychicMoveAnimations.playDreamEater(refs, launch, target, v),
     lightscreen: (refs, launch, _target, v) => PsychicMoveAnimations.playScreen(refs, launch, v, PsychicMoveAnimations.LIGHT_SCREEN),
     rest: (refs, launch, _target, v) => PsychicMoveAnimations.playRest(refs, launch, v),
@@ -281,6 +283,121 @@ export class PsychicMoveAnimations {
     dim.remove();
 
     await FxEffects.orangeSparkles(refs, launch, head.y);
+  }
+
+  /**
+   * Calm Mind: the scene goes dark (0-0.28 s); a white starburst glows on the
+   * user while three pale red rings shrink in onto it one after another
+   * (0.3-1.3 s); the scene clears and orange stat sparkles drift down (from ~1.5 s).
+   */
+  private static async playCalmMind(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const dim = await PsychicMoveAnimations.dimIn(fieldEl);
+
+    // White starburst: thin rays fading outward, turning slowly.
+    const size = Math.max(Math.max(r.width, r.height) * 1.1, 70);
+    const burst = document.createElement('div');
+    const mask = 'radial-gradient(circle,#000 0 18%,#0008 45%,#0000 70%)';
+    burst.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#ffffff 0 10%,#ffffffaa 22%,#fff0 40%),repeating-conic-gradient(#ffffffdd 0 3deg,#fff0 3deg 14deg);-webkit-mask-image:${mask};mask-image:${mask}`;
+    Fx.place(burst, launch);
+    fxEl.appendChild(burst);
+    const glow = Fx.anim(burst, [
+      { transform: 'scale(.3) rotate(0deg)', opacity: 0 },
+      { transform: 'scale(1) rotate(12deg)', opacity: 1, offset: 0.2 },
+      { transform: 'scale(.92) rotate(36deg)', opacity: 0.85, offset: 0.6 },
+      { transform: 'scale(1.05) rotate(60deg)', opacity: 1, offset: 0.85 },
+      { transform: 'scale(.4) rotate(72deg)', opacity: 0 }
+    ], { duration: 1100, easing: 'ease-in-out' }).then(() => burst.remove());
+
+    // Pale red rings close in on the user, one every 0.25 s.
+    const reach = Math.max(r.width, r.height) * 1.5 + 40;
+    const rings: Promise<void>[] = [];
+    for (let i = 0; i < 3; i++) {
+      const ring = document.createElement('div');
+      const bw = Math.max(reach * 0.05, 6);
+      ring.style.cssText = `position:absolute;width:${reach}px;height:${reach}px;border-radius:50%;pointer-events:none;box-sizing:border-box;border:${bw}px solid #E8787Ccc;box-shadow:0 0 10px #E8787C99,inset 0 0 10px #E8787C99`;
+      Fx.place(ring, launch);
+      fxEl.appendChild(ring);
+      rings.push(
+        Fx.anim(ring, [
+          { transform: 'scale(1)', opacity: 0 },
+          { transform: 'scale(.85)', opacity: 0.9, offset: 0.2 },
+          { transform: 'scale(.3)', opacity: 0.9, offset: 0.85 },
+          { transform: 'scale(.15)', opacity: 0 }
+        ], { duration: 650, easing: 'ease-in', delay: 100 + i * 250, fill: 'backwards' }).then(() => ring.remove())
+      );
+    }
+    await Promise.all([glow, ...rings]);
+
+    Fx.flash(launchEl, '#ffffff', 0.4);
+    await PsychicMoveAnimations.dimOut(dim);
+    await FxEffects.orangeSparkles(refs, launch, launch.y - r.height / 2);
+  }
+
+  /**
+   * Cosmic Power: the scene turns into a deep purple starry sky with
+   * twinkling specks and violet light streaks (0-0.35 s); white five-point
+   * stars and coloured specks stream up from the user to the top of the
+   * screen (0.35-1.75 s); the sky clears and orange stat sparkles drift down (from ~2.1 s).
+   */
+  private static async playCosmicPower(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const specks = ['#ffffff', '#FF8AD8', '#7FE8FF', '#FFE27A', '#B89CFF'];
+
+    // 1. Starry sky.
+    const sky = Fx.backdrop(fieldEl, 'overflow:hidden;background:radial-gradient(ellipse at 45% 40%,#4A2490,#26105A 55%,#0E0626)');
+    for (let i = 0; i < 6; i++) {
+      const beam = document.createElement('div');
+      const bw = 18 + Math.random() * 30;
+      beam.style.cssText = `position:absolute;left:${Math.random() * W}px;top:-10%;width:${bw}px;height:120%;pointer-events:none;background:linear-gradient(180deg,#9A6CFF00,#9A6CFF66 40%,#C8A8FF55 60%,#9A6CFF00);filter:blur(6px);transform:rotate(${(Math.random() * 2 - 1) * 12}deg)`;
+      sky.appendChild(beam);
+      beam.animate([{ opacity: 0.4 }, { opacity: 1 }, { opacity: 0.4 }], { duration: 900 + Math.random() * 600, iterations: Infinity, delay: -Math.random() * 900 });
+    }
+    for (let i = 0; i < 46; i++) {
+      const s = 1.5 + Math.random() * 2.5;
+      const c = specks[i % specks.length];
+      const dot = document.createElement('div');
+      dot.style.cssText = `position:absolute;left:${Math.random() * W}px;top:${Math.random() * H}px;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:${c};box-shadow:0 0 4px ${c}`;
+      sky.appendChild(dot);
+      const dur = 500 + Math.random() * 700;
+      dot.animate([{ opacity: 0.2 }, { opacity: 1 }, { opacity: 0.2 }], { duration: dur, iterations: Infinity, delay: -Math.random() * dur });
+    }
+    await Fx.anim(sky, [{ opacity: 0 }, { opacity: 1 }], { duration: 350, easing: 'ease-out' });
+
+    // 2. Stars and specks stream up from the user.
+    const spread = Math.max(r.width * 0.6, 40);
+    const base = launch.y + r.height * 0.3;
+    const rising: Promise<void>[] = [];
+    for (let i = 0; i < 40; i++) {
+      const isStar = i % 3 !== 2;
+      const el = isStar
+        ? FxGlyphs.fivePointStar(10 + Math.random() * 16, '#C8B4FF')
+        : FxGlyphs.sparkStar(6 + Math.random() * 6, specks[1 + (i % (specks.length - 1))]);
+      Fx.place(el, { x: launch.x + (Math.random() * 2 - 1) * spread, y: base - Math.random() * r.height * 0.4 });
+      fxEl.appendChild(el);
+      const rise = base + 30;
+      const drift = (Math.random() * 2 - 1) * 30;
+      const spin = (Math.random() * 2 - 1) * 180;
+      rising.push(
+        Fx.anim(el, [
+          { transform: 'translate(0,0) scale(.3) rotate(0deg)', opacity: 0 },
+          { transform: `translate(${drift * 0.2}px,${-rise * 0.15}px) scale(1) rotate(${spin * 0.2}deg)`, opacity: 1, offset: 0.15 },
+          { transform: `translate(${drift * 0.8}px,${-rise * 0.8}px) scale(.9) rotate(${spin * 0.8}deg)`, opacity: 1, offset: 0.8 },
+          { transform: `translate(${drift}px,${-rise}px) scale(.6) rotate(${spin}deg)`, opacity: 0 }
+        ], { duration: 650 + Math.random() * 350, easing: 'ease-in', delay: (i / 40) * 750 + Math.random() * 60, fill: 'backwards' }).then(() => el.remove())
+      );
+    }
+    Fx.flash(launchEl, '#C8B4FF', 0.35);
+    await Promise.all(rising);
+
+    // 3. The sky clears, then the stat boost.
+    await Fx.anim(sky, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    sky.remove();
+    await FxEffects.orangeSparkles(refs, launch, launch.y - r.height / 2);
   }
 
   /**

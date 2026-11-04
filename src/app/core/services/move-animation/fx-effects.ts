@@ -155,6 +155,36 @@ export class FxEffects {
     glow.remove();
   }
 
+  /**
+   * One claw mark centred on `at`, `len` px long at `angle` degrees: a tapered
+   * black stroke with a two-layer `glow` that rips in from its top end, holds,
+   * then fades; with `tip` a small glowing orb sits on its top end (Crush Claw, Dragon Claw).
+   */
+  static clawMark(fxEl: HTMLElement, at: Point, len: number, angle: number, style: ClawStyle): Promise<void> {
+    const th = Math.max(len * 0.11, 6);
+    const rad = (angle * Math.PI) / 180;
+    const [g1, g2] = style.glow;
+    // Glow on a wrapper: clip-path on the same element would cut the drop-shadow off.
+    const mark = document.createElement('div');
+    mark.style.cssText = `position:absolute;left:${at.x - (Math.cos(rad) * len) / 2}px;top:${at.y - (Math.sin(rad) * len) / 2 - th / 2}px;width:${len}px;height:${th}px;pointer-events:none;transform-origin:0 50%;filter:drop-shadow(0 0 1.5px ${g1}) drop-shadow(0 0 3px ${g2})`;
+    const stroke = document.createElement('div');
+    stroke.style.cssText = 'width:100%;height:100%;clip-path:polygon(0 50%,12% 0,85% 20%,100% 50%,85% 80%,12% 100%);background:linear-gradient(90deg,#2A0A0A,#0A0A0A 30%,#141010 70%,#2A0A0A)';
+    mark.appendChild(stroke);
+    if (style.tip) {
+      const orb = document.createElement('div');
+      const os = th * 1.6;
+      orb.style.cssText = `position:absolute;left:${-os * 0.35}px;top:${(th - os) / 2}px;width:${os}px;height:${os}px;border-radius:50%;background:radial-gradient(circle,#fff 0 25%,${style.tip} 60%,${style.tip}00);box-shadow:0 0 6px ${style.tip}`;
+      mark.appendChild(orb);
+    }
+    fxEl.appendChild(mark);
+    return Fx.anim(mark, [
+      { transform: `rotate(${angle}deg) scale(0,1)`, opacity: 1 },
+      { transform: `rotate(${angle}deg) scale(1,1.15)`, opacity: 1, offset: 0.2 },
+      { transform: `rotate(${angle}deg) scale(1,1)`, opacity: 1, offset: 0.7 },
+      { transform: `rotate(${angle}deg) scale(1,.6)`, opacity: 0 }
+    ], { duration: 620, easing: 'ease-out' }).then(() => mark.remove());
+  }
+
   /** The user drops back into view from above, after being away (Fly, Bounce, …). */
   static async dropBackIn(el: HTMLElement) {
     el.getAnimations?.().forEach((a) => a.cancel());
@@ -450,4 +480,10 @@ export class FxEffects {
     ], { duration: 700, easing: 'ease-in' }).then(() => fist.remove());
     await Promise.all(bits);
   }
+}
+
+/** Colours of a {@link FxEffects.clawMark}: the two glow layers round the black stroke and an optional tip orb. */
+export interface ClawStyle {
+  glow: [string, string];
+  tip?: string;
 }

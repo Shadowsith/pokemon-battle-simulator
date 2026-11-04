@@ -26,22 +26,30 @@ export const DRAGON = {
     return s;
   },
 
-  /** Generic melee slash: sharp claws and a low growl. */
+  /** Custom (power-up 0-0.75 s, claw rakes hit at 0.92 / 1.27 s): a low growl as it powers up, then sharp claws. */
   dragonclaw: () => {
-    const s = new MoveSfx(0.75, 0xd2c1);
-    s.pulse(0.0, 0.2, { freq: (u) => 100 * (1 + 0.1 * Math.sin(2 * Math.PI * 10 * u)), gain: env.swell(0.25), duty: 0.25 });
-    s.whoosh(0.0, 0.18, { from: 2000, to: 9000, gain: 0.3 });
-    s.slash(0.17, 0.6);
-    s.thud(0.17, 0.4, 0.5);
+    const s = new MoveSfx(1.7, 0xd2c1);
+    s.pulse(0.0, 0.7, { freq: (u) => 100 * (1 + 0.1 * Math.sin(2 * Math.PI * 10 * u)), gain: env.swell(0.25), duty: 0.25 });
+    s.whoosh(0.05, 0.6, { from: 800, to: 4000, gain: 0.15 });
+    s.sparkle(0.1, 0.55, 6, { lo: 3000, hi: 5500, gain: 0.1 });
+    for (const at of [0.92, 1.27]) {
+      s.whoosh(at - 0.12, 0.13, { from: 2000, to: 9000, gain: 0.3 });
+      s.slash(at, 0.6);
+      s.thud(at, 0.4, 0.5);
+    }
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: a mystic, swirling dance. */
+  /** Custom (red storm 0-1.5 s, stat sparkles from 1.55 s): a mystic, swirling dance with crackles. */
   dragondance: () => {
-    const s = new MoveSfx(1.5, 0xd2dd);
-    s.arpeggio(0.02, [57, 60, 64, 67, 69, 72, 76, 79], 0.09, { gain: 0.22, voice: 'wave', hold: 0.14 });
-    s.noise(0.02, 0.75, { clock: (u) => 2000 + 1500 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.15) });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.3, 0xd2dd);
+    s.arpeggio(0.02, [57, 60, 64, 67, 69, 72, 76, 79], 0.15, { gain: 0.2, voice: 'wave', hold: 0.2 });
+    s.noise(0.02, 1.45, { clock: (u) => 2000 + 1500 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.17) });
+    // Little electric crackles through the storm.
+    for (let i = 0; i < 9; i++) {
+      s.noise(0.25 + s.random() * 1.0, 0.05, { clock: () => 12000, gain: env.decay(0.18, 1), short: true });
+    }
+    s.statUp(1.55);
     return s;
   },
 
