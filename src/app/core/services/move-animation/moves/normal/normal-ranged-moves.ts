@@ -12,6 +12,7 @@ export class NormalRangedMoveAnimations {
     eggbomb: (refs, launch, target) => NormalRangedMoveAnimations.playEggBomb(refs, launch, target),
     explosion: (refs, launch, target, v) => NormalRangedMoveAnimations.playExplosion(refs, launch, target, v),
     glare: (refs, launch, target) => NormalRangedMoveAnimations.playGlare(refs, launch, target),
+    hypervoice: (refs, launch, target) => NormalRangedMoveAnimations.playHyperVoice(refs, launch, target),
     hyperbeam: (refs, launch, target) => NormalRangedMoveAnimations.playHyperBeam(refs, launch, target),
     triattack: (refs, launch, target) => NormalRangedMoveAnimations.playTriAttack(refs, launch, target),
     razorwind: (refs, _launch, target) => NormalRangedMoveAnimations.playRazorBlades(refs, target),
@@ -22,6 +23,69 @@ export class NormalRangedMoveAnimations {
   static readonly chargeAnims: MoveAnimRegistry = {
     razorwind: (refs, launch) => NormalRangedMoveAnimations.playRazorWhirlwind(refs, launch)
   };
+
+  /**
+   * Hyper Voice: three thick orange-red sound rings with a yellow glow fly
+   * from the user to the target, swelling as they go (launched 0 / 0.16 /
+   * 0.32 s, arriving 0.5 / 0.66 / 0.82 s); each arrival pops small rings
+   * on the target, which flashes and shakes.
+   */
+  private static async playHyperVoice(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const size = Math.max(tr.height * 1.6, 110);
+    const start = Math.max(lr.height * 0.35, 30) / size;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const travel = 500;
+
+    const waves: Promise<void>[] = [];
+    for (let i = 0; i < 3; i++) {
+      const ring = document.createElement('div');
+      const bw = Math.max(size * 0.07, 7);
+      ring.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;box-sizing:border-box;border:${bw}px solid #F0581Ce6;box-shadow:0 0 10px #FFB43Acc,inset 0 0 12px #FFD24Acc`;
+      Fx.place(ring, launch);
+      fxEl.appendChild(ring);
+      waves.push(
+        Fx.anim(ring, [
+          { transform: `translate(0,0) scale(${start})`, opacity: 0 },
+          { transform: `translate(${dx * 0.15}px,${dy * 0.15}px) scale(${start + (1 - start) * 0.15})`, opacity: 0.95, offset: 0.15 },
+          { transform: `translate(${dx * 0.85}px,${dy * 0.85}px) scale(${start + (1 - start) * 0.85})`, opacity: 0.9, offset: 0.85 },
+          { transform: `translate(${dx}px,${dy}px) scale(1.05)`, opacity: 0 }
+        ], { duration: travel, easing: 'ease-in', delay: i * 160, fill: 'backwards' }).then(() => {
+          ring.remove();
+          Fx.flash(targetEl, '#FFB43A', 0.5);
+          Fx.shake(targetEl, 5);
+          return NormalRangedMoveAnimations.ringPops(fxEl, target, tr);
+        })
+      );
+    }
+    await Promise.all(waves);
+  }
+
+  /** Three small orange rings popping at random spots on the target (Hyper Voice hits). */
+  private static ringPops(fxEl: HTMLElement, target: Point, tr: DOMRect): Promise<void> {
+    const pops: Promise<void>[] = [];
+    for (let k = 0; k < 3; k++) {
+      const s = Math.max(tr.width * 0.28, 20);
+      const pop = document.createElement('div');
+      pop.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;box-sizing:border-box;border:3px solid #F0581C;box-shadow:0 0 6px #FFD24A,inset 0 0 4px #FFD24A`;
+      Fx.place(pop, {
+        x: target.x + (Math.random() * 2 - 1) * tr.width * 0.3,
+        y: target.y + (Math.random() * 2 - 1) * tr.height * 0.3
+      });
+      fxEl.appendChild(pop);
+      pops.push(
+        Fx.anim(pop, [
+          { transform: 'scale(.2)', opacity: 1 },
+          { transform: 'scale(1)', opacity: 0.9, offset: 0.6 },
+          { transform: 'scale(1.3)', opacity: 0 }
+        ], { duration: 300, easing: 'ease-out', delay: k * 60, fill: 'backwards' }).then(() => pop.remove())
+      );
+    }
+    return Promise.all(pops).then(() => void 0);
+  }
 
   /**
    * Barrage: one large glowing white orb is lobbed at the target; the ground

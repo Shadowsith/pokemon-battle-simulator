@@ -10,7 +10,9 @@ export class GrassMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     absorb: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target),
     aromatherapy: (refs, launch) => GrassMoveAnimations.playAromatherapy(refs, launch),
+    frenzyplant: (refs, launch, target) => GrassMoveAnimations.playFrenzyPlant(refs, launch, target),
     gigadrain: (refs, launch, target) => GrassMoveAnimations.playGigaDrain(refs, launch, target),
+    leafblade: (refs, _launch, target) => GrassMoveAnimations.playLeafBlade(refs, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     sleeppowder: (refs, _launch, target, v) => GrassMoveAnimations.playSleepPowder(refs, target, v),
@@ -23,6 +25,201 @@ export class GrassMoveAnimations {
   static readonly chargeAnims: MoveAnimRegistry = {
     solarbeam: (refs, launch) => GrassMoveAnimations.playSolarBeamCharge(refs, launch)
   };
+
+  /**
+   * Frenzy Plant: the scene goes dark (0-0.28 s) and turns into a bright
+   * green glade with light rays, where leaves and white motes drift upward
+   * (from 0.28 s); three twisted roots grow from the user to the target
+   * (0.9-1.45 s) and strike it with a green burst (1.45 s); then all clears (~2.0-2.35 s).
+   */
+  private static async playFrenzyPlant(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    // 1. Dark, then the green glade fades in over it.
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 280, easing: 'ease-out', fill: 'forwards' });
+    const glade = document.createElement('div');
+    glade.style.cssText =
+      'position:absolute;inset:0;background:' +
+      'repeating-linear-gradient(100deg,#ffffff00 0 34px,#ffffff2a 34px 52px,#ffffff00 52px 90px),' +
+      'linear-gradient(170deg,#EFFFD8,#A8E486 40%,#52B84C)';
+    dim.appendChild(glade);
+    Fx.anim(glade, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+    GrassMoveAnimations.risingLeaves(glade, W, H, 2000);
+
+    // 2. Roots grow from the user's lower body to the target.
+    await Fx.wait(620);
+    const from = { x: launch.x, y: launch.y + lr.height * 0.25 };
+    const roots = GrassMoveAnimations.rootStrands(W, H, from, target);
+    fxEl.appendChild(roots.svg);
+    await roots.grow(550);
+
+    // 3. Green hit on the target.
+    const burst = FxGlyphs.spikyBurst(Math.max(tr.width * 0.9, 60), '#3FCB4A', '#B8F08A', '#F4FFE0');
+    Fx.place(burst, target);
+    fxEl.appendChild(burst);
+    const burstDone = Fx.anim(burst, [
+      { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+      { transform: 'scale(1.1) rotate(12deg)', opacity: 1, offset: 0.35 },
+      { transform: 'scale(1.25) rotate(20deg)', opacity: 0 }
+    ], { duration: 500, easing: 'ease-out' }).then(() => burst.remove());
+    Fx.flash(targetEl, '#6AE05A', 0.8);
+    Fx.shake(targetEl, 6);
+    Fx.shakeField(fieldEl, 0.6);
+    await Promise.all([burstDone, Fx.blink(targetEl, 3)]);
+
+    // 4. Roots and glade fade together.
+    await Promise.all([
+      Fx.anim(roots.svg, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' }),
+      Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' })
+    ]);
+    roots.svg.remove();
+    dim.remove();
+  }
+
+  /**
+   * Leaf Blade: four glowing green blade cuts slash across the target from
+   * different angles in quick succession (0-0.55 s), then a flurry of green
+   * leaves flies in from all round and lands on it (0.7-1.15 s).
+   */
+  private static async playLeafBlade(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const len = Math.max(r.width * 1.1, 80);
+
+    // 1. Four cuts, each a green blade drawn out round its left end.
+    const cuts: Promise<void>[] = [];
+    [35, 145, 80, 10].forEach((angle, i) => {
+      const blade = document.createElement('div');
+      blade.style.cssText = `position:absolute;width:${len}px;height:9px;pointer-events:none;clip-path:polygon(0 50%,50% 0,100% 50%,50% 100%);background:linear-gradient(90deg,#7AE05A00,#C8FFB0 30%,#F4FFE8 50%,#C8FFB0 70%,#7AE05A00);filter:drop-shadow(0 0 5px #3FCB4A)`;
+      const rad = (angle * Math.PI) / 180;
+      Fx.place(blade, { x: target.x - (Math.cos(rad) * len) / 2 + len / 2, y: target.y - (Math.sin(rad) * len) / 2 });
+      fxEl.appendChild(blade);
+      const delay = i * 140;
+      cuts.push(
+        Fx.anim(blade, [
+          { transform: `rotate(${angle}deg) scale(0,1)`, transformOrigin: '0 50%', opacity: 1 },
+          { transform: `rotate(${angle}deg) scale(1,1.3)`, transformOrigin: '0 50%', opacity: 1, offset: 0.4 },
+          { transform: `rotate(${angle}deg) scale(1,.3)`, transformOrigin: '0 50%', opacity: 0 }
+        ], { duration: 280, easing: 'ease-out', delay, fill: 'backwards' }).then(() => blade.remove())
+      );
+      setTimeout(() => {
+        Fx.flash(targetEl, '#7AE05A', 0.5);
+        Fx.shake(targetEl, 4);
+      }, delay + 100);
+    });
+    await Promise.all(cuts);
+    await Fx.wait(150);
+
+    // 2. Leaves fly in from all round onto the target.
+    const leaves: Promise<void>[] = [];
+    const reach = Math.max(r.width * 1.1, 80);
+    for (let i = 0; i < 12; i++) {
+      const leaf = GrassMoveAnimations.leafGlyph(12 + Math.random() * 8);
+      Fx.place(leaf, target);
+      fxEl.appendChild(leaf);
+      const ang = (Math.PI * 2 * i) / 12 + Math.random() * 0.3;
+      const x = Math.cos(ang) * reach;
+      const y = Math.sin(ang) * reach * 0.8;
+      const spin = (Math.random() < 0.5 ? -1 : 1) * (360 + Math.random() * 180);
+      leaves.push(
+        Fx.anim(leaf, [
+          { transform: `translate(${x}px,${y}px) rotate(0deg) scale(1)`, opacity: 0 },
+          { transform: `translate(${x * 0.7}px,${y * 0.7}px) rotate(${spin * 0.3}deg) scale(1)`, opacity: 1, offset: 0.25 },
+          { transform: `translate(${(Math.random() * 2 - 1) * r.width * 0.2}px,${(Math.random() * 2 - 1) * r.height * 0.2}px) rotate(${spin}deg) scale(.6)`, opacity: 0 }
+        ], { duration: 360, easing: 'ease-in', delay: Math.random() * 120, fill: 'backwards' }).then(() => leaf.remove())
+      );
+    }
+    setTimeout(() => {
+      Fx.flash(targetEl, '#7AE05A', 0.6);
+      Fx.shake(targetEl, 5);
+    }, 380);
+    await Promise.all(leaves);
+    await Fx.wait(150);
+  }
+
+  /** A green leaf: pointed oval, lighter towards one tip (Frenzy Plant, Leaf Blade). */
+  private static leafGlyph(s: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${s}px;height:${s * 0.6}px;pointer-events:none;border-radius:0 100% 0 100%;background:linear-gradient(135deg,#9AF07A,#3AA840 60%,#22802A);opacity:.9`;
+    return el;
+  }
+
+  /** Green leaves and white motes drifting up across `layer` (`W` x `H` px) for about `total` ms. */
+  private static risingLeaves(layer: HTMLElement, W: number, H: number, total: number) {
+    for (let i = 0; i < 26; i++) {
+      const isLeaf = i % 3 !== 2;
+      const s = isLeaf ? 12 + Math.random() * 12 : 3 + Math.random() * 4;
+      const el = isLeaf ? GrassMoveAnimations.leafGlyph(s) : document.createElement('div');
+      if (!isLeaf) el.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff`;
+      el.style.left = `${Math.random() * W}px`;
+      el.style.top = `${H}px`;
+      layer.appendChild(el);
+      const sway = (Math.random() * 2 - 1) * 40;
+      const spin = (Math.random() * 2 - 1) * 360;
+      const dur = isLeaf ? 1100 + Math.random() * 600 : 800 + Math.random() * 400;
+      Fx.anim(el, [
+        { transform: 'translate(0,0) rotate(0deg)' },
+        { transform: `translate(${sway}px,${-(H + 30) * 0.5}px) rotate(${spin * 0.5}deg)`, offset: 0.5 },
+        { transform: `translate(${-sway * 0.5}px,${-(H + 30)}px) rotate(${spin}deg)` }
+      ], { duration: dur, easing: 'linear', delay: Math.random() * (total - dur), fill: 'backwards' }).then(() => el.remove());
+    }
+  }
+
+  /**
+   * Three twisted brown roots from `from` to `to` on a full-field SVG, arched
+   * up a little; `grow` draws them out along their length.
+   */
+  private static rootStrands(W: number, H: number, from: Point, to: Point) {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('width', `${W}`);
+    svg.setAttribute('height', `${H}`);
+    svg.setAttribute('style', 'position:absolute;left:0;top:0;overflow:visible;pointer-events:none;filter:drop-shadow(0 2px 2px #00000066)');
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const len = Math.hypot(dx, dy) || 1;
+    const nx = -dy / len;
+    const ny = dx / len;
+    const ctrl = { x: from.x + dx / 2, y: from.y + dy / 2 - len * 0.18 };
+    const paths: SVGPathElement[] = [];
+    for (let k = 0; k < 3; k++) {
+      const phase = (k * Math.PI * 2) / 3;
+      const pts: string[] = [];
+      for (let i = 0; i <= 40; i++) {
+        const t = i / 40;
+        const bx = (1 - t) * (1 - t) * from.x + 2 * (1 - t) * t * ctrl.x + t * t * to.x;
+        const by = (1 - t) * (1 - t) * from.y + 2 * (1 - t) * t * ctrl.y + t * t * to.y;
+        const amp = 7 * Math.sin(Math.PI * Math.min(1, t * 1.15));
+        const off = amp * Math.sin(t * Math.PI * 5 + phase);
+        pts.push(`${(bx + nx * off).toFixed(1)},${(by + ny * off).toFixed(1)}`);
+      }
+      const d = `M${pts.join(' L')}`;
+      for (const [color, width] of [['#3A2410', 9], ['#8A5A2A', 6], ['#C89A5A', 2]] as const) {
+        const path = document.createElementNS(ns, 'path');
+        path.setAttribute('d', d);
+        path.setAttribute('fill', 'none');
+        path.setAttribute('stroke', color);
+        path.setAttribute('stroke-width', `${width}`);
+        path.setAttribute('stroke-linecap', 'round');
+        path.setAttribute('stroke-linejoin', 'round');
+        path.setAttribute('pathLength', '1');
+        path.setAttribute('stroke-dasharray', '1 1');
+        path.setAttribute('stroke-dashoffset', '1');
+        svg.appendChild(path);
+        paths.push(path);
+      }
+    }
+    const grow = (ms: number) =>
+      Promise.all(
+        paths.map((p) => Fx.anim(p, [{ strokeDashoffset: 1 }, { strokeDashoffset: 0 }], { duration: ms, easing: 'ease-out', fill: 'forwards' }))
+      ).then(() => void 0);
+    return { svg, grow };
+  }
 
   /** A soft, glowing yellow ball of sunlight. */
   private static sunMote(s: number): HTMLElement {

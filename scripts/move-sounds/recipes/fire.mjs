@@ -278,12 +278,18 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic field (shake + waves ~0.6 s) + burn fleck (~0.7 s): a rolling blast of scorching air over all foes. */
+  /**
+   * FireRangedMoveAnimations.playHeatWave: the scene turns red (0-0.3 s),
+   * scorching air blows across (0.3-1.6 s), the target flashes red
+   * (0.9 / 1.12 / 1.34 s); the tint clears (~1.6-1.95 s).
+   */
   heatwave: () => {
-    const s = new MoveSfx(1.25, 0x4ea7);
-    s.noise(0.0, 0.75, { clock: (u) => 900 + 400 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.42) });
-    s.wave(0.0, 0.7, { freq: (u) => 180 + 60 * Math.sin(2 * Math.PI * 5 * u), gain: env.swell(0.2) });
-    s.burn(0.7);
+    const s = new MoveSfx(2.0, 0x4ea7);
+    s.noise(0.1, 1.6, { clock: (u) => 900 + 400 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.42) });
+    s.wave(0.1, 1.55, { freq: (u) => 180 + 60 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.2) });
+    s.whoosh(0.3, 0.6, { from: 800, to: 3000, gain: 0.2 });
+    s.whoosh(0.8, 0.6, { from: 900, to: 3200, gain: 0.2 });
+    s.burn(0.9);
     return s;
   },
 

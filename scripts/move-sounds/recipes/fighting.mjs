@@ -188,14 +188,22 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee punch at max power (impact at 0.17 s): a tightening focus hum, then a crushing blow. */
+  /**
+   * FightingMoveAnimations.playFocusPunch: a steel girder lands on the user's
+   * head (0.18 s) while red streaks rush up (to 1.0 s); the blue burst flares
+   * (1.0-1.25 s) and the red fist slams into the target (1.41 s).
+   */
   focuspunch: () => {
-    const s = new MoveSfx(0.95, 0xf0c9);
-    s.pulse(0.0, 0.16, { freq: (u) => 180 + 200 * u, gain: env.ramp(0.08, 0.22), duty: 0.5 });
-    s.whoosh(0.04, 0.13, { from: 2000, to: 8000, gain: 0.3 });
-    s.thud(0.17, 0.9, 1);
-    s.noise(0.17, 0.12, { clock: () => 12000, gain: env.decay(0.4, 1) });
-    s.rumble(0.2, 0.55, { from: 450, to: 120, gain: 0.3 });
+    const s = new MoveSfx(2.3, 0xf0c9);
+    s.thud(0.18, 0.45, 0.3);
+    s.pulse(0.18, 0.05, { freq: () => 880, gain: env.decay(0.18, 2), duty: 0.25 });
+    s.pulse(0.2, 0.8, { freq: (u) => 160 + 260 * u, gain: env.ramp(0.06, 0.2), duty: 0.5 });
+    s.whoosh(0.3, 0.7, { from: 1500, to: 7000, gain: 0.22 });
+    s.noise(1.0, 0.3, { clock: (u) => 3000 + 9000 * u, gain: env.swell(0.2) });
+    s.whoosh(1.25, 0.16, { from: 2000, to: 9000, gain: 0.3 });
+    s.thud(1.41, 0.9, 1);
+    s.noise(1.41, 0.12, { clock: () => 12000, gain: env.decay(0.4, 1) });
+    s.rumble(1.44, 0.6, { from: 450, to: 120, gain: 0.3 });
     return s;
   },
 

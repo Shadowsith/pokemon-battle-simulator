@@ -79,6 +79,27 @@ export class FxGlyphs {
   }
 
   /**
+   * A white cartoon glove pointing up with its index finger, `w` px wide
+   * (the wrist cuff is at the bottom centre, so wag it with transform-origin
+   * `50% 100%`) (Follow Me).
+   */
+  static pointingHandGlyph(w: number, fill = '#ffffff', edge = '#9A9AA6'): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${w * 1.5}px;pointer-events:none;filter:drop-shadow(0 0 2px #00000077)`;
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 24 36">' +
+      `<g fill="${fill}" stroke="${edge}" stroke-width="1.2" stroke-linejoin="round">` +
+      '<rect x="7" y="29" width="11" height="6" rx="1.5"/>' +
+      '<rect x="9" y="1.5" width="5.4" height="17" rx="2.7"/>' +
+      '<path d="M5,17 C5,14.5 7,13.5 9,14 H19 C21.5,14 22,16 22,18 V24 C22,28 19,30 15,30 H10 C7,30 5,28 5,25 Z"/>' +
+      '<rect x="0.8" y="17" width="8.5" height="4.6" rx="2.3" transform="rotate(-20 5 19)"/>' +
+      '</g>' +
+      `<path d="M14.6,18.5 H21.5 M14.6,22.5 H21.5" stroke="${edge}" stroke-width="0.9" stroke-linecap="round"/>` +
+      '</svg>';
+    return el;
+  }
+
+  /**
    * A flat karate-chop hand seen from the side, `w` px long: fingers held
    * together pointing right, thumb tucked along the top, a short wrist on the
    * left; the bottom edge is the striking edge. Black with a white outline by default (Brick Break).
@@ -147,12 +168,12 @@ export class FxGlyphs {
   }
 
   /** A classic five-point star, white with a soft `glow` (Cosmic Power). */
-  static fivePointStar(size: number, glow: string): HTMLElement {
+  static fivePointStar(size: number, glow: string, core = '#fff', edge = '#F0EAFF'): HTMLElement {
     // The glow sits on a wrapper: clip-path on the same element would cut the drop-shadow off.
     const el = document.createElement('div');
     el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 3px ${glow}) drop-shadow(0 0 6px ${glow})`;
     const shape = document.createElement('div');
-    shape.style.cssText = 'width:100%;height:100%;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:radial-gradient(circle at 50% 55%,#fff 0 45%,#F0EAFF)';
+    shape.style.cssText = `width:100%;height:100%;clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);background:radial-gradient(circle at 50% 55%,${core} 0 45%,${edge})`;
     el.appendChild(shape);
     return el;
   }
@@ -234,6 +255,23 @@ export class FxGlyphs {
       `<g fill="${c.edge}" stroke="${c.edge}" stroke-width="1.6">${shapes}</g>` +
       `<g fill="${c.fill}">${shapes}</g>` +
       `<path d="M11,6.5 H21 M11,10 H21 M11,13.5 H21" stroke="${c.lines}" stroke-width="1" stroke-linecap="round"/>`;
+    return svg;
+  }
+
+  /** A red steel I-beam (girder) lying sideways, seen slightly from below: top flange, web with rivet holes, bottom flange. */
+  static girderGlyph(w: number): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 60 12');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${w * (12 / 60)}px;filter:drop-shadow(0 2px 2px #00000066)`);
+    let holes = '';
+    for (let x = 6; x < 60; x += 8) holes += `<circle cx="${x}" cy="6" r="0.9"/>`;
+    svg.innerHTML =
+      '<rect x="0" y="3.5" width="60" height="5" fill="#8E1414"/>' +
+      '<rect x="0" y="0" width="60" height="3.5" rx="0.6" fill="#D8342A" stroke="#6E1010" stroke-width="0.6"/>' +
+      '<rect x="0" y="8.5" width="60" height="3.5" rx="0.6" fill="#B82020" stroke="#6E1010" stroke-width="0.6"/>' +
+      '<path d="M0.5,0.9 H59.5" stroke="#FF8A7A" stroke-width="0.6"/>' +
+      `<g fill="#4A0808">${holes}</g>`;
     return svg;
   }
 

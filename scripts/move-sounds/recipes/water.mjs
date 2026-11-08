@@ -119,14 +119,20 @@ export const WATER = {
     return s;
   },
 
-  /** Generic beam (grows 0.26 s, holds 0.38 s, fades 0.2 s): a roaring high-pressure water blast. */
+  /**
+   * WaterMoveAnimations.playHydroCannon: dark while a water ball gathers
+   * (0.3-1.1 s), the bright sea fades in (1.1-1.4 s), the fat jet fires
+   * (1.4 s) and hits five times (1.6-2.2 s), thins out (2.3-2.6 s).
+   */
   hydrocannon: () => {
-    const s = new MoveSfx(1.1, 0x4dca);
-    s.noise(0.0, 0.84, { clock: (u) => 4000 + 3000 * Math.min(1, u * 3), gain: (u) => 0.35 * Math.min(1, u * 3) * (u > 0.76 ? (1 - u) / 0.24 : 1) });
-    s.pulse(0.0, 0.84, { freq: (u) => 140 + 40 * Math.sin(2 * Math.PI * 12 * u), gain: (u) => 0.18 * Math.min(1, u * 3) * (u > 0.76 ? (1 - u) / 0.24 : 1), duty: 0.5 });
-    s.splash(0.26, 0.6);
-    s.splash(0.5, 0.4);
-    s.bubbles(0.6, 0.45, 7, { gain: 0.13 });
+    const s = new MoveSfx(3.0, 0x4dca);
+    s.wave(0.3, 0.8, { freq: (u) => 200 + 300 * u + 20 * Math.sin(2 * Math.PI * 9 * u), gain: env.ramp(0.04, 0.2) });
+    s.bubbles(0.3, 0.7, 9, { lo: 400, hi: 1100, gain: 0.14 });
+    s.noise(1.1, 0.3, { clock: (u) => 2000 + 4000 * u, gain: env.ramp(0.05, 0.2) });
+    s.noise(1.4, 1.2, { clock: () => 6000, gain: (u) => 0.38 * Math.min(1, u * 8) * (u > 0.75 ? (1 - u) / 0.25 : 1) });
+    s.pulse(1.4, 1.2, { freq: (u) => 120 + 40 * Math.sin(2 * Math.PI * 14 * u), gain: (u) => 0.2 * Math.min(1, u * 8) * (u > 0.75 ? (1 - u) / 0.25 : 1), duty: 0.5 });
+    for (let i = 0; i < 5; i++) s.splash(1.6 + i * 0.15, i === 0 ? 0.7 : 0.4);
+    s.bubbles(2.3, 0.5, 7, { gain: 0.13 });
     return s;
   },
 
@@ -146,14 +152,18 @@ export const WATER = {
     return s;
   },
 
-  /** Generic field move (~0.6 s) + stat-down fleck: a heavy wave of muddy water crashes over the foes. */
+  /** SurfWave.play with the mud style: same timing as Surf (wave rises 0-0.57 s, rolls in to 1.3 s, crashes), with a thicker, sludgier sound. */
   muddywater: () => {
-    const s = new MoveSfx(1.35, 0x3dd7);
-    s.noise(0.0, 0.65, { clock: (u) => 2500 + 2500 * Math.sin(Math.PI * u), gain: (u) => 0.4 * Math.min(1, u * 5) * Math.pow(1 - u, 0.8) });
-    s.rumble(0.0, 0.6, { from: 400, to: 150, gain: 0.3 });
-    s.splash(0.25, 0.35);
-    s.bubbles(0.1, 0.45, 6, { lo: 150, hi: 400, gain: 0.14 });
-    s.statDown(0.65, 0.22);
+    const s = new MoveSfx(2.6, 0x3dd7);
+    s.noise(0.0, 0.57, { clock: env.ramp(600, 1600), gain: env.swell(0.22) });
+    s.noise(0.57, 0.75, { clock: (u) => 1000 + 3000 * u, gain: (u) => 0.42 * Math.min(1, u * 3) });
+    s.rumble(0.57, 0.75, { from: 180, to: 380, gain: 0.32 });
+    s.bubbles(0.6, 0.6, 6, { lo: 150, hi: 400, gain: 0.12 });
+    s.splash(1.3, 0.5);
+    s.thud(1.3, 0.4, 0.6);
+    s.noise(1.3, 0.8, { clock: env.ramp(4000, 800), gain: env.attackDecay(0.35, 0.05) });
+    s.bubbles(1.4, 0.8, 8, { lo: 150, hi: 450, gain: 0.14 });
+    s.noise(2.15, 0.4, { clock: () => 600, gain: env.decay(0.12, 1) });
     return s;
   },
 

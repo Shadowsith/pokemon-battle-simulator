@@ -13,6 +13,7 @@ export class FightingMoveAnimations {
     crosschop: (refs, _launch, target) => FightingMoveAnimations.playCrossChop(refs, target),
     detect: (refs, launch) => FightingMoveAnimations.playDetect(refs, launch),
     dynamicpunch: (refs, _launch, target) => FightingMoveAnimations.playDynamicPunch(refs, target),
+    focuspunch: (refs, launch, target) => FightingMoveAnimations.playFocusPunch(refs, launch, target),
     highjumpkick: (refs, _launch, target, v) => FightingMoveAnimations.playHighJumpKick(refs, target, v),
     jumpkick: (refs, launch, target) => FightingMoveAnimations.playJumpKick(refs, launch, target),
     lowkick: (refs, _launch, target) => FightingMoveAnimations.playLowKick(refs, target),
@@ -20,6 +21,84 @@ export class FightingMoveAnimations {
     submission: (refs, _launch, target) => FightingMoveAnimations.playSubmission(refs, target),
     vitalthrow: (refs, _launch, target) => FightingMoveAnimations.playVitalThrow(refs, target)
   };
+
+  /**
+   * Focus Punch: a red steel girder drops onto the user's head and is held
+   * up there while red streaks rush upward round it (0-1.0 s); then the
+   * scene turns into a blue burst of white rays and a red fist slams into
+   * the target (1.41 s).
+   */
+  private static async playFocusPunch(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    // 1. Girder over the user's head, with red streaks rushing up.
+    const girderW = Math.max(lr.width * 1.15, 70);
+    const girder = FxGlyphs.girderGlyph(girderW);
+    const top = { x: launch.x, y: launch.y - lr.height * 0.45 };
+    Fx.place(girder, top);
+    fxEl.appendChild(girder);
+    const hold = Fx.anim(girder, [
+      { transform: 'translateY(-40px)', opacity: 0 },
+      { transform: 'translateY(4px)', opacity: 1, offset: 0.18 },
+      { transform: 'translateY(0)', opacity: 1, offset: 0.26 },
+      { transform: 'translateY(2px)', opacity: 1, offset: 0.6 },
+      { transform: 'translateY(0)', opacity: 1, offset: 0.9 },
+      { transform: 'translateY(-6px)', opacity: 0 }
+    ], { duration: 1000, easing: 'ease-out' }).then(() => girder.remove());
+    Fx.wait(180).then(() => Fx.shake(launchEl, 2));
+    for (let i = 0; i < 14; i++) {
+      const h = 18 + Math.random() * 22;
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;width:2px;height:${h}px;border-radius:1px;pointer-events:none;background:linear-gradient(#FF8A7A00,#FF5A4A 60%,#FFD0C8);box-shadow:0 0 4px #FF4A3A`;
+      Fx.place(streak, {
+        x: launch.x + (Math.random() * 2 - 1) * girderW * 0.55,
+        y: launch.y + lr.height * (0.1 + Math.random() * 0.35)
+      });
+      fxEl.appendChild(streak);
+      const rise = lr.height * (0.9 + Math.random() * 0.5);
+      Fx.anim(streak, [
+        { transform: 'translateY(0)', opacity: 0 },
+        { transform: `translateY(${-rise * 0.25}px)`, opacity: 1, offset: 0.25 },
+        { transform: `translateY(${-rise}px)`, opacity: 0 }
+      ], { duration: 320, easing: 'ease-in', delay: 150 + Math.random() * 650, fill: 'backwards' }).then(() => streak.remove());
+    }
+    await hold;
+
+    // 2. Blue burst backdrop, then the red fist slams in.
+    const blue = await FxEffects.burstBackdrop(fieldEl, target, 'blue');
+    const fistW = Math.max(tr.width * 0.55, 44);
+    const fist = FxGlyphs.fistGlyph(fistW, 'red');
+    Fx.place(fist, target);
+    fxEl.appendChild(fist);
+    await Fx.anim(fist, [{ transform: 'scale(2.4)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], {
+      duration: 160,
+      easing: 'ease-in',
+      fill: 'forwards'
+    });
+    const glow = FxGlyphs.spikyBurst(fistW * 2, '#FF9A9A', '#FFD0D0', '#ffffff');
+    Fx.place(glow, target);
+    fxEl.insertBefore(glow, fist);
+    const glowDone = Fx.anim(glow, [
+      { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+      { transform: 'scale(1.1) rotate(10deg)', opacity: 0.9, offset: 0.35 },
+      { transform: 'scale(1.25) rotate(18deg)', opacity: 0 }
+    ], { duration: 600, easing: 'ease-out' }).then(() => glow.remove());
+    Fx.flash(targetEl, '#FF6A5A', 0.8);
+    Fx.shake(targetEl, 7);
+    Fx.shakeField(fieldEl, 1);
+    const fistDone = Fx.anim(fist, [
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: 'scale(1.05)', opacity: 1, offset: 0.6 },
+      { transform: 'scale(.9)', opacity: 0 }
+    ], { duration: 600, easing: 'ease-in' }).then(() => fist.remove());
+    await Promise.all([glowDone, fistDone]);
+
+    // 3. The backdrop clears.
+    await Fx.anim(blue, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    blue.remove();
+  }
 
   /**
    * Submission: caster and target tumble together - both run two laps round
@@ -215,7 +294,7 @@ export class FightingMoveAnimations {
     const f = Fx.rect(fieldEl);
 
     // 1. Red burst backdrop (0-0.25 s), flickering behind the sprites.
-    const red = await FxEffects.redBurstBackdrop(fieldEl, target);
+    const red = await FxEffects.burstBackdrop(fieldEl, target);
 
     // 2. The fist slams in (0.25-0.42 s) over an orange blast; stones fly out.
     const fistW = Math.max(r.width * 0.55, 44);

@@ -111,15 +111,19 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Sonic (4 rings every 0.11 s, impact 0.43 s): a booming, ringing shout that hits all foes. */
+  /**
+   * NormalRangedMoveAnimations.playHyperVoice: three sound rings fly out
+   * (0 / 0.16 / 0.32 s) and hit the target (0.5 / 0.66 / 0.82 s).
+   */
   hypervoice: () => {
-    const s = new MoveSfx(1.0, 0x4f0c);
-    for (let i = 0; i < 4; i++) {
-      s.pulse(i * 0.11, 0.14, { freq: (u) => 740 - 120 * u, gain: env.attackDecay(0.24, 0.1), duty: 0.5 });
-      s.pulse(i * 0.11, 0.14, { freq: (u) => 1110 - 180 * u, gain: env.attackDecay(0.12, 0.1), duty: 0.25 });
+    const s = new MoveSfx(1.3, 0x4f0c);
+    for (let i = 0; i < 3; i++) {
+      const at = i * 0.16;
+      s.pulse(at, 0.45, { freq: (u) => 740 - 160 * u, gain: env.attackDecay(0.22, 0.1), duty: 0.5 });
+      s.pulse(at, 0.45, { freq: (u) => 1110 - 240 * u, gain: env.attackDecay(0.1, 0.1), duty: 0.25 });
+      s.noise(at + 0.5, 0.18, { clock: env.ramp(8000, 3000), gain: env.attackDecay(0.26, 0.05) });
+      s.pulse(at + 0.5, 0.2, { freq: () => 620, gain: env.decay(0.18, 1.5), duty: 0.5 });
     }
-    s.noise(0.43, 0.35, { clock: env.ramp(8000, 3000), gain: env.attackDecay(0.3, 0.05) });
-    s.pulse(0.43, 0.45, { freq: (u) => 620 * (1 + 0.03 * Math.sin(2 * Math.PI * 10 * u)), gain: env.decay(0.25, 1.5), duty: 0.5 });
     return s;
   },
 

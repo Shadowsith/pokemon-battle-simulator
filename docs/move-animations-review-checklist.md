@@ -329,40 +329,40 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [x] ⭐ **Dragon Dance** / Drachentanz — `dragondance` · Dragon · Status · user turns magenta red inside a swirling dark red storm with small cyan lightning flickers, then orange stat sparkles (custom, needs review)
 - [ ] **Endeavor** / Notsituation — `endeavor` · Normal · Physical · `melee`
 - [x] ⭐ **Eruption** / Eruption — `eruption` · Fire · Special · red-hot backdrop, a fountain of fire, embers and stones erupts from the user's top, then hot stones rain down round the target with smoke puffs and flames (custom, needs review)
-- [ ] ⭐ **Extrasensory** / Sondersensor — `extrasensory` · Psychic · Special · `projectile`
-- [ ] ⭐ **Facade** / Fassade — `facade` · Normal · Physical · `melee`
+- [x] ⭐ **Extrasensory** / Sondersensor — `extrasensory` · Psychic · Special · dark scene, four red rings with an orange glow burst out of the user one after another, then the target shudders very fast (custom, needs review)
+- [x] ⭐ **Facade** / Fassade — `facade` · Normal · Physical · user glows yellow-green, red and blue while three waves of coloured orbs pop off it in all directions, then a white starburst hits the target (custom, needs review)
 - [ ] **Fake Out** / Mogelhieb — `fakeout` · Normal · Physical · `melee`
 - [ ] **Fake Tears** / Trugträne — `faketears` · Dark · Status · `selfAura`
 - [ ] **Feather Dance** / Daunenreigen — `featherdance` · Flying · Status · `selfAura`
 - [ ] **Flatter** / Schmeichler — `flatter` · Dark · Status · `selfAura`
-- [ ] ⭐ **Focus Punch** / Power-Punch — `focuspunch` · Fighting · Physical · `melee`
-- [ ] ⭐ **Follow Me** / Spotlight — `followme` · Normal · Status · `selfAura`
-- [ ] ⭐ **Frenzy Plant** / Flora-Statue — `frenzyplant` · Grass · Special · `projectile`
+- [x] ⭐ **Focus Punch** / Power-Punch — `focuspunch` · Fighting · Physical · a red steel girder drops onto the user's head while red streaks rush up, then a blue backdrop with white burst rays and a red fist slams into the target (custom, needs review)
+- [x] ⭐ **Follow Me** / Spotlight — `followme` · Normal · Status · a white glove with its index finger up whirls twice round the user, then rises above its head and wags its finger (custom, needs review)
+- [x] ⭐ **Frenzy Plant** / Flora-Statue — `frenzyplant` · Grass · Special · dark scene turns into a bright green glade with light rays, rising leaves and white motes, then three twisted roots grow from the user to the target and strike it with a green burst (custom, needs review)
 - [ ] **Grass Whistle** / Grasflöte — `grasswhistle` · Grass · Status · `targetAura`
 - [ ] **Grudge** / Nachspiel — `grudge` · Ghost · Status · `selfAura`
-- [ ] ⭐ **Hail** / Hagelsturm — `hail` · Ice · Status · `weather`
-- [ ] ⭐ **Heat Wave** / Hitzewelle — `heatwave` · Fire · Special · `field`
+- [x] ⭐ **Hail** / Hagelsturm — `hail` · Ice · Status · scene darkens to a cold grey-blue, then a storm of large see-through hailstones pelts down at a slant while white sparkles twinkle (custom, needs review)
+- [x] ⭐ **Heat Wave** / Hitzewelle — `heatwave` · Fire · Special · scene takes on a light red tint, blurry streaks of scorching air blow across the field from the user's side to the foe's, target shimmers in the heat and flashes red (custom, needs review)
 - [ ] ⭐ **Helping Hand** / Rechte Hand — `helpinghand` · Normal · Status · `targetAura`
 - [ ] **Howl** / Jauler — `howl` · Normal · Status · `selfAura`
-- [ ] ⭐ **Hydro Cannon** / Aquahaubitze — `hydrocannon` · Water · Special · `beam`
-- [ ] ⭐ **Hyper Voice** / Schallwelle — `hypervoice` · Normal · Special · `sonic`
+- [x] ⭐ **Hydro Cannon** / Aquahaubitze — `hydrocannon` · Water · Special · dark scene while a big water ball gathers in front of the user, then a bright rushing blue sea and a very fat water jet blasts from the ball into the target (custom, needs review)
+- [x] ⭐ **Hyper Voice** / Schallwelle — `hypervoice` · Normal · Special · three thick orange-red sound rings with a yellow glow fly to the target, swelling as they go; each hit pops small orange rings on the target (custom, needs review)
 - [ ] **Ice Ball** / Frostbeule — `iceball` · Ice · Physical · `lob`
 - [ ] **Icicle Spear** / Eisspeer — `iciclespear` · Ice · Physical · `projectile`
 - [ ] **Imprison** / Begrenzer — `imprison` · Psychic · Status · `selfAura`
 - [ ] **Ingrain** / Verwurzler — `ingrain` · Grass · Status · `selfAura`
-- [ ] ⭐ **Iron Defense** / Eisenabwehr — `irondefense` · Steel · Status · `selfAura`
+- [x] ⭐ **Iron Defense** / Eisenabwehr — `irondefense` · Steel · Status · background blinks white twice, user turns shiny metallic silver and gleams twice with glints, then an orange-red stat-up aura rises over it (custom, needs review)
 - [ ] **Knock Off** / Abschlag — `knockoff` · Dark · Physical · `melee`
-- [ ] ⭐ **Leaf Blade** / Laubklinge — `leafblade` · Grass · Physical · `melee`
-- [ ] ⭐ **Luster Purge** / Scheinwerfer — `lusterpurge` · Psychic · Special · `projectile`
-- [ ] ⭐ **Magic Coat** / Magiemantel — `magiccoat` · Psychic · Status · `selfAura`
+- [x] ⭐ **Leaf Blade** / Laubklinge — `leafblade` · Grass · Physical · four glowing green blade cuts slash across the target from different angles in quick succession, then green leaves fly in from all round onto it (custom, needs review)
+- [x] ⭐ **Luster Purge** / Scheinwerfer — `lusterpurge` · Psychic · Special · pale white scene, the user shines white at the heart of a light burst whose rays sweep the screen, then quick black bursts strike the target while the scene stays white (custom, needs review)
+- [x] ⭐ **Magic Coat** / Magiemantel — `magiccoat` · Psychic · Status · a glowing magenta sphere swells round the user and a see-through white card appears in front of it, a sheen sweeps the card while purple sparkles twinkle (custom, needs review)
 - [ ] **Magical Leaf** / Zauberblatt — `magicalleaf` · Grass · Special · `projectile`
 - [ ] **Memento** / Memento-Mori — `memento` · Dark · Status · `selfAura`
 - [ ] **Metal Sound** / Metallsound — `metalsound` · Steel · Status · `selfAura`
-- [ ] ⭐ **Meteor Mash** / Sternenhieb — `meteormash` · Steel · Physical · `melee`
+- [x] ⭐ **Meteor Mash** / Sternenhieb — `meteormash` · Steel · Physical · black scene, yellow shooting stars streak past the target, then a yellow fist slams into it and stars burst out of the fist in all directions (custom, needs review)
 - [ ] ⭐ **Mist Ball** / Nebelball — `mistball` · Psychic · Special · `lob`
 - [ ] **Mud Shot** / Lehmschuss — `mudshot` · Ground · Special · `projectile`
 - [ ] **Mud Sport** / Lehmsuhler — `mudsport` · Ground · Status · `targetAura`
-- [ ] ⭐ **Muddy Water** / Lehmbrühe — `muddywater` · Water · Special · `field`
+- [x] ⭐ **Muddy Water** / Lehmbrühe — `muddywater` · Water · Special · like Surf with brown muddy water: a curling brown wave with cream foam rises, the field floods brown, the wave rolls over to the target and crashes onto it in brown splashes (custom, needs review)
 - [ ] **Nature Power** / Natur-Kraft — `naturepower` · Normal · Status · `targetAura`
 - [ ] **Needle Arm** / Nietenranke — `needlearm` · Grass · Physical · `melee`
 - [ ] **Odor Sleuth** / Schnüffler — `odorsleuth` · Normal · Status · `targetAura`

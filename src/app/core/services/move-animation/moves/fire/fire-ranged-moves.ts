@@ -18,9 +18,71 @@ export class FireRangedMoveAnimations {
       await DeliveryAnimations.playDelivery(refs, launch, target, v);
       await FireRangedMoveAnimations.playVortex(refs, v);
     },
+    heatwave: (refs, _launch, _target, v) => FireRangedMoveAnimations.playHeatWave(refs, v),
     flamethrower: (refs, launch, target, v) => FireRangedMoveAnimations.playFlamethrower(refs, launch, target, v),
     sacredfire: (refs, _launch, target) => FireRangedMoveAnimations.playSacredFire(refs, target)
   };
+
+  /**
+   * Heat Wave: the scene takes on a light red tint (0-0.3 s), then blurry
+   * streaks of scorching air blow across the whole field from the user's
+   * side to the foe's (0.3-1.6 s); the target shimmers in the heat and
+   * flashes red (from ~0.9 s); the tint clears (~1.6-1.95 s).
+   */
+  private static async playHeatWave(refs: BattleStageRefs, v: MoveVisual) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const tint = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#F2A08A,#E0624A 55%,#C8442E)');
+    await Fx.anim(tint, [{ opacity: 0 }, { opacity: 0.55 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+
+    // Hot-air streaks, in a clipped layer over the whole field.
+    const air = document.createElement('div');
+    air.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fxEl.appendChild(air);
+    const blow = 1300;
+    const streaks: Promise<void>[] = [];
+    for (let i = 0; i < 30; i++) {
+      const len = W * (0.25 + Math.random() * 0.35);
+      const thick = 5 + Math.random() * 12;
+      const y = Math.random() * H;
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;left:0;top:${y}px;width:${len}px;height:${thick}px;border-radius:${thick}px;filter:blur(${2 + thick * 0.2}px);background:linear-gradient(90deg,#FFB08000,#FFC8A0aa 30%,#FFF0DCcc 55%,#FF9A6A88 80%,#FFB08000)`;
+      air.appendChild(streak);
+      const start = v.dir > 0 ? -len : W;
+      const end = v.dir > 0 ? W : -len;
+      const wob = 4 + Math.random() * 6;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 6; k++) {
+        const t = k / 6;
+        frames.push({ transform: `translate(${start + (end - start) * t}px,${Math.sin(t * Math.PI * 3) * wob}px)`, opacity: k === 0 || k === 6 ? 0 : 0.9 });
+      }
+      const dur = 550 + Math.random() * 300;
+      streaks.push(
+        Fx.anim(streak, frames, { duration: dur, easing: 'linear', delay: Math.random() * (blow - dur), fill: 'backwards' }).then(() =>
+          streak.remove()
+        )
+      );
+    }
+
+    // The target wavers in the heat and flashes red.
+    const original = targetEl.style.transform;
+    const shimmer: Keyframe[] = [];
+    for (let k = 0; k <= 10; k++) {
+      const a = k === 0 || k === 10 ? 0 : (k % 2 ? 1 : -1);
+      shimmer.push({ transform: `${original} skewX(${a * 6}deg) scaleY(${1 + a * 0.03})` });
+    }
+    const heat = Fx.wait(600).then(() => {
+      for (let i = 0; i < 3; i++) setTimeout(() => Fx.flash(targetEl, '#FF5A2A', 0.6), i * 220);
+      return Fx.anim(targetEl, shimmer, { duration: 700, easing: 'ease-in-out', fill: 'none' });
+    });
+    await Promise.all([...streaks, heat]);
+    targetEl.style.transform = original;
+    air.remove();
+
+    await Fx.anim(tint, [{ opacity: 0.55 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    tint.remove();
+  }
 
   /**
    * Eruption: the scene glows red-hot (0-0.3 s); a volcano erupts from the

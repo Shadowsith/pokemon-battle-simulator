@@ -226,6 +226,41 @@ export class FxEffects {
     await Fx.wait(1200);
   }
 
+  /**
+   * Classic stat-up aura (~800 ms): bands of orange-red light scroll up
+   * through an oval over the caster while it glows orange (Iron Defense).
+   */
+  static async statUpAura(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const w = Math.max(r.width * 1.05, 50);
+    const h = Math.max(r.height * 1.05, 50);
+    const aura = document.createElement('div');
+    const mask = 'radial-gradient(ellipse 50% 50% at 50% 50%,#000 55%,#0000 100%)';
+    aura.style.cssText =
+      `position:absolute;width:${w}px;height:${h}px;pointer-events:none;mix-blend-mode:screen;` +
+      'background:repeating-linear-gradient(0deg,#FF5A1A00 0 4px,#FF6A1Add 4px 9px,#FFC24Aee 9px 12px,#FF5A1A00 12px 22px);' +
+      `-webkit-mask-image:${mask};mask-image:${mask}`;
+    Fx.place(aura, launch);
+    fxEl.appendChild(aura);
+    const scroll = aura.animate([{ backgroundPosition: '0 0' }, { backgroundPosition: '0 -44px' }], { duration: 400, iterations: Infinity });
+    const glow = Fx.anim(launchEl, [
+      { filter: 'brightness(1) drop-shadow(0 0 0 #fff0)' },
+      { filter: 'brightness(1.2) sepia(.6) saturate(2) hue-rotate(-20deg) drop-shadow(0 0 8px #FF7A2A)', offset: 0.3 },
+      { filter: 'brightness(1.2) sepia(.6) saturate(2) hue-rotate(-20deg) drop-shadow(0 0 8px #FF7A2A)', offset: 0.7 },
+      { filter: 'brightness(1) drop-shadow(0 0 0 #fff0)' }
+    ], { duration: 800, easing: 'ease-in-out', fill: 'none' });
+    await Fx.anim(aura, [
+      { opacity: 0, transform: 'scaleY(.8)' },
+      { opacity: 1, transform: 'scaleY(1)', offset: 0.2 },
+      { opacity: 1, transform: 'scaleY(1)', offset: 0.75 },
+      { opacity: 0, transform: 'scaleY(1.05)' }
+    ], { duration: 800, easing: 'ease-in-out' });
+    await glow;
+    scroll.cancel();
+    aura.remove();
+  }
+
   /** Sleep: "Z"s float up from `head` one after another, drifting sideways (`away`) and growing as they rise (Rest, Sleep Powder). */
   static sleepZs(fxEl: HTMLElement, head: Point, away: number, colors: string[]): Promise<void> {
     const zs: Promise<void>[] = [];
@@ -311,26 +346,27 @@ export class FxEffects {
   }
 
   /**
-   * A red backdrop with flickering yellow burst rays centred on `at`, behind
-   * the sprites (Dynamic Punch, Megahorn). Resolves once it has faded in;
-   * the caller fades it out and removes it.
+   * A backdrop with flickering burst rays centred on `at`, behind the sprites:
+   * red with yellow rays (Dynamic Punch, Megahorn) or blue with white rays
+   * (Focus Punch). Resolves once it has faded in; the caller fades it out and removes it.
    */
-  static async redBurstBackdrop(fieldEl: HTMLElement, at: Point): Promise<HTMLElement> {
+  static async burstBackdrop(fieldEl: HTMLElement, at: Point, tone: keyof typeof BURST_TONES = 'red'): Promise<HTMLElement> {
+    const t = BURST_TONES[tone];
     const c = `${at.x}px ${at.y}px`;
-    const red = Fx.backdrop(fieldEl, `background:radial-gradient(circle at ${c},#FF4A1A,#D0140E 35%,#6A0404 85%)`);
+    const back = Fx.backdrop(fieldEl, `background:radial-gradient(circle at ${c},${t.bg[0]},${t.bg[1]} 35%,${t.bg[2]} 85%)`);
     const rays = document.createElement('div');
     rays.style.cssText =
       `position:absolute;inset:0;transform-origin:${c};` +
-      `background:radial-gradient(circle at ${c},#FFE07A 0 6%,#D0140E00 22%),` +
-      `repeating-conic-gradient(from 0deg at ${c},#FFC23A00 0 8deg,#FFB03Add 8deg 10deg,#FFE87A 10deg 11deg,#FFC23A00 11deg 20deg)`;
-    red.appendChild(rays);
+      `background:radial-gradient(circle at ${c},${t.core} 0 6%,#0000 22%),` +
+      `repeating-conic-gradient(from 0deg at ${c},#0000 0 8deg,${t.ray}dd 8deg 10deg,${t.rayHi} 10deg 11deg,#0000 11deg 20deg)`;
+    back.appendChild(rays);
     rays.animate([
       { transform: 'scale(1) rotate(0deg)', opacity: 0.85 },
       { transform: 'scale(1.06) rotate(1.5deg)', opacity: 1 },
       { transform: 'scale(1) rotate(0deg)', opacity: 0.85 }
     ], { duration: 160, iterations: 8 });
-    await Fx.anim(red, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' });
-    return red;
+    await Fx.anim(back, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+    return back;
   }
 
   /**
@@ -487,3 +523,9 @@ export interface ClawStyle {
   glow: [string, string];
   tip?: string;
 }
+
+/** Colours of {@link FxEffects.burstBackdrop}: backdrop gradient (centre → edge), core glow and rays. */
+const BURST_TONES = {
+  red: { bg: ['#FF4A1A', '#D0140E', '#6A0404'], core: '#FFE07A', ray: '#FFB03A', rayHi: '#FFE87A' },
+  blue: { bg: ['#D8F4FF', '#2AA8F0', '#0A3A8A'], core: '#FFFFFF', ray: '#E8F8FF', rayHi: '#FFFFFF' }
+};

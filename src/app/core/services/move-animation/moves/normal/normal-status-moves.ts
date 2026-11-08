@@ -10,6 +10,7 @@ export class NormalStatusMoveAnimations {
     batonpass: (refs, launch) => NormalStatusMoveAnimations.playBatonPass(refs, launch),
     bellydrum: (refs, launch) => NormalStatusMoveAnimations.playBellyDrum(refs, launch),
     encore: (refs, _launch, target) => NormalStatusMoveAnimations.playEncore(refs, target),
+    followme: (refs, launch) => NormalStatusMoveAnimations.playFollowMe(refs, launch),
     healbell: (refs, launch) => NormalStatusMoveAnimations.playHealBell(refs, launch),
     milkdrink: (refs, launch) => NormalStatusMoveAnimations.playMilkDrink(refs, launch),
     morningsun: (refs, launch) => NormalStatusMoveAnimations.playMorningSun(refs, launch),
@@ -21,6 +22,52 @@ export class NormalStatusMoveAnimations {
     swordsdance: (refs, launch) => NormalStatusMoveAnimations.playSwordsDance(refs, launch),
     whirlwind: (refs, _launch, target, v) => NormalStatusMoveAnimations.playWhirlwind(refs, target, v)
   };
+
+  /**
+   * Follow Me: a white glove with its index finger up whirls twice round the
+   * user (0-1.0 s; smaller and dimmer while it passes behind), then rises
+   * above the user's head and wags its finger four times (1.2-2.1 s).
+   */
+  private static async playFollowMe(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const w = Math.max(r.width * 0.32, 26);
+    const hand = FxGlyphs.pointingHandGlyph(w);
+    Fx.place(hand, launch);
+    fxEl.appendChild(hand);
+
+    // 1. Two laps round the user on a flat ellipse; the back half reads as further away.
+    const rx = Math.max(r.width * 0.65, 40);
+    const ry = Math.max(r.height * 0.18, 12);
+    const steps = 24;
+    const laps: Keyframe[] = [];
+    for (let k = 0; k <= steps; k++) {
+      const a = (k / steps) * Math.PI * 4;
+      const depth = (1 + Math.cos(a)) / 2; // 1 = in front, 0 = behind
+      laps.push({
+        transform: `translate(${Math.sin(a) * rx}px,${Math.cos(a) * ry}px) scale(${0.7 + 0.3 * depth})`,
+        opacity: k === 0 ? 0 : 0.55 + 0.45 * depth
+      });
+    }
+    await Fx.anim(hand, laps, { duration: 1000, easing: 'linear' });
+
+    // 2. Up above the head, then the finger wags.
+    const up = -r.height * 0.5 - w * 0.6;
+    await Fx.anim(hand, [{ transform: 'translate(0,0) scale(1)' }, { transform: `translate(0,${up}px) scale(1)` }], {
+      duration: 200,
+      easing: 'ease-out',
+      fill: 'forwards'
+    });
+    hand.style.transformOrigin = '50% 100%';
+    const wag: Keyframe[] = [{ transform: `translate(0,${up}px) rotate(0deg)` }];
+    for (let i = 0; i < 4; i++) {
+      wag.push({ transform: `translate(0,${up}px) rotate(-18deg)` }, { transform: `translate(0,${up}px) rotate(18deg)` });
+    }
+    wag.push({ transform: `translate(0,${up}px) rotate(0deg)` });
+    await Fx.anim(hand, wag, { duration: 900, easing: 'ease-in-out' });
+    await Fx.anim(hand, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in' });
+    hand.remove();
+  }
 
   /** Particle colours of Protect's barrier: green, white, light blue. */
   private static readonly PROTECT_COLORS = ['#86E8A8', '#FFFFFF', '#8FD0FF', '#B8F0D0', '#CFE8FF'];

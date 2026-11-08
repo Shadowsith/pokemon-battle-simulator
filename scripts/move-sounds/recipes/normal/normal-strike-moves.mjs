@@ -186,13 +186,18 @@ export const NORMAL_STRIKE = {
   },
 
 
-  /** Generic melee (impact 0.17 s): a gutsy, angry body slam. */
+  /**
+   * NormalBlowMoveAnimations.playFacade: the user glows in shifting colours
+   * while three waves of orbs pop off it (0.1 / 0.35 / 0.6 s), then a white
+   * starburst hits the target (0.95 s).
+   */
   facade: () => {
-    const s = new MoveSfx(0.7, 0xfacd);
-    s.whoosh(0.0, 0.17, { from: 1200, to: 5000, gain: 0.25 });
-    s.pulse(0.0, 0.15, { freq: env.ramp(180, 260), gain: env.ramp(0.05, 0.2), duty: 0.5 });
-    s.thud(0.17, 0.7, 0.8);
-    s.noise(0.17, 0.1, { clock: () => 5000, gain: env.decay(0.3, 1.5), short: true });
+    const s = new MoveSfx(1.4, 0xfacd);
+    s.pulse(0.0, 0.9, { freq: env.ramp(180, 300), gain: env.swell(0.14), duty: 0.5 });
+    for (let w = 0; w < 3; w++) s.sparkle(0.1 + w * 0.25, 0.2, 5, { lo: 1200 + w * 300, hi: 2600 + w * 400, gain: 0.16 });
+    s.whoosh(0.8, 0.15, { from: 1200, to: 5000, gain: 0.25 });
+    s.thud(0.95, 0.7, 0.8);
+    s.noise(0.95, 0.1, { clock: () => 5000, gain: env.decay(0.3, 1.5), short: true });
     return s;
   },
 

@@ -10,6 +10,7 @@ export class NormalBlowMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     dizzypunch: (refs, _launch, target, v) => NormalBlowMoveAnimations.playDizzyPunch(refs, target, v),
     doubleedge: (refs, launch, target, v) => NormalBlowMoveAnimations.playDoubleEdge(refs, launch, target, v),
+    facade: (refs, launch, target) => NormalBlowMoveAnimations.playFacade(refs, launch, target),
     extremespeed: (refs, launch, target, v) => NormalBlowMoveAnimations.playExtremeSpeed(refs, launch, target, v),
     headbutt: (refs, _launch, target, v) => NormalBlowMoveAnimations.playHeadbutt(refs, target, v),
     megakick: (refs, _launch, target) => NormalBlowMoveAnimations.playMegaKick(refs, target),
@@ -524,6 +525,72 @@ export class NormalBlowMoveAnimations {
 
     await burstShow;
     FxEffects.afterImpact(refs, launch, target, v);
+  }
+
+  /**
+   * Facade: the user glows yellow-green, red and blue in turn while three
+   * waves of coloured orbs pop off it in all directions (0-0.9 s), then a
+   * white starburst hits the target (0.95 s).
+   */
+  private static async playFacade(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { launchEl, targetEl, fxEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    // 1. Glow cycling through yellow-green, red and blue.
+    const glowFrames = ['#C8E84A', '#FF5A4A', '#5A8CFF', '#C8E84A'].map((c) => ({
+      filter: `brightness(1.25) drop-shadow(0 0 10px ${c}) drop-shadow(0 0 4px ${c})`
+    }));
+    const glow = Fx.anim(launchEl, [{ filter: 'brightness(1) drop-shadow(0 0 0 #fff0)' }, ...glowFrames, { filter: 'brightness(1) drop-shadow(0 0 0 #fff0)' }], {
+      duration: 900,
+      easing: 'ease-in-out',
+      fill: 'none'
+    });
+
+    // Coloured orbs pop off the user in all directions, in three waves.
+    const colors = ['#C8E84A', '#FF5A4A', '#5A8CFF', '#9A6AE0'];
+    const reach = Math.max(lr.width, lr.height) * 0.9 + 30;
+    const n = 9;
+    for (let w = 0; w < 3; w++) {
+      for (let i = 0; i < n; i++) {
+        const size = 8 + Math.random() * 8;
+        const c = colors[(i + w) % colors.length];
+        const orb = document.createElement('div');
+        orb.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 35%,#ffffffcc 0 15%,${c}dd 45%,${c}55 100%);box-shadow:0 0 6px ${c}aa`;
+        Fx.place(orb, launch);
+        fxEl.appendChild(orb);
+        const ang = (Math.PI * 2 * i) / n + w * 0.35 + Math.random() * 0.3;
+        const d = reach * (0.75 + Math.random() * 0.35);
+        const x = Math.cos(ang) * d;
+        const y = Math.sin(ang) * d * 0.8;
+        Fx.anim(orb, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${x * 0.3}px,${y * 0.3}px) scale(1)`, opacity: 1, offset: 0.2 },
+          { transform: `translate(${x}px,${y}px) scale(.7)`, opacity: 0 }
+        ], { duration: 420, easing: 'ease-out', delay: 100 + w * 250, fill: 'backwards' }).then(() => orb.remove());
+      }
+    }
+    await glow;
+    await Fx.wait(50);
+
+    // 2. White starburst hit on the target.
+    const size = Math.max(tr.width * 0.8, 56);
+    const flare = document.createElement('div');
+    flare.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 8px #ffffff)`;
+    const shape = document.createElement('div');
+    shape.style.cssText = 'width:100%;height:100%;clip-path:polygon(50% 0,56% 38%,85% 15%,62% 44%,100% 50%,62% 56%,85% 85%,56% 62%,50% 100%,44% 62%,15% 85%,38% 56%,0 50%,38% 44%,15% 15%,44% 38%);background:radial-gradient(circle,#fff 0 30%,#F4F6FF 50%,#E8ECFF00 78%)';
+    flare.appendChild(shape);
+    Fx.place(flare, target);
+    fxEl.appendChild(flare);
+    Fx.flash(targetEl, '#ffffff', 0.7);
+    Fx.shake(targetEl, 6);
+    await Fx.anim(flare, [
+      { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+      { transform: 'scale(1.1) rotate(15deg)', opacity: 1, offset: 0.35 },
+      { transform: 'scale(1.3) rotate(25deg)', opacity: 0 }
+    ], { duration: 450, easing: 'ease-out' });
+    flare.remove();
+    await Fx.wait(150);
   }
 
   /**

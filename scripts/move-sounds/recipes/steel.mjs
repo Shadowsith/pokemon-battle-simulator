@@ -89,15 +89,20 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Defense rise fleck (0.85 s): the body hardens with ringing metallic clangs. */
+  /**
+   * SteelMoveAnimations.playIronDefense: two white blinks (0 / 0.16 s), the
+   * user gleams silver twice (0.45-1.25 s, peaks 0.69 / 0.97 s), then the
+   * stat-up aura rises (1.3-2.1 s).
+   */
   irondefense: () => {
-    const s = new MoveSfx(1.5, 0x1d3f);
-    for (const at of [0.05, 0.3, 0.55]) {
+    const s = new MoveSfx(2.2, 0x1d3f);
+    for (const at of [0.0, 0.16]) s.pulse(at, 0.08, { freq: () => 2093, gain: env.decay(0.14, 1.5), duty: 0.25 });
+    s.wave(0.45, 0.8, { freq: () => 392, gain: env.swell(0.14) });
+    for (const at of [0.5, 0.69, 0.97]) {
       s.noise(at, 0.04, { clock: () => 8000, gain: env.decay(0.3, 1), short: true });
       s.pulse(at, 0.25, { freq: () => 1568 + at * 400, gain: env.decay(0.15, 2), duty: 0.5 });
     }
-    s.wave(0.0, 0.8, { freq: () => 392, gain: env.swell(0.14) });
-    s.statUp(0.85);
+    s.statUp(1.3);
     return s;
   },
 
@@ -167,15 +172,24 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic melee punch (lunge 0.17 s → impact): a comet-fast fist, a whistling dive into a heavy metallic clang. */
+  /**
+   * SteelMoveAnimations.playMeteorMash: black (0-0.25 s), six shooting stars
+   * streak past (0.25-1.0 s, every 0.075 s), the fist lands (1.15 s) and
+   * stars burst out; the scene clears (~1.7-2.0 s).
+   */
   meteormash: () => {
-    const s = new MoveSfx(0.75, 0x3e7e);
-    s.pulse(0.0, 0.17, { freq: env.ramp(900, 2400), gain: env.ramp(0.05, 0.16), duty: 0.125 });
-    s.whoosh(0.0, 0.18, { from: 3000, to: 11000, gain: 0.3 });
-    s.thud(0.17, 0.7, 0.8);
-    s.noise(0.17, 0.25, { clock: () => 9000, gain: env.decay(0.3, 2), short: true });
-    s.pulse(0.17, 0.45, { freq: () => 1568, gain: env.decay(0.16, 2), duty: 0.25 });
-    s.pulse(0.17, 0.45, { freq: () => 2217, gain: env.decay(0.1, 2.5), duty: 0.5 });
+    const s = new MoveSfx(2.1, 0x3e7e);
+    for (let i = 0; i < 6; i++) {
+      const at = 0.25 + i * 0.075;
+      s.pulse(at, 0.3, { freq: (u) => (2400 + i * 150) * (1 - 0.5 * u), gain: env.decay(0.1, 1.5), duty: 0.125 });
+    }
+    s.whoosh(0.3, 0.6, { from: 6000, to: 2000, gain: 0.18 });
+    s.whoosh(1.0, 0.15, { from: 3000, to: 11000, gain: 0.3 });
+    s.thud(1.15, 0.7, 0.8);
+    s.noise(1.15, 0.25, { clock: () => 9000, gain: env.decay(0.3, 2), short: true });
+    s.pulse(1.15, 0.45, { freq: () => 1568, gain: env.decay(0.16, 2), duty: 0.25 });
+    s.pulse(1.15, 0.45, { freq: () => 2217, gain: env.decay(0.1, 2.5), duty: 0.5 });
+    s.sparkle(1.2, 0.45, 8, { lo: 2800, hi: 5600, gain: 0.12 });
     return s;
   },
 

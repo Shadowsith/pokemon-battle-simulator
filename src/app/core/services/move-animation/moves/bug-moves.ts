@@ -66,7 +66,7 @@ export class BugMoveAnimations {
   private static async hornImpact(refs: BattleStageRefs, target: Point) {
     const { fieldEl, fxEl, targetEl } = refs;
     const r = Fx.rect(targetEl);
-    const red = await FxEffects.redBurstBackdrop(fieldEl, target);
+    const red = await FxEffects.burstBackdrop(fieldEl, target);
 
     const size = Math.max(r.width * 1.3, 90);
     const blast = FxGlyphs.spikyBurst(size, '#FFB020', '#FFE45A', '#FFFBE0');

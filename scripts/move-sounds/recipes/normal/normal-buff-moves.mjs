@@ -138,11 +138,19 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (quick, ~0.8 s): the user waves for attention - a cheery "hey, over here!" jingle. */
+  /**
+   * NormalStatusMoveAnimations.playFollowMe: a glove whirls twice round the
+   * user (0-1.0 s), rises over its head (1.0-1.2 s) and wags its finger four
+   * times (1.2-2.1 s, a tick every ~0.11 s).
+   */
   followme: () => {
-    const s = new MoveSfx(1.05, 0xf011);
-    s.arpeggio(0.02, [72, 76, 79, 76, 79, 84], 0.09, { gain: 0.24, duty: 0.5 });
-    s.arpeggio(0.6, [84, 84], 0.1, { gain: 0.18, duty: 0.25, voice: 'wave', hold: 0.2 });
+    const s = new MoveSfx(2.4, 0xf011);
+    s.whoosh(0.0, 0.5, { from: 1500, to: 4500, gain: 0.2 });
+    s.whoosh(0.5, 0.5, { from: 1500, to: 4500, gain: 0.2 });
+    s.arpeggio(1.0, [72, 76, 79], 0.06, { gain: 0.2, duty: 0.5 });
+    const ticks = [];
+    for (let i = 0; i < 8; i++) ticks.push(i % 2 ? 79 : 84);
+    s.arpeggio(1.2, ticks, 0.1125, { gain: 0.18, duty: 0.25, hold: 0.05 });
     return s;
   },
 

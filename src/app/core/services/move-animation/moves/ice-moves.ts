@@ -12,8 +12,66 @@ export class IceMoveAnimations {
     icepunch: (refs, _launch, target) => FxEffects.playElementalPunch(refs, target, 'ice', '#9CD6FF', () => FxGlyphs.iceChunk()),
     blizzard: (refs, launch, target) => IceMoveAnimations.playBlizzard(refs, launch, target),
     icebeam: (refs, launch, target) => IceMoveAnimations.playIceBeam(refs, launch, target),
+    hail: (refs) => IceMoveAnimations.playHail(refs),
     haze: (refs) => IceMoveAnimations.playHaze(refs)
   };
+
+  /**
+   * Hail: the scene darkens to a cold grey-blue (0-0.3 s), then a storm of
+   * large see-through hailstones pelts down at a slant over everything while
+   * white sparkles twinkle (0.3-1.9 s); the scene clears (~1.9-2.25 s).
+   */
+  private static async playHail(refs: BattleStageRefs) {
+    const { fieldEl, fxEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const dim = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 40%,#46525E,#1C2430 60%,#0C1018)');
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 0.85 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
+
+    const storm = 1600;
+    const done: Promise<void>[] = [];
+    for (let i = 0; i < 44; i++) {
+      const size = 10 + Math.random() * 16;
+      const stone = IceMoveAnimations.hailstone(size);
+      const x0 = Math.random() * (W + H * 0.4) - H * 0.2;
+      const y1 = H * (0.35 + Math.random() * 0.65);
+      const drift = -(y1 + size) * 0.35;
+      stone.style.left = `${x0}px`;
+      stone.style.top = `${-size * 2}px`;
+      fxEl.appendChild(stone);
+      const dur = 380 + Math.random() * 220;
+      done.push(
+        Fx.anim(stone, [
+          { transform: 'translate(0,0)', opacity: 0.85 },
+          { transform: `translate(${drift}px,${y1 + size}px)`, opacity: 0.85, offset: 0.9 },
+          { transform: `translate(${drift * 1.05}px,${y1 + size * 1.1}px) scale(.6)`, opacity: 0 }
+        ], { duration: dur, easing: 'linear', delay: Math.random() * (storm - dur), fill: 'backwards' }).then(() => stone.remove())
+      );
+    }
+    for (let i = 0; i < 10; i++) {
+      const star = FxGlyphs.sparkStar(8 + Math.random() * 8, '#ffffff');
+      Fx.place(star, { x: Math.random() * W, y: Math.random() * H });
+      fxEl.appendChild(star);
+      done.push(
+        Fx.anim(star, [
+          { transform: 'scale(0)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.5 },
+          { transform: 'scale(0)', opacity: 0 }
+        ], { duration: 400, easing: 'ease-in-out', delay: Math.random() * (storm - 400), fill: 'backwards' }).then(() => star.remove())
+      );
+    }
+    await Promise.all(done);
+
+    await Fx.anim(dim, [{ opacity: 0.85 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    dim.remove();
+  }
+
+  /** A large see-through hailstone: a pale blue-white ball with a bright highlight and a frosty rim. */
+  private static hailstone(s: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 32% 30%,#ffffff 0 14%,#EAF6FFaa 30%,#B8DCF455 62%,#DDF0FFcc 88%,#ffffff00 100%);box-shadow:0 0 3px #ffffff99`;
+    return el;
+  }
 
   /**
    * Haze: a murky dark green haze rolls in over the whole scene, drifts

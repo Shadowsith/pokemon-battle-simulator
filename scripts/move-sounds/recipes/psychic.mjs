@@ -117,14 +117,22 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + flinch fleck: an odd, warbling wave of sixth sense. */
+  /**
+   * PsychicMoveAnimations.playExtrasensory: the scene dims (0-0.28 s), four
+   * red rings burst out of the user 0.12 s apart (0.28-1.06 s), then the
+   * target shudders fast (1.06-1.6 s).
+   */
   extrasensory: () => {
-    const s = new MoveSfx(1.0, 0xe755);
-    s.wave(0.0, 0.43, { freq: (u) => 700 * Math.pow(1.6, u) * (1 + 0.06 * Math.sin(2 * Math.PI * 14 * u)), gain: env.ramp(0.15, 0.3) });
-    s.pulse(0.0, 0.43, { freq: (u) => 1050 * Math.pow(1.6, u), gain: () => 0.07, duty: 0.125 });
-    s.wave(0.43, 0.3, { freq: (u) => 1100 * (1 + 0.1 * Math.sin(2 * Math.PI * 6 * u)), gain: env.decay(0.35, 1.5) });
-    s.noise(0.43, 0.08, { clock: () => 8000, gain: env.decay(0.3, 1) });
-    s.flinch(0.6);
+    const s = new MoveSfx(1.9, 0xe755);
+    s.wave(0.0, 0.28, { freq: (u) => 300 + 200 * u, gain: env.ramp(0.0, 0.12) });
+    for (let i = 0; i < 4; i++) {
+      const at = 0.28 + i * 0.12;
+      s.wave(at, 0.4, { freq: (u) => (700 + 90 * i) * Math.pow(1.7, u) * (1 + 0.06 * Math.sin(2 * Math.PI * 14 * u)), gain: env.decay(0.22, 1.6) });
+      s.pulse(at, 0.25, { freq: (u) => (1050 + 130 * i) * Math.pow(1.7, u), gain: env.decay(0.07, 2), duty: 0.125 });
+    }
+    s.noise(1.06, 0.08, { clock: () => 8000, gain: env.decay(0.3, 1) });
+    s.wave(1.06, 0.54, { freq: (u) => 1100 * (1 + 0.12 * Math.sin(2 * Math.PI * 22 * u)), gain: env.decay(0.3, 1.2) });
+    s.pulse(1.06, 0.54, { freq: () => 140, gain: (u) => 0.1 * (1 - u) * (Math.sin(2 * Math.PI * 22 * u) > 0 ? 1 : 0.3), duty: 0.25 });
     return s;
   },
 
@@ -273,25 +281,36 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + Sp. Def-down fleck (~0.55 s): a ray of glistening light - a shimmering warble rising into a bright burst. */
+  /**
+   * PsychicMoveAnimations.playLusterPurge: the scene turns white (0-0.25 s),
+   * the user shines in a burst of light (0.25-1.1 s), six quick black hits
+   * strike the target (1.2-1.65 s), it blinks, the scene clears (~1.95-2.27 s).
+   */
   lusterpurge: () => {
-    const s = new MoveSfx(1.15, 0x105e);
-    s.wave(0.0, 0.45, { freq: (u) => (600 + 600 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 10 * u)), gain: env.ramp(0.1, 0.26) });
-    s.pulse(0.0, 0.45, { freq: (u) => 1200 + 1200 * u, gain: env.ramp(0.03, 0.08), duty: 0.125 });
-    s.thud(0.43, 0.5, 0.5);
-    s.noise(0.43, 0.25, { clock: (u) => 11000 - 6000 * u, gain: env.attackDecay(0.35, 0.04) });
-    s.sparkle(0.45, 0.2, 4, { gain: 0.12 });
-    s.statDown(0.55, 0.22);
+    const s = new MoveSfx(2.3, 0x105e);
+    s.wave(0.1, 1.0, { freq: (u) => (600 + 600 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 10 * u)), gain: env.swell(0.24) });
+    s.pulse(0.25, 0.85, { freq: (u) => 1200 + 1200 * u, gain: env.swell(0.07), duty: 0.125 });
+    s.sparkle(0.3, 0.7, 8, { lo: 3000, hi: 6000, gain: 0.12 });
+    for (let i = 0; i < 6; i++) {
+      const at = 1.2 + i * 0.09;
+      s.thud(at, 0.35, 0.3);
+      s.noise(at, 0.06, { clock: () => 9000, gain: env.decay(0.26, 1), short: true });
+    }
     return s;
   },
 
-  /** Generic self aura (priority, ≈ 0.8 s): a mirror-like barrier rings up around the caster with a bright reflective shimmer. */
+  /**
+   * PsychicMoveAnimations.playMagicCoat: a magenta sphere swells (0-0.3 s), a
+   * white card snaps in (0.2-0.45 s), a sheen sweeps it (0.5-1.15 s) amid
+   * sparkles, everything fades (~1.4-1.7 s).
+   */
   magiccoat: () => {
-    const s = new MoveSfx(1.1, 0x3ac0);
-    s.pulse(0.0, 0.35, { freq: (u) => 600 * Math.pow(3, u), gain: env.swell(0.18), duty: 0.25 });
-    s.chord(0.15, 0.7, [84, 88, 91, 96], { rate: 0.03, gain: 0.2, vibrato: 0.01 });
-    s.wave(0.3, 0.7, { freq: (u) => 1320 * (1 + 0.03 * Math.sin(2 * Math.PI * 8 * u)), gain: env.decay(0.18, 1.5) });
-    s.sparkle(0.35, 0.5, 7, { lo: 3500, hi: 6500, gain: 0.12 });
+    const s = new MoveSfx(1.8, 0x3ac0);
+    s.pulse(0.0, 0.3, { freq: (u) => 600 * Math.pow(3, u), gain: env.swell(0.18), duty: 0.25 });
+    s.pulse(0.3, 0.06, { freq: () => 2637, gain: env.decay(0.15, 1.5), duty: 0.25 });
+    s.chord(0.35, 1.1, [84, 88, 91, 96], { rate: 0.03, gain: 0.18, vibrato: 0.01 });
+    s.wave(0.5, 0.65, { freq: (u) => 1320 * (1 + 0.03 * Math.sin(2 * Math.PI * 8 * u)), gain: env.swell(0.14) });
+    s.sparkle(0.35, 1.0, 10, { lo: 3500, hi: 6500, gain: 0.12 });
     return s;
   },
 

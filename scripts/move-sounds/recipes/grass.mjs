@@ -85,16 +85,22 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic projectile at max power (impact at 0.43 s): giant thorny roots burst up - rustle swell, heavy lashing hits. */
+  /**
+   * GrassMoveAnimations.playFrenzyPlant: dark (0-0.28 s), a green glade with
+   * rising leaves (from 0.28 s), roots grow to the target (0.9-1.45 s) and
+   * strike it (1.45 s); all clears ~2.0-2.35 s.
+   */
   frenzyplant: () => {
-    const s = new MoveSfx(1.15, 0xf2e9);
-    s.rumble(0.0, 0.45, { from: 200, to: 450, gain: 0.3 });
-    s.noise(0.05, 0.38, { clock: (u) => 2000 + 3000 * u, gain: env.ramp(0.05, 0.25) });
-    s.thud(0.43, 0.8, 0.9);
-    s.slash(0.5, 0.35);
-    s.thud(0.6, 0.5, 0.6);
-    s.noise(0.45, 0.55, { clock: () => 3500, gain: env.decay(0.2, 2) });
-    s.arpeggio(0.7, [67, 71, 74], 0.07, { gain: 0.14, voice: 'wave' });
+    const s = new MoveSfx(2.5, 0xf2e9);
+    s.wave(0.28, 0.6, { freq: (u) => 300 + 250 * u, gain: env.swell(0.12) });
+    s.noise(0.28, 1.6, { clock: () => 3000, gain: env.swell(0.1) });
+    s.sparkle(0.35, 0.5, 6, { lo: 2600, hi: 5000, gain: 0.12 });
+    s.rumble(0.9, 0.55, { from: 180, to: 420, gain: 0.35 });
+    s.noise(0.9, 0.55, { clock: (u) => 1500 + 3500 * u, gain: env.ramp(0.05, 0.25) });
+    s.thud(1.45, 0.85, 0.9);
+    s.slash(1.5, 0.3);
+    s.noise(1.45, 0.5, { clock: () => 3500, gain: env.decay(0.2, 2) });
+    s.arpeggio(1.6, [67, 71, 74], 0.07, { gain: 0.14, voice: 'wave' });
     return s;
   },
 
@@ -171,14 +177,21 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic melee slash (impact 0.17 s): a sharp leaf edge cuts - a bright slice with a rustling green tail. */
+  /**
+   * GrassMoveAnimations.playLeafBlade: four blade cuts (land 0.1 / 0.24 /
+   * 0.38 / 0.52 s), then leaves fly in and land (0.7-1.15 s, hit ~1.08 s).
+   */
   leafblade: () => {
-    const s = new MoveSfx(0.75, 0x1eaf);
-    s.whoosh(0.0, 0.18, { from: 2500, to: 10000, gain: 0.3 });
-    s.slash(0.17, 0.6);
-    s.thud(0.17, 0.35, 0.2);
-    s.noise(0.24, 0.3, { clock: () => 3500, gain: env.decay(0.14, 1.5) });
-    s.wave(0.2, 0.3, { freq: () => 1319, gain: env.decay(0.12, 2) });
+    const s = new MoveSfx(1.4, 0x1eaf);
+    for (let i = 0; i < 4; i++) {
+      const at = i * 0.14;
+      s.whoosh(at, 0.1, { from: 3000, to: 11000, gain: 0.25 });
+      s.slash(at + 0.1, 0.5);
+      s.wave(at + 0.1, 0.15, { freq: () => 1319 + i * 110, gain: env.decay(0.1, 2) });
+    }
+    s.noise(0.7, 0.4, { clock: (u) => 2500 + 2500 * u, gain: env.ramp(0.05, 0.2) });
+    s.thud(1.08, 0.35, 0.2);
+    s.noise(1.08, 0.25, { clock: () => 3500, gain: env.decay(0.16, 1.5) });
     return s;
   },
 

@@ -12,7 +12,9 @@ export class SteelMoveAnimations {
   /** Hand-made Steel move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     doomdesire: (refs) => SteelMoveAnimations.playDoomDesireHit(refs),
+    irondefense: (refs, launch) => SteelMoveAnimations.playIronDefense(refs, launch),
     irontail: (refs, launch, target, v) => SteelMoveAnimations.playIronTail(refs, launch, target, v),
+    meteormash: (refs, _launch, target) => SteelMoveAnimations.playMeteorMash(refs, target),
     steelwing: (refs, launch, target, v) => SteelMoveAnimations.playSteelWing(refs, launch, target, v)
   };
 
@@ -20,6 +22,154 @@ export class SteelMoveAnimations {
   static readonly chargeAnims: MoveAnimRegistry = {
     doomdesire: (refs) => SteelMoveAnimations.playDoomDesireWish(refs)
   };
+
+  /**
+   * Meteor Mash: the scene goes black (0-0.25 s) and yellow shooting stars
+   * streak past the target one after another (0.25-1.0 s); then a yellow fist
+   * slams into it (1.15 s) and stars burst out of the fist in all directions.
+   */
+  private static async playMeteorMash(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const black = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 45%,#1A1A20,#000)');
+    await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+
+    // 1. Shooting stars streak past the target, falling at a slant.
+    const reach = Math.max(r.width * 1.4, 110);
+    const streaks: Promise<void>[] = [];
+    for (let i = 0; i < 6; i++) {
+      const angle = 25 + Math.random() * 25;
+      const rad = (angle * Math.PI) / 180;
+      const side = (i % 2 ? 1 : -1) * (0.15 + Math.random() * 0.4) * r.width;
+      const c = { x: target.x - Math.sin(rad) * side, y: target.y + Math.cos(rad) * side };
+      const star = SteelMoveAnimations.shootingStar(12 + Math.random() * 6, reach * 0.5, angle);
+      Fx.place(star, c);
+      fxEl.appendChild(star);
+      const dx = Math.cos(rad) * reach;
+      const dy = Math.sin(rad) * reach;
+      streaks.push(
+        Fx.anim(star, [
+          { transform: `translate(${-dx}px,${-dy}px) rotate(${angle}deg)`, opacity: 0 },
+          { transform: `translate(${-dx * 0.6}px,${-dy * 0.6}px) rotate(${angle}deg)`, opacity: 1, offset: 0.2 },
+          { transform: `translate(${dx * 0.6}px,${dy * 0.6}px) rotate(${angle}deg)`, opacity: 1, offset: 0.8 },
+          { transform: `translate(${dx}px,${dy}px) rotate(${angle}deg)`, opacity: 0 }
+        ], { duration: 380, easing: 'linear', delay: i * 75, fill: 'backwards' }).then(() => star.remove())
+      );
+    }
+    await Promise.all(streaks);
+    await Fx.wait(150);
+
+    // 2. The yellow fist slams in; stars burst out of it.
+    const fistW = Math.max(r.width * 0.55, 44);
+    const fist = FxGlyphs.fistGlyph(fistW, 'yellow');
+    Fx.place(fist, target);
+    fxEl.appendChild(fist);
+    await Fx.anim(fist, [{ transform: 'scale(2.2)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], {
+      duration: 150,
+      easing: 'ease-in',
+      fill: 'forwards'
+    });
+    Fx.flash(targetEl, '#FFE04A', 0.8);
+    Fx.shake(targetEl, 7);
+    Fx.shakeField(fieldEl, 0.6);
+    const burst: Promise<void>[] = [];
+    for (let i = 0; i < 12; i++) {
+      const star = FxGlyphs.fivePointStar(10 + Math.random() * 8, '#FFD83A', '#FFFBE0', '#FFD83A');
+      Fx.place(star, target);
+      fxEl.insertBefore(star, fist);
+      const ang = (Math.PI * 2 * i) / 12 + Math.random() * 0.3;
+      const d = Math.max(r.width * 0.8, 60) * (0.7 + Math.random() * 0.4);
+      burst.push(
+        Fx.anim(star, [
+          { transform: 'translate(0,0) scale(.4) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d * 0.7}px,${Math.sin(ang) * d * 0.7}px) scale(1) rotate(120deg)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) scale(.6) rotate(180deg)`, opacity: 0 }
+        ], { duration: 550, easing: 'ease-out' }).then(() => star.remove())
+      );
+    }
+    const fistDone = Fx.anim(fist, [
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: 'scale(1.05)', opacity: 1, offset: 0.6 },
+      { transform: 'scale(.9)', opacity: 0 }
+    ], { duration: 550, easing: 'ease-in' }).then(() => fist.remove());
+    await Promise.all([fistDone, ...burst]);
+
+    await Fx.anim(black, [{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'ease-in' });
+    black.remove();
+  }
+
+  /**
+   * A yellow five-point star with a fading yellow tail of `tail` px behind it,
+   * pointing right (rotate it to the flight direction; the star stays upright
+   * inside by counter-rotating by `angle`).
+   */
+  private static shootingStar(size: number, tail: number, angle: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none`;
+    const trail = document.createElement('div');
+    trail.style.cssText = `position:absolute;right:${size / 2}px;top:${size * 0.3}px;width:${tail}px;height:${size * 0.4}px;border-radius:${size}px;background:linear-gradient(90deg,#FFD83A00,#FFD83A88 60%,#FFF3A0);filter:blur(1px)`;
+    const star = FxGlyphs.fivePointStar(size, '#FFD83A', '#FFFBE0', '#FFD83A');
+    star.style.left = '0';
+    star.style.top = '0';
+    star.style.transform = `rotate(${-angle}deg)`;
+    el.append(trail, star);
+    return el;
+  }
+
+  /**
+   * Iron Defense: the background blinks white twice (0-0.4 s); the user turns
+   * shiny metallic silver, gleaming twice while glints twinkle on it
+   * (0.45-1.25 s); then an orange-red stat-up aura rises over it (1.3-2.1 s).
+   */
+  private static async playIronDefense(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+
+    // 1. Two quick white blinks of the background.
+    const white = Fx.backdrop(fieldEl, 'background:#ffffff');
+    await Fx.anim(white, [
+      { opacity: 0, easing: 'step-end' }, { opacity: 1, offset: 0.2, easing: 'step-end' },
+      { opacity: 0, offset: 0.45, easing: 'step-end' }, { opacity: 1, offset: 0.65, easing: 'step-end' },
+      { opacity: 0, offset: 0.9 }, { opacity: 0 }
+    ], { duration: 400, easing: 'linear' });
+    white.remove();
+    await Fx.wait(50);
+
+    // 2. Metallic silver, gleaming twice, with glints.
+    const metal = 'grayscale(1) brightness(1.15) contrast(1.25)';
+    const shine = `grayscale(1) brightness(1.7) contrast(1.1) drop-shadow(0 0 8px ${SILVER})`;
+    const base = `${metal} drop-shadow(0 0 3px ${SILVER})`;
+    const steel = Fx.anim(launchEl, [
+      { filter: 'none' },
+      { filter: base, offset: 0.15 },
+      { filter: shine, offset: 0.3 },
+      { filter: base, offset: 0.45 },
+      { filter: shine, offset: 0.65 },
+      { filter: base, offset: 0.85 },
+      { filter: 'none' }
+    ], { duration: 800, easing: 'ease-in-out', fill: 'none' });
+    const glints: Promise<void>[] = [];
+    for (let i = 0; i < 5; i++) {
+      const star = FxGlyphs.sparkStar(10 + Math.random() * 8, '#ffffff');
+      Fx.place(star, {
+        x: launch.x + (Math.random() * 2 - 1) * r.width * 0.4,
+        y: launch.y + (Math.random() * 2 - 1) * r.height * 0.4
+      });
+      fxEl.appendChild(star);
+      glints.push(
+        Fx.anim(star, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.5 },
+          { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+        ], { duration: 320, easing: 'ease-in-out', delay: 120 + i * 120, fill: 'backwards' }).then(() => star.remove())
+      );
+    }
+    await Promise.all([steel, ...glints]);
+
+    // 3. Orange-red stat-up aura.
+    await Fx.wait(50);
+    await FxEffects.statUpAura(refs, launch);
+  }
 
   /**
    * Doom Desire, the turn it's used (sound: hum from 0 s, glints 0.35 / 0.8 s):

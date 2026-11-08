@@ -90,13 +90,16 @@ export const ICE = {
     return s;
   },
 
-  /** Generic weather (particles fall ~1.1 s, glow 0.9 s, clip ~1.45 s): an icy wind with hailstones clattering down. */
+  /**
+   * IceMoveAnimations.playHail: the scene darkens (0-0.3 s), hailstones pelt
+   * down (0.3-1.9 s), the scene clears (~1.9-2.25 s).
+   */
   hail: () => {
-    const s = new MoveSfx(1.45, 0x4a11);
-    s.noise(0.0, 1.35, { clock: (u) => 4000 + 1500 * Math.sin(2 * Math.PI * 1.5 * u), gain: env.swell(0.22) });
-    s.wave(0.0, 1.3, { freq: (u) => 900 - 250 * u, gain: env.swell(0.08) });
-    for (let i = 0; i < 12; i++) {
-      const at = 0.1 + s.random() * 1.05;
+    const s = new MoveSfx(2.3, 0x4a11);
+    s.noise(0.0, 2.2, { clock: (u) => 4000 + 1500 * Math.sin(2 * Math.PI * 1.5 * u), gain: env.swell(0.22) });
+    s.wave(0.0, 2.1, { freq: (u) => 900 - 300 * u, gain: env.swell(0.08) });
+    for (let i = 0; i < 22; i++) {
+      const at = 0.35 + s.random() * 1.5;
       s.noise(at, 0.03, { clock: () => 10000, gain: env.decay(0.28, 1), short: true });
       s.pulse(at, 0.05, { freq: () => 2600 + s.random() * 1800, gain: env.decay(0.12, 1.5), duty: 0.125 });
     }

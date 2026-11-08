@@ -13,8 +13,11 @@ export class PsychicMoveAnimations {
     barrier: (refs, launch) => PsychicMoveAnimations.playBarrier(refs, launch),
     calmmind: (refs, launch) => PsychicMoveAnimations.playCalmMind(refs, launch),
     cosmicpower: (refs, launch) => PsychicMoveAnimations.playCosmicPower(refs, launch),
+    extrasensory: (refs, launch) => PsychicMoveAnimations.playExtrasensory(refs, launch),
     dreameater: (refs, launch, target, v) => PsychicMoveAnimations.playDreamEater(refs, launch, target, v),
+    lusterpurge: (refs, launch, target) => PsychicMoveAnimations.playLusterPurge(refs, launch, target),
     lightscreen: (refs, launch, _target, v) => PsychicMoveAnimations.playScreen(refs, launch, v, PsychicMoveAnimations.LIGHT_SCREEN),
+    magiccoat: (refs, launch) => PsychicMoveAnimations.playMagicCoat(refs, launch),
     rest: (refs, launch, _target, v) => PsychicMoveAnimations.playRest(refs, launch, v),
     reflect: (refs, launch, _target, v) => PsychicMoveAnimations.playScreen(refs, launch, v, PsychicMoveAnimations.REFLECT),
     futuresight: (refs) => PsychicMoveAnimations.playFutureSightHit(refs),
@@ -77,6 +80,109 @@ export class PsychicMoveAnimations {
       frames.push({ transform: `${original} translateX(${x}px)` });
     }
     return Fx.anim(el, frames, { duration, easing: 'linear', fill: 'none' });
+  }
+
+  /**
+   * Extrasensory: the scene goes dark (0-0.28 s), four red psychic rings
+   * with an orange glow burst outward from the user one after another
+   * (0.28-1.05 s), then the target shudders very fast (1.05-1.6 s) and the scene clears.
+   */
+  private static async playExtrasensory(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const r = Fx.rect(launchEl);
+    const dim = await PsychicMoveAnimations.dimIn(fieldEl);
+
+    const reach = Math.max(r.width, r.height) * 1.8 + 40;
+    const bw = Math.max(reach * 0.035, 4);
+    const rings: Promise<void>[] = [];
+    for (let i = 0; i < 4; i++) {
+      const ring = document.createElement('div');
+      ring.style.cssText = `position:absolute;width:${reach}px;height:${reach}px;border-radius:50%;pointer-events:none;box-sizing:border-box;border:${bw}px solid #E8302Ee6;box-shadow:0 0 12px #FF7A2Acc,inset 0 0 12px #FF7A2Acc`;
+      Fx.place(ring, launch);
+      fxEl.appendChild(ring);
+      rings.push(
+        Fx.anim(ring, [
+          { transform: 'scale(.12)', opacity: 0 },
+          { transform: 'scale(.3)', opacity: 1, offset: 0.15 },
+          { transform: 'scale(.85)', opacity: 0.85, offset: 0.7 },
+          { transform: 'scale(1.1)', opacity: 0 }
+        ], { duration: 420, easing: 'ease-out', delay: i * 120, fill: 'backwards' }).then(() => ring.remove())
+      );
+    }
+    await Promise.all(rings);
+
+    Fx.flash(targetEl, '#F28BF0', 0.45);
+    await PsychicMoveAnimations.tremble(targetEl, 550, 4);
+    await PsychicMoveAnimations.dimOut(dim);
+  }
+
+  /**
+   * Luster Purge: the scene turns pale white (0-0.25 s); the user shines in a
+   * bright white glow at the heart of a burst of light whose rays sweep the
+   * whole screen (0.25-1.1 s); the rays fade but the scene stays white while
+   * quick black bursts strike the target (1.2-1.85 s); then it clears.
+   */
+  private static async playLusterPurge(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    // 1. Pale white scene.
+    const pale = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#F2F3F6,#CDD1D8)');
+    await Fx.anim(pale, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'forwards' });
+
+    // 2. The user shines; a burst of light with long rays turns slowly round it.
+    const size = W * 2.2;
+    const burst = document.createElement('div');
+    const mask = 'radial-gradient(circle,#000 0 8%,#000a 25%,#0000 55%)';
+    burst.style.cssText =
+      `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(circle,#ffffff 0 3%,#F4FFE8ee 5%,#ffffff00 10%),' +
+      'repeating-conic-gradient(#ffffffee 0 2deg,#ffffff00 2deg 9deg,#E8FFF4cc 9deg 10.5deg,#ffffff00 10.5deg 17deg);' +
+      `-webkit-mask-image:${mask};mask-image:${mask}`;
+    Fx.place(burst, launch);
+    fxEl.appendChild(burst);
+    const shine = Fx.anim(launchEl, [
+      { filter: 'brightness(1) drop-shadow(0 0 0 #fff0)' },
+      { filter: 'brightness(2.4) saturate(.3) drop-shadow(0 0 14px #ffffff)', offset: 0.3 },
+      { filter: 'brightness(2.4) saturate(.3) drop-shadow(0 0 14px #ffffff)', offset: 0.75 },
+      { filter: 'brightness(1) drop-shadow(0 0 0 #fff0)' }
+    ], { duration: 850, easing: 'ease-in-out', fill: 'none' });
+    await Fx.anim(burst, [
+      { transform: 'scale(.05) rotate(0deg)', opacity: 0 },
+      { transform: 'scale(.8) rotate(8deg)', opacity: 1, offset: 0.3 },
+      { transform: 'scale(1) rotate(20deg)', opacity: 1, offset: 0.75 },
+      { transform: 'scale(1.05) rotate(26deg)', opacity: 0 }
+    ], { duration: 850, easing: 'ease-out' });
+    burst.remove();
+    await shine;
+    await Fx.wait(100);
+
+    // 3. Quick black bursts on the target.
+    const bursts: Promise<void>[] = [];
+    for (let i = 0; i < 6; i++) {
+      const hit = FxGlyphs.spikyBurst(Math.max(tr.width * (0.35 + Math.random() * 0.2), 28), '#141414', '#3A3A3A', '#6A6A6A');
+      Fx.place(hit, {
+        x: target.x + (Math.random() * 2 - 1) * tr.width * 0.3,
+        y: target.y + (Math.random() * 2 - 1) * tr.height * 0.3
+      });
+      fxEl.appendChild(hit);
+      const delay = i * 90;
+      bursts.push(
+        Fx.anim(hit, [
+          { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+          { transform: 'scale(1.1) rotate(15deg)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(.9) rotate(25deg)', opacity: 0 }
+        ], { duration: 200, easing: 'ease-out', delay, fill: 'backwards' }).then(() => hit.remove())
+      );
+      setTimeout(() => Fx.shake(targetEl, 4), delay);
+    }
+    await Promise.all(bursts);
+    await Fx.blink(targetEl, 2);
+
+    await Fx.anim(pale, [{ opacity: 1 }, { opacity: 0 }], { duration: 320, easing: 'ease-in' });
+    pale.remove();
   }
 
   /**
@@ -487,6 +593,70 @@ export class PsychicMoveAnimations {
     await Promise.all([bubbleDone, zs]);
 
     await FxEffects.healSparkles(refs, launch);
+  }
+
+  /**
+   * Magic Coat: a glowing magenta sphere swells round the user (0-0.3 s) and
+   * a see-through white card appears in front of it (0.2-0.45 s); a sheen
+   * sweeps over the card while purple sparkles twinkle round the sphere,
+   * then everything fades (~1.4-1.7 s).
+   */
+  private static async playMagicCoat(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const size = Math.max(Math.max(r.width, r.height) * 1.25, 80);
+    const total = 1700;
+
+    const sphere = document.createElement('div');
+    sphere.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 50% 50%,#FF70F000 42%,#E040E033 62%,#F070FFaa 86%,#FFC0FFee 94%,#F070FF00 100%);box-shadow:0 0 18px #E040E0aa`;
+    Fx.place(sphere, launch);
+    fxEl.appendChild(sphere);
+    const sphereDone = Fx.anim(sphere, [
+      { transform: 'scale(.2)', opacity: 0 },
+      { transform: 'scale(1.06)', opacity: 1, offset: 0.15 },
+      { transform: 'scale(1)', opacity: 0.9, offset: 0.3 },
+      { transform: 'scale(1.03)', opacity: 1, offset: 0.6 },
+      { transform: 'scale(1)', opacity: 0.85, offset: 0.82 },
+      { transform: 'scale(1.08)', opacity: 0 }
+    ], { duration: total, easing: 'ease-in-out' }).then(() => sphere.remove());
+
+    const cw = size * 0.45;
+    const ch = size * 0.6;
+    const card = document.createElement('div');
+    card.style.cssText = `position:absolute;width:${cw}px;height:${ch}px;border-radius:${cw * 0.06}px;pointer-events:none;overflow:hidden;box-sizing:border-box;border:${Math.max(cw * 0.05, 3)}px solid #ffffff;background:linear-gradient(160deg,#ffffff66,#ffffff22 60%,#ffffff55);box-shadow:0 0 8px #ffffffcc,inset 0 0 6px #ffffffaa`;
+    const sheen = document.createElement('div');
+    sheen.style.cssText = `position:absolute;left:-30%;top:0;width:160%;height:${ch * 0.22}px;background:linear-gradient(180deg,transparent,#ffffffcc,transparent);transform:rotate(-12deg)`;
+    card.appendChild(sheen);
+    Fx.place(card, launch);
+    fxEl.appendChild(card);
+    const cardDone = Fx.anim(card, [
+      { transform: 'scale(1,0)', opacity: 0 },
+      { transform: 'scale(1,0)', opacity: 0, offset: 0.12 },
+      { transform: 'scale(1,1.05)', opacity: 1, offset: 0.24 },
+      { transform: 'scale(1,1)', opacity: 1, offset: 0.3 },
+      { transform: 'scale(1,1)', opacity: 1, offset: 0.82 },
+      { transform: 'scale(.9,.9)', opacity: 0 }
+    ], { duration: total, easing: 'ease-out' }).then(() => card.remove());
+    Fx.anim(sheen, [{ transform: `translateY(${-ch * 0.3}px) rotate(-12deg)` }, { transform: `translateY(${ch * 1.1}px) rotate(-12deg)` }], {
+      duration: 650,
+      easing: 'ease-in-out',
+      delay: 500
+    });
+
+    for (let i = 0; i < 14; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const d = (size / 2) * (0.85 + Math.random() * 0.35);
+      const star = FxGlyphs.sparkStar(9 + Math.random() * 9, i % 2 ? '#B060FF' : '#F0A0FF');
+      Fx.place(star, { x: launch.x + Math.cos(ang) * d, y: launch.y + Math.sin(ang) * d });
+      fxEl.appendChild(star);
+      Fx.anim(star, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1.2) rotate(45deg)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+      ], { duration: 500, easing: 'ease-out', delay: 300 + Math.random() * 900, fill: 'backwards' }).then(() => star.remove());
+    }
+    Fx.flash(launchEl, '#F070FF', 0.3);
+    await Promise.all([sphereDone, cardDone]);
   }
 
   /** Light Screen: bluish-pink, sparkles twinkle around the rim. */
