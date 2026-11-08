@@ -30,152 +30,37 @@
     </div>
   </section>
 
-  <!-- ---------- format ---------- -->
-  <section class="cb-section">
-    <span class="cb-label">Kampfart</span>
-    <div class="cb-segment">
-      <button
-        type="button"
-        class="seg-btn"
-        [class.active]="config().format === 'singles'"
-        (click)="setFormat('singles')"
-      >
-        Einzelkampf
-      </button>
-      <button
-        type="button"
-        class="seg-btn"
-        [class.active]="config().format === 'doubles'"
-        [disabled]="!canDouble()"
-        (click)="setFormat('doubles')"
-      >
-        Doppelkampf (2 vs 2)
-      </button>
-    </div>
-    @if (!canDouble()) {
-      <p class="cb-hint">Für Doppelkämpfe braucht dein aktives Team mindestens 2 Pokémon.</p>
-    }
-  </section>
-
-  <!-- ---------- background ---------- -->
-  <section class="cb-section">
-    <label class="cb-label" for="cb-background">Hintergrund</label>
-    <select
-      id="cb-background"
-      class="cb-select"
-      [value]="config().background"
-      (change)="setBackground($any($event.target).value)"
-    >
-      <option value="random">Zufällig (draußen)</option>
-      @for (s of scenes; track s.id) {
-        <option [value]="s.id">{{ s.label }}</option>
-      }
-    </select>
-    <p class="cb-hint">Tag oder Nacht richtet sich nach der Uhrzeit (Nacht von 20 bis 6 Uhr).</p>
-  </section>
-
-  <!-- ---------- opponent count ---------- -->
-  <section class="cb-section">
-    <span class="cb-label">Anzahl gegnerischer Pokémon</span>
-    <div class="cb-stepper">
-      <button
-        type="button"
-        class="cb-btn"
-        [disabled]="config().opponentCount <= (config().format === 'doubles' ? 2 : 1)"
-        (click)="stepCount(-1)"
-      >
-        −
-      </button>
-      <span class="cb-count">{{ config().opponentCount }}</span>
-      <button type="button" class="cb-btn" [disabled]="config().opponentCount >= 6" (click)="stepCount(1)">+</button>
-    </div>
-  </section>
-
-  <!-- ---------- mode ---------- -->
-  <section class="cb-section">
-    <span class="cb-label">Gegner-Team</span>
-    <div class="cb-segment">
-      <button
-        type="button"
-        class="seg-btn"
-        [class.active]="config().mode === 'random'"
-        (click)="setMode('random')"
-      >
-        Zufällige Auswahl
-      </button>
-      <button
-        type="button"
-        class="seg-btn"
-        [class.active]="config().mode === 'team'"
-        (click)="setMode('team')"
-      >
-        Vorgegebenes Team
-      </button>
-    </div>
-  </section>
-
-  @if (config().mode === 'random') {
-    <!-- ---------- random constraints ---------- -->
+  <app-opponent-rules
+    [rules]="config()"
+    [canDouble]="canDouble()"
+    [showTypeRules]="config().mode === 'random'"
+    (rulesChange)="setRules($event)"
+  >
+    <!-- ---------- mode ---------- -->
     <section class="cb-section">
-      <label class="check-row">
-        <input
-          type="checkbox"
-          [checked]="config().forceDistinctTypes"
-          (change)="toggleForceDistinct($any($event.target).checked)"
-        />
-        <span>Multitypen-Team erzwingen (jeder Haupttyp nur einmal)</span>
-      </label>
-
-      @if (config().forceDistinctTypes) {
-        <p class="cb-hint">
-          Optional: wähle bis zu {{ config().opponentCount }} Haupttypen, die sicher vorkommen
-          sollen. Leer = beliebige Typen.
-        </p>
-        <div class="type-chips">
-          @for (t of types; track t) {
-            <button
-              type="button"
-              class="type-chip"
-              [class.on]="isDistinctType(t)"
-              [style.background]="isDistinctType(t) ? typeColor(t) : ''"
-              [disabled]="!canPickDistinctType(t)"
-              (click)="toggleDistinctType(t)"
-            >
-              {{ typeLabel(t) }}
-            </button>
-          }
-        </div>
-      }
-
-      <label class="check-row">
-        <input
-          type="checkbox"
-          [checked]="config().forceSingleType"
-          (change)="toggleForceSingle($any($event.target).checked)"
-        />
-        <span>Monotyp-Team erzwingen (alle denselben Haupttyp)</span>
-      </label>
-
-      @if (config().forceSingleType) {
-        <div class="cb-row">
-          <select
-            class="cb-select grow"
-            [value]="config().singleType ?? ''"
-            (change)="setSingleType($any($event.target).value)"
-          >
-            <option value="">(zufällig)</option>
-            @for (t of types; track t) {
-              <option [value]="t">{{ typeLabel(t) }}</option>
-            }
-          </select>
-        </div>
-        <p class="cb-hint">
-          Es könnte weniger als {{ config().opponentCount }} Pokémon geben, wenn der Typ selten ist –
-          der Kampf startet dann mit einem kleineren Team.
-        </p>
-      }
+      <span class="cb-label">Gegner-Team</span>
+      <div class="cb-segment">
+        <button
+          type="button"
+          class="seg-btn"
+          [class.active]="config().mode === 'random'"
+          (click)="setMode('random')"
+        >
+          Zufällige Auswahl
+        </button>
+        <button
+          type="button"
+          class="seg-btn"
+          [class.active]="config().mode === 'team'"
+          (click)="setMode('team')"
+        >
+          Vorgegebenes Team
+        </button>
+      </div>
     </section>
-  } @else {
+  </app-opponent-rules>
+
+  @if (config().mode === 'team') {
     <!-- ---------- predefined opponent team ---------- -->
     <section class="cb-section">
       <label class="cb-label" for="cb-copy">Spieler-Team kopieren</label>

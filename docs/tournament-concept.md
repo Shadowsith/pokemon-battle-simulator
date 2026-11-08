@@ -1,6 +1,6 @@
 # Technical concept: tournament mode ("Turnier")
 
-**Status:** concept; not implemented yet · **Scope:** single-player knockout bracket against NPCs
+**Status:** implemented · **Scope:** single-player knockout bracket against NPCs
 
 ## Context
 The app has single fights (random / Custom Battle) and linear runs (Arenaleiter, Top-Vier). A knockout tournament adds a new mode: the player and 3/7/15 NPC trainers are placed in a bracket shown as a diagram. The player fights their matches. NPC-vs-NPC matches get an instant result. The tournament is configured with the same random-opponent settings as Custom Battles.
@@ -40,7 +40,7 @@ Move these sections from `pages/custom-battle/custom-battle.page.html` into a st
   - `async create(config)`:
     - Roll `size − 1` teams with `NpcTeamService.generate(opponentCount, rulesToNpcOptions(config))`.
     - Pick distinct sprites with `TrainerRosterService.randomId(exclude)` and name them with `trainerLabel()`. If two names are the same, add a suffix.
-    - Compute strength as the sum of base stat totals. Look up by dex number with the @pkmn/sim Dex, the same way `DamageCalcService.lookupSpecies` does. Expose a small public `baseStatTotal(dexId)` there instead of duplicating the lookup.
+    - Compute strength as the sum of base stat totals. Look up by dex number with the @pkmn/sim Dex, the same way `DamageCalcService.lookupSpecies` does. Implemented by summing the existing `DamageCalcService.statLine()` (level-100 stats), so no new lookup was needed.
     - The player entrant uses the active team's name and the avatar from settings.
   - `currentOpponent`: a computed signal. `setPending()` / `takePending()` work as a one-time hand-off to the battle screen, like the other modes.
   - `recordOutcome(won)`:

@@ -3,11 +3,10 @@ import {
   CustomBattleConfig,
   SavedCustomBattle,
   clampConfig,
-  defaultCustomBattleConfig
+  sanitizeRules
 } from '../models/custom-battle.model';
 import { MAX_TEAM_SIZE, MOVES_PER_POKEMON, TeamPokemon } from '../models/team.model';
 import { knownItemId } from '../models/item.model';
-import { isSceneId } from '../battle/battle-background';
 
 const STORE_KEY = 'pbs.customBattles';
 
@@ -93,22 +92,13 @@ function sanitize(v: unknown): SavedCustomBattle | null {
   const s = v as Record<string, unknown>;
   if (typeof s['id'] !== 'string' || typeof s['name'] !== 'string') return null;
   const c = (s['config'] ?? {}) as Record<string, unknown>;
-  const base = defaultCustomBattleConfig();
   const config = clampConfig({
-    format: c['format'] === 'doubles' ? 'doubles' : 'singles',
-    opponentCount: typeof c['opponentCount'] === 'number' ? c['opponentCount'] : base.opponentCount,
+    ...sanitizeRules(c),
     mode: c['mode'] === 'team' ? 'team' : 'random',
     team: Array.isArray(c['team'])
       ? (c['team'] as unknown[]).map(sanitizeMon).filter((m): m is TeamPokemon => m !== null)
       : [],
-    forceDistinctTypes: c['forceDistinctTypes'] === true,
-    distinctTypes: Array.isArray(c['distinctTypes'])
-      ? (c['distinctTypes'] as unknown[]).filter((t): t is string => typeof t === 'string')
-      : [],
-    forceSingleType: c['forceSingleType'] === true,
-    singleType: typeof c['singleType'] === 'string' ? (c['singleType'] as string) : null,
-    avatarId: typeof c['avatarId'] === 'string' ? (c['avatarId'] as string) : null,
-    background: isSceneId(c['background']) ? c['background'] : 'random'
+    avatarId: typeof c['avatarId'] === 'string' ? (c['avatarId'] as string) : null
   });
   return { id: s['id'], name: s['name'], config };
 }

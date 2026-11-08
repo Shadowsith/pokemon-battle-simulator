@@ -33,6 +33,11 @@ export const routes: Routes = [
       import('./pages/elite-four/elite-four.page').then((m) => m.EliteFourPage)
   },
   {
+    path: 'tournament',
+    loadComponent: () =>
+      import('./pages/tournament/tournament.page').then((m) => m.TournamentPage)
+  },
+  {
     path: 'battle',
     loadComponent: () =>
       import('./pages/battle/battle.page').then((m) => m.BattlePage)

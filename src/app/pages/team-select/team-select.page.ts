@@ -34,6 +34,10 @@ export class TeamSelectPage {
     this.router.navigateByUrl('/custom-battle');
   }
 
+  goToTournament(): void {
+    this.router.navigateByUrl('/tournament');
+  }
+
   goToGyms(): void {
     this.router.navigateByUrl('/gym-challenge');
   }

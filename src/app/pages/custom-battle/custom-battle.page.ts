@@ -2,7 +2,6 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { IonContent, IonButton } from '@ionic/angular/standalone';
 import {
-  POKEMON_TYPES,
   frontSpritePath,
   germanTypeLabel,
   typeColor
@@ -13,6 +12,7 @@ import { TRAINER_AVATARS, trainerAvatarPath } from '../../core/models/trainer.mo
 import {
   CustomBattleConfig,
   OpponentMode,
+  RandomOpponentRules,
   clampConfig,
   defaultCustomBattleConfig
 } from '../../core/models/custom-battle.model';
@@ -22,15 +22,14 @@ import { CustomBattleService } from '../../core/services/custom-battle.service';
 import { heldItem, knownItemId } from '../../core/models/item.model';
 import { ItemIconComponent } from '../../shared/item-icon/item-icon.component';
 import { ItemPickerComponent } from '../../shared/item-picker/item-picker.component';
-import type { BattleFormat } from '../../core/battle/battle-format';
-import { SCENES, SceneId, isSceneId } from '../../core/battle/battle-background';
+import { OpponentRulesComponent } from '../../shared/opponent-rules/opponent-rules.component';
 
 type Picker = { kind: 'species' } | { kind: 'move'; pokeIndex: number; slot: number };
 
 @Component({
   selector: 'app-custom-battle',
   standalone: true,
-  imports: [IonContent, IonButton, RouterLink, ItemIconComponent, ItemPickerComponent],
+  imports: [IonContent, IonButton, RouterLink, ItemIconComponent, ItemPickerComponent, OpponentRulesComponent],
   templateUrl: './custom-battle.page.html',
   styleUrl: './custom-battle.page.scss'
 })
@@ -40,9 +39,7 @@ export class CustomBattlePage {
   readonly teamService = inject(TeamService);
   readonly customBattleSvc = inject(CustomBattleService);
 
-  readonly types = POKEMON_TYPES;
   readonly avatars = TRAINER_AVATARS;
-  readonly scenes = SCENES;
   readonly avatarPath = trainerAvatarPath;
   readonly spritePath = frontSpritePath;
   readonly typeColor = typeColor;
@@ -126,59 +123,16 @@ export class CustomBattlePage {
     this.config.update((c) => clampConfig(fn({ ...c })));
   }
 
-  setCount(n: number): void {
-    this.patch((c) => ({ ...c, opponentCount: n }));
-  }
-
-  stepCount(delta: number): void {
-    this.setCount(this.config().opponentCount + delta);
-  }
-
   /** Doubles needs at least two Pokémon in the player's active team. */
   readonly canDouble = computed(() => (this.teamService.activeTeam()?.pokemon.length ?? 0) >= 2);
 
-  setBackground(value: string): void {
-    const background: SceneId | 'random' = isSceneId(value) ? value : 'random';
-    this.patch((c) => ({ ...c, background }));
-  }
-
-  setFormat(format: BattleFormat): void {
-    if (format === 'doubles' && !this.canDouble()) return;
-    this.patch((c) => ({ ...c, format }));
+  /** Format, background, team size and type rules from <app-opponent-rules>. */
+  setRules(rules: RandomOpponentRules): void {
+    this.patch((c) => ({ ...c, ...rules }));
   }
 
   setMode(mode: OpponentMode): void {
     this.patch((c) => ({ ...c, mode }));
-  }
-
-  toggleForceDistinct(on: boolean): void {
-    this.patch((c) => ({ ...c, forceDistinctTypes: on, forceSingleType: on ? false : c.forceSingleType }));
-  }
-
-  toggleForceSingle(on: boolean): void {
-    this.patch((c) => ({ ...c, forceSingleType: on, forceDistinctTypes: on ? false : c.forceDistinctTypes }));
-  }
-
-  isDistinctType(t: string): boolean {
-    return this.config().distinctTypes.includes(t);
-  }
-
-  canPickDistinctType(t: string): boolean {
-    const c = this.config();
-    return c.distinctTypes.includes(t) || c.distinctTypes.length < c.opponentCount;
-  }
-
-  toggleDistinctType(t: string): void {
-    this.patch((c) => {
-      const has = c.distinctTypes.includes(t);
-      if (has) return { ...c, distinctTypes: c.distinctTypes.filter((x) => x !== t) };
-      if (c.distinctTypes.length >= c.opponentCount) return c;
-      return { ...c, distinctTypes: [...c.distinctTypes, t] };
-    });
-  }
-
-  setSingleType(value: string): void {
-    this.patch((c) => ({ ...c, singleType: value || null }));
   }
 
   // --- avatar --------------------------------------------------

@@ -10,7 +10,7 @@ import {
   sceneForGymType,
   timeOfDay
 } from '../../../core/battle/battle-background';
-import { CustomBattleConfig, configToNpcOptions } from '../../../core/models/custom-battle.model';
+import { CustomBattleConfig, rulesToNpcOptions } from '../../../core/models/custom-battle.model';
 import type { GymLeader, RunMember } from '../../../core/models/trainer-run.model';
 import { AudioService } from '../../../core/services/audio.service';
 import { CustomBattleService } from '../../../core/services/custom-battle.service';
@@ -18,6 +18,7 @@ import { EliteFourRunService } from '../../../core/services/elite-four-run.servi
 import { GymRunService } from '../../../core/services/gym-run.service';
 import { NpcPokemon, NpcTeamService } from '../../../core/services/npc-team.service';
 import { SettingsService } from '../../../core/services/settings.service';
+import { TournamentFight, TournamentService } from '../../../core/services/tournament.service';
 import { TrainerRosterService } from '../../../core/services/trainer-roster.service';
 import { RunCarry, TrainerRunService } from '../../../core/services/trainer-run.service';
 import { fallbackOpponentMoves, makeGlurak, movesByIds } from '../battle-defaults';
@@ -47,6 +48,8 @@ export class BattleSetupService {
 
   /** Set when this battle is one leg of a run (Top-Vier or Arenaleiter). */
   readonly challenge: { svc: TrainerRunService; member: RunMember } | null = this.takeChallenge();
+  /** Set when this battle is the player's next tournament match. */
+  readonly tournament: TournamentFight | null = inject(TournamentService).takePending();
   /** "Arenaleiter" / "Arenaleiterin" for a gym leader's VS intro, else null. */
   readonly gymTitle = (this.challenge?.member as GymLeader | undefined)?.badge
     ? this.challenge!.member.title.split(' ')[0]
@@ -107,6 +110,15 @@ export class BattleSetupService {
       return INTRO_MS;
     }
 
+    if (this.tournament) {
+      const { opponent } = this.tournament;
+      this.setOpponentMons(opponent.team);
+      this.opponentRoll = Promise.resolve();
+      s.npcAvatarId.set(opponent.trainerId);
+      s.npcNameOverride.set(opponent.name);
+      return INTRO_MS;
+    }
+
     if (this.challenge) {
       const member = this.challenge.member;
       this.setOpponentMons(member.team);
@@ -126,6 +138,7 @@ export class BattleSetupService {
   private pickFormat(): BattleFormat {
     if (this.state.debug || this.state.playerTeam().length < 2) return 'singles';
     if (this.customBattle) return this.customBattle.format;
+    if (this.tournament) return this.tournament.config.format;
     if (this.challenge) return this.challenge.svc.run()?.format ?? 'singles';
     return this.settings.allowDoubleBattles() && Math.random() < 0.5 ? 'doubles' : 'singles';
   }
@@ -140,7 +153,7 @@ export class BattleSetupService {
   }
 
   private pickScene(): SceneId {
-    const custom = this.customBattle?.background;
+    const custom = this.customBattle?.background ?? this.tournament?.config.background;
     if (custom) return custom === 'random' ? randomOutdoorScene() : custom;
     if (this.challenge) {
       // Gym leaders fight on their type's scene, the Elite Four in their hall.
@@ -153,9 +166,11 @@ export class BattleSetupService {
 
   /**
    * Puts an exact, pre-built party on the opponent's side (Top 4, custom
-   * "team" mode). `moves` are @pkmn/sim ids resolved against MOVE_LIBRARY.
+   * "team" mode, tournament). `moves` are @pkmn/sim ids resolved against MOVE_LIBRARY.
    */
-  private setOpponentMons(mons: { speciesNum: number; name: string; types: string[]; moves: string[] }[]): void {
+  private setOpponentMons(
+    mons: { speciesNum: number; name: string; types: string[]; moves: string[]; item?: string | null }[]
+  ): void {
     const s = this.state;
     s.opponentTeam.set(mons.map((m) => toBattlePokemon(m, (d) => s.hp(d))));
     s.opponentMovesets.set(mons.map((m) => movesByIds(m.moves)));
@@ -171,7 +186,7 @@ export class BattleSetupService {
     const size = Math.max(minSize, cfg?.opponentCount ?? s.playerTeam().length);
     let rolled: NpcPokemon[] = [];
     try {
-      rolled = await this.npcTeam.generate(size, cfg ? configToNpcOptions(cfg) : undefined);
+      rolled = await this.npcTeam.generate(size, cfg ? rulesToNpcOptions(cfg) : undefined);
     } catch {
       rolled = [];
     }

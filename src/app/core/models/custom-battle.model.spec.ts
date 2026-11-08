@@ -1,6 +1,6 @@
 import {
   clampConfig,
-  configToNpcOptions,
+  rulesToNpcOptions,
   defaultCustomBattleConfig
 } from './custom-battle.model';
 
@@ -10,7 +10,7 @@ describe('custom-battle.model', () => {
     expect(c.opponentCount).toBe(3);
     expect(c.mode).toBe('random');
     expect(c.background).toBe('random');
-    expect(configToNpcOptions(c)).toEqual({});
+    expect(rulesToNpcOptions(c)).toEqual({});
   });
 
   it('clamps opponentCount to 1..6 and trims team / distinctTypes to it', () => {
@@ -46,7 +46,7 @@ describe('custom-battle.model', () => {
     expect(c.forceSingleType).toBe(true);
     expect(c.forceDistinctTypes).toBe(false);
     expect(c.distinctTypes).toEqual([]);
-    expect(configToNpcOptions(c)).toEqual({ singleType: 'Water' });
+    expect(rulesToNpcOptions(c)).toEqual({ singleType: 'Water' });
   });
 
   it('maps distinct-type config to guaranteed types', () => {
@@ -56,7 +56,7 @@ describe('custom-battle.model', () => {
       forceDistinctTypes: true,
       distinctTypes: ['Fire', 'Electric']
     });
-    expect(configToNpcOptions(c)).toEqual({
+    expect(rulesToNpcOptions(c)).toEqual({
       distinctPrimaryTypes: true,
       guaranteedTypes: ['Fire', 'Electric']
     });

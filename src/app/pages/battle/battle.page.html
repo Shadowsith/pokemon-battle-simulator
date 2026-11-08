@@ -43,8 +43,8 @@
         {{ outcome() === 'win' ? 'Du hast gewonnen!' : 'Du wurdest besiegt!' }}
       </h2>
       <div class="trainer-actions">
-        @if (inChallengeBattle) {
-          <ion-button (click)="challengeContinue()">Weiter</ion-button>
+        @if (inRunBattle) {
+          <ion-button (click)="continueRun()">Weiter</ion-button>
         } @else {
           <ion-button (click)="resetBattle()">Nochmal</ion-button>
           <ion-button fill="outline" (click)="toTeamSelect()">Zur Auswahl</ion-button>
@@ -347,7 +347,7 @@
         }
       </div>
 
-      @if (!inChallengeBattle && !debug) {
+      @if (!inRunBattle && !debug) {
         <ion-button size="small" fill="clear" class="reset-btn" (click)="resetBattle()">Reset</ion-button>
       }
     </div>

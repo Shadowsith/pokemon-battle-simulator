@@ -1,0 +1,113 @@
+<ion-content class="ion-padding">
+  <header class="cb-head">
+    <a class="back-link" routerLink="/team-select">‹ Zurück</a>
+    <h1>Turnier</h1>
+  </header>
+
+  @if (tournament(); as t) {
+    <!-- ---------- bracket ---------- -->
+    <section class="cb-section wide">
+      <app-tournament-bracket
+        [rounds]="bracket()?.rounds ?? []"
+        [entrants]="t.entrants"
+        [nextKey]="nextKey()"
+        (entrantSelected)="showEntrant($event)"
+      />
+      <p class="cb-hint">Tippe auf einen Trainer, um sein Team zu sehen.</p>
+    </section>
+
+    @switch (t.status) {
+      @case ('active') {
+        <div class="t-panel">
+          @if (opponent(); as o) {
+            <p class="panel-line">{{ nextRoundLabel() }} gegen</p>
+            <div class="opponent">
+              <img class="opponent-avatar" [src]="avatarPath(o.trainerId)" [alt]="o.name" />
+              <strong>{{ o.name }}</strong>
+            </div>
+            <div class="mon-row">
+              @for (mon of o.team; track $index) {
+                <img [src]="spritePath(mon.speciesNum)" [alt]="mon.name" [title]="mon.name" />
+              }
+            </div>
+            <ion-button expand="block" [disabled]="!teamService.activeReady()" (click)="startFight()">
+              Kampf starten
+            </ion-button>
+          }
+          <ion-button expand="block" fill="clear" color="medium" (click)="newTournament()">Aufgeben</ion-button>
+        </div>
+      }
+      @case ('won') {
+        <div class="t-panel win">
+          <p class="panel-headline">🏆 Du hast das Turnier gewonnen!</p>
+          <ion-button expand="block" (click)="newTournament()">Neues Turnier</ion-button>
+          <ion-button expand="block" fill="outline" (click)="toMenu()">Zum Menü</ion-button>
+        </div>
+      }
+      @case ('lost') {
+        <div class="t-panel loss">
+          <p class="panel-headline">Ausgeschieden gegen {{ t.lostTo }}</p>
+          @if (champion(); as c) {
+            <p class="panel-line">Turniersieger: <strong>{{ c.name }}</strong></p>
+          }
+          <ion-button expand="block" (click)="newTournament()">Neues Turnier</ion-button>
+          <ion-button expand="block" fill="outline" (click)="toMenu()">Zum Menü</ion-button>
+        </div>
+      }
+    }
+  } @else {
+    <!-- ---------- config ---------- -->
+    <p class="cb-hint intro">
+      Tritt im K.-o.-System gegen zufällige NPC-Trainer an. Vor jedem Kampf wird dein Team vollständig
+      geheilt. Die Kämpfe der übrigen Trainer werden sofort entschieden – eine Niederlage scheidet dich aus.
+    </p>
+
+    <section class="cb-section">
+      <span class="cb-label">Teilnehmer</span>
+      <div class="cb-segment">
+        @for (size of sizes; track size) {
+          <button type="button" class="seg-btn" [class.active]="config().size === size" (click)="setSize(size)">
+            {{ size }} Trainer
+          </button>
+        }
+      </div>
+    </section>
+
+    <app-opponent-rules
+      [rules]="config()"
+      [canDouble]="canDouble()"
+      countLabel="Pokémon pro gegnerischem Team"
+      (rulesChange)="setRules($event)"
+    />
+
+    <div class="cb-actions">
+      <ion-button expand="block" [disabled]="!teamService.activeReady() || creating()" (click)="start()">
+        {{ creating() ? 'Teams werden ausgelost…' : 'Turnier starten' }}
+      </ion-button>
+      @if (!teamService.activeReady()) {
+        <p class="cb-hint">Du brauchst ein kampfbereites aktives Team.</p>
+      }
+    </div>
+  }
+
+  <!-- ---------- entrant team sheet ---------- -->
+  @if (shown(); as e) {
+    <div class="sheet-overlay" (click)="shownId.set(null)">
+      <div class="sheet" (click)="$event.stopPropagation()">
+        <div class="sheet-head">
+          <img [src]="avatarPath(e.trainerId)" [alt]="e.name" width="48" height="48" />
+          <strong>{{ e.name }}</strong>
+          <button type="button" class="cb-btn" (click)="shownId.set(null)">Schließen</button>
+        </div>
+        <ul class="sheet-list">
+          @for (mon of e.team; track $index) {
+            <li>
+              <img [src]="spritePath(mon.speciesNum)" [alt]="mon.name" width="56" height="56" />
+              <span>{{ mon.name }}</span>
+            </li>
+          }
+        </ul>
+      </div>
+    </div>
+  }
+</ion-content>

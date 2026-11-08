@@ -1,0 +1,145 @@
+/* Half the column gap: each connector is drawn half by the feeding pair, half by the next match. */
+$stub: 12px;
+$line: #c4ccd8;
+
+:host {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 6px;
+}
+
+.bracket {
+  display: grid;
+  grid-template-columns: repeat(var(--rounds), minmax(150px, 1fr));
+  column-gap: $stub * 2;
+  min-width: calc(var(--rounds) * 150px + (var(--rounds) - 1) * #{$stub * 2});
+}
+
+.round {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.round-label {
+  margin: 0 0 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #666;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.round-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+
+  /* bracket arm joining the two matches of a pair */
+  &.paired::after {
+    content: '';
+    position: absolute;
+    right: -$stub;
+    top: 25%;
+    bottom: 25%;
+    width: $stub;
+    border: 2px solid $line;
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+  }
+}
+
+.cell {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 5px 0;
+  position: relative;
+}
+
+/* stub from the previous round's arm into this match */
+.round:not(.first) .cell::before {
+  content: '';
+  position: absolute;
+  left: -$stub;
+  top: 50%;
+  width: $stub;
+  border-top: 2px solid $line;
+}
+
+.match {
+  width: 100%;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+  background: #fff;
+  overflow: hidden;
+
+  &.mine {
+    border-color: #9db6dc;
+  }
+
+  &.next {
+    border-color: #3c6cb4;
+    box-shadow: 0 0 0 2px rgba(60, 108, 180, 0.25);
+  }
+}
+
+.slot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 34px;
+  padding: 3px 8px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 13px;
+  color: #333;
+  text-align: left;
+  cursor: pointer;
+
+  & + .slot {
+    border-top: 1px solid #eee;
+  }
+
+  &.empty {
+    color: #aaa;
+    cursor: default;
+  }
+
+  &.player {
+    background: #eef3fb;
+  }
+
+  &.winner {
+    font-weight: 700;
+  }
+
+  &.loser {
+    opacity: 0.45;
+  }
+}
+
+.slot-avatar {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  object-fit: contain;
+}
+
+.slot-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

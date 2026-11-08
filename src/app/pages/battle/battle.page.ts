@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnDestroy, OnInit, ViewChild, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
+import { TournamentService } from '../../core/services/tournament.service';
 import { IonContent, IonButton } from '@ionic/angular/standalone';
 import { Move } from '../../core/models/move.model';
 import {
@@ -68,6 +69,7 @@ export class BattlePage implements OnInit, OnDestroy {
   @ViewChild('opponentPanel', { static: true, read: ElementRef }) opponentPanelRef!: ElementRef<HTMLElement>;
 
   private readonly router = inject(Router);
+  private readonly tournament = inject(TournamentService);
   private readonly settings = inject(SettingsService);
   private readonly teamService = inject(TeamService);
   private readonly animation = inject(MoveAnimationService);
@@ -81,7 +83,8 @@ export class BattlePage implements OnInit, OnDestroy {
 
   readonly debug = this.state.debug;
   readonly inCustomBattle = this.setup.customBattle !== null;
-  readonly inChallengeBattle = this.setup.challenge !== null;
+  /** A run leg or tournament match: the result screen hands back to that mode's page. */
+  readonly inRunBattle = this.setup.challenge !== null || this.setup.tournament !== null;
   readonly gymTitle = this.setup.gymTitle;
 
   /** Every Pokémon in this simulator battles at level 100. */
@@ -270,12 +273,17 @@ export class BattlePage implements OnInit, OnDestroy {
     this.router.navigateByUrl('/team-select');
   }
 
-  /** Run leg over: report the outcome and hand back to that mode's run screen. */
-  challengeContinue(): void {
+  /** Run leg / tournament match over: report the outcome and hand back to that mode's page. */
+  continueRun(): void {
+    const won = this.outcome() === 'win';
+    if (this.setup.tournament) {
+      this.tournament.recordOutcome(won);
+      this.router.navigateByUrl(this.tournament.route);
+      return;
+    }
     const challenge = this.setup.challenge;
     if (!challenge) return;
     const { svc } = challenge;
-    const won = this.outcome() === 'win';
     svc.recordOutcome(won, won ? this.setup.snapshotRunCarry() : null);
     this.router.navigate([svc.route], { queryParams: { resume: 1 } });
   }
