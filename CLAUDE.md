@@ -30,7 +30,7 @@ A local Pokémon battle simulator app with animated battles against NPCs. Stack:
 - `public/assets/` – `sprites`, `sounds`, `trainers`, `data` (generated). Generated/fetched by `scripts/*.mjs` (`fetch-sprites`, `fetch-cries`, `fetch-trainers`, `fetch-item-icons`, `build-team-data`, `build-item-table`, `generate-move-library`, `categorize-moves`, …).
 - Free move sounds: `scripts/synth-move-sounds.mjs [moveId ...]` synthesizes original GBA-style clips (no samples) into `public/assets/sounds/moves/free/`, which `audio.service` prefers over the regular clip of the same name. Engine in `scripts/move-sounds/` (`track.mjs` voices, `move-sfx.mjs` shared gestures); **a new recipe goes into `recipes/<type>.mjs` of its move's type** (Normal is split by kind into `recipes/normal/normal-{strike,ranged,status,buff}-moves.mjs`), timed to the move's animation.
 - Battle backgrounds: `scripts/build-backgrounds.mjs [sceneId ...]` draws original SVG scenes into `public/assets/backgrounds/` (engine + recipes in `scripts/backgrounds/`); concept in `docs/battle-backgrounds-concept.md`.
-- `docs/` – concepts and checklists (Kalos team concepts, move animation/sound review checklists, music themes, local multiplayer concept — not implemented).
+- `docs/` – concepts and checklists (Kalos team concepts, move animation/sound review checklists, music themes, local multiplayer concept, tournament mode concept — both not implemented).
 
 ## Known oversized files (split before extending)
 
