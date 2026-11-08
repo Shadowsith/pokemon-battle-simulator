@@ -170,13 +170,19 @@ export const BUG = {
     return s;
   },
 
-  /** Generic beam (grows 0.26 s, holds ~0.25 s, fades to ~0.71 s) + confusion fleck: a flickering, chittering signal of buzzing light. */
+  /**
+   * BugMoveAnimations.playSignalBeam: a stream of light squares flows from the
+   * user past the target (0-1.7 s, hits at ~0.2 s); the target flashes red /
+   * green every 0.28 s, then a green glow fades (to ~2.1 s). A buzzing
+   * signal with alternating "traffic light" beeps.
+   */
   signalbeam: () => {
-    const s = new MoveSfx(1.3, 0x51b9);
-    s.pulse(0.0, 0.7, { freq: (u) => 900 * (Math.floor(u * 28) % 2 ? 1 : 1.26), gain: env.swell(0.2), duty: 0.25 });
-    s.noise(0.0, 0.7, { clock: () => 3500, gain: env.swell(0.14), short: true });
-    s.pulse(0.0, 0.7, { freq: (u) => 220 + 60 * Math.sin(2 * Math.PI * 30 * u), gain: env.swell(0.1), duty: 0.5 });
-    s.confusion(0.72);
+    const s = new MoveSfx(2.2, 0x51b9);
+    s.pulse(0.0, 1.7, { freq: (u) => 900 * (Math.floor(u * 60) % 2 ? 1 : 1.26), gain: env.swell(0.16), duty: 0.25 });
+    s.noise(0.0, 1.7, { clock: () => 3500, gain: env.swell(0.1), short: true });
+    s.pulse(0.0, 1.7, { freq: (u) => 220 + 60 * Math.sin(2 * Math.PI * 60 * u), gain: env.swell(0.08), duty: 0.5 });
+    for (let k = 0; k < 5; k++) s.pulse(0.2 + k * 0.28, 0.12, { freq: () => (k % 2 ? 1320 : 990), gain: env.decay(0.14, 2), duty: 0.5 });
+    s.sparkle(1.75, 0.35, 4, { lo: 3000, hi: 5000, gain: 0.1 });
     return s;
   },
 

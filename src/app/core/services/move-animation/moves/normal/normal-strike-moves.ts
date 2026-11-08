@@ -16,8 +16,102 @@ export class NormalStrikeMoveAnimations {
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
     skullbash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSkullBash(refs, target, v),
     slash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v),
+    smellingsalts: (refs, _launch, target) => NormalStrikeMoveAnimations.playSmellingSalts(refs, target),
     superfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSuperFang(refs, target, v)
   };
+
+  /**
+   * Smelling Salts, after the DPPt animation: two white open hands appear on
+   * either side of the target (0-0.25 s) and clap twice - each turns edge-on
+   * and back, and a pale yellow-green burst with white specks flares on its
+   * outer side while the target jolts (0.4 s and 0.85 s); then the hands
+   * fade (1.25-1.5 s).
+   */
+  private static async playSmellingSalts(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const w = Math.max(r.width * 0.38, 26);
+    const off = Math.max(r.width * 0.55, 36);
+    const y = target.y + r.height * 0.1;
+
+    // The hands: the right one is a mirror image of the left (only the glyph flips, never a sprite).
+    const sides = [-1, 1] as const;
+    const hands = sides.map((side) => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:absolute;width:0;height:0;pointer-events:none';
+      const glove = FxGlyphs.gloveGlyph(w);
+      glove.style.left = `${-w / 2}px`;
+      glove.style.top = `${-w * 0.55}px`;
+      if (side > 0) glove.style.transform = 'scaleX(-1)';
+      wrap.appendChild(glove);
+      Fx.place(wrap, { x: target.x + side * off, y });
+      fxEl.appendChild(wrap);
+      return wrap;
+    });
+
+    const claps = [400, 850];
+    const clap = 260;
+    const total = 1500;
+    const done = hands.map((wrap, i) => {
+      const side = sides[i];
+      const frames: Keyframe[] = [
+        { transform: 'translateX(0) scale(.6,.6)', opacity: 0, offset: 0 },
+        { transform: 'translateX(0) scale(1,1)', opacity: 1, offset: 250 / total }
+      ];
+      // Each clap: the hand swings in a little and turns edge-on, then opens again.
+      for (const at of claps) {
+        frames.push(
+          { transform: 'translateX(0) scale(1,1)', opacity: 1, offset: (at - clap * 0.4) / total },
+          { transform: `translateX(${-side * 4}px) scale(.22,1)`, opacity: 1, offset: at / total },
+          { transform: 'translateX(0) scale(1,1)', opacity: 1, offset: (at + clap * 0.6) / total }
+        );
+      }
+      frames.push({ transform: 'translateX(0) scale(1,1)', opacity: 1, offset: 1250 / total }, { transform: 'translateX(0) scale(.9,.9)', opacity: 0, offset: 1 });
+      return Fx.anim(wrap, frames, { duration: total, easing: 'ease-in-out' }).then(() => wrap.remove());
+    });
+
+    // A burst with specks on the outer side of each hand at every clap; the target jolts.
+    const bursts = claps.map((at) =>
+      Fx.wait(at).then(() => {
+        Fx.shake(targetEl, 4);
+        Fx.flash(targetEl, '#F0FFC0', 0.4);
+        return Promise.all(sides.map((side) => NormalStrikeMoveAnimations.clapBurst(fxEl, { x: target.x + side * (off + w * 0.7), y }, side, w)));
+      })
+    );
+    await Promise.all([...done, ...bursts]);
+  }
+
+  /** A pale yellow-green burst at `at` and white specks drifting up and outward (`side`) from it (Smelling Salts). */
+  private static clapBurst(fxEl: HTMLElement, at: Point, side: 1 | -1, size: number): Promise<void> {
+    const parts: Promise<void>[] = [];
+    const burst = FxGlyphs.spikyBurst(size * 1.5, '#B8E07A', '#F0FFC0', '#FFFFFF');
+    Fx.place(burst, at);
+    fxEl.appendChild(burst);
+    parts.push(
+      Fx.anim(burst, [
+        { transform: 'scale(.3) rotate(0deg)', opacity: 0.9 },
+        { transform: 'scale(1.1) rotate(10deg)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(1.25) rotate(18deg)', opacity: 0 }
+      ], { duration: 320, easing: 'ease-out' }).then(() => burst.remove())
+    );
+    for (let i = 0; i < 9; i++) {
+      const s = 2 + Math.random() * 2;
+      const speck = document.createElement('div');
+      speck.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:${i % 3 ? '#ffffff' : '#D8C8FF'};box-shadow:0 0 3px #ffffff`;
+      Fx.place(speck, at);
+      fxEl.appendChild(speck);
+      const dx = side * (10 + Math.random() * size * 0.9);
+      const dy = -(6 + Math.random() * size * 1.1);
+      parts.push(
+        Fx.anim(speck, [
+          { transform: 'translate(0,0)', opacity: 0 },
+          { transform: `translate(${dx * 0.4}px,${dy * 0.4}px)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${dx}px,${dy}px)`, opacity: 0 }
+        ], { duration: 500 + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 80, fill: 'backwards' }).then(() => speck.remove())
+      );
+    }
+    return Promise.all(parts).then(() => void 0);
+  }
 
   /**
    * Super Fang: small rodent incisors snap down into the target (a quick

@@ -523,13 +523,22 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a sharp slap that jolts the target awake. */
+  /**
+   * NormalStrikeMoveAnimations.playSmellingSalts: two hands appear by the
+   * target (0-0.25 s) and clap at 0.4 s and 0.85 s, each with a burst and
+   * drifting specks; the hands fade (1.25-1.5 s). Two sharp claps, a bright
+   * wake-up chime.
+   */
   smellingsalts: () => {
-    const s = new MoveSfx(0.75, 0x5a17);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 5000, gain: 0.3 });
-    s.thud(0.17, 0.6, 0.4);
-    s.noise(0.17, 0.06, { clock: () => 15000, gain: env.decay(0.35, 1) });
-    s.arpeggio(0.27, [84, 91], 0.06, { gain: 0.16, duty: 0.25, hold: 0.09 });
+    const s = new MoveSfx(1.6, 0x5a17);
+    s.whoosh(0.0, 0.25, { from: 2000, to: 5000, gain: 0.12 });
+    for (const at of [0.4, 0.85]) {
+      s.thud(at, 0.35, 0.2);
+      s.noise(at, 0.07, { clock: () => 15000, gain: env.decay(0.4, 1) });
+      s.noise(at, 0.12, { clock: () => 5000, gain: env.decay(0.2, 2) });
+      s.sparkle(at + 0.03, 0.4, 4, { lo: 4500, hi: 8000, gain: 0.1 });
+    }
+    s.arpeggio(1.0, [84, 91], 0.06, { gain: 0.16, duty: 0.25, hold: 0.09 });
     return s;
   },
 

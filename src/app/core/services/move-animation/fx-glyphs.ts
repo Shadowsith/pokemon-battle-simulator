@@ -78,6 +78,19 @@ export class FxGlyphs {
     return el;
   }
 
+  /** The comic anger mark: four red curved brackets bulging toward a common centre, `size` px wide (Taunt). */
+  static angerMark(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 2px #FF5A5A88)`;
+    const arcs = 'M2,8 Q8,8 8,2 M12,2 Q12,8 18,8 M18,12 Q12,12 12,18 M8,18 Q8,12 2,12';
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 20 20" fill="none" stroke-linecap="round">' +
+      `<path d="${arcs}" stroke="#7A0808" stroke-width="3.8"/>` +
+      `<path d="${arcs}" stroke="#F01E1E" stroke-width="2.4"/>` +
+      '</svg>';
+    return el;
+  }
+
   /**
    * A white cartoon glove pointing up with its index finger, `w` px wide
    * (the wrist cuff is at the bottom centre, so wag it with transform-origin

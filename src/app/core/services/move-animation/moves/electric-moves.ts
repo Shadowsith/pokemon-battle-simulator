@@ -11,6 +11,7 @@ export class ElectricMoveAnimations {
     thunder: (refs, _launch, target) => ElectricMoveAnimations.playThunder(refs, target),
     thunderbolt: (refs, _launch, target) => ElectricMoveAnimations.playThunderbolt(refs, target),
     thunderwave: (refs, _launch, target) => ElectricMoveAnimations.playThunderWave(refs, target),
+    volttackle: (refs, launch, target) => ElectricMoveAnimations.playVoltTackle(refs, launch, target),
     zapcannon: (refs, launch, target, v) => ElectricMoveAnimations.playZapCannon(refs, launch, target, v),
     thunderpunch: (refs, _launch, target) =>
       FxEffects.playElementalPunch(refs, target, 'yellow', '#FFE04A', () => FxGlyphs.sparkBolt())
@@ -393,8 +394,139 @@ export class ElectricMoveAnimations {
     bg.remove();
   }
 
-  /** Keeps short jagged sparks flickering off the edge of `el` (a ball of `size` px); returns a stop function. */
-  private static crackle(el: HTMLElement, size: number): () => void {
+  /**
+   * Volt Tackle, after the Gen 5 animation: the scene goes dark (0-0.3 s);
+   * the user is wrapped in a big pulsing yellow-white ball of electricity
+   * with green-yellow sparks crackling round it (0.3-1.3 s); it charges at
+   * the target behind a white lightning streak racing along the ground
+   * (1.3-1.55 s); at the hit the backdrop turns dark olive with yellow rays
+   * bursting in from the edges while yellow sparks crackle over the target
+   * (1.55-2.45 s); the scene clears and the user takes recoil (to ~3.05 s).
+   */
+  private static async playVoltTackle(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // 1. The ball of electricity swells round the user and pulses.
+    const size = Math.max(Math.max(lr.width, lr.height) * 1.5, 80);
+    const ball = document.createElement('div');
+    ball.style.cssText =
+      `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(circle,#FFFFF0 0 22%,#FFF68Aee 40%,#E8F05A99 55%,#C8E83A44 68%,#C8E83A00 74%)';
+    Fx.place(ball, launch);
+    fxEl.appendChild(ball);
+    const stopBall = ElectricMoveAnimations.crackle(ball, size, '#D8F040');
+    const charged = 'brightness(1.6) sepia(.5) saturate(3) hue-rotate(10deg)';
+    Fx.anim(launchEl, [{ filter: 'none' }, { filter: charged, offset: 0.2 }, { filter: charged, offset: 0.85 }, { filter: 'none' }], {
+      duration: 1300,
+      easing: 'linear',
+      fill: 'none'
+    });
+    await Fx.anim(ball, [
+      { transform: 'scale(.3)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.15 },
+      { transform: 'scale(.78)', opacity: 1, offset: 0.35 },
+      { transform: 'scale(1.08)', opacity: 1, offset: 0.55 },
+      { transform: 'scale(.82)', opacity: 1, offset: 0.75 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], { duration: 1000, easing: 'ease-in-out' });
+
+    // 2. The charge: user and ball rush most of the way to the target behind a lightning streak on the ground.
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const original = launchEl.style.transform;
+    const rush = 250;
+    const dash = Fx.anim(launchEl, [
+      { transform: `${original} translate(0,0)` },
+      { transform: `${original} translate(${dx * 0.55}px,${dy * 0.55}px)` }
+    ], { duration: rush, easing: 'ease-in' });
+    Fx.anim(ball, [
+      { transform: 'translate(0,0) scale(1)', opacity: 1 },
+      { transform: `translate(${dx * 0.55}px,${dy * 0.55}px) scale(.6)`, opacity: 0 }
+    ], { duration: rush, easing: 'ease-in' }).then(() => {
+      stopBall();
+      ball.remove();
+    });
+    const streakDone = ElectricMoveAnimations.groundStreak(fxEl, Fx.footOf(launchEl, fieldEl), Fx.footOf(targetEl, fieldEl), rush);
+    await dash;
+
+    // 3. The hit: the olive ray backdrop opens behind the dark, which clears off it; sparks crackle over the target.
+    Fx.anim(launchEl, [{ transform: `${original} translate(${dx * 0.55}px,${dy * 0.55}px)` }, { transform: original }], {
+      duration: 300,
+      easing: 'ease-out'
+    }).then(() => {
+      launchEl.getAnimations?.().forEach((a) => a.cancel());
+      launchEl.style.transform = original;
+    });
+    const c = `${target.x}px ${target.y}px`;
+    const rays = Fx.backdrop(
+      fieldEl,
+      `background:radial-gradient(circle at ${c},#2E2C1E 0 28%,#2E2C1E00 62%),repeating-conic-gradient(from 0deg at ${c},#D8B82A 0 3deg,#3A3620 3deg 8deg)`
+    );
+    rays.animate([{ filter: 'brightness(1)' }, { filter: 'brightness(1.25)' }, { filter: 'brightness(1)' }], { duration: 160, iterations: 6 });
+    Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 150, easing: 'ease-in' }).then(() => dim.remove());
+    const sparkSize = Math.max(Math.max(tr.width, tr.height) * 1.1, 60);
+    const sparks = document.createElement('div');
+    sparks.style.cssText = `width:${sparkSize}px;height:${sparkSize}px;pointer-events:none`;
+    Fx.place(sparks, target);
+    fxEl.appendChild(sparks);
+    const stopSparks = ElectricMoveAnimations.crackle(sparks, sparkSize, '#FFE84A');
+    Fx.shakeField(fieldEl, 0.7);
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => {
+        Fx.flash(targetEl, '#FFE84A', 0.6);
+        Fx.shake(targetEl, 5);
+      }, i * 220);
+    }
+    await Promise.all([streakDone, Fx.wait(900)]);
+    stopSparks();
+    sparks.remove();
+
+    // 4. The scene clears; the user takes recoil.
+    await Fx.anim(rays, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    rays.remove();
+    Fx.flash(launchEl, '#FFE84A', 0.5);
+    Fx.shake(launchEl, 4);
+    await Fx.wait(300);
+  }
+
+  /**
+   * A white lightning streak that races along the ground from `from` to `to`
+   * in `rush` ms, then flickers and fades (Volt Tackle). The zigzag is drawn
+   * downward and the strip turned onto the path, since zigzagPoints kinks sideways.
+   */
+  private static groundStreak(fxEl: HTMLElement, from: Point, to: Point, rush: number): Promise<void> {
+    const len = Math.hypot(to.x - from.x, to.y - from.y);
+    const deg = (Math.atan2(to.y - from.y, to.x - from.x) * 180) / Math.PI - 90;
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('width', '1');
+    svg.setAttribute('height', `${len}`);
+    svg.setAttribute('style', `position:absolute;left:${from.x}px;top:${from.y}px;overflow:visible;pointer-events:none;transform-origin:0 0;transform:rotate(${deg}deg);filter:drop-shadow(0 0 4px #FFF68A)`);
+    fxEl.appendChild(svg);
+    const draw = () => {
+      svg.innerHTML =
+        `<polyline points="${Fx.zigzagPoints(0, 0, 0, len, 7)}" fill="none" stroke="#FFFFFF" stroke-width="2.4"/>` +
+        `<polyline points="${Fx.zigzagPoints(0, 0, 0, len, 10)}" fill="none" stroke="#FFF68Aaa" stroke-width="1.2"/>`;
+    };
+    draw();
+    const flicker = setInterval(draw, 60);
+    return Fx.anim(svg, [
+      { clipPath: 'inset(0 -20px 100% -20px)', opacity: 1 },
+      { clipPath: 'inset(0 -20px 0 -20px)', opacity: 1, offset: 0.35 },
+      { clipPath: 'inset(0 -20px 0 -20px)', opacity: 1, offset: 0.7 },
+      { clipPath: 'inset(0 -20px 0 -20px)', opacity: 0 }
+    ], { duration: rush / 0.35, easing: 'linear' }).then(() => {
+      clearInterval(flicker);
+      svg.remove();
+    });
+  }
+
+  /** Keeps short jagged sparks (`color`) flickering off the edge of `el` (a ball of `size` px); returns a stop function. */
+  private static crackle(el: HTMLElement, size: number, color = '#FFF6A0'): () => void {
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
     svg.setAttribute('width', `${size}`);
@@ -408,7 +540,7 @@ export class ElectricMoveAnimations {
         const ang = Math.random() * 360;
         const len = size * (0.35 + Math.random() * 0.4);
         const pts = Fx.zigzagPoints(0, c * 0.7, 0, c * 0.7 + len, 4);
-        html += `<polyline points="${pts}" fill="none" stroke="#FFF6A0" stroke-width="1.8" transform="translate(${c},${c}) rotate(${ang})"/>`;
+        html += `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.8" transform="translate(${c},${c}) rotate(${ang})"/>`;
       }
       svg.innerHTML = html;
     };

@@ -336,15 +336,21 @@ export const WATER = {
     return s;
   },
 
-  /** Generic field move at full power (~0.6 s + heavy shake): a huge spout erupts and rains down on the foes. */
+  /**
+   * WaterMoveAnimations.playWaterSpout: a water column shoots up (0-0.35 s),
+   * holds and thins away (to 1.0 s), drops rain round the target from 0.9 s,
+   * splashes hit it at 1.2 / 1.37 / 1.54 / 1.71 / 1.88 s, the foam bank
+   * builds and fades (to ~2.6 s). A gushing roar, then pattering rain and splashes.
+   */
   waterspout: () => {
-    const s = new MoveSfx(1.3, 0x3a66);
-    s.noise(0.0, 0.35, { clock: env.ramp(1200, 8000), gain: env.attackDecay(0.55, 0.15) });
-    s.pulse(0.0, 0.4, { freq: (u) => 70 + 120 * u, gain: env.decay(0.35, 1), duty: 0.5 });
-    s.rumble(0.0, 0.7, { from: 600, to: 250, gain: 0.3 });
-    s.splash(0.4, 0.55);
-    s.noise(0.45, 0.75, { clock: () => 6000, gain: env.decay(0.2, 1.2) });
-    s.bubbles(0.45, 0.6, 9, { gain: 0.12 });
+    const s = new MoveSfx(2.7, 0x3a66);
+    s.noise(0.0, 0.5, { clock: env.ramp(1200, 8000), gain: env.attackDecay(0.5, 0.15) });
+    s.pulse(0.0, 0.4, { freq: (u) => 70 + 120 * u, gain: env.decay(0.3, 1), duty: 0.5 });
+    s.noise(0.3, 0.7, { clock: () => 5000, gain: env.decay(0.18, 1.2) });
+    s.bubbles(0.2, 0.6, 7, { gain: 0.1 });
+    s.noise(0.9, 1.2, { clock: () => 7000, gain: env.swell(0.12), short: true });
+    for (const at of [1.2, 1.37, 1.54, 1.71, 1.88]) s.splash(at, 0.3);
+    s.noise(1.1, 1.4, { clock: () => 2200, gain: env.swell(0.12) });
     return s;
   },
 

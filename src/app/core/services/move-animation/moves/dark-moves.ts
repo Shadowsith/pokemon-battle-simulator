@@ -1,6 +1,7 @@
-import { Point, BattleStageRefs, MoveAnimRegistry } from '../animation.types';
+import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../animation.types';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
+import { FxEffects } from '../fx-effects';
 
 /** Hand-made animations for Dark-type moves. */
 export class DarkMoveAnimations {
@@ -8,8 +9,70 @@ export class DarkMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     bite: (refs, _launch, target) => DarkMoveAnimations.playBite(refs, target),
     crunch: (refs, _launch, target) => DarkMoveAnimations.playCrunch(refs, target),
-    darkpulse: (refs, launch, target) => DarkMoveAnimations.playDarkPulse(refs, launch, target)
+    darkpulse: (refs, launch, target) => DarkMoveAnimations.playDarkPulse(refs, launch, target),
+    taunt: (refs, launch, target, v) => DarkMoveAnimations.playTaunt(refs, launch, target, v)
   };
+
+  /**
+   * Taunt, after the DPPt animation: a white smoke puff billows up in front of
+   * the user and turns lilac (0-0.65 s); out of it a white glove beckons the
+   * foe twice with its index finger (0.15-1.0 s) and fades (1.0-1.4 s); then a
+   * red anger mark pops on the target's head and pulses, hops to the other
+   * side and pulses again (1.4-2.4 s).
+   */
+  private static async playTaunt(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    // 1. Smoke billows up in front of the user's head: white, then lilac.
+    const spot: Point = {
+      x: launch.x + (target.x - launch.x) * 0.3,
+      y: launch.y - lr.height * 0.2 + (target.y - launch.y) * 0.15
+    };
+    const cloud = Math.max(lr.width * 0.7, 50);
+    const smoke = [
+      FxEffects.smokePuff(fxEl, spot, cloud),
+      Fx.wait(200).then(() => FxEffects.smokePuff(fxEl, spot, cloud * 1.1, ['#D8C8F0', '#B8A8D8']))
+    ];
+
+    // 2. The glove beckons out of the smoke: the finger tips toward the user and back, twice.
+    const w = Math.max(lr.width * 0.28, 24);
+    const hand = FxGlyphs.pointingHandGlyph(w);
+    const pose = (deg: number) => `${v.dir < 0 ? 'scaleX(-1) ' : ''}rotate(${deg}deg)`;
+    hand.style.transformOrigin = '50% 100%';
+    Fx.place(hand, spot);
+    fxEl.appendChild(hand);
+    const curl = -18;
+    const beckon = Fx.anim(hand, [
+      { transform: `${pose(0)} scale(.6)`, opacity: 0 },
+      { transform: `${pose(0)} scale(1)`, opacity: 1, offset: 0.12 },
+      { transform: `${pose(curl)} scale(1)`, opacity: 1, offset: 0.27 },
+      { transform: `${pose(6)} scale(1)`, opacity: 1, offset: 0.42 },
+      { transform: `${pose(curl)} scale(1)`, opacity: 1, offset: 0.57 },
+      { transform: `${pose(0)} scale(1)`, opacity: 1, offset: 0.68 },
+      { transform: `${pose(0)} scale(1)`, opacity: 0, filter: 'brightness(.6)' }
+    ], { duration: 1250, delay: 150, easing: 'ease-in-out', fill: 'backwards' }).then(() => hand.remove());
+    await Promise.all([...smoke, beckon]);
+
+    // 3. The anger mark pops on one side of the target's head, then hops to the other.
+    const size = Math.max(tr.width * 0.28, 20);
+    for (const side of [1, -1]) {
+      const mark = FxGlyphs.angerMark(size);
+      Fx.place(mark, { x: target.x + side * tr.width * 0.25, y: target.y - tr.height * (side > 0 ? 0.3 : 0.36) });
+      fxEl.appendChild(mark);
+      Fx.shake(targetEl, 2);
+      await Fx.anim(mark, [
+        { transform: 'scale(0)', opacity: 1 },
+        { transform: 'scale(1.25)', opacity: 1, offset: 0.15 },
+        { transform: 'scale(.95)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(1.2)', opacity: 1, offset: 0.55 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.8 },
+        { transform: 'scale(1)', opacity: 0 }
+      ], { duration: 500, easing: 'ease-out' });
+      mark.remove();
+    }
+  }
 
   /**
    * Bite: a white jaw with sharp teeth opens above and below the target and

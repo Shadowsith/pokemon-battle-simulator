@@ -347,15 +347,27 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (0.43 s), bp 130: a white-hot blast roars out and explodes with a long, searing burn. */
+  /**
+   * FireRangedMoveAnimations.playOverheat: the user turns red-hot as the scene
+   * goes black (0-0.3 s), the blue ray backdrop opens (0.55-0.75 s), the user
+   * explodes (0.75 s) and fire sweeps the screen (target hit ~0.9-1.0 s,
+   * embers to ~2.15 s), black and back (2.15-2.65 s), smoke rises (from
+   * 2.65 s), stat-down bubbles (3.45 s). Tense build, huge blast, sizzling fade.
+   */
   overheat: () => {
-    const s = new MoveSfx(1.3, 0x0e47);
-    s.noise(0.0, 0.45, { clock: env.ramp(1500, 7000), gain: env.ramp(0.15, 0.4) });
-    s.pulse(0.0, 0.45, { freq: env.ramp(90, 200), gain: env.ramp(0.05, 0.16), duty: 0.5 });
-    s.thud(0.43, 0.6, 0.9);
-    s.noise(0.43, 0.75, { clock: (u) => 9000 - 6000 * u, gain: (u) => 0.4 * Math.min(1, u * 15) * Math.pow(1 - u, 1.1) });
-    s.noise(0.45, 0.7, { clock: () => 900, gain: (u) => 0.25 * Math.sin(Math.PI * u) });
-    s.sparkle(0.5, 0.55, 8, { lo: 6000, hi: 9500, gain: 0.12 });
+    const s = new MoveSfx(4.4, 0x0e47);
+    s.noise(0.0, 0.75, { clock: env.ramp(500, 2400), gain: env.ramp(0.08, 0.32) });
+    s.pulse(0.0, 0.75, { freq: env.ramp(70, 160), gain: env.ramp(0.04, 0.14), duty: 0.5 });
+    s.chord(0.5, 0.25, [72, 79, 84], { rate: 0.02, gain: 0.1 });
+    s.thud(0.75, 0.9, 1);
+    s.noise(0.75, 0.4, { clock: (u) => 11000 - 8000 * u, gain: env.attackDecay(0.45, 0.02) });
+    s.noise(0.77, 1.4, { clock: (u) => 1400 - 900 * u, gain: (u) => 0.45 * Math.min(1, u * 12) * Math.pow(1 - u, 1.2) });
+    s.rumble(0.8, 1.0, { from: 300, to: 90, gain: 0.3 });
+    s.sparkle(0.85, 0.8, 10, { lo: 5500, hi: 9500, gain: 0.12 });
+    s.burn(0.95, 0.3);
+    s.whoosh(2.15, 0.25, { from: 4000, to: 1200, gain: 0.15 });
+    s.noise(2.65, 1.0, { clock: () => 600, gain: env.swell(0.12) });
+    s.statDown(3.45);
     return s;
   },
 
@@ -403,13 +415,21 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) + burn fleck (~0.6 s): eerie wisps of ghost fire float over to the target. */
+  /**
+   * FireStatusMoveAnimations.playWillOWisp: wisps float over, circle the target
+   * and spiral away (0-1.8 s); a smoke cloud billows (1.6 s) and flares magenta
+   * (~2.25 s); the target burns (2.7-3.6 s). An eerie warble, a dark whoomph, a burn crackle.
+   */
   willowisp: () => {
-    const s = new MoveSfx(1.15, 0x3f1e);
-    s.wave(0.02, 0.6, { freq: (u) => 520 * (1 + 0.05 * Math.sin(2 * Math.PI * 7 * u)) * (1 + 0.2 * u), gain: env.swell(0.24) });
-    s.wave(0.12, 0.5, { freq: (u) => 555 * (1 + 0.05 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.12) });
-    s.noise(0.02, 0.6, { clock: () => 1000, gain: env.swell(0.12) });
-    s.burn(0.6, 0.35);
+    const s = new MoveSfx(3.6, 0x3f1e);
+    s.wave(0.02, 1.7, { freq: (u) => 520 * (1 + 0.05 * Math.sin(2 * Math.PI * 14 * u)) * (1 + 0.2 * Math.sin(Math.PI * u)), gain: env.swell(0.22) });
+    s.wave(0.12, 1.6, { freq: (u) => 555 * (1 + 0.05 * Math.sin(2 * Math.PI * 11 * u)), gain: env.swell(0.1) });
+    s.noise(0.02, 1.7, { clock: () => 1000, gain: env.swell(0.1) });
+    s.noise(1.6, 0.6, { clock: env.ramp(400, 1200), gain: env.attackDecay(0.3, 0.1) });
+    s.pulse(1.6, 0.4, { freq: env.ramp(90, 60), gain: env.decay(0.18, 1.5), duty: 0.5 });
+    s.chord(2.2, 0.4, [70, 77], { rate: 0.03, gain: 0.08 });
+    s.burn(2.7, 0.35);
+    s.burn(3.05, 0.25);
     return s;
   },
 };

@@ -10,8 +10,86 @@ export class BugMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
-    megahorn: (refs, launch, target) => BugMoveAnimations.playMegahorn(refs, launch, target)
+    megahorn: (refs, launch, target) => BugMoveAnimations.playMegahorn(refs, launch, target),
+    signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target)
   };
+
+  /**
+   * Signal Beam, after the DPPt animation: a beam of glowing squares - blue
+   * near the user, turning violet and magenta further on, some inside thin
+   * outlined frames - streams from the user past the target (0-1.7 s,
+   * reaching the target at ~0.2 s). Meanwhile the target flashes red and
+   * green in turn like a traffic light, ending on a green glow that fades
+   * (to ~2.1 s).
+   */
+  private static async playSignalBeam(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const dist = Math.max(Math.hypot(dx, dy), 1);
+    // The beam runs on past the target, off the screen.
+    const reach = dist + Math.hypot(W, H) * 0.5;
+    const ux = dx / dist;
+    const uy = dy / dist;
+    const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+
+    const layer = document.createElement('div');
+    layer.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fxEl.appendChild(layer);
+
+    // The stream: squares fly along the beam, shifting from blue to magenta as they go.
+    const size = Math.max(Math.min(W, H) * 0.06, 14);
+    const count = 40;
+    const gap = 30;
+    const travel = 520;
+    const segments: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const framed = i % 4 === 1;
+      const s = size * (framed ? 1.35 : 0.85 + Math.random() * 0.3);
+      const seg = document.createElement('div');
+      seg.style.cssText = framed
+        ? `position:absolute;width:${s}px;height:${s}px;pointer-events:none;border:1.5px solid;box-sizing:border-box`
+        : `position:absolute;width:${s}px;height:${s}px;pointer-events:none;border-radius:2px;filter:blur(1px);box-shadow:0 0 5px #FF60C0`;
+      Fx.place(seg, launch);
+      layer.appendChild(seg);
+      const side = (Math.random() * 2 - 1) * size * 0.15;
+      const at = (f: number) => `translate(${ux * reach * f - uy * side}px,${uy * reach * f + ux * side}px) rotate(${deg}deg)`;
+      const paint = (c: string) => (framed ? { borderColor: c } : { backgroundColor: c });
+      segments.push(
+        Fx.anim(seg, [
+          { transform: `${at(0)} scale(.6)`, opacity: 0, ...paint('#3A5AF0') },
+          { transform: `${at(0.08)} scale(1)`, opacity: 0.95, ...paint('#4A5AF0'), offset: 0.08 },
+          { transform: `${at(0.3)} scale(1)`, opacity: 0.95, ...paint(framed ? '#9A6AFF' : '#9A3AE8'), offset: 0.3 },
+          { transform: `${at(1)} scale(1)`, opacity: 0.9, ...paint(framed ? '#FF6AD0' : '#F0207A') }
+        ], { duration: travel, easing: 'linear', delay: i * gap, fill: 'backwards' }).then(() => seg.remove())
+      );
+    }
+
+    // The target flashes red and green in turn while the beam hits it, then glows green and clears.
+    const hitAt = travel * (dist / reach);
+    const hold = count * gap + travel - hitAt;
+    const cycle = 280;
+    const fade = 450;
+    const total = hold + fade;
+    const red = 'sepia(1) saturate(6) hue-rotate(-40deg) brightness(.9)';
+    const green = 'sepia(1) saturate(5) hue-rotate(70deg) brightness(1.05)';
+    const light: Keyframe[] = [{ filter: 'none', offset: 0 }];
+    const flips = Math.floor(hold / cycle);
+    for (let k = 0; k < flips; k++) {
+      const col = k % 2 ? green : red;
+      light.push({ filter: col, offset: (k * cycle + 60) / total }, { filter: col, offset: ((k + 1) * cycle) / total });
+    }
+    light.push({ filter: green, offset: Math.min(flips * cycle + 60, hold) / total },{ filter: green, offset: hold / total }, { filter: 'none', offset: 1 });
+    const glow = Fx.wait(hitAt).then(() => {
+      for (let k = 0; k < flips; k += 2) setTimeout(() => Fx.shake(targetEl, 3), k * cycle);
+      return Fx.anim(targetEl, light, { duration: total, easing: 'linear', fill: 'none' });
+    });
+
+    await Promise.all([...segments, glow]);
+    layer.remove();
+  }
 
   /**
    * Megahorn: a big black horn shoots at the target trailing red streaks,

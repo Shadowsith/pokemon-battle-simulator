@@ -18,7 +18,8 @@ export class WaterMoveAnimations {
     raindance: (refs) => WaterMoveAnimations.playRainDance(refs),
     muddywater: (refs, launch, target, v) => SurfWave.play(refs, launch, target, v, SurfWave.MUD),
     surf: (refs, launch, target, v) => SurfWave.play(refs, launch, target, v, SurfWave.SURF),
-    waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target)
+    waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target),
+    waterspout: (refs, launch, target) => WaterMoveAnimations.playWaterSpout(refs, launch, target)
   };
 
   /** Turn-1 animations of two-turn Water moves, by @pkmn/sim move id. */
@@ -500,6 +501,116 @@ export class WaterMoveAnimations {
 
     await Fx.anim(sea, [{ opacity: 1 }, { opacity: 0 }], { duration: 450, easing: 'ease-in' });
     sea.remove();
+  }
+
+  /**
+   * Water Spout, after the DPPt animation: a pale blue water column shoots up
+   * from the user and off the top of the screen while fine spray drifts round
+   * it (0-0.35 s, holds to 0.6 s); the column thins away from the bottom
+   * (0.6-1.0 s); then water drops rain down round the target, blue splashes
+   * hit it and a bank of white foam builds along the ground toward it
+   * (0.9-2.2 s) and fades (to ~2.6 s).
+   */
+  private static async playWaterSpout(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    // 1. The column: revealed from the bottom up, then cut away from the bottom up.
+    const cw = Math.max(lr.width * 0.22, 16);
+    const baseY = launch.y - lr.height * 0.35;
+    const col = document.createElement('div');
+    col.style.cssText =
+      `position:absolute;left:${launch.x - cw / 2}px;top:-20px;width:${cw}px;height:${baseY + 20}px;border-radius:${cw / 2}px;pointer-events:none;` +
+      'background:repeating-linear-gradient(180deg,#ffffff33 0 6px,#ffffff00 6px 14px),linear-gradient(90deg,#8A9CF0aa,#E8ECFF 40%,#C8D0FF 60%,#8A9CF0aa);filter:drop-shadow(0 0 4px #9AB0FF)';
+    fxEl.appendChild(col);
+    col.animate([{ backgroundPosition: '0 0,0 0' }, { backgroundPosition: '0 -28px,0 0' }], { duration: 120, iterations: Infinity });
+    const column = Fx.anim(col, [
+      { clipPath: 'inset(100% -10px 0 -10px)' },
+      { clipPath: 'inset(0 -10px 0 -10px)', offset: 0.35 },
+      { clipPath: 'inset(0 -10px 0 -10px)', offset: 0.6 },
+      { clipPath: 'inset(0 -10px 100% -10px)' }
+    ], { duration: 1000, easing: 'ease-out' }).then(() => col.remove());
+    Fx.flash(launchEl, '#9AB0FF', 0.4);
+    // Fine spray drifts round the column.
+    for (let i = 0; i < 30; i++) {
+      const s = 1.5 + Math.random() * 2;
+      const speck = document.createElement('div');
+      speck.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:#F0F4FF;box-shadow:0 0 2px #C8D4FF`;
+      Fx.place(speck, { x: launch.x + (Math.random() * 2 - 1) * cw * 2, y: baseY - Math.random() * lr.height });
+      fxEl.appendChild(speck);
+      const dx = (Math.random() * 2 - 1) * 18;
+      Fx.anim(speck, [
+        { transform: 'translate(0,0)', opacity: 0 },
+        { transform: `translate(${dx * 0.4}px,-4px)`, opacity: 0.9, offset: 0.3 },
+        { transform: `translate(${dx}px,6px)`, opacity: 0 }
+      ], { duration: 700 + Math.random() * 200, delay: 150 + Math.random() * 550, easing: 'ease-out', fill: 'backwards' }).then(() => speck.remove());
+    }
+    await Fx.wait(900);
+
+    // 2. The water comes down on the target side.
+    const parts: Promise<void>[] = [column];
+    const rain = document.createElement('div');
+    rain.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fxEl.appendChild(rain);
+    for (let i = 0; i < 26; i++) {
+      const drop = document.createElement('div');
+      drop.style.cssText = 'position:absolute;width:4px;height:9px;border-radius:50% 50% 50% 50% / 65% 65% 35% 35%;background:linear-gradient(180deg,#ffffff,#B8C8FF)';
+      const x = target.x + (Math.random() * 2 - 1) * tr.width * 0.9;
+      const land = target.y + (Math.random() * 2 - 1) * tr.height * 0.5;
+      Fx.place(drop, { x, y: -10 });
+      rain.appendChild(drop);
+      parts.push(
+        Fx.anim(drop, [
+          { transform: 'translateY(0)', opacity: 1 },
+          { transform: `translateY(${land + 10}px)`, opacity: 1, offset: 0.9 },
+          { transform: `translateY(${land + 14}px) scale(1.4,.5)`, opacity: 0 }
+        ], { duration: 400 + Math.random() * 150, delay: Math.random() * 1000, easing: 'ease-in', fill: 'backwards' }).then(() => drop.remove())
+      );
+    }
+    // Blue splashes land on the target.
+    for (let i = 0; i < 5; i++) {
+      const s = Math.max(tr.width * 0.3, 20);
+      const blob = document.createElement('div');
+      blob.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#6A8AFFcc,#3A5AE899 50%,#3A5AE800 72%)`;
+      Fx.place(blob, { x: target.x + (Math.random() * 2 - 1) * tr.width * 0.3, y: target.y + (Math.random() * 2 - 1) * tr.height * 0.3 });
+      fxEl.appendChild(blob);
+      const delay = 300 + i * 170;
+      setTimeout(() => {
+        Fx.shake(targetEl, 4);
+        Fx.flash(targetEl, '#6A8AFF', 0.4);
+      }, delay);
+      parts.push(
+        Fx.anim(blob, [
+          { transform: 'scale(.4)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.3 },
+          { transform: 'scale(1.25)', opacity: 0 }
+        ], { duration: 450, delay, easing: 'ease-out', fill: 'backwards' }).then(() => blob.remove())
+      );
+    }
+    // A foam bank builds along the ground from partway over toward the target, then fades.
+    const lfoot = Fx.footOf(launchEl, fieldEl);
+    const tfoot = Fx.footOf(targetEl, fieldEl);
+    const from: Point = { x: lfoot.x + (tfoot.x - lfoot.x) * 0.45, y: lfoot.y + (tfoot.y - lfoot.y) * 0.45 };
+    const to: Point = { x: tfoot.x + tr.width * 0.5, y: tfoot.y };
+    for (let i = 0; i < 12; i++) {
+      const t = i / 11;
+      const s = Math.max(tr.width * (0.35 + Math.random() * 0.2), 26);
+      const puff = document.createElement('div');
+      puff.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 40% 35%,#ffffff,#DCDCF4cc 45%,#C8C8F000 72%)`;
+      Fx.place(puff, { x: from.x + (to.x - from.x) * t, y: from.y + (to.y - from.y) * t - s * 0.25 });
+      fxEl.appendChild(puff);
+      parts.push(
+        Fx.anim(puff, [
+          { transform: 'translateY(6px) scale(.4)', opacity: 0 },
+          { transform: 'translateY(0) scale(1)', opacity: 0.85, offset: 0.25 },
+          { transform: 'translateY(-4px) scale(1.15)', opacity: 0.8, offset: 0.65 },
+          { transform: 'translateY(-8px) scale(1.3)', opacity: 0 }
+        ], { duration: 1300, delay: 200 + i * 60, easing: 'ease-out', fill: 'backwards' }).then(() => puff.remove())
+      );
+    }
+    await Promise.all(parts);
+    rain.remove();
   }
 
   /** A handful of water droplets splashing outwards from `at`. */

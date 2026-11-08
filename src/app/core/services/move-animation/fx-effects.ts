@@ -261,6 +261,41 @@ export class FxEffects {
     aura.remove();
   }
 
+  /**
+   * Classic stat-down shower (~900 ms): see-through blue bubbles drift down
+   * over the caster while it glows a dull blue (Overheat).
+   */
+  static async statDownBubbles(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const w = Math.max(r.width * 0.9, 44);
+    const h = Math.max(r.height * 0.9, 44);
+    const glow = Fx.anim(launchEl, [
+      { filter: 'brightness(1) drop-shadow(0 0 0 #5AB4FF00)' },
+      { filter: 'brightness(.85) drop-shadow(0 0 8px #5AB4FF)', offset: 0.3 },
+      { filter: 'brightness(.85) drop-shadow(0 0 8px #5AB4FF)', offset: 0.7 },
+      { filter: 'brightness(1) drop-shadow(0 0 0 #5AB4FF00)' }
+    ], { duration: 900, easing: 'ease-in-out', fill: 'none' });
+    const drops: Promise<void>[] = [];
+    for (let i = 0; i < 18; i++) {
+      const s = 6 + Math.random() * 7;
+      const bubble = document.createElement('div');
+      bubble.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;border:1px solid #CFEAFF;background:radial-gradient(circle at 35% 35%,#FFFFFFcc,#8CCBFF88 45%,#3A8CE066)`;
+      Fx.place(bubble, { x: launch.x + (Math.random() - 0.5) * w, y: launch.y - h * (0.35 + Math.random() * 0.25) });
+      fxEl.appendChild(bubble);
+      const fall = h * (0.45 + Math.random() * 0.3);
+      const sway = (Math.random() * 2 - 1) * 6;
+      drops.push(
+        Fx.anim(bubble, [
+          { transform: 'translate(0,0)', opacity: 0 },
+          { transform: `translate(${sway}px,${fall * 0.3}px)`, opacity: 0.9, offset: 0.25 },
+          { transform: `translate(${-sway}px,${fall}px)`, opacity: 0 }
+        ], { duration: 550 + Math.random() * 150, easing: 'ease-in', delay: Math.random() * 300, fill: 'backwards' }).then(() => bubble.remove())
+      );
+    }
+    await Promise.all([glow, ...drops]);
+  }
+
   /** Sleep: "Z"s float up from `head` one after another, drifting sideways (`away`) and growing as they rise (Rest, Sleep Powder). */
   static sleepZs(fxEl: HTMLElement, head: Point, away: number, colors: string[]): Promise<void> {
     const zs: Promise<void>[] = [];
@@ -347,8 +382,8 @@ export class FxEffects {
 
   /**
    * A backdrop with flickering burst rays centred on `at`, behind the sprites:
-   * red with yellow rays (Dynamic Punch, Megahorn) or blue with white rays
-   * (Focus Punch). Resolves once it has faded in; the caller fades it out and removes it.
+   * red with yellow rays (Dynamic Punch, Megahorn), blue with white rays
+   * (Focus Punch) or red-brown with peach rays (Psycho Boost). Resolves once it has faded in; the caller fades it out and removes it.
    */
   static async burstBackdrop(fieldEl: HTMLElement, at: Point, tone: keyof typeof BURST_TONES = 'red'): Promise<HTMLElement> {
     const t = BURST_TONES[tone];
@@ -527,5 +562,6 @@ export interface ClawStyle {
 /** Colours of {@link FxEffects.burstBackdrop}: backdrop gradient (centre → edge), core glow and rays. */
 const BURST_TONES = {
   red: { bg: ['#FF4A1A', '#D0140E', '#6A0404'], core: '#FFE07A', ray: '#FFB03A', rayHi: '#FFE87A' },
-  blue: { bg: ['#D8F4FF', '#2AA8F0', '#0A3A8A'], core: '#FFFFFF', ray: '#E8F8FF', rayHi: '#FFFFFF' }
+  blue: { bg: ['#D8F4FF', '#2AA8F0', '#0A3A8A'], core: '#FFFFFF', ray: '#E8F8FF', rayHi: '#FFFFFF' },
+  ember: { bg: ['#D8521E', '#A8340E', '#4A1004'], core: '#FF3A4A', ray: '#F4A47A', rayHi: '#FFD8B8' }
 };

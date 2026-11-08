@@ -78,7 +78,7 @@ export const FIGHTING = {
   },
 
   /**
-   * FightingMoveAnimations.playCrossChop: two hands appear (0-0.25 s), chop across
+   * FightingPunchMoveAnimations.playCrossChop: two hands appear (0-0.25 s), chop across
    * (0.4-0.6 s) and cross at 0.5 s (bursts at 0.5 / 0.58 s), fade by ~0.9 s. Two crossed chops.
    */
   crosschop: () => {
@@ -103,7 +103,7 @@ export const FIGHTING = {
   },
 
   /**
-   * FightingMoveAnimations.playDetect: dark (0-0.3 s), the ring sparkle flares at ~0.3-0.55 s
+   * FightingStatusMoveAnimations.playDetect: dark (0-0.3 s), the ring sparkle flares at ~0.3-0.55 s
    * while the caster glows white (0.45-0.85 s), gone by 1.1 s, light back by 1.4 s.
    * Senses the attack coming - a sharp alert ping.
    */
@@ -137,7 +137,7 @@ export const FIGHTING = {
   },
 
   /**
-   * FightingMoveAnimations.playDynamicPunch: red burst backdrop (0-0.25 s), the fist slams at
+   * FightingPunchMoveAnimations.playDynamicPunch: red burst backdrop (0-0.25 s), the fist slams at
    * 0.42 s (blast, quake, stones flying to ~1.27 s), backdrop clears (to ~1.57 s), birds circle
    * the head (~1.57-2.97 s). An explosive punch, tumbling rocks, then the dizzy confusion jingle.
    */
@@ -189,7 +189,7 @@ export const FIGHTING = {
   },
 
   /**
-   * FightingMoveAnimations.playFocusPunch: a steel girder lands on the user's
+   * FightingPunchMoveAnimations.playFocusPunch: a steel girder lands on the user's
    * head (0.18 s) while red streaks rush up (to 1.0 s); the blue burst flares
    * (1.0-1.25 s) and the red fist slams into the target (1.41 s).
    */
@@ -229,7 +229,7 @@ export const FIGHTING = {
   },
 
   /**
-   * FightingMoveAnimations.playHighJumpKick: the user darts forward and back (0-0.26 s), then three
+   * FightingKickThrowMoveAnimations.playHighJumpKick: the user darts forward and back (0-0.26 s), then three
    * fiery bursts pop on the target (0.26 / 0.33 / 0.41 s, each ~0.48 s) with a field shake.
    * A leaping rush and a huge triple-cracking kick (on a miss the same clip covers the crash).
    */
@@ -245,7 +245,7 @@ export const FIGHTING = {
   },
 
   /**
-   * FightingMoveAnimations.playLowKick: a foot sweeps low across the target (0-0.52 s),
+   * FightingKickThrowMoveAnimations.playLowKick: a foot sweeps low across the target (0-0.52 s),
    * hit at ~0.23 s with the sparkle burst (~0.7 s).
    */
   lowkick: () => {
@@ -374,7 +374,7 @@ export const FIGHTING = {
   },
 
   /**
-   * FightingMoveAnimations.playSeismicToss: dim 0.3 s, sky 0.55 s, streaks rush up (0.55-1.45 s) then down
+   * FightingKickThrowMoveAnimations.playSeismicToss: dim 0.3 s, sky 0.55 s, streaks rush up (0.55-1.45 s) then down
    * (1.45-2.15 s), impact + quake + flying stones at 2.15 s, fade to ~3.1 s. A soaring rise, a plunging fall, a huge crash.
    */
   seismictoss: () => {
@@ -390,13 +390,22 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee punch (impact 0.17 s), no fleck: a rising uppercut that whips skyward on contact. */
+  /**
+   * FightingPunchMoveAnimations.playSkyUppercut: dark red scene (0-0.25 s), white
+   * rings pulse on the platforms (0.25-0.95 s, peaks ~0.43 / 0.74 s), black
+   * then the blue sky rushes up (0.95-1.55 s), the fist shoots up (1.55 s)
+   * and strikes (1.8 s), punching on through to ~2.2 s; sky fades (~2.8 s).
+   */
   skyuppercut: () => {
-    const s = new MoveSfx(0.75, 0x5c90);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 5000, gain: 0.3 });
-    s.thud(0.17, 0.75, 0.6);
-    s.whoosh(0.19, 0.35, { from: 3000, to: 11000, gain: 0.3 });
-    s.pulse(0.19, 0.3, { freq: env.ramp(400, 1400), gain: env.decay(0.14, 1.2), duty: 0.25 });
+    const s = new MoveSfx(2.85, 0x5c90);
+    s.pulse(0.0, 0.95, { freq: (u) => 110 + 30 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.12), duty: 0.5 });
+    for (const at of [0.43, 0.74]) s.chord(at, 0.2, [72, 79], { rate: 0.03, gain: 0.08 });
+    s.noise(0.95, 1.3, { clock: env.ramp(1200, 4000), gain: env.swell(0.16) });
+    s.whoosh(1.55, 0.25, { from: 1200, to: 6000, gain: 0.32 });
+    s.thud(1.8, 0.8, 0.7);
+    s.noise(1.8, 0.2, { clock: (u) => 9000 - 5000 * u, gain: env.attackDecay(0.3, 0.02) });
+    s.whoosh(1.82, 0.4, { from: 3000, to: 11000, gain: 0.3 });
+    s.pulse(1.82, 0.35, { freq: env.ramp(400, 1400), gain: env.decay(0.14, 1.2), duty: 0.25 });
     return s;
   },
 
@@ -411,7 +420,7 @@ export const FIGHTING = {
   },
 
   /**
-   * FightingMoveAnimations.playSubmission: both sprites roll two counter-clockwise laps
+   * FightingKickThrowMoveAnimations.playSubmission: both sprites roll two counter-clockwise laps
    * (0-1.2 s, laps at 0 / 0.6 s) while four hits land (0.25 / 0.5 / 0.75 / 1.0 s), then
    * dust swirls round the target (1.2-2.0 s). A tumbling scuffle of thumps, then a dusty skid.
    */
@@ -428,18 +437,29 @@ export const FIGHTING = {
   },
 
 
-  /** Generic melee (bp 120): a gathering grunt of power and a crushing blow. */
+  /**
+   * FightingPunchMoveAnimations.playSuperpower: the user powers up with rising
+   * light and haze (0-1.2 s), lunges as the scene darkens (1.2-1.45 s), pink
+   * sparks pop on the target (1.45 s), the red ray burst opens (1.6 s, shakes
+   * 1.85 / 2.07 / 2.29 s), black and back (2.6-3.15 s), stat-down (3.15 s).
+   */
   superpower: () => {
-    const s = new MoveSfx(0.9, 0x5e9e);
-    s.pulse(0.0, 0.18, { freq: env.ramp(60, 120), gain: env.swell(0.3), duty: 0.5 });
-    s.whoosh(0.0, 0.18, { from: 700, to: 3000, gain: 0.35 });
-    s.thud(0.17, 1.0, 1);
-    s.noise(0.17, 0.12, { clock: () => 11000, gain: env.decay(0.3, 1.5) });
-    s.rumble(0.2, 0.5, { from: 350, to: 100, gain: 0.3 });
+    const s = new MoveSfx(4.1, 0x5e9e);
+    s.pulse(0.0, 1.2, { freq: env.ramp(60, 140), gain: env.swell(0.22), duty: 0.5 });
+    s.noise(0.0, 1.2, { clock: env.ramp(600, 2400), gain: env.ramp(0.05, 0.22) });
+    s.sparkle(0.1, 0.9, 8, { lo: 3000, hi: 6000, gain: 0.08 });
+    s.whoosh(1.2, 0.25, { from: 700, to: 3000, gain: 0.35 });
+    s.sparkle(1.45, 0.2, 4, { lo: 5000, hi: 8000, gain: 0.12 });
+    s.thud(1.6, 1.0, 1);
+    s.noise(1.6, 0.15, { clock: () => 11000, gain: env.decay(0.3, 1.5) });
+    s.rumble(1.62, 0.9, { from: 350, to: 100, gain: 0.3 });
+    for (const at of [1.85, 2.07, 2.29]) s.thud(at, 0.3, 0.5);
+    s.whoosh(2.6, 0.3, { from: 3000, to: 900, gain: 0.12 });
+    s.statDown(3.2);
     return s;
   },
 
-  /** FightingMoveAnimations.playJumpKick: four feet fly in 0.14 s apart, hitting at 0.26 / 0.40 / 0.54 / 0.68 s. */
+  /** FightingKickThrowMoveAnimations.playJumpKick: four feet fly in 0.14 s apart, hitting at 0.26 / 0.40 / 0.54 / 0.68 s. */
   jumpkick: () => {
     const s = new MoveSfx(1.0, 0x1c1c);
     for (let i = 0; i < 4; i++) {

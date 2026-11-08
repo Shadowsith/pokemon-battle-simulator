@@ -298,12 +298,22 @@ export const DARK = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s, no fleck): a mocking jeer - two cocky "nyah" blips over a low menacing pulse. */
+  /**
+   * DarkMoveAnimations.playTaunt: a smoke puff billows up (0 / 0.2 s), a glove
+   * beckons out of it twice (curls at ~0.49 / 0.86 s) and fades (to 1.4 s);
+   * an anger mark pops on the target at 1.4 s and again at 1.9 s.
+   * A soft poof, two cocky "nyah" blips, two angry buzzes.
+   */
   taunt: () => {
-    const s = new MoveSfx(1.05, 0x7a07);
-    s.pulse(0.02, 0.8, { freq: (u) => 98 * (1 + 0.04 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.2), duty: 0.25 });
-    for (const [at, f] of [[0.1, 660], [0.3, 523], [0.5, 660], [0.66, 494]]) {
-      s.pulse(at, 0.14, { freq: (u) => f * (1 + 0.12 * Math.sin(Math.PI * u)), gain: env.attackDecay(0.22, 0.1), duty: 0.5 });
+    const s = new MoveSfx(2.45, 0x7a07);
+    s.noise(0.0, 0.45, { clock: () => 1600, gain: env.attackDecay(0.2, 0.05) });
+    s.noise(0.2, 0.4, { clock: () => 1200, gain: env.attackDecay(0.12, 0.05) });
+    for (const [at, f] of [[0.42, 660], [0.56, 523], [0.79, 660], [0.93, 494]]) {
+      s.pulse(at, 0.14, { freq: (u) => f * (1 + 0.12 * Math.sin(Math.PI * u)), gain: env.attackDecay(0.2, 0.1), duty: 0.5 });
+    }
+    for (const at of [1.4, 1.9]) {
+      s.pulse(at, 0.22, { freq: (u) => 140 + 40 * Math.sin(2 * Math.PI * 18 * u), gain: env.attackDecay(0.24, 0.08), duty: 0.25 });
+      s.pulse(at + 0.02, 0.12, { freq: () => 880, gain: env.decay(0.1, 2), duty: 0.125 });
     }
     return s;
   },

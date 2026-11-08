@@ -4,7 +4,7 @@ import { env } from '../track.mjs';
 /** Psychic-type move sounds: warbling, shimmering tones. */
 export const PSYCHIC = {
   /**
-   * PsychicMoveAnimations.playAgility: speed lines rush by for 1.4 s while the
+   * PsychicStatusMoveAnimations.playAgility: speed lines rush by for 1.4 s while the
    * caster runs two quick laps (0.18-1.08 s).
    */
   agility: () => {
@@ -31,7 +31,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playAmnesia: the scene dims (0-0.3 s), a cloud pops
+   * PsychicStatusMoveAnimations.playAmnesia: the scene dims (0-0.3 s), a cloud pops
    * up (0.15 s), its "?" wobbles (0.65-1.35 s), the cloud puffs away
    * (1.2-1.65 s) and the scene clears (to ~2.07 s).
    */
@@ -48,7 +48,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playBarrier: a glass panel appears for 1.7 s, a band
+   * PsychicStatusMoveAnimations.playBarrier: a glass panel appears for 1.7 s, a band
    * of light sweeps across it (0.28-0.93 s) and sparkles twinkle (0.3-1.2 s).
    */
   barrier: () => {
@@ -100,7 +100,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playDreamEater: darkness (0.3 s), 16 dream orbs float
+   * PsychicAttackMoveAnimations.playDreamEater: darkness (0.3 s), 16 dream orbs float
    * from the target to the caster (arrivals ~1.3-2.2 s), the caster glows with
    * sparkles (to ~3 s), the darkness lifts.
    */
@@ -118,7 +118,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playExtrasensory: the scene dims (0-0.28 s), four
+   * PsychicAttackMoveAnimations.playExtrasensory: the scene dims (0-0.28 s), four
    * red rings burst out of the user 0.12 s apart (0.28-1.06 s), then the
    * target shudders fast (1.06-1.6 s).
    */
@@ -256,7 +256,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playScreen (LIGHT_SCREEN): a screen of light opens (0-0.25 s),
+   * PsychicStatusMoveAnimations.playScreen (LIGHT_SCREEN): a screen of light opens (0-0.25 s),
    * a sheen sweeps it (0.28-0.98 s), sparkles twinkle 0.2-1.72 s, fade by 1.7 s.
    */
   lightscreen: () => {
@@ -282,7 +282,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playLusterPurge: the scene turns white (0-0.25 s),
+   * PsychicAttackMoveAnimations.playLusterPurge: the scene turns white (0-0.25 s),
    * the user shines in a burst of light (0.25-1.1 s), six quick black hits
    * strike the target (1.2-1.65 s), it blinks, the scene clears (~1.95-2.27 s).
    */
@@ -300,7 +300,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playMagicCoat: a magenta sphere swells (0-0.3 s), a
+   * PsychicStatusMoveAnimations.playMagicCoat: a magenta sphere swells (0-0.3 s), a
    * white card snaps in (0.2-0.45 s), a sheen sweeps it (0.5-1.15 s) amid
    * sparkles, everything fades (~1.4-1.7 s).
    */
@@ -406,7 +406,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playPsychic: the scene dims (0-0.3 s), the wave
+   * PsychicAttackMoveAnimations.playPsychic: the scene dims (0-0.3 s), the wave
    * pattern fades in (0.3-0.6 s), the target warps for 1.1 s with four
    * flashes (0.6 / 0.86 / 1.12 / 1.38 s), the dim fades (1.7-2.08 s).
    * A rising, warbling psychic tone that pulses with each flash.
@@ -424,15 +424,27 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile at near-max power (impact 0.43 s): a huge psychic surge that bursts. */
+  /**
+   * PsychicAttackMoveAnimations.playPsychoBoost: magenta glow swells with sparks
+   * (0-0.9 s), turns white-hot (0.9-1.3 s), white swirls spin out as the
+   * scene goes black (1.3-2.0 s), a pink bubble grows on the target
+   * (2.0-2.3 s), red ray burst with popping rings (2.3-3.2 s, shakes at
+   * 2.3 / 2.55 / 2.8 s), black and back (3.2-3.8 s), stat-down (3.5 s).
+   */
   psychoboost: () => {
-    const s = new MoveSfx(1.3, 0x9b05);
-    s.wave(0.0, 0.45, { freq: (u) => (300 + 1300 * u) * (1 + 0.1 * Math.sin(2 * Math.PI * 10 * u)), gain: env.ramp(0.1, 0.32) });
-    s.pulse(0.0, 0.45, { freq: (u) => 150 + 500 * u, gain: env.ramp(0.05, 0.2), duty: 0.5 });
-    s.thud(0.43, 0.45, 0.9);
-    s.noise(0.43, 0.3, { clock: (u) => 10000 - 7000 * u, gain: env.attackDecay(0.3, 0.03) });
-    s.chord(0.48, 0.7, [76, 83, 88], { rate: 0.035, gain: 0.2, vibrato: 0.02 });
-    s.rumble(0.45, 0.8, { from: 600, to: 200, gain: 0.25 });
+    const s = new MoveSfx(4.2, 0x9b05);
+    s.wave(0.0, 1.3, { freq: (u) => (250 + 900 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 12 * u)), gain: env.ramp(0.06, 0.26) });
+    s.pulse(0.0, 1.3, { freq: (u) => 120 + 380 * u, gain: env.ramp(0.03, 0.14), duty: 0.5 });
+    s.sparkle(0.15, 1.0, 10, { lo: 4500, hi: 8000, gain: 0.1 });
+    s.chord(0.9, 0.45, [84, 88, 91], { rate: 0.03, gain: 0.14 });
+    s.whoosh(1.3, 0.7, { from: 6000, to: 900, gain: 0.25 });
+    s.wave(2.0, 0.3, { freq: env.ramp(500, 1200), gain: env.swell(0.15) });
+    s.thud(2.3, 0.8, 0.9);
+    s.noise(2.3, 0.35, { clock: (u) => 10000 - 7000 * u, gain: env.attackDecay(0.35, 0.03) });
+    s.chord(2.32, 0.85, [76, 83, 88], { rate: 0.035, gain: 0.2, vibrato: 0.02 });
+    s.rumble(2.35, 0.85, { from: 500, to: 150, gain: 0.25 });
+    for (const at of [2.55, 2.8]) s.thud(at, 0.35, 0.5);
+    s.statDown(3.5);
     return s;
   },
 
@@ -489,7 +501,7 @@ export const PSYCHIC = {
   },
 
   /**
-   * PsychicMoveAnimations.playScreen (Reflect): a violet panel pops up
+   * PsychicStatusMoveAnimations.playScreen (Reflect): a violet panel pops up
    * (0-0.25 s) and stays for 1.7 s, a sheen sweeps it (0.28-0.98 s) while
    * sparkles twinkle (0.2-1.7 s). A hard, glassy panel tone.
    */
@@ -502,7 +514,7 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** PsychicMoveAnimations.playRest: sleep bubble breathes twice (peaks 0.34 / 1.1 s, pops 1.7 s) while 4 Zs float up (0–1.94 s), then heal sparkles (1.94–3.04 s). A drowsy lullaby with snoring breaths and a soft healing glitter. */
+  /** PsychicStatusMoveAnimations.playRest: sleep bubble breathes twice (peaks 0.34 / 1.1 s, pops 1.7 s) while 4 Zs float up (0–1.94 s), then heal sparkles (1.94–3.04 s). A drowsy lullaby with snoring breaths and a soft healing glitter. */
   rest: () => {
     const s = new MoveSfx(3.2, 0x7e57);
     for (const [at, d] of [[0.0, 0.68], [0.68, 0.77]]) {
@@ -592,14 +604,24 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a sly sleight of hand, two held items swap with a crossing warble and a pop. */
+  /**
+   * PsychicStatusMoveAnimations.playTrick: the scene dims (0-0.3 s), two bags
+   * pop up (0.3 s) and swap places three times round an oval (0.45-2.05 s,
+   * one swap per ~0.53 s), settle and fade (2.25-2.6 s).
+   * A sly crossing warble per swap and a pop at the end.
+   */
   trick: () => {
-    const s = new MoveSfx(1.15, 0x7c1c);
-    s.wave(0.02, 0.6, { freq: (u) => 440 * Math.pow(2, u) * (1 + 0.03 * Math.sin(2 * Math.PI * 10 * u)), gain: env.swell(0.2) });
-    s.wave(0.02, 0.6, { freq: (u) => 880 * Math.pow(0.5, u) * (1 + 0.03 * Math.sin(2 * Math.PI * 10 * u)), gain: env.swell(0.17) });
-    s.pulse(0.65, 0.05, { freq: () => 1568, gain: env.decay(0.2, 1), duty: 0.25 });
-    s.pulse(0.72, 0.1, { freq: () => 2093, gain: env.decay(0.2, 1.5), duty: 0.25 });
-    s.sparkle(0.7, 0.3, 4, { gain: 0.12 });
+    const s = new MoveSfx(2.9, 0x7c1c);
+    s.noise(0.0, 0.3, { clock: () => 500, gain: env.swell(0.06) });
+    for (const at of [0.3, 0.33]) s.pulse(at, 0.06, { freq: () => 1175, gain: env.decay(0.14, 1.5), duty: 0.25 });
+    for (let k = 0; k < 3; k++) {
+      const at = 0.45 + k * 0.53;
+      s.wave(at, 0.53, { freq: (u) => (k % 2 ? 880 * Math.pow(0.5, u) : 440 * Math.pow(2, u)) * (1 + 0.03 * Math.sin(2 * Math.PI * 10 * u)), gain: env.swell(0.17) });
+      s.wave(at, 0.53, { freq: (u) => (k % 2 ? 440 * Math.pow(2, u) : 880 * Math.pow(0.5, u)) * (1 + 0.03 * Math.sin(2 * Math.PI * 10 * u)), gain: env.swell(0.14) });
+    }
+    s.pulse(2.1, 0.05, { freq: () => 1568, gain: env.decay(0.2, 1), duty: 0.25 });
+    s.pulse(2.17, 0.1, { freq: () => 2093, gain: env.decay(0.2, 1.5), duty: 0.25 });
+    s.sparkle(2.15, 0.35, 4, { gain: 0.12 });
     return s;
   },
 

@@ -16,13 +16,185 @@ export class NormalRangedMoveAnimations {
     hyperbeam: (refs, launch, target) => NormalRangedMoveAnimations.playHyperBeam(refs, launch, target),
     triattack: (refs, launch, target) => NormalRangedMoveAnimations.playTriAttack(refs, launch, target),
     razorwind: (refs, _launch, target) => NormalRangedMoveAnimations.playRazorBlades(refs, target),
-    selfdestruct: (refs, launch, target, v) => NormalRangedMoveAnimations.playSelfDestruct(refs, launch, target, v)
+    secretpower: (refs) => NormalRangedMoveAnimations.playSecretPower(refs),
+    selfdestruct: (refs, launch, target, v) => NormalRangedMoveAnimations.playSelfDestruct(refs, launch, target, v),
+    uproar: (refs, launch) => NormalRangedMoveAnimations.playUproar(refs, launch)
   };
 
   /** Turn-1 animations of two-turn moves, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {
     razorwind: (refs, launch) => NormalRangedMoveAnimations.playRazorWhirlwind(refs, launch)
   };
+
+  /**
+   * Uproar, after the DPPt animation: three noisy rounds, 0.85 s apart (at 0,
+   * 0.85 and 1.7 s). Each time the user flushes orange-red, a dome of red-orange
+   * sound rings swells out of it and noise symbols - music notes, red
+   * lightning bolts, yellow "Z"s, an orange "?" - burst out in every
+   * direction, growing as they fly and fading; the target winces (+0.3 s).
+   * Ends at ~2.6 s.
+   */
+  private static async playUproar(refs: BattleStageRefs, launch: Point) {
+    const { launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const g = Math.max(lr.width * 0.18, 14);
+    // One set of noise symbols per round, so each burst looks a little different.
+    const rounds: (() => HTMLElement)[][] = [
+      [() => FxGlyphs.musicNote(g, '#E8B830'), () => FxGlyphs.boltGlyph('#E02020', g * 0.6), () => FxGlyphs.musicNote(g, '#F0902A', '?'), () => FxGlyphs.sleepZ(g, '#E8C030')],
+      [() => FxGlyphs.boltGlyph('#E8C030', g * 0.6), () => FxGlyphs.musicNote(g, '#E02828'), () => FxGlyphs.sleepZ(g, '#E8A020'), () => FxGlyphs.boltGlyph('#E02020', g * 0.5)],
+      [() => FxGlyphs.sleepZ(g * 1.4, '#E8C030'), () => FxGlyphs.musicNote(g, '#E02828'), () => FxGlyphs.boltGlyph('#E8C030', g * 0.6), () => FxGlyphs.musicNote(g, '#F0902A', '?')]
+    ];
+    const gap = 850;
+    const done = rounds.map((glyphs, r) => Fx.wait(r * gap).then(() => NormalRangedMoveAnimations.uproarRound(refs, launch, lr, glyphs)));
+    for (let r = 0; r < rounds.length; r++) {
+      setTimeout(() => {
+        Fx.shake(targetEl, 3);
+        Fx.flash(targetEl, '#FF8A3C', 0.3);
+      }, r * gap + 300);
+    }
+    await Promise.all(done);
+  }
+
+  /** One Uproar round: the user flushes, a dome of sound rings swells out and the given noise symbols scatter. */
+  private static uproarRound(refs: BattleStageRefs, launch: Point, lr: DOMRect, glyphs: (() => HTMLElement)[]): Promise<void> {
+    const { fxEl, launchEl } = refs;
+    const parts: Promise<void>[] = [];
+    parts.push(
+      Fx.anim(launchEl, [
+        { filter: 'none' },
+        { filter: 'sepia(.6) saturate(3) hue-rotate(-25deg) brightness(1.1)', offset: 0.3 },
+        { filter: 'none' }
+      ], { duration: 700, easing: 'ease-in-out', fill: 'none' })
+    );
+    // Two ring domes, one just behind the other.
+    const size = Math.max(lr.width, lr.height) * 1.9;
+    for (let k = 0; k < 2; k++) {
+      const rings = document.createElement('div');
+      rings.style.cssText =
+        `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+        'background:repeating-radial-gradient(circle,#FF5A2A00 0 9%,#FF6A3Acc 10% 12%,#E0402088 13% 15%,#FF5A2A00 16% 20%)';
+      Fx.place(rings, launch);
+      fxEl.appendChild(rings);
+      parts.push(
+        Fx.anim(rings, [
+          { transform: 'scale(.2)', opacity: 0 },
+          { transform: 'scale(.6)', opacity: 0.85, offset: 0.25 },
+          { transform: 'scale(1.1)', opacity: 0 }
+        ], { duration: 800, delay: k * 120, easing: 'ease-out', fill: 'backwards' }).then(() => rings.remove())
+      );
+    }
+    // The noise symbols fly out round the user's upper half, growing as they go.
+    glyphs.forEach((make, i) => {
+      const el = make();
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:absolute;width:0;height:0;pointer-events:none';
+      // Centre the symbol on the wrapper, whatever its size.
+      el.style.transform = 'translate(-50%,-50%)';
+      wrap.appendChild(el);
+      Fx.place(wrap, { x: launch.x, y: launch.y - lr.height * 0.1 });
+      fxEl.appendChild(wrap);
+      const a = -Math.PI * (0.1 + (0.8 * i) / Math.max(glyphs.length - 1, 1)) + (Math.random() - 0.5) * 0.3;
+      const d = Math.max(lr.width, lr.height) * (0.75 + Math.random() * 0.3);
+      const tilt = (Math.random() * 2 - 1) * 20;
+      parts.push(
+        Fx.anim(wrap, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${Math.cos(a) * d * 0.4}px,${Math.sin(a) * d * 0.4}px) rotate(${tilt * 0.5}deg) scale(1)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px) rotate(${tilt}deg) scale(1.5)`, opacity: 0 }
+        ], { duration: 850, delay: 80 + i * 40, easing: 'ease-out', fill: 'backwards' }).then(() => wrap.remove())
+      );
+    });
+    return Promise.all(parts).then(() => void 0);
+  }
+
+  /**
+   * Secret Power, after the Gen 5 animation: the user hops in place
+   * (0-0.35 s); low on the target a white star flashes and glowing yellow
+   * orbs burst out while the target is squashed (0.45 s); the orbs scatter,
+   * drop to the ground and cool to orange (0.45-1.1 s) as dust puffs spread
+   * round its feet and fade to lavender (0.55-1.4 s).
+   */
+  private static async playSecretPower(refs: BattleStageRefs) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+
+    // 1. The user hops in place.
+    const original = launchEl.style.transform;
+    const hop = Math.max(lr.height * 0.12, 10);
+    await Fx.anim(launchEl, [
+      { transform: `${original} translateY(0)` },
+      { transform: `${original} translateY(${-hop}px)`, offset: 0.45 },
+      { transform: `${original} translateY(0)` }
+    ], { duration: 350, easing: 'ease-in-out', fill: 'none' });
+    await Fx.wait(100);
+
+    // 2. Impact low on the target: a white star flash, a squash and a burst of yellow orbs.
+    const hit: Point = { x: foot.x, y: foot.y - tr.height * 0.22 };
+    const parts: Promise<void>[] = [];
+    const star = FxGlyphs.sparkStar(Math.max(tr.width * 0.55, 40), '#FFF6A0');
+    Fx.place(star, hit);
+    fxEl.appendChild(star);
+    parts.push(
+      Fx.anim(star, [
+        { transform: 'scale(.2) rotate(0deg)', opacity: 1 },
+        { transform: 'scale(1.1) rotate(20deg)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(.6) rotate(35deg)', opacity: 0 }
+      ], { duration: 260, easing: 'ease-out' }).then(() => star.remove())
+    );
+    const tOrig = targetEl.style.transform;
+    parts.push(
+      Fx.anim(targetEl, [
+        { transform: `${tOrig} translateY(0) scale(1,1)` },
+        { transform: `${tOrig} translateY(${tr.height * 0.08}px) scale(1.12,.84)`, offset: 0.3 },
+        { transform: `${tOrig} translateY(0) scale(1,1)` }
+      ], { duration: 300, easing: 'ease-out', fill: 'none' })
+    );
+    Fx.flash(targetEl, '#FFE23A', 0.5);
+
+    // The orbs fan out round the impact, then drop to the ground, cooling from yellow to orange.
+    const ground = foot.y - hit.y;
+    for (let i = 0; i < 10; i++) {
+      const s = 7 + Math.random() * 5;
+      const orb = document.createElement('div');
+      orb.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 40% 35%,#FFFDE0,#FFE23A 50%,#E8B800);box-shadow:0 0 6px #FFE23A`;
+      Fx.place(orb, hit);
+      fxEl.appendChild(orb);
+      const a = (Math.PI * 2 * i) / 10 + Math.random() * 0.4;
+      const r = tr.width * (0.25 + Math.random() * 0.25);
+      const x = Math.cos(a) * r;
+      const y = Math.sin(a) * r * 0.7;
+      parts.push(
+        Fx.anim(orb, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0, filter: 'none' },
+          { transform: `translate(${x}px,${y}px) scale(1)`, opacity: 1, filter: 'none', offset: 0.3 },
+          { transform: `translate(${x * 1.5}px,${ground - 4 + Math.random() * 10}px) scale(.8)`, opacity: 1, filter: 'hue-rotate(-28deg) saturate(1.4)', offset: 0.75 },
+          { transform: `translate(${x * 1.6}px,${ground + Math.random() * 8}px) scale(.6)`, opacity: 0, filter: 'hue-rotate(-28deg) saturate(1.4)' }
+        ], { duration: 650, easing: 'ease-in', delay: Math.random() * 40 }).then(() => orb.remove())
+      );
+    }
+
+    // Dust puffs spread round the target's feet, fading from grey-white to lavender.
+    for (let i = 0; i < 9; i++) {
+      const s = Math.max(tr.width * (0.22 + Math.random() * 0.12), 16);
+      const puff = document.createElement('div');
+      puff.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 40% 35%,#ffffff,#DCDCE2 50%,#C8C8D000 72%)`;
+      const side = i % 2 ? 1 : -1;
+      Fx.place(puff, { x: foot.x + side * Math.random() * tr.width * 0.35, y: foot.y - 4 - Math.random() * tr.height * 0.15 });
+      fxEl.appendChild(puff);
+      const drift = side * (10 + Math.random() * tr.width * 0.25);
+      const lavender = 'sepia(1) hue-rotate(230deg) saturate(.7) brightness(1.15)';
+      parts.push(
+        Fx.anim(puff, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0, filter: 'none' },
+          { transform: `translate(${drift * 0.4}px,-4px) scale(1)`, opacity: 0.85, filter: 'none', offset: 0.3 },
+          { transform: `translate(${drift}px,-10px) scale(1.3)`, opacity: 0, filter: lavender }
+        ], { duration: 800, easing: 'ease-out', delay: 100 + i * 30, fill: 'backwards' }).then(() => puff.remove())
+      );
+    }
+    await Promise.all(parts);
+  }
 
   /**
    * Hyper Voice: three thick orange-red sound rings with a yellow glow fly

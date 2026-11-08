@@ -366,10 +366,10 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Nature Power** / Natur-Kraft — `naturepower` · Normal · Status · `targetAura`
 - [ ] **Needle Arm** / Nietenranke — `needlearm` · Grass · Physical · `melee`
 - [ ] **Odor Sleuth** / Schnüffler — `odorsleuth` · Normal · Status · `targetAura`
-- [ ] ⭐ **Overheat** / Hitzekoller — `overheat` · Fire · Special · `projectile`
+- [x] ⭐ **Overheat** / Hitzekoller — `overheat` · Fire · Special · user turns red-hot as the scene goes black, a blue backdrop with white rays opens behind it, then it explodes: a white flash, a yellow-green shock ring and fireballs burst out over the whole screen, the target flashes orange and red embers glow at the edges; back in the scene dark smoke rises off both, the target blinks and blue stat-down bubbles drift over the user (custom, needs review)
 - [ ] **Poison Fang** / Giftzahn — `poisonfang` · Poison · Physical · `melee`
 - [ ] **Poison Tail** / Giftschweif — `poisontail` · Poison · Physical · `melee`
-- [ ] ⭐ **Psycho Boost** / Psyschub — `psychoboost` · Psychic · Special · `projectile`
+- [x] ⭐ **Psycho Boost** / Psyschub — `psychoboost` · Psychic · Special · a magenta glow swells round the user with pink sparks and turns white-hot, white psychic swirls spin out over the screen as it goes black, a pink bubble grows on the target, then a red-brown backdrop with peach rays bursts round it while pink rings pop over the target; back in the scene blue stat-down bubbles drift over the user (custom, needs review)
 - [ ] **Recycle** / Aufbereitung — `recycle` · Normal · Status · `selfAura`
 - [ ] **Refresh** / Heilung — `refresh` · Normal · Status · `selfAura`
 - [ ] **Revenge** / Vergeltung — `revenge` · Fighting · Physical · `melee`
@@ -377,36 +377,36 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Rock Tomb** / Felsgrab — `rocktomb` · Rock · Physical · `projectile`
 - [ ] **Role Play** / Rollenspiel — `roleplay` · Psychic · Status · `targetAura`
 - [ ] **Sand Tomb** / Sandgrab — `sandtomb` · Ground · Physical · `projectile`
-- [ ] ⭐ **Secret Power** / Geheimpower — `secretpower` · Normal · Physical · `projectile`
+- [x] ⭐ **Secret Power** / Geheimpower — `secretpower` · Normal · Physical · the user hops, then low on the target a white star flashes and glowing yellow orbs burst out while it is squashed; the orbs drop to the ground cooling to orange as dust puffs spread round its feet and fade to lavender (custom, needs review)
 - [ ] **Shadow Punch** / Finsterfaust — `shadowpunch` · Ghost · Physical · `melee`
 - [ ] **Sheer Cold** / Eiseskälte — `sheercold` · Ice · Special · `projectile`
 - [ ] **Shock Wave** / Schockwelle — `shockwave` · Electric · Special · `projectile`
-- [ ] ⭐ **Signal Beam** / Ampelleuchte — `signalbeam` · Bug · Special · `projectile`
+- [x] ⭐ **Signal Beam** / Ampelleuchte — `signalbeam` · Bug · Special · a beam of glowing squares, blue near the user turning violet and magenta, some in thin outlined frames, streams from the user past the target, which flashes red and green in turn like a traffic light and ends on a fading green glow (custom, needs review)
 - [ ] **Silver Wind** / Silberhauch — `silverwind` · Bug · Special · `projectile`
 - [ ] **Skill Swap** / Fähigkeitstausch — `skillswap` · Psychic · Status · `targetAura`
-- [ ] ⭐ **Sky Uppercut** / Himmelhieb — `skyuppercut` · Fighting · Physical · `melee`
-- [ ] ⭐ **Slack Off** / Tagedieb — `slackoff` · Normal · Status · `selfAura`
-- [ ] ⭐ **Smelling Salts** / Riechsalz — `smellingsalts` · Normal · Physical · `melee`
+- [x] ⭐ **Sky Uppercut** / Himmelhieb — `skyuppercut` · Fighting · Physical · scene turns dark red and white rings pulse on both platforms, then black and a blue sky with white streaks rushing upward; a blue fist shoots up from below, turns icy as it strikes the target in a blue-violet spiky burst and punches on up through it (custom, needs review)
+- [x] ⭐ **Slack Off** / Tagedieb — `slackoff` · Normal · Status · the user slowly flattens out lazily while cyan ring sparkles twinkle over it and it fades to a pale pink-white, then it springs back into shape and recovers HP with green heal sparkles (custom, needs review)
+- [x] ⭐ **Smelling Salts** / Riechsalz — `smellingsalts` · Normal · Physical · two white open hands appear on either side of the target and clap twice: each turns edge-on and a pale yellow-green burst with white specks flares on its outer side while the target jolts (custom, needs review)
 - [ ] **Snatch** / Übernahme — `snatch` · Dark · Status · `selfAura`
 - [ ] **Spit Up** / Entfessler — `spitup` · Normal · Special · `projectile`
 - [ ] **Stockpile** / Horter — `stockpile` · Normal · Status · `selfAura`
-- [ ] ⭐ **Superpower** / Kraftkoloss — `superpower` · Fighting · Physical · `melee`
+- [x] ⭐ **Superpower** / Kraftkoloss — `superpower` · Fighting · Physical · pale yellow light streaks and a pink-red haze rise round the glowing user, it lunges as the scene goes dark, pink sparks pop on the target and a red backdrop with orange rays bursts behind it while they scatter; the target blinks and blue stat-down bubbles drift over the user (custom, needs review)
 - [ ] **Swallow** / Verzehrer — `swallow` · Normal · Status · `selfAura`
 - [ ] **Tail Glow** / Schweifglanz — `tailglow` · Bug · Status · `selfAura`
-- [ ] ⭐ **Taunt** / Verhöhner — `taunt` · Dark · Status · `targetAura`
+- [x] ⭐ **Taunt** / Verhöhner — `taunt` · Dark · Status · a white smoke puff billows up in front of the user and turns lilac, a white glove beckons the foe twice out of it and fades, then a red anger mark pops on the target's head, pulses and hops to the other side (custom, needs review)
 - [ ] **Teeter Dance** / Taumeltanz — `teeterdance` · Normal · Status · `targetAura`
 - [ ] **Tickle** / Spaßkanone — `tickle` · Normal · Status · `selfAura`
 - [ ] **Torment** / Folterknecht — `torment` · Dark · Status · `targetAura`
-- [ ] ⭐ **Trick** / Trickbetrug — `trick` · Psychic · Status · `targetAura`
-- [ ] ⭐ **Uproar** / Aufruhr — `uproar` · Normal · Special · `sonic`
-- [ ] ⭐ **Volt Tackle** / Volttackle — `volttackle` · Electric · Physical · `melee`
+- [x] ⭐ **Trick** / Trickbetrug — `trick` · Psychic · Status · the scene dims to a dark grey, a cream bag pops up at the user and one at the target, and they swap places three times round an oval (one passing high, the other low) before fading (custom, needs review)
+- [x] ⭐ **Uproar** / Aufruhr — `uproar` · Normal · Special · three noisy rounds: the user flushes orange-red, a dome of red-orange sound rings swells out of it and music notes, lightning bolts, "Z"s and a "?" burst out in every direction while the target winces (custom, needs review)
+- [x] ⭐ **Volt Tackle** / Volttackle — `volttackle` · Electric · Physical · scene goes dark and the user is wrapped in a big pulsing yellow-white ball of electricity crackling with green-yellow sparks, then it charges behind a white lightning streak along the ground; at the hit a dark olive backdrop with yellow rays bursts in while yellow sparks crackle over the target, and the user takes recoil (custom, needs review)
 - [ ] **Water Pulse** / Aquawelle — `waterpulse` · Water · Special · `pulse`
 - [ ] **Water Sport** / Nassmacher — `watersport` · Water · Status · `targetAura`
-- [ ] ⭐ **Water Spout** / Fontränen — `waterspout` · Water · Special · `field`
+- [x] ⭐ **Water Spout** / Fontränen — `waterspout` · Water · Special · a pale blue water column shoots up from the user and off the top of the screen amid fine spray, thins away, then water drops rain down round the target, blue splashes hit it and a bank of white foam builds along the ground toward it before fading (custom, needs review)
 - [ ] **Weather Ball** / Meteorologe — `weatherball` · Normal · Special · `lob`
-- [ ] ⭐ **Will-O-Wisp** / Irrlicht — `willowisp` · Fire · Status · `targetAura`
-- [ ] ⭐ **Wish** / Wunschtraum — `wish` · Normal · Status · `selfAura`
-- [ ] ⭐ **Yawn** / Gähner — `yawn` · Normal · Status · `targetAura`
+- [x] ⭐ **Will-O-Wisp** / Irrlicht — `willowisp` · Fire · Status · seven pink-magenta wisps with dark cores float over to the target in a wobbly chain, circle it and spiral away; a smoke cloud billows over it, black, then purple, flaring magenta and fading as a red haze; then the target turns red-hot with small flames flickering over it (custom, needs review)
+- [x] ⭐ **Wish** / Wunschtraum — `wish` · Normal · Status · the scene fades into a purple starry night sky, a big yellow shooting star sweeps across trailing stars that fade from yellow to pink, glowing pink and yellow sparkles drift down onto the glowing user, then it recovers HP with green heal sparkles (custom, needs review)
+- [x] ⭐ **Yawn** / Gähner — `yawn` · Normal · Status · the user stretches up in a big yawn and a stream of grey-white breath puffs floats over to the target and past it, then a drowsy bubble swells and shrinks at the target's face while little rings drift up off it, and it pops (custom, needs review)
 
 ## Gen 4 (113)
 

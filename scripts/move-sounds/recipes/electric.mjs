@@ -327,16 +327,24 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic melee at high power (impact 0.17 s) + recoil (0.29 s) + paralysis fleck (~0.6 s): an electrified full-body charge. */
+  /**
+   * ElectricMoveAnimations.playVoltTackle: dark (0-0.3 s), a pulsing electric
+   * ball crackles round the user (0.3-1.3 s), the charge (1.3-1.55 s), the hit
+   * with sparks on the target (1.55-2.45 s, jolts every 0.22 s), recoil at
+   * ~2.75 s. A swelling buzz, a zapping rush, a crackling blast.
+   */
   volttackle: () => {
-    const s = new MoveSfx(1.0, 0x701a);
-    s.noise(0.0, 0.17, { clock: env.ramp(3000, 9000), gain: env.ramp(0.1, 0.4), short: true });
-    s.thud(0.17, 0.75, 0.85);
-    s.noise(0.17, 0.22, { clock: (u) => 20000 - 14000 * u, gain: env.attackDecay(0.45, 0.02) });
-    s.pulse(0.17, 0.28, { freq: (u) => 1600 - 1300 * u, gain: env.decay(0.35, 2), duty: 0.25 });
-    s.thud(0.29, 0.3, 0.3);
-    s.noise(0.3, 0.35, { clock: () => 6000, gain: env.decay(0.18, 1.5), short: true });
-    s.paralyze(0.6);
+    const s = new MoveSfx(3.1, 0x701a);
+    s.noise(0.3, 1.0, { clock: (u) => 5000 + 2500 * Math.sin(2 * Math.PI * 2.5 * u), gain: env.swell(0.2), short: true });
+    s.pulse(0.3, 1.0, { freq: (u) => 110 + 25 * Math.sin(2 * Math.PI * 2.5 * u), gain: env.swell(0.16), duty: 0.5 });
+    s.noise(1.3, 0.25, { clock: env.ramp(3000, 12000), gain: env.ramp(0.1, 0.4), short: true });
+    s.thud(1.55, 0.8, 0.85);
+    s.noise(1.55, 0.25, { clock: (u) => 20000 - 14000 * u, gain: env.attackDecay(0.45, 0.02) });
+    s.pulse(1.55, 0.3, { freq: (u) => 1600 - 1300 * u, gain: env.decay(0.3, 2), duty: 0.25 });
+    s.noise(1.6, 0.85, { clock: () => 6500, gain: env.swell(0.18), short: true });
+    for (const at of [1.77, 1.99, 2.21]) s.noise(at, 0.06, { clock: () => 14000, gain: env.decay(0.22, 1.5) });
+    s.thud(2.75, 0.3, 0.3);
+    s.noise(2.75, 0.25, { clock: () => 6000, gain: env.decay(0.15, 1.5), short: true });
     return s;
   },
 

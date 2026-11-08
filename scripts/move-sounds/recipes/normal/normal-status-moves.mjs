@@ -465,13 +465,20 @@ export const NORMAL_STATUS = {
   },
 
 
-  /** Generic target aura (~0.8 s, no fleck – sleep comes next turn): a big lazy yawn, a slow falling sigh. */
+  /**
+   * NormalStatusMoveAnimations.playYawn: the user stretches in a yawn (0-0.4 s),
+   * breath puffs float over the target (0.2-1.4 s), a drowsy bubble breathes at
+   * its face with rings drifting up (1.4-2.6 s) and pops. A big lazy yawn, a
+   * breathy sigh, sleepy bloops and a soft pop.
+   */
   yawn: () => {
-    const s = new MoveSfx(1.15, 0x3eaa);
+    const s = new MoveSfx(2.7, 0x3eaa);
     s.wave(0.02, 0.4, { freq: (u) => 330 * Math.pow(1.5, Math.sin(Math.PI * u)), gain: env.swell(0.3) });
-    s.wave(0.42, 0.55, { freq: (u) => 440 * Math.pow(0.5, u), gain: env.decay(0.3, 1) });
-    s.noise(0.42, 0.5, { clock: () => 3000, gain: env.decay(0.08, 1) });
-    s.arpeggio(0.6, [72, 67], 0.16, { gain: 0.1, voice: 'wave', hold: 0.25 });
+    s.wave(0.42, 0.7, { freq: (u) => 440 * Math.pow(0.5, u), gain: env.decay(0.28, 1) });
+    s.noise(0.2, 1.2, { clock: () => 2500, gain: env.swell(0.1) });
+    s.bubbles(1.5, 0.9, 5, { lo: 500, hi: 900, gain: 0.14 });
+    s.arpeggio(1.6, [72, 67], 0.3, { gain: 0.1, voice: 'wave', hold: 0.35 });
+    s.pulse(2.55, 0.05, { freq: () => 1400, gain: env.decay(0.15, 1.5), duty: 0.25 });
     return s;
   },
 };

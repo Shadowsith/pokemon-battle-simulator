@@ -20,6 +20,7 @@ export class FireRangedMoveAnimations {
     },
     heatwave: (refs, _launch, _target, v) => FireRangedMoveAnimations.playHeatWave(refs, v),
     flamethrower: (refs, launch, target, v) => FireRangedMoveAnimations.playFlamethrower(refs, launch, target, v),
+    overheat: (refs, launch, target) => FireRangedMoveAnimations.playOverheat(refs, launch, target),
     sacredfire: (refs, _launch, target) => FireRangedMoveAnimations.playSacredFire(refs, target)
   };
 
@@ -82,6 +83,173 @@ export class FireRangedMoveAnimations {
 
     await Fx.anim(tint, [{ opacity: 0.55 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
     tint.remove();
+  }
+
+  /**
+   * Overheat, after the Gen 5 animation: the user turns red-hot and the scene
+   * goes black (0-0.3 s); a blue backdrop with white rays opens behind the
+   * user (0.55-0.75 s); then the user explodes (0.75 s) - a white flash, a
+   * yellow-green shock ring and fireballs burst out over the whole screen,
+   * the target flashes orange as they pass, red embers linger at the screen
+   * edges (to ~2.15 s); the scene goes black and returns (2.15-2.65 s); dark
+   * smoke rises off the user and the target, which blinks (from 2.65 s);
+   * last, blue stat-down bubbles drift over the user (3.45-4.35 s).
+   */
+  private static async playOverheat(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    // Distance to the farthest screen corner: the blast reaches past it.
+    const reach = Math.hypot(Math.max(launch.x, W - launch.x), Math.max(launch.y, H - launch.y));
+
+    // 1. The user turns red-hot until the scene returns; the scene goes black.
+    const redHot = 'sepia(1) saturate(8) hue-rotate(-35deg) brightness(.85)';
+    const tint = Fx.anim(launchEl, [
+      { filter: 'none' },
+      { filter: redHot, offset: 0.12 },
+      { filter: redHot, offset: 0.85 },
+      { filter: 'none' }
+    ], { duration: 2650, easing: 'linear', fill: 'none' });
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // 2. The blue ray backdrop opens behind the black, which then clears off it.
+    const blue = await FxEffects.burstBackdrop(fieldEl, launch, 'blue');
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in' });
+
+    // 3. The explosion (0.75 s), in a layer clipped to the field.
+    const layer = document.createElement('div');
+    layer.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fxEl.appendChild(layer);
+    Fx.shakeField(fieldEl, 0.8);
+    const blast: Promise<void>[] = [];
+
+    // A white flash at the user's heart.
+    const coreSize = Math.max(lr.width * 1.2, 70);
+    const core = document.createElement('div');
+    core.style.cssText = `position:absolute;width:${coreSize}px;height:${coreSize}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0 35%,#FFF6C0cc 55%,#FFF6C000 72%)`;
+    Fx.place(core, launch);
+    layer.appendChild(core);
+    blast.push(
+      Fx.anim(core, [{ transform: 'scale(.3)', opacity: 1 }, { transform: 'scale(2.6)', opacity: 0 }], { duration: 380, easing: 'ease-out' }).then(() =>
+        core.remove()
+      )
+    );
+
+    // A yellow-green shock ring sweeps out over the whole screen.
+    const ringSize = reach * 2.2;
+    const ring = document.createElement('div');
+    ring.style.cssText =
+      `position:absolute;width:${ringSize}px;height:${ringSize}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(circle,#DFF08A33 0 40%,#F2F08A99 52%,#C8E85A77 60%,#F0A03A44 66%,#F0A03A00 70%)';
+    Fx.place(ring, launch);
+    layer.appendChild(ring);
+    blast.push(
+      Fx.anim(ring, [
+        { transform: 'scale(.05)', opacity: 1 },
+        { transform: 'scale(.6)', opacity: 0.9, offset: 0.5 },
+        { transform: 'scale(1)', opacity: 0 }
+      ], { duration: 800, easing: 'ease-out' }).then(() => ring.remove())
+    );
+
+    // Fireballs burst out in every direction, an inner and an outer wave, swelling as they fly.
+    const ball = Math.max(Math.min(W, H) * 0.11, 26);
+    for (let i = 0; i < 32; i++) {
+      const a = (Math.PI * 2 * i) / 32 + Math.random() * 0.2;
+      const d = reach * (i % 2 ? 0.3 + Math.random() * 0.2 : 0.65 + Math.random() * 0.4);
+      const puff = FxGlyphs.firePuff(ball * (0.7 + Math.random() * 0.6), i % 4 ? 'hot' : 'red');
+      Fx.place(puff, launch);
+      layer.appendChild(puff);
+      const rot = Math.random() * 180;
+      blast.push(
+        Fx.anim(puff, [
+          { transform: `translate(0,0) rotate(${rot}deg) scale(.3)`, opacity: 0 },
+          { transform: `translate(${Math.cos(a) * d * 0.25}px,${Math.sin(a) * d * 0.25}px) rotate(${rot + 60}deg) scale(1)`, opacity: 1, offset: 0.15 },
+          { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px) rotate(${rot + 200}deg) scale(1.7)`, opacity: 0.2 }
+        ], { duration: 700 + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 120 }).then(() => puff.remove())
+      );
+    }
+
+    // The target flashes orange as the blast sweeps over it.
+    const hitAt = 120 + (Math.hypot(target.x - launch.x, target.y - launch.y) / reach) * 380;
+    const scorched = 'sepia(1) saturate(4) hue-rotate(-15deg) brightness(1.1) drop-shadow(0 0 8px #FF9A2A)';
+    const hit = Fx.wait(hitAt).then(() => {
+      Fx.shake(targetEl, 6);
+      return Fx.anim(targetEl, [
+        { filter: 'none' },
+        { filter: scorched, offset: 0.2 },
+        { filter: scorched, offset: 0.6 },
+        { filter: 'none' }
+      ], { duration: 500, easing: 'linear', fill: 'none' });
+    });
+
+    // Red embers glow along the screen edges after the fire has passed, drifting outward.
+    const embers = Fx.wait(450).then(() => {
+      const glows: Promise<void>[] = [];
+      const edge = 2 * (W + H);
+      for (let i = 0; i < 18; i++) {
+        const t = ((i + Math.random() * 0.6) / 18) * edge;
+        const ins = Math.random() * ball * 0.4;
+        const p: Point =
+          t < W ? { x: t, y: ins } : t < W + H ? { x: W - ins, y: t - W } : t < 2 * W + H ? { x: 2 * W + H - t, y: H - ins } : { x: ins, y: edge - t };
+        const out = Math.atan2(p.y - H / 2, p.x - W / 2);
+        const puff = FxGlyphs.firePuff(ball * (1.1 + Math.random() * 0.6), 'red');
+        Fx.place(puff, p);
+        layer.appendChild(puff);
+        glows.push(
+          Fx.anim(puff, [
+            { transform: 'scale(.7)', opacity: 0 },
+            { transform: 'scale(1)', opacity: 0.85, offset: 0.2 },
+            { transform: `translate(${Math.cos(out) * 20}px,${Math.sin(out) * 20}px) scale(1.2)`, opacity: 0 }
+          ], { duration: 700 + Math.random() * 250, easing: 'ease-out', delay: Math.random() * 150 }).then(() => puff.remove())
+        );
+      }
+      return Promise.all(glows);
+    });
+    await Promise.all([...blast, hit, embers]);
+    layer.remove();
+
+    // 4. Black again (2.15 s), then back to the battle scene.
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+    blue.remove();
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    dim.remove();
+
+    // 5. Dark smoke rises off the user and, thinner, off the target, which blinks.
+    const smoke = [
+      FireRangedMoveAnimations.smokePlume(fxEl, { x: launch.x, y: launch.y - lr.height * 0.1 }, Math.max(lr.width * 0.7, 46), Math.max(lr.height * 1.3, 90), 13),
+      FireRangedMoveAnimations.smokePlume(fxEl, { x: target.x, y: target.y - tr.height * 0.2 }, Math.max(tr.width * 0.35, 24), Math.max(tr.height * 1.1, 60), 7)
+    ];
+    await Fx.wait(250);
+    const blink = Fx.blink(targetEl, 3);
+    await Fx.wait(550);
+
+    // 6. The user's Sp. Atk falls sharply (3.45 s).
+    await Promise.all([FxEffects.statDownBubbles(refs, launch), blink, tint, ...smoke]);
+  }
+
+  /** A column of dark smoke rising `rise` px from `base`, `width` px wide: `count` puffs that swell, drift and fade (Overheat). */
+  private static smokePlume(fxEl: HTMLElement, base: Point, width: number, rise: number, count: number): Promise<void> {
+    const puffs: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const s = width * (0.5 + Math.random() * 0.4);
+      const puff = document.createElement('div');
+      puff.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 45% 40%,#5A5848dd,#3E3C30aa 50%,#3E3C3000 72%)`;
+      Fx.place(puff, { x: base.x + (Math.random() * 2 - 1) * width * 0.25, y: base.y });
+      fxEl.appendChild(puff);
+      const up = rise * (0.6 + Math.random() * 0.4);
+      const sway = (Math.random() * 2 - 1) * width * 0.3;
+      puffs.push(
+        Fx.anim(puff, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${sway * 0.4}px,${-up * 0.35}px) scale(1)`, opacity: 0.85, offset: 0.3 },
+          { transform: `translate(${sway}px,${-up}px) scale(1.7)`, opacity: 0 }
+        ], { duration: 800 + Math.random() * 150, easing: 'ease-out', delay: i * 35 }).then(() => puff.remove())
+      );
+    }
+    return Promise.all(puffs).then(() => void 0);
   }
 
   /**

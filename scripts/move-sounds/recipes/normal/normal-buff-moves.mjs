@@ -290,7 +290,7 @@ export const NORMAL_BUFF = {
   },
 
   /**
-   * NormalStatusMoveAnimations.playRecover: golden stars twinkle over the
+   * NormalHealMoveAnimations.playRecover: golden stars twinkle over the
    * caster (0-1.22 s, glow flashes 0 / 0.4 s), then FxEffects.healSparkles
    * (1.25-2.35 s, green flashes 1.25 / 1.6 s). A warm shimmer, then a rising heal run.
    */
@@ -359,13 +359,20 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s), no fleck (heals afterwards): a lazy, sleepy yawn that sinks, then a soft restoring glow. */
+  /**
+   * NormalHealMoveAnimations.playSlackOff: the user flattens lazily
+   * (0-0.5 s), cyan sparkles twinkle while it pales (0.45-1.35 s), it springs
+   * back (1.35-1.8 s), then the heal sparkles (1.8-2.7 s). A sinking yawn,
+   * soft twinkles, a little boing and a restoring arpeggio.
+   */
   slackoff: () => {
-    const s = new MoveSfx(1.4, 0x51ac);
+    const s = new MoveSfx(2.8, 0x51ac);
     s.wave(0.02, 0.6, { freq: (u) => 520 - 220 * u + 60 * Math.sin(Math.PI * u), gain: env.swell(0.26) });
     s.pulse(0.02, 0.6, { freq: (u) => 260 - 110 * u, gain: env.swell(0.08), duty: 0.25 });
-    s.arpeggio(0.7, [67, 72, 76, 79], 0.08, { gain: 0.2, voice: 'wave', hold: 0.2 });
-    s.sparkle(0.8, 0.4, 5, { lo: 3000, hi: 5000, gain: 0.12 });
+    s.sparkle(0.5, 0.85, 8, { lo: 3500, hi: 6000, gain: 0.1 });
+    s.wave(1.4, 0.25, { freq: (u) => 300 + 500 * Math.sin(Math.PI * u * 0.8), gain: env.decay(0.18, 1.5) });
+    s.arpeggio(1.8, [67, 72, 76, 79], 0.08, { gain: 0.2, voice: 'wave', hold: 0.2 });
+    s.sparkle(1.9, 0.6, 7, { lo: 3000, hi: 5000, gain: 0.12 });
     return s;
   },
 
@@ -381,7 +388,7 @@ export const NORMAL_BUFF = {
   },
 
   /**
-   * NormalStatusMoveAnimations.playSoftBoiled: the egg drops (0-0.42 s) and cracks,
+   * NormalHealMoveAnimations.playSoftBoiled: the egg drops (0-0.42 s) and cracks,
    * a wave and blue sparkles burst out (0.42-1.57 s), then healSparkles (1.57-2.47 s).
    */
   softboiled: () => {
@@ -461,12 +468,22 @@ export const NORMAL_BUFF = {
   },
 
 
-  /** Generic self aura (~0.8 s, no fleck): a wish rises to the stars - a soft twinkling run with a glimmer. */
+  /**
+   * NormalHealMoveAnimations.playWish: the starry sky fades in (0-0.4 s), a
+   * shooting star sweeps across (0.5-1.4 s), sparkles drift down onto the
+   * user (1.3-2.6 s), the sky fades (to ~3.0 s), heal sparkles (3.0-3.9 s).
+   * A hushed shimmer, a falling-star glissando, twinkles, then the restoring run.
+   */
   wish: () => {
-    const s = new MoveSfx(1.2, 0x3e15);
-    s.arpeggio(0.02, [76, 79, 83, 88], 0.1, { gain: 0.22, voice: 'wave', hold: 0.2 });
-    s.chord(0.4, 0.5, [88, 91, 95], { rate: 0.04, gain: 0.12, voice: 'wave' });
-    s.sparkle(0.1, 0.85, 10, { lo: 3000, hi: 6000, gain: 0.12 });
+    const s = new MoveSfx(3.9, 0x3e15);
+    s.noise(0.0, 0.5, { clock: () => 900, gain: env.swell(0.06) });
+    s.sparkle(0.1, 0.5, 5, { lo: 4000, hi: 7000, gain: 0.08 });
+    s.wave(0.5, 0.9, { freq: (u) => 2200 - 1400 * u * u, gain: env.swell(0.14) });
+    s.sparkle(0.6, 0.9, 10, { lo: 3500, hi: 7000, gain: 0.12 });
+    s.chord(1.3, 1.0, [88, 91, 95], { rate: 0.04, gain: 0.12, voice: 'wave' });
+    s.sparkle(1.4, 1.0, 10, { lo: 3000, hi: 6000, gain: 0.1 });
+    s.arpeggio(3.0, [76, 79, 83, 88], 0.1, { gain: 0.2, voice: 'wave', hold: 0.2 });
+    s.sparkle(3.1, 0.6, 6, { lo: 3000, hi: 5000, gain: 0.1 });
     return s;
   },
 

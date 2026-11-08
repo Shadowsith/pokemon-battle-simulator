@@ -210,13 +210,20 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + paralysis fleck (~0.55 s): a mysterious, shifting orb of energy pops on the target. */
+  /**
+   * NormalRangedMoveAnimations.playSecretPower: the user hops (0-0.35 s), a
+   * star flashes low on the target and orbs burst out (0.45 s), the orbs
+   * drop to the ground (to ~1.1 s) while dust puffs spread (0.55-1.4 s).
+   */
   secretpower: () => {
-    const s = new MoveSfx(0.95, 0x5ec9);
-    s.pulse(0.0, 0.43, { freq: (u) => 600 + 500 * u + 80 * Math.sin(2 * Math.PI * 6 * u), gain: env.ramp(0.08, 0.22), duty: 0.25 });
-    s.whoosh(0.05, 0.38, { from: 1500, to: 5000, gain: 0.18 });
-    s.thud(0.43, 0.5, 0.4);
-    s.paralyze(0.55, 0.2);
+    const s = new MoveSfx(1.45, 0x5ec9);
+    s.pulse(0.0, 0.3, { freq: (u) => 300 + 500 * Math.sin(Math.PI * u), gain: env.swell(0.14), duty: 0.25 });
+    s.thud(0.33, 0.25, 0.3);
+    s.thud(0.45, 0.55, 0.5);
+    s.noise(0.45, 0.15, { clock: (u) => 9000 - 5000 * u, gain: env.attackDecay(0.25, 0.01) });
+    s.arpeggio(0.47, [84, 88, 91], 0.04, { gain: 0.12, duty: 0.25, hold: 0.06 });
+    s.sparkle(0.5, 0.6, 8, { lo: 3500, hi: 6500, gain: 0.12 });
+    s.noise(0.55, 0.85, { clock: () => 700, gain: env.swell(0.14) });
     return s;
   },
 
@@ -354,13 +361,21 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic sonic (4 rings every 0.11 s, impact 0.43 s): a raucous, rattling shout that keeps blaring. */
+  /**
+   * NormalRangedMoveAnimations.playUproar: three noisy rounds at 0 / 0.85 /
+   * 1.7 s - rings swell and noise symbols scatter (~0.85 s each), the target
+   * winces 0.3 s into each; ends at ~2.6 s. Three raucous, rattling blares.
+   */
   uproar: () => {
-    const s = new MoveSfx(1.05, 0x0b2a);
-    s.pulse(0.0, 0.85, { freq: (u) => (330 + 60 * Math.sin(2 * Math.PI * 9 * u)), gain: (u) => 0.22 * Math.min(1, u * 10) * Math.pow(1 - u, 0.8), duty: 0.25 });
-    s.pulse(0.0, 0.85, { freq: (u) => (495 + 80 * Math.sin(2 * Math.PI * 9 * u + 1)), gain: (u) => 0.12 * Math.min(1, u * 10) * Math.pow(1 - u, 0.8), duty: 0.5 });
-    for (let i = 0; i < 4; i++) s.noise(i * 0.11, 0.08, { clock: () => 6000, gain: env.decay(0.22, 1.5) });
-    s.thud(0.43, 0.45, 0.4);
+    const s = new MoveSfx(2.7, 0x0b2a);
+    for (let r = 0; r < 3; r++) {
+      const at = r * 0.85;
+      const lift = 1 + r * 0.06;
+      s.pulse(at, 0.75, { freq: (u) => (330 + 60 * Math.sin(2 * Math.PI * 9 * u)) * lift, gain: (u) => 0.22 * Math.min(1, u * 10) * Math.pow(1 - u, 0.8), duty: 0.25 });
+      s.pulse(at, 0.75, { freq: (u) => (495 + 80 * Math.sin(2 * Math.PI * 9 * u + 1)) * lift, gain: (u) => 0.12 * Math.min(1, u * 10) * Math.pow(1 - u, 0.8), duty: 0.5 });
+      for (let i = 0; i < 3; i++) s.noise(at + i * 0.11, 0.08, { clock: () => 6000, gain: env.decay(0.2, 1.5) });
+      s.thud(at + 0.3, 0.35, 0.4);
+    }
     return s;
   },
 
