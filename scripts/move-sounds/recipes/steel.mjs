@@ -234,13 +234,19 @@ export const STEEL = {
     return s;
   },
 
-  /** Shield move (MoveAnimationService.playShield, 0.62 s golden bubble): a royal steel shield clangs up. */
+  /**
+   * Custom (1.6 s): magenta sparks crackle while the orb forms (0-0.4 s), the
+   * honeycomb shield clangs open at 0.35 s with a royal chord, shimmers
+   * (to 1.3 s) and fades.
+   */
   kingsshield: () => {
-    const s = new MoveSfx(0.85, 0x4153);
-    s.noise(0.0, 0.05, { clock: () => 9000, gain: env.decay(0.35, 1), short: true });
-    s.pulse(0.0, 0.15, { freq: (u) => 700 + 700 * u, gain: env.attackDecay(0.2, 0.3), duty: 0.25 });
-    s.chord(0.12, 0.6, [76, 83, 88], { rate: 0.03, gain: 0.2, voice: 'pulse' });
-    s.wave(0.15, 0.6, { freq: () => 1568, gain: env.decay(0.25, 2) });
+    const s = new MoveSfx(1.75, 0x4153);
+    for (let i = 0; i < 6; i++) s.noise(i * 0.05, 0.04, { clock: () => 9000, gain: env.decay(0.22, 1), short: true });
+    s.pulse(0.0, 0.35, { freq: (u) => 500 + 700 * u, gain: env.swell(0.14), duty: 0.25 });
+    s.noise(0.35, 0.05, { clock: () => 9000, gain: env.decay(0.35, 1), short: true });
+    s.chord(0.35, 0.95, [76, 83, 88], { rate: 0.03, gain: 0.2, voice: 'pulse' });
+    s.wave(0.38, 1.0, { freq: () => 1568, gain: env.decay(0.22, 2) });
+    s.sparkle(0.6, 0.7, 5, { lo: 3500, hi: 6000, gain: 0.1 });
     return s;
   },
 };

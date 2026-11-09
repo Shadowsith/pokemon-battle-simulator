@@ -1,14 +1,136 @@
 import { Point, BattleStageRefs, MoveAnimRegistry } from '../animation.types';
 import { Fx } from '../fx';
+import { FxEffects } from '../fx-effects';
+import { FxGlyphs } from '../fx-glyphs';
 
 /** Hand-made animations for Poison-type moves. */
 export class PoisonMoveAnimations {
   /** Hand-made Poison move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     acid: (refs, launch, target) => PoisonMoveAnimations.playAcidSpit(refs, launch, target),
+    belch: (refs, launch, target) => PoisonMoveAnimations.playBelch(refs, launch, target),
     sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
     toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target)
   };
+
+  /**
+   * Belch, after the XY animation: the user rears up and a pink gas puff with
+   * yellow sparks bursts at its mouth (0-0.4 s). The scene turns a dusky
+   * maroon and pink-orange sound rings travel to the target, swelling
+   * (0.4-1.1 s); rings close in round it with a pink zigzag ring
+   * (1.0-1.6 s), then pink gas bursts all round the target (1.5-2.1 s) and the
+   * scene clears (to ~2.4 s).
+   */
+  private static async playBelch(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const pink: [string, string] = ['#FFB0D8', '#F070B0'];
+    const dir = target.x >= launch.x ? 1 : -1;
+
+    // The user rears up and burps a pink gas puff with sparks.
+    const original = launchEl.style.transform;
+    const rear = Fx.anim(launchEl, [
+      { transform: `${original} translateY(0) scale(1,1)` },
+      { transform: `${original} translateY(-6px) scale(.97,1.05)`, offset: 0.4 },
+      { transform: `${original} translateY(0) scale(1.03,.97)`, offset: 0.7 },
+      { transform: `${original} translateY(0) scale(1,1)` }
+    ], { duration: 500, easing: 'ease-out', fill: 'none' });
+    const mouth: Point = { x: launch.x + dir * lr.width * 0.3, y: launch.y - lr.height * 0.15 };
+    const effects: Promise<unknown>[] = [rear, Fx.wait(150).then(() => FxEffects.smokePuff(fxEl, mouth, Math.max(lr.width * 0.6, 50), pink))];
+    for (let i = 0; i < 3; i++) {
+      const spark = FxGlyphs.sparkStar(10, '#FFE04A');
+      Fx.place(spark, { x: mouth.x + dir * (10 + i * 8), y: mouth.y + (i - 1) * 10 });
+      fxEl.appendChild(spark);
+      effects.push(
+        Fx.anim(spark, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1, offset: 0.4 }, { transform: 'scale(0)', opacity: 0 }], {
+          duration: 300,
+          delay: 200 + i * 60,
+          easing: 'ease-out'
+        }).then(() => spark.remove())
+      );
+    }
+    await Fx.wait(400);
+
+    // A dusky scene; sound rings travel to the target, swelling.
+    const dusk = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 50%,#9A4A60,#6A2A40 60%,#3A1424)');
+    effects.push(Fx.anim(dusk, [{ opacity: 0 }, { opacity: 0.85, offset: 0.1 }, { opacity: 0.85, offset: 0.85 }, { opacity: 0 }], { duration: 2000, easing: 'linear' }).then(() => dusk.remove()));
+    const ringSize = Math.max(tr.height * 0.9, 70);
+    const dx = target.x - mouth.x;
+    const dy = target.y - mouth.y;
+    for (let i = 0; i < 5; i++) {
+      const ring = document.createElement('div');
+      ring.style.cssText = `width:${ringSize}px;height:${ringSize}px;border-radius:50%;pointer-events:none;border:4px solid #FF9AC0;box-shadow:0 0 8px #FFA060,inset 0 0 8px #FFA060`;
+      Fx.place(ring, mouth);
+      fxEl.appendChild(ring);
+      effects.push(
+        Fx.anim(ring, [
+          { transform: 'translate(0,0) scale(.2)', opacity: 0 },
+          { transform: `translate(${dx * 0.3}px,${dy * 0.3}px) scale(.6)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${dx}px,${dy}px) scale(1.3)`, opacity: 0 }
+        ], { duration: 500, delay: i * 100, easing: 'ease-in' }).then(() => ring.remove())
+      );
+    }
+    await Fx.wait(600);
+
+    // Rings close in round the target with a pink zigzag ring.
+    for (const [delay, k] of [[0, 1.6], [120, 1.3], [240, 1.0]] as const) {
+      const ring = document.createElement('div');
+      ring.style.cssText = `width:${ringSize * k}px;height:${ringSize * k}px;border-radius:50%;pointer-events:none;border:4px solid #FF7AB8;box-shadow:0 0 8px #FF5AA0`;
+      Fx.place(ring, target);
+      fxEl.appendChild(ring);
+      effects.push(
+        Fx.anim(ring, [{ transform: 'scale(1.2)', opacity: 0 }, { transform: 'scale(1)', opacity: 1, offset: 0.3 }, { transform: 'scale(.4)', opacity: 0 }], {
+          duration: 550,
+          delay,
+          easing: 'ease-in'
+        }).then(() => ring.remove())
+      );
+    }
+    const zig = PoisonMoveAnimations.zigzagRing(ringSize * 0.8);
+    Fx.place(zig, target);
+    fxEl.appendChild(zig);
+    effects.push(
+      Fx.anim(zig, [
+        { transform: 'scale(.4) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1) rotate(20deg)', opacity: 1, offset: 0.3 },
+        { transform: 'scale(.9) rotate(40deg)', opacity: 1, offset: 0.7 },
+        { transform: 'scale(1.2) rotate(60deg)', opacity: 0 }
+      ], { duration: 600, easing: 'ease-out' }).then(() => zig.remove())
+    );
+    Fx.shake(targetEl, 4);
+    await Fx.wait(500);
+
+    // Pink gas bursts all round the target.
+    Fx.shake(targetEl, 6);
+    effects.push(
+      Fx.anim(targetEl, [
+        { filter: 'none' },
+        { filter: 'sepia(1) saturate(3) hue-rotate(-60deg) brightness(1.1)', offset: 0.3 },
+        { filter: 'none' }
+      ], { duration: 600, easing: 'ease-out', fill: 'none' })
+    );
+    for (let i = 0; i < 4; i++) {
+      const at: Point = { x: target.x + (Math.random() * 2 - 1) * tr.width * 0.45, y: target.y + (Math.random() * 2 - 1) * tr.height * 0.35 };
+      effects.push(Fx.wait(i * 80).then(() => FxEffects.smokePuff(fxEl, at, Math.max(tr.width * 0.8, 60), pink)));
+    }
+    await Promise.all(effects);
+  }
+
+  /** A pink zigzag (star-edged) ring `size` px across. */
+  private static zigzagRing(size: number): HTMLElement {
+    const pts: string[] = [];
+    const spikes = 18;
+    for (let i = 0; i < spikes * 2; i++) {
+      const a = (Math.PI * 2 * i) / (spikes * 2);
+      const rad = i % 2 ? 40 : 46;
+      pts.push(`${(50 + Math.cos(a) * rad).toFixed(1)},${(50 + Math.sin(a) * rad).toFixed(1)}`);
+    }
+    const el = document.createElement('div');
+    el.style.cssText = `width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 4px #FF5AA0)`;
+    el.innerHTML = `<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block"><polygon points="${pts.join(' ')}" fill="none" stroke="#FF8AC8" stroke-width="2.5"/></svg>`;
+    return el;
+  }
 
   /** Poison palette: body, shadow, bubble highlight. */
   private static readonly PURPLE = '#7A2E9E';

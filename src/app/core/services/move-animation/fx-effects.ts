@@ -357,6 +357,53 @@ export class FxEffects {
     }
   }
 
+  /**
+   * A stat drop as in the XY games: a dark purple cloud gathers over the
+   * target and rains violet streaks onto it while it darkens (~1.0 s;
+   * Parting Shot, Mystical Fire).
+   */
+  static async statDropCloud(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const cloudW = Math.max(tr.width * 1.1, 70);
+    const top: Point = { x: target.x, y: target.y - Math.max(tr.height * 0.75, 45) };
+    const cloud = document.createElement('div');
+    cloud.style.cssText =
+      `width:${cloudW}px;height:${cloudW * 0.3}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(ellipse,#E0B0FF 0 10%,#8A3AE0 40%,#4A1A90cc 60%,#2A0A6000 75%);box-shadow:0 0 10px #8A3AE0';
+    Fx.place(cloud, top);
+    fxEl.appendChild(cloud);
+    const effects: Promise<void>[] = [
+      Fx.anim(cloud, [
+        { transform: 'scale(.2,.5)', opacity: 0 },
+        { transform: 'scale(1,1)', opacity: 1, offset: 0.25 },
+        { transform: 'scale(1.05,1)', opacity: 1, offset: 0.75 },
+        { transform: 'scale(.9,.8)', opacity: 0 }
+      ], { duration: 1000, easing: 'ease-out' }).then(() => cloud.remove()),
+      Fx.anim(targetEl, [
+        { filter: 'none' },
+        { filter: 'brightness(.75) drop-shadow(0 0 5px #8A3AE0)', offset: 0.4 },
+        { filter: 'none' }
+      ], { duration: 1000, easing: 'ease-in-out', fill: 'none' })
+    ];
+    for (let i = 0; i < 14; i++) {
+      const len = 10 + Math.random() * 14;
+      const streak = document.createElement('div');
+      streak.style.cssText = `width:2px;height:${len}px;border-radius:1px;pointer-events:none;background:linear-gradient(180deg,#B060FF00,#C080FF,#F0D8FF);box-shadow:0 0 3px #A050FF`;
+      Fx.place(streak, { x: top.x + (Math.random() * 2 - 1) * cloudW * 0.4, y: top.y });
+      fxEl.appendChild(streak);
+      const fall = tr.height * (0.45 + Math.random() * 0.35);
+      effects.push(
+        Fx.anim(streak, [
+          { transform: 'translateY(0)', opacity: 0 },
+          { transform: `translateY(${fall * 0.2}px)`, opacity: 1, offset: 0.2 },
+          { transform: `translateY(${fall}px)`, opacity: 0 }
+        ], { duration: 420, delay: 200 + i * 45, easing: 'ease-in' }).then(() => streak.remove())
+      );
+    }
+    await Promise.all(effects);
+  }
+
   /** A burst of smoke puffs swelling out from `at` and fading: white by default (Substitute), grey dust (Extreme Speed). */
   static smokePuff(fxEl: HTMLElement, at: Point, size: number, tone: [string, string] = ['#ECEEF2', '#D4D8E0']): Promise<void> {
     const puffs: Promise<void>[] = [];

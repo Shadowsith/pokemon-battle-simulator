@@ -178,18 +178,25 @@ export const WATER = {
     return s;
   },
 
-  /** Generic pulse (3 rings 0.13 s apart, impact ~0.56 s), bp 110: three mighty tidal pulses surge out and crash in a huge wave. */
+  /**
+   * Custom (2.7 s): two deep pulses as the rings spread (0 / 0.18 s), a
+   * shimmering underwater swell while the orbs gather and beams flare
+   * (0.25-1.25 s), a rush as the orbs stream over (1.2-1.8 s), then the huge
+   * crackling blast at 1.8 s with bubbles (to 2.7 s).
+   */
   originpulse: () => {
-    const s = new MoveSfx(1.4, 0x0219);
-    for (let i = 0; i < 3; i++) {
-      const at = i * 0.13;
+    const s = new MoveSfx(2.85, 0x0219);
+    for (const at of [0.0, 0.18]) {
       s.pulse(at, 0.3, { freq: (u) => 200 * Math.pow(0.6, u), gain: env.decay(0.3, 1.5), duty: 0.5 });
       s.wave(at, 0.25, { freq: env.ramp(500, 900), gain: env.decay(0.16, 1) });
     }
-    s.noise(0.0, 0.56, { clock: env.ramp(1500, 5000), gain: env.swell(0.18) });
-    s.thud(0.56, 0.6, 0.9);
-    s.noise(0.56, 0.75, { clock: (u) => 7000 - 5000 * u, gain: (u) => 0.45 * Math.min(1, u * 12) * Math.pow(1 - u, 1.2) });
-    s.bubbles(0.65, 0.55, 8, { lo: 300, hi: 800, gain: 0.16 });
+    s.chord(0.25, 1.0, [62, 69, 74], { rate: 0.04, gain: 0.12, vibrato: 0.01 });
+    s.sparkle(0.7, 0.55, 6, { lo: 3500, hi: 6500, gain: 0.12 });
+    s.noise(1.2, 0.6, { clock: env.ramp(1500, 6000), gain: env.swell(0.22) });
+    s.thud(1.8, 0.65, 0.9);
+    s.noise(1.8, 0.8, { clock: (u) => 7000 - 5000 * u, gain: (u) => 0.45 * Math.min(1, u * 12) * Math.pow(1 - u, 1.2) });
+    for (let i = 0; i < 6; i++) s.noise(1.85 + i * 0.07 + s.random() * 0.02, 0.03, { clock: () => 11000, gain: env.decay(0.16, 1), short: true });
+    s.bubbles(2.0, 0.6, 8, { lo: 300, hi: 800, gain: 0.14 });
     return s;
   },
 
@@ -235,14 +242,22 @@ export const WATER = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + burn fleck (0.55 s): scalding steam erupts in a blast. */
+  /**
+   * Custom (2.7 s): steam jets hiss out of the user with two pressure thumps
+   * (0 / 0.28 s), steam rushes to the target (0.45-1.05 s), the hot blast hits
+   * at 1.05 s with crackling sparks (to 1.9 s), then the target cools with a
+   * fading hiss as steam rises off it (to 2.7 s).
+   */
   steameruption: () => {
-    const s = new MoveSfx(1.0, 0x57e1);
-    s.noise(0.0, 0.45, { clock: env.ramp(3000, 9000), gain: env.ramp(0.12, 0.3) });
-    s.rumble(0.0, 0.45, { from: 200, to: 400, gain: 0.2 });
-    s.noise(0.43, 0.3, { clock: env.ramp(8000, 2000), gain: env.attackDecay(0.4, 0.05) });
-    s.thud(0.43, 0.55, 0.8);
-    s.burn(0.55, 0.25);
+    const s = new MoveSfx(2.85, 0x57e1);
+    s.noise(0.0, 0.65, { clock: env.ramp(4000, 9000), gain: env.attackDecay(0.28, 0.3) });
+    for (const at of [0.0, 0.28]) s.thud(at, 0.25, 0.4);
+    s.whoosh(0.45, 0.6, { from: 2000, to: 7000, gain: 0.3 });
+    s.rumble(0.45, 0.6, { from: 200, to: 400, gain: 0.18 });
+    s.thud(1.05, 0.6, 0.8);
+    s.noise(1.05, 0.5, { clock: env.ramp(8000, 2500), gain: env.attackDecay(0.4, 0.05) });
+    for (let i = 0; i < 8; i++) s.noise(1.1 + i * 0.09 + s.random() * 0.03, 0.03, { clock: () => 10000, gain: env.decay(0.14, 1), short: true });
+    s.noise(1.9, 0.8, { clock: env.ramp(6000, 3000), gain: env.decay(0.14, 1) });
     return s;
   },
 

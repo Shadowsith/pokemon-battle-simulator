@@ -114,13 +114,22 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic melee at high power: a roaring climb and a crushing dive. */
+  /**
+   * Custom (3.8 s): a rising roar as the user glows (0.25-0.6 s) and blasts
+   * off (0.6-0.9 s), a distant whistle across the nebula (1.05-1.45 s), a star
+   * flash ping (1.45 s), the comet's dive (1.87 s) and the crushing blast at
+   * 2.12 s, then the Defense / Sp. Def drop (2.97 s).
+   */
   dragonascent: () => {
-    const s = new MoveSfx(0.95, 0xd2a5);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 11000, gain: 0.45 });
-    s.pulse(0.0, 0.17, { freq: env.ramp(200, 700), gain: env.ramp(0.05, 0.22), duty: 0.25 });
-    s.thud(0.17, 0.9, 1);
-    s.noise(0.2, 0.6, { clock: env.ramp(6000, 1200), gain: env.decay(0.3, 1.5) });
+    const s = new MoveSfx(3.9, 0xd2a5);
+    s.pulse(0.25, 0.35, { freq: env.ramp(120, 260), gain: env.swell(0.2), duty: 0.25 });
+    s.whoosh(0.6, 0.3, { from: 1500, to: 11000, gain: 0.4 });
+    s.wave(1.05, 0.4, { freq: env.ramp(1800, 2600), gain: env.swell(0.08) });
+    s.sparkle(1.45, 0.3, 4, { lo: 4000, hi: 7000, gain: 0.16 });
+    s.whoosh(1.87, 0.25, { from: 2000, to: 10000, gain: 0.4 });
+    s.thud(2.12, 0.9, 1);
+    s.noise(2.12, 0.6, { clock: env.ramp(6000, 1200), gain: env.decay(0.32, 1.5) });
+    s.statDown(2.97, 0.24);
     return s;
   },
 
@@ -203,14 +212,24 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + drain (~0.75 s): a rushing crimson wing-beam slices in, then life flows back. */
+  /**
+   * Custom (3.55 s): the dark scene and bars swoop in, a crimson hum swells
+   * with the sphere (0.25-0.85 s), the beam rips down from the sky (1.0 s,
+   * hit 1.15 s) with crashing rubble, the life energy drains back
+   * (1.75-2.65 s) and the user is healed (from 2.65 s).
+   */
   oblivionwing: () => {
-    const s = new MoveSfx(1.3, 0x0b17);
-    s.whoosh(0.0, 0.45, { from: 1500, to: 9000, gain: 0.4 });
-    s.pulse(0.0, 0.45, { freq: env.ramp(400, 1200), gain: env.ramp(0.05, 0.16), duty: 0.125 });
-    s.noise(0.43, 0.25, { clock: (u) => 12000 - 8000 * u, gain: env.attackDecay(0.5, 0.03) });
-    s.thud(0.43, 0.45, 0.5);
-    s.drain(0.75);
+    const s = new MoveSfx(3.6, 0x0b17);
+    s.whoosh(0.0, 0.25, { from: 1500, to: 4000, gain: 0.15 });
+    s.pulse(0.25, 0.6, { freq: (u) => (120 + 60 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 20 * u)), gain: env.swell(0.2), duty: 0.25 });
+    s.pulse(0.25, 0.6, { freq: env.ramp(400, 1200), gain: env.ramp(0.04, 0.14), duty: 0.125 });
+    s.whoosh(1.0, 0.2, { from: 9000, to: 2000, gain: 0.35 });
+    s.noise(1.15, 0.5, { clock: (u) => 12000 - 9000 * u, gain: env.attackDecay(0.45, 0.03) });
+    s.thud(1.15, 0.6, 0.8);
+    for (let i = 0; i < 4; i++) s.thud(1.35 + i * 0.09, 0.15, 0.3);
+    s.drain(1.75);
+    s.chord(2.65, 0.8, [72, 76, 79], { rate: 0.05, gain: 0.12 });
+    s.sparkle(2.7, 0.7, 6, { lo: 3000, hi: 5500, gain: 0.12 });
     return s;
   },
 

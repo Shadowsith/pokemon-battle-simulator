@@ -147,13 +147,23 @@ export const DARK = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): a ring portal opens, unleashing a heavy flurry of dark blows. */
+  /**
+   * Custom (3.8 s): a dark hum as the portals circle the user (0.3-1.0 s), a
+   * warping warble as the scene melts (1.0-1.2 s), six heavy blows from the
+   * portals (1.48-2.33 s, 0.17 s apart), then the user's Defense drop (2.95 s).
+   */
   hyperspacefury: () => {
-    const s = new MoveSfx(1.1, 0x4f5f);
-    s.pulse(0.0, 0.43, { freq: (u) => 110 + 60 * Math.sin(2 * Math.PI * 4 * u), gain: env.ramp(0.08, 0.2), duty: 0.25 });
-    s.whoosh(0.0, 0.43, { from: 800, to: 4000, gain: 0.25 });
-    for (const [at, g] of [[0.43, 0.55], [0.53, 0.4], [0.63, 0.45], [0.74, 0.35]]) s.thud(at, g, 0.6);
-    s.rumble(0.45, 0.6, { from: 400, to: 120, gain: 0.25 });
+    const s = new MoveSfx(3.9, 0x4f5f);
+    s.pulse(0.3, 0.7, { freq: (u) => 110 + 60 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.2), duty: 0.25 });
+    s.whoosh(0.3, 0.7, { from: 800, to: 3000, gain: 0.18 });
+    s.wave(1.0, 0.3, { freq: (u) => 400 + 300 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.14) });
+    for (let i = 0; i < 6; i++) {
+      const at = 1.48 + i * 0.17;
+      s.noise(at - 0.1, 0.1, { clock: env.ramp(2000, 6000), gain: env.swell(0.1) });
+      s.thud(at, 0.5, 0.6);
+    }
+    s.rumble(1.5, 1.0, { from: 400, to: 120, gain: 0.2 });
+    s.statDown(2.95, 0.24);
     return s;
   },
 
@@ -198,12 +208,19 @@ export const DARK = {
     return s;
   },
 
-  /** Generic target aura (0-0.8 s): a sneering parting jab of low taunting blips. */
+  /**
+   * Custom (2.1 s): darkness and bars swoop in (0-0.3 s), the user yells - a
+   * rough, jeering shout blasts at the foe (0.3-0.9 s); the scene clears, then
+   * the purple cloud rains stat-drop streaks onto the target (1.1-2.1 s).
+   */
   partingshot: () => {
-    const s = new MoveSfx(1.1, 0xda57);
-    s.pulse(0.02, 0.6, { freq: (u) => 140 + 20 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.25), duty: 0.25 });
-    s.arpeggio(0.05, [67, 64, 67, 64, 58], 0.12, { gain: 0.2, duty: 0.125, hold: 0.1 });
-    s.whoosh(0.7, 0.25, { from: 5000, to: 1500, gain: 0.2 });
+    const s = new MoveSfx(2.25, 0xda57);
+    s.whoosh(0.0, 0.3, { from: 1500, to: 5000, gain: 0.18 });
+    s.pulse(0.3, 0.55, { freq: (u) => (260 - 90 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 22 * u)), gain: env.attackDecay(0.28, 0.3), duty: 0.25 });
+    s.noise(0.3, 0.55, { clock: (u) => 3500 - 1500 * u, gain: env.attackDecay(0.22, 0.3) });
+    s.arpeggio(0.35, [67, 64, 67, 64], 0.12, { gain: 0.14, duty: 0.125, hold: 0.1 });
+    s.thud(0.9, 0.25, 0.3);
+    s.statDown(1.3, 0.24);
     return s;
   },
 

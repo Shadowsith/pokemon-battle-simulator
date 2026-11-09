@@ -439,6 +439,16 @@ export class FxGlyphs {
     return el;
   }
 
+  /**
+   * A flower petal `s` px wide: a soft oval with pointed ends, shading from
+   * `light` through `color` to `dark` (pink by default; Petal Dance, Petal Blizzard).
+   */
+  static petalGlyph(s: number, color: string, light = '#FFD0DE', dark = '#D84A72'): HTMLElement {
+    const petal = document.createElement('div');
+    petal.style.cssText = `position:absolute;width:${s}px;height:${s * 0.7}px;pointer-events:none;border-radius:80% 10% 80% 10%;background:linear-gradient(135deg,${light},${color} 55%,${dark});box-shadow:0 0 2px #00000033`;
+    return petal;
+  }
+
   /** A plain music note in `color` with a dark outline (Heal Bell). */
   static musicNote(size: number, color: string, note = '♪'): HTMLElement {
     const el = document.createElement('div');

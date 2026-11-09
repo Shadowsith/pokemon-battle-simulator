@@ -16,12 +16,20 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic field move: a storm of glittering diamonds. */
+  /**
+   * Custom (2.1 s): a bright swell as the glow forms (0-0.35 s), a crystal
+   * chime as the diamond appears (0.35 s), then the glittering storm rushes
+   * over (0.95-1.8 s) with the hit at 1.35 s.
+   */
   diamondstorm: () => {
-    const s = new MoveSfx(1.25, 0xd1a5);
-    s.noise(0.0, 1.0, { clock: (u) => 3500 + 1500 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.25) });
-    s.rumble(0.0, 0.6, { from: 400, to: 150, gain: 0.35 });
-    s.sparkle(0.05, 0.9, 18, { lo: 2500, hi: 5500, gain: 0.2 });
+    const s = new MoveSfx(2.25, 0xd1a5);
+    s.wave(0.0, 0.35, { freq: env.ramp(500, 1000), gain: env.swell(0.12) });
+    s.chord(0.35, 0.6, [84, 88, 91], { rate: 0.03, gain: 0.14 });
+    s.sparkle(0.35, 0.5, 6, { lo: 3500, hi: 6500, gain: 0.14 });
+    s.noise(0.95, 0.85, { clock: (u) => 3500 + 1500 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.24) });
+    s.sparkle(0.95, 0.85, 16, { lo: 2500, hi: 5500, gain: 0.18 });
+    s.thud(1.35, 0.5, 0.5);
+    s.noise(1.35, 0.2, { clock: () => 9000, gain: env.decay(0.25, 1) });
     return s;
   },
 

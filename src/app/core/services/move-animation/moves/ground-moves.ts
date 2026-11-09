@@ -1,4 +1,5 @@
 import { Point, BattleStageRefs, MoveVisual, MoveAnimRegistry } from '../animation.types';
+import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
@@ -11,6 +12,8 @@ export class GroundMoveAnimations {
     bonemerang: (refs, launch, target, v) => GroundMoveAnimations.playBonemerang(refs, launch, target, v),
     dig: (refs, _launch, target) => GroundMoveAnimations.playDigUp(refs, target),
     earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs),
+    landswrath: (refs, launch, target) => GroundMoveAnimations.playLandsWrath(refs, launch, target),
+    precipiceblades: (refs, _launch, target) => GroundMoveAnimations.playPrecipiceBlades(refs, target),
     spikes: (refs, launch) => GroundMoveAnimations.playSpikes(refs, launch)
   };
 
@@ -18,6 +21,260 @@ export class GroundMoveAnimations {
   static readonly chargeAnims: MoveAnimRegistry = {
     dig: (refs) => GroundMoveAnimations.playDigDown(refs)
   };
+
+  /**
+   * Land's Wrath, after the XY animation: the scene goes black (0-0.25 s) and
+   * golden rings swirl out over the ground round the user while golden light
+   * rises from it (0.25-1.25 s). Then the ground glows gold across the whole
+   * field and a curtain of golden light streaks shoots up over the target's
+   * side, battering it (1.25-2.35 s), before everything fades (to ~2.7 s).
+   */
+  private static async playLandsWrath(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const lFoot = Fx.footOf(launchEl, fieldEl);
+    const tFoot = Fx.footOf(targetEl, fieldEl);
+
+    const dark = Fx.backdrop(fieldEl, 'background:#050402');
+    await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    const layer = document.createElement('div');
+    layer.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fxEl.appendChild(layer);
+
+    // Golden rings swirl over the ground round the user; golden light rises off it.
+    const charge: Promise<void>[] = [
+      Fx.anim(launchEl, [
+        { filter: 'none' },
+        { filter: 'brightness(1.2) drop-shadow(0 0 8px #FFD030)', offset: 0.5 },
+        { filter: 'none' }
+      ], { duration: 750, easing: 'ease-in-out', fill: 'none' })
+    ];
+    const ringW = Math.max(lr.width * 1.6, 110);
+    for (const [delay, k] of [[0, 0.6], [150, 0.85], [300, 1.1]] as const) {
+      const ring = document.createElement('div');
+      ring.style.cssText = `width:${ringW * k}px;height:${ringW * k * 0.32}px;border-radius:50%;pointer-events:none;border:3px solid #FFD640;border-right-color:#FFD64000;box-shadow:0 0 10px #FFB020,inset 0 0 8px #FFB020`;
+      Fx.place(ring, lFoot);
+      layer.appendChild(ring);
+      charge.push(
+        Fx.anim(ring, [
+          { transform: 'scale(.4)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(1.35)', opacity: 0 }
+        ], { duration: 600, delay, easing: 'ease-out' }).then(() => ring.remove())
+      );
+    }
+    for (let i = 0; i < 10; i++) {
+      const h = lr.height * (0.8 + Math.random() * 0.8);
+      const ray = GroundMoveAnimations.goldRay(h, 3 + Math.random() * 3);
+      ray.style.left = `${lFoot.x + (Math.random() * 2 - 1) * ringW * 0.35}px`;
+      ray.style.top = `${lFoot.y - h}px`;
+      layer.appendChild(ray);
+      charge.push(GroundMoveAnimations.riseRay(ray, 450, 150 + Math.random() * 400));
+    }
+    await Promise.all(charge);
+
+    // The ground glows gold across the field and a curtain of light streaks shoots up on the target's side.
+    const glow = document.createElement('div');
+    glow.style.cssText = `position:absolute;left:0;right:0;top:${tFoot.y - H * 0.35}px;bottom:0;background:linear-gradient(180deg,#FFB02000,#C8800A88 45%,#FFC83Acc)`;
+    dark.appendChild(glow);
+    const curtain = 1100;
+    const effects: Promise<void>[] = [
+      Fx.anim(glow, [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], { duration: curtain, easing: 'linear' }),
+      Fx.anim(targetEl, [
+        { filter: 'none' },
+        { filter: 'brightness(.7) sepia(.6) drop-shadow(0 0 6px #FFC030)', offset: 0.2 },
+        { filter: 'brightness(.7) sepia(.6) drop-shadow(0 0 6px #FFC030)', offset: 0.7 },
+        { filter: 'none' }
+      ], { duration: curtain, easing: 'linear', fill: 'none' })
+    ];
+    const span = Math.max(tr.width * 4, W * 0.6);
+    for (let i = 0; i < 44; i++) {
+      const x = target.x + (Math.random() * 2 - 1) * span * 0.5;
+      const base = tFoot.y + (Math.random() * 2 - 1) * 14;
+      const h = Math.max(tr.height, 60) * (1 + Math.random() * 1.8);
+      const ray = GroundMoveAnimations.goldRay(h, 3 + Math.random() * 5);
+      ray.style.left = `${x}px`;
+      ray.style.top = `${base - h}px`;
+      layer.appendChild(ray);
+      effects.push(GroundMoveAnimations.riseRay(ray, 380 + Math.random() * 200, Math.random() * (curtain - 500)));
+    }
+    for (const at of [0, 300, 600]) setTimeout(() => Fx.shake(targetEl, 6), at);
+    Fx.shakeField(fieldEl, 0.6);
+    await Promise.all(effects);
+
+    await Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
+    dark.remove();
+    layer.remove();
+  }
+
+  /** A thin vertical golden light streak `h` px tall, brightest at its foot. */
+  private static goldRay(h: number, w: number): HTMLElement {
+    const ray = document.createElement('div');
+    ray.style.cssText = `position:absolute;width:${w}px;height:${h}px;margin-left:${-w / 2}px;transform-origin:50% 100%;pointer-events:none;border-radius:${w}px;background:linear-gradient(0deg,#FFF6C0,#FFD040 35%,#FFB02000);box-shadow:0 0 6px #FFB020`;
+    return ray;
+  }
+
+  /** A light streak shoots up from the ground, flickers and fades, then is removed. */
+  private static riseRay(ray: HTMLElement, duration: number, delay: number): Promise<void> {
+    return Fx.anim(ray, [
+      { transform: 'scaleY(0)', opacity: 1 },
+      { transform: 'scaleY(1)', opacity: 1, offset: 0.35 },
+      { transform: 'scaleY(1.05)', opacity: 0.6, offset: 0.6 },
+      { transform: 'scaleY(1.1)', opacity: 0 }
+    ], { duration, delay, easing: 'ease-out' }).then(() => ray.remove());
+  }
+
+  /**
+   * Precipice Blades, after the ORAS animation: the scene goes dark and a
+   * glowing lava floor wells up (0-0.5 s). Jagged orange rock blades thrust up
+   * out of the ground across the target's side (0.4-1.0 s). The target
+   * erupts in a fiery blast with flying rocks while a red crystal blade spears
+   * up through it (1.0-1.5 s), then grey smoke rolls over everything and the
+   * scene clears (to ~2.6 s).
+   */
+  private static async playPrecipiceBlades(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const r = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+
+    // Dark scene with a lava glow welling up from the ground line.
+    const dark = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    const lava = document.createElement('div');
+    lava.style.cssText =
+      `position:absolute;left:0;right:0;top:${foot.y - H * 0.25}px;bottom:0;` +
+      'background:linear-gradient(180deg,#FF902000,#FF9A28aa 25%,#FFC040 55%,#FFE070)';
+    dark.appendChild(lava);
+    Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+    Fx.anim(lava, [{ opacity: 0, transform: 'translateY(30%)' }, { opacity: 1, transform: 'translateY(0)' }], { duration: 450, easing: 'ease-out' });
+    await Fx.wait(400);
+
+    // Rock blades thrust up across the target's side, the nearest ones tallest.
+    const layer = document.createElement('div');
+    layer.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fxEl.appendChild(layer);
+    const blades: HTMLElement[] = [];
+    const rises: Promise<void>[] = [];
+    const count = 9;
+    const span = Math.max(r.width * 3, W * 0.45);
+    for (let i = 0; i < count; i++) {
+      const x = foot.x + ((i / (count - 1)) * 2 - 1) * span * 0.5 + (Math.random() * 2 - 1) * 10;
+      // Skip the target's own spot so it stays in view.
+      if (Math.abs(x - foot.x) < r.width * 0.3) continue;
+      const near = Math.random() < 0.4;
+      const h = Math.max(r.height, 60) * (near ? 1.4 + Math.random() * 0.5 : 0.7 + Math.random() * 0.5);
+      const w = h * (0.28 + Math.random() * 0.12);
+      const blade = GroundMoveAnimations.rockBlade(w, h);
+      const y = foot.y + (near ? 18 + Math.random() * 14 : -6 + Math.random() * 10);
+      blade.style.left = `${x - w / 2}px`;
+      blade.style.top = `${y - h}px`;
+      blade.style.zIndex = near ? '2' : '0';
+      layer.appendChild(blade);
+      blades.push(blade);
+      rises.push(
+        Fx.anim(blade, [
+          { transform: 'translateY(40%) scaleY(0)' },
+          { transform: 'translateY(-4%) scaleY(1.04)', offset: 0.7 },
+          { transform: 'translateY(0) scaleY(1)' }
+        ], { duration: 260, delay: Math.random() * 300, easing: 'ease-out' })
+      );
+    }
+    Fx.shakeField(fieldEl, 0.5);
+    await Promise.all(rises);
+    await Fx.wait(150);
+
+    // The blast: fire, flying rocks and a red crystal spearing up through the target.
+    const size = Math.max(r.width * 1.4, 100);
+    const effects: Promise<void>[] = [];
+    for (let i = 0; i < 7; i++) {
+      const fire = FxGlyphs.firePuff(size * (0.5 + Math.random() * 0.4));
+      Fx.place(fire, { x: target.x + (Math.random() * 2 - 1) * size * 0.35, y: foot.y - Math.random() * r.height * 0.6 });
+      fire.style.zIndex = '1';
+      layer.appendChild(fire);
+      effects.push(
+        Fx.anim(fire, [
+          { transform: 'scale(.2)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.3 },
+          { transform: 'translateY(-14px) scale(1.25)', opacity: 0 }
+        ], { duration: 600, delay: i * 40, easing: 'ease-out' }).then(() => fire.remove())
+      );
+    }
+    for (let i = 0; i < 8; i++) {
+      const rock = FxGlyphs.rockChunk(8 + Math.random() * 10);
+      rock.style.filter = 'brightness(.55) saturate(.6)';
+      rock.style.zIndex = '2';
+      Fx.place(rock, { x: target.x, y: foot.y - r.height * 0.3 });
+      layer.appendChild(rock);
+      const ang = -Math.PI / 2 + (Math.random() * 2 - 1) * 1.2;
+      const d = size * (0.6 + Math.random() * 0.5);
+      effects.push(
+        Fx.anim(rock, [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) rotate(${Math.random() * 360}deg)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(${Math.cos(ang) * d * 1.2}px,${Math.sin(ang) * d + 30}px) rotate(${Math.random() * 540}deg)`, opacity: 0 }
+        ], { duration: 650, easing: 'ease-out' }).then(() => rock.remove())
+      );
+    }
+    const crystalH = Math.max(r.height * 1.6, 110);
+    const crystal = GroundMoveAnimations.crystalBlade(crystalH * 0.3, crystalH);
+    crystal.style.left = `${target.x + r.width * 0.15 - crystalH * 0.15}px`;
+    crystal.style.top = `${foot.y + 10 - crystalH}px`;
+    crystal.style.zIndex = '3';
+    layer.appendChild(crystal);
+    const crystalDone = Fx.anim(crystal, [
+      { transform: 'translateY(60%) scaleY(0)', opacity: 1 },
+      { transform: 'translateY(0) scaleY(1)', opacity: 1, offset: 0.12 },
+      { transform: 'translateY(0) scaleY(1)', opacity: 1, offset: 0.75 },
+      { transform: 'translateY(0) scaleY(1)', opacity: 0 }
+    ], { duration: 1300, easing: 'ease-out' }).then(() => crystal.remove());
+    Fx.flash(targetEl, '#FFB040', 0.9);
+    Fx.shake(targetEl, 7);
+    Fx.shakeField(fieldEl, 0.9);
+    await Fx.wait(400);
+
+    // Grey smoke rolls over the scene; the blades and the darkness clear away.
+    const smoke: Promise<void>[] = [];
+    for (let i = 0; i < 5; i++) {
+      const at: Point = { x: foot.x + ((i / 4) * 2 - 1) * span * 0.5, y: foot.y - r.height * (0.2 + Math.random() * 0.3) };
+      smoke.push(Fx.wait(i * 60).then(() => FxEffects.smokePuff(layer, at, Math.max(r.width * 1.6, 130), ['#8A8A90', '#5A5A62'])));
+    }
+    const clear = Promise.all(blades.map((b) => Fx.anim(b, [{ opacity: 1 }, { opacity: 0 }], { duration: 500, delay: 250, easing: 'ease-in' })));
+    const fadeDark = Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 700, delay: 300, easing: 'ease-in' });
+    await Promise.all([...effects, ...smoke, crystalDone, clear, fadeDark]);
+    dark.remove();
+    layer.remove();
+  }
+
+  /** A tall jagged rock blade `w` × `h` px, orange-brown with dark cracks, its tip leaning a little. */
+  private static rockBlade(w: number, h: number): HTMLElement {
+    const lean = (Math.random() * 2 - 1) * 12;
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${h}px;pointer-events:none;transform-origin:50% 100%;filter:drop-shadow(0 0 4px #FF902088)`;
+    el.innerHTML =
+      '<svg viewBox="0 0 40 100" width="100%" height="100%" preserveAspectRatio="none" style="display:block;overflow:visible">' +
+      `<path d="M2 100 L8 46 L${20 + lean} 0 L30 38 L38 100 Z" fill="#C8783C" stroke="#4A2410" stroke-width="1.5" stroke-linejoin="round"/>` +
+      `<path d="M${20 + lean} 0 L30 38 L38 100 L24 100 Z" fill="#8E4E22"/>` +
+      `<path d="M14 60 L20 48 L17 34 M26 80 L30 66" stroke="#4A2410" stroke-width="1.2" fill="none"/>` +
+      '<path d="M2 100 L38 100" stroke="#FFD060" stroke-width="3"/></svg>';
+    return el;
+  }
+
+  /** A slim glowing red crystal spike `w` × `h` px, its point upward. */
+  private static crystalBlade(w: number, h: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${h}px;pointer-events:none;transform-origin:50% 100%;filter:drop-shadow(0 0 8px #FF3060)`;
+    el.innerHTML =
+      '<svg viewBox="0 0 30 100" width="100%" height="100%" preserveAspectRatio="none" style="display:block">' +
+      '<path d="M2 100 L15 0 L28 100 Z" fill="#E0204A"/>' +
+      '<path d="M15 0 L28 100 L17 100 Z" fill="#9A0A2A"/>' +
+      '<path d="M15 0 L8 100" stroke="#FF8AA8" stroke-width="1.5"/></svg>';
+    return el;
+  }
 
   /**
    * Spikes: small metal caltrops are tossed one after another in high arcs

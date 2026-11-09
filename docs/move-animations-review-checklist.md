@@ -623,15 +623,15 @@ Changes to the generic delivery animations or to this review list alone don't ne
 
 - [ ] **Aromatic Mist** / Duftwolke — `aromaticmist` · Fairy · Status · `selfAura`
 - [ ] **Baby-Doll Eyes** / Kulleraugen — `babydolleyes` · Fairy · Status · `selfAura`
-- [ ] ⭐ **Belch** / Rülpser — `belch` · Poison · Special · `projectile`
-- [ ] ⭐ **Boomburst** / Überschallknall — `boomburst` · Normal · Special · `sonic`
+- [x] ⭐ **Belch** / Rülpser — `belch` · Poison · Special · pink burp puff + sparks, dusky scene, sound rings travel to and close in on the target, pink gas bursts (custom, needs review)
+- [x] ⭐ **Boomburst** / Überschallknall — `boomburst` · Normal · Special · red-pink rays + mouth sparks, orange scene, shockwave rings roll through the target (custom, needs review)
 - [ ] **Celebrate** / Ehrentag — `celebrate` · Normal · Status · `selfAura`
 - [ ] **Confide** / Vertrauenssache — `confide` · Normal · Status · `selfAura`
 - [ ] **Crafty Shield** / Trickschutz — `craftyshield` · Fairy · Status · `selfAura`
-- [ ] ⭐ **Dazzling Gleam** / Zauberschein — `dazzlinggleam` · Fairy · Special · `field`
-- [ ] ⭐ **Diamond Storm** / Diamantsturm — `diamondstorm` · Rock · Physical · `field`
+- [x] ⭐ **Dazzling Gleam** / Zauberschein — `dazzlinggleam` · Fairy · Special · white wash, shadow halo + prismatic rainbow ring at the user, dark streaks, blinding prismatic flash on target (custom, needs review)
+- [x] ⭐ **Diamond Storm** / Diamantsturm — `diamondstorm` · Rock · Physical · white glow into a faceted diamond, magenta scene, storm of pink shards to the target, pink burst (custom, needs review)
 - [ ] **Disarming Voice** / Säuselstimme — `disarmingvoice` · Fairy · Special · `sonic`
-- [ ] ⭐ **Dragon Ascent** / Zenitstürmer — `dragonascent` · Flying · Physical · `melee`
+- [x] ⭐ **Dragon Ascent** / Zenitstürmer — `dragonascent` · Flying · Physical · glows and shoots up, streak + star flash in a nebula, green comet dives onto target, user Def/SpD drop (custom, needs review)
 - [ ] **Draining Kiss** / Diebeskuss — `drainingkiss` · Fairy · Special · `projectile`
 - [ ] **Eerie Impulse** / Mystowellen — `eerieimpulse` · Electric · Status · `selfAura`
 - [ ] **Electric Terrain** / Elektrofeld — `electricterrain` · Electric · Status · `targetAura`
@@ -640,43 +640,43 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Fairy Wind** / Feenbrise — `fairywind` · Fairy · Special · `projectile`
 - [ ] **Fell Stinger** / Stachelfinale — `fellstinger` · Bug · Physical · `melee`
 - [ ] **Flower Shield** / Floraschutz — `flowershield` · Fairy · Status · `targetAura`
-- [ ] ⭐ **Flying Press** / Flying Press — `flyingpress` · Fighting · Physical · `melee`
+- [x] ⭐ **Flying Press** / Flying Press — `flyingpress` · Fighting · Physical · leaps out of sight, dives down through speed lines, body slam with dust cloud + rock chips (custom, needs review)
 - [ ] **Forest's Curse** / Waldesfluch — `forestscurse` · Grass · Status · `targetAura`
-- [ ] ⭐ **Freeze-Dry** / Gefriertrockner — `freezedry` · Ice · Special · `projectile`
-- [ ] ⭐ **Geomancy** / Geokontrolle — `geomancy` · Fairy · Status · `selfAura`
+- [x] ⭐ **Freeze-Dry** / Gefriertrockner — `freezedry` · Ice · Special · warm glow, ice shards swirl in, target whitens inside an ice crystal that shatters into snowflakes (custom, needs review)
+- [x] ⭐ **Geomancy** / Geokontrolle — `geomancy` · Fairy · Status · turn 1: light pillars + swirling rainbow gems; turn 2: rainbow light fan, white ground glow, stat-up aura (custom, needs review)
 - [ ] **Grassy Terrain** / Grasfeld — `grassyterrain` · Grass · Status · `targetAura`
 - [ ] **Happy Hour** / Goldene Zeiten — `happyhour` · Normal · Status · `selfAura`
 - [ ] **Hold Back** / Zurückhaltung — `holdback` · Normal · Physical · `melee`
 - [ ] **Hold Hands** / Händchenhalten — `holdhands` · Normal · Status · `targetAura`
-- [ ] ⭐ **Hyperspace Fury** / Dimensionswahn — `hyperspacefury` · Dark · Physical · `projectile`
-- [ ] ⭐ **Hyperspace Hole** / Dimensionsloch — `hyperspacehole` · Psychic · Special · `projectile`
+- [x] ⭐ **Hyperspace Fury** / Dimensionswahn — `hyperspacefury` · Dark · Physical · magenta scene + portal rings round the user, psychedelic swirl, gloves punch out of portals round the target, user Defense drop (custom, needs review)
+- [x] ⭐ **Hyperspace Hole** / Dimensionsloch — `hyperspacehole` · Psychic · Special · white wash, user sinks into an ink hole and rises from one under the target, pink burst + white bolt + ink spikes (custom, needs review)
 - [ ] **Infestation** / Plage — `infestation` · Bug · Special · `projectile`
 - [ ] **Ion Deluge** / Plasmaschauer — `iondeluge` · Electric · Status · `targetAura`
-- [ ] ⭐ **King's Shield** / Königsschild — `kingsshield` · Steel · Status · `selfAura`
-- [ ] ⭐ **Land's Wrath** / Bodengewalt — `landswrath` · Ground · Physical · `field`
+- [x] ⭐ **King's Shield** / Königsschild — `kingsshield` · Steel · Status · magenta sparks + grey orb, glowing lilac honeycomb shield in front of the user (custom, needs review)
+- [x] ⭐ **Land's Wrath** / Bodengewalt — `landswrath` · Ground · Physical · black scene, golden ground rings + rising light round the user, golden light curtain over the target's side (custom, needs review)
 - [ ] ⭐ **Light of Ruin** / Lux Calamitatis — `lightofruin` · Fairy · Special · `projectile`
 - [ ] **Magnetic Flux** / Magnetregler — `magneticflux` · Electric · Status · `selfAura`
 - [ ] **Mat Block** / Tatami-Schild — `matblock` · Fighting · Status · `selfAura`
 - [ ] **Misty Terrain** / Nebelfeld — `mistyterrain` · Fairy · Status · `targetAura`
-- [ ] ⭐ **Moonblast** / Mondgewalt — `moonblast` · Fairy · Special · `projectile`
-- [ ] ⭐ **Mystical Fire** / Magieflamme — `mysticalfire` · Fire · Special · `projectile`
+- [x] ⭐ **Moonblast** / Mondgewalt — `moonblast` · Fairy · Special · magenta sky, glowing full moon with pink rays, white orb to target, huge white flash + pink rings (custom, needs review)
+- [x] ⭐ **Mystical Fire** / Magieflamme — `mysticalfire` · Fire · Special · flame tip draws a fire ring, ring flies to target and bursts into a fireball, purple stat-drop cloud (custom, needs review)
 - [ ] **Noble Roar** / Kampfgebrüll — `nobleroar` · Normal · Status · `selfAura`
 - [ ] **Nuzzle** / Wangenrubbler — `nuzzle` · Electric · Physical · `melee`
-- [ ] ⭐ **Oblivion Wing** / Unheilsschwingen — `oblivionwing` · Flying · Special · `projectile`
-- [ ] ⭐ **Origin Pulse** / Ursprungswoge — `originpulse` · Water · Special · `pulse`
+- [x] ⭐ **Oblivion Wing** / Unheilsschwingen — `oblivionwing` · Flying · Special · letterbox + crimson sphere, crimson sky beam onto target with rubble, magenta drain + heal sparkles (custom, needs review)
+- [x] ⭐ **Origin Pulse** / Ursprungswoge — `originpulse` · Water · Special · cyan rings, deep-sea scene, blue orbs gather + beams, stream to target, blue-white crackling blast (custom, needs review)
 - [ ] **Parabolic Charge** / Parabolladung — `paraboliccharge` · Electric · Special · `field`
-- [ ] ⭐ **Parting Shot** / Abgangstirade — `partingshot` · Dark · Status · `targetAura`
-- [ ] ⭐ **Petal Blizzard** / Blütenwirbel — `petalblizzard` · Grass · Physical · `field`
-- [ ] ⭐ **Phantom Force** / Phantomkraft — `phantomforce` · Ghost · Physical · `beam`
+- [x] ⭐ **Parting Shot** / Abgangstirade — `partingshot` · Dark · Status · letterbox + speed lines, white shout burst at foe, purple cloud rains on target (custom, needs review)
+- [x] ⭐ **Petal Blizzard** / Blütenwirbel — `petalblizzard` · Grass · Physical · dim green scene, multicoloured petal storm across the field, green sphere bursts on target (custom, needs review)
+- [x] ⭐ **Phantom Force** / Phantomkraft — `phantomforce` · Ghost · Physical · turn 1: sinks into a purple portal; turn 2: drops out of a portal above the target, purple burst + flames (custom, needs review)
 - [ ] **Play Nice** / Kameradschaft — `playnice` · Normal · Status · `selfAura`
-- [ ] ⭐ **Play Rough** / Knuddler — `playrough` · Fairy · Physical · `melee`
+- [x] ⭐ **Play Rough** / Knuddler — `playrough` · Fairy · Physical · speed lines + dash, brawl cloud with stars and hearts (custom, needs review)
 - [ ] **Powder** / Pulverschleuder — `powder` · Bug · Status · `powder`
 - [ ] **Power-Up Punch** / Steigerungshieb — `poweruppunch` · Fighting · Physical · `melee`
-- [ ] ⭐ **Precipice Blades** / Abgrundsklinge — `precipiceblades` · Ground · Physical · `field`
+- [x] ⭐ **Precipice Blades** / Abgrundsklinge — `precipiceblades` · Ground · Physical · dark scene + lava floor, rock blades rise, fiery blast with red crystal spear, smoke (custom, needs review)
 - [ ] **Rototiller** / Pflüger — `rototiller` · Ground · Status · `targetAura`
-- [ ] ⭐ **Spiky Shield** / Schutzstacheln — `spikyshield` · Grass · Status · `selfAura`
-- [ ] ⭐ **Steam Eruption** / Dampfschwall — `steameruption` · Water · Special · `projectile`
-- [ ] ⭐ **Sticky Web** / Klebenetz — `stickyweb` · Bug · Status · `targetAura`
+- [x] ⭐ **Spiky Shield** / Schutzstacheln — `spikyshield` · Grass · Status · green-tinted user + green ring, cone of green spikes bursts toward foe (custom, needs review)
+- [x] ⭐ **Steam Eruption** / Dampfschwall — `steameruption` · Water · Special · glowing user + steam jets, steam flood, hot orange blast on target, cools with rising steam (custom, needs review)
+- [x] ⭐ **Sticky Web** / Klebenetz — `stickyweb` · Bug · Status · glowing orb + green web arcs over foe, drops flat, white ground web spreads (custom, needs review)
 - [ ] ⭐ **Thousand Arrows** / Tausend Pfeile — `thousandarrows` · Ground · Physical · `field`
 - [ ] ⭐ **Thousand Waves** / Tausend Wellen — `thousandwaves` · Ground · Physical · `field`
 - [ ] **Topsy-Turvy** / Invertigo — `topsyturvy` · Dark · Status · `targetAura`

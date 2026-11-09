@@ -217,14 +217,26 @@ export const BUG = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s, foe side): sticky threads are strung out with twangy plucks. */
+  /**
+   * Custom (2.45 s): the web orb whooshes up to the foe (0-0.52 s), the web
+   * opens with a shimmer (to 0.82 s), drops onto the target (to 1.15 s, soft
+   * landing), then the ground web spreads with twangy thread plucks (to 1.7 s)
+   * and fades with a faint glint tail.
+   */
   stickyweb: () => {
-    const s = new MoveSfx(1.0, 0x571c);
-    for (const [at, f] of [[0.02, 520], [0.2, 620], [0.38, 470], [0.56, 580]]) {
-      s.pulse(at, 0.16, { freq: (u) => f * (1 - 0.25 * u), gain: env.decay(0.26, 1.5), duty: 0.125 });
-      s.noise(at, 0.1, { clock: () => 3000, gain: env.decay(0.12, 1) });
+    const s = new MoveSfx(2.6, 0x571c);
+    s.whoosh(0.0, 0.52, { from: 1200, to: 4500, gain: 0.22 });
+    s.pulse(0.0, 0.52, { freq: (u) => 500 + 500 * u, gain: env.swell(0.1), duty: 0.125 });
+    s.sparkle(0.52, 0.3, 4, { lo: 3500, hi: 6000, gain: 0.14 });
+    s.wave(0.52, 0.3, { freq: (u) => 700 * (1 + 0.03 * Math.sin(2 * Math.PI * 16 * u)), gain: env.attackDecay(0.12, 0.3) });
+    s.pulse(0.82, 0.33, { freq: (u) => 900 - 500 * u, gain: env.decay(0.14, 0.6), duty: 0.125 });
+    s.thud(1.15, 0.3, 0.2);
+    for (const [at, f] of [[1.15, 520], [1.29, 620], [1.43, 470], [1.57, 580]]) {
+      s.pulse(at, 0.16, { freq: (u) => f * (1 - 0.25 * u), gain: env.decay(0.24, 1.5), duty: 0.125 });
+      s.noise(at, 0.1, { clock: () => 3000, gain: env.decay(0.1, 1) });
     }
-    s.wave(0.6, 0.35, { freq: (u) => 300 * (1 + 0.04 * Math.sin(2 * Math.PI * 14 * u)), gain: env.decay(0.2, 1) });
+    s.wave(1.7, 0.45, { freq: (u) => 300 * (1 + 0.04 * Math.sin(2 * Math.PI * 14 * u)), gain: env.decay(0.16, 1) });
+    s.sparkle(1.8, 0.6, 3, { lo: 3000, hi: 5000, gain: 0.08 });
     return s;
   },
 

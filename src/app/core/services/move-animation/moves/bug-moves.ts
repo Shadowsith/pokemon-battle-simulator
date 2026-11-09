@@ -11,8 +11,126 @@ export class BugMoveAnimations {
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
     megahorn: (refs, launch, target) => BugMoveAnimations.playMegahorn(refs, launch, target),
-    signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target)
+    signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target),
+    stickyweb: (refs, launch, target) => BugMoveAnimations.playStickyWeb(refs, launch, target)
   };
+
+  /**
+   * Sticky Web, after the XY animation: a glowing white orb wrapped in a small
+   * green web arcs up from the user to above the target (0-0.52 s), where the
+   * web opens wide round it (to 0.82 s). The web drops over the target and
+   * settles flat on the ground (to 1.15 s), then a white web spreads out over
+   * the ground round the target (to 1.7 s), lies there and fades (~2.45 s).
+   */
+  private static async playStickyWeb(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+    const hover: Point = { x: target.x, y: target.y - Math.max(r.height * 0.55, 40) };
+    const big = Math.max(r.width * 1.9, 130);
+    const flat = 0.3;
+
+    const layer = document.createElement('div');
+    layer.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    fxEl.appendChild(layer);
+
+    // The green web and the orb fly together, both centred on `hover` at the end of the arc.
+    const web = BugMoveAnimations.webGlyph(big, '#4AF0A0', '#1AC878');
+    Fx.place(web, hover);
+    const orbSize = Math.max(r.width * 0.3, 20);
+    const orb = document.createElement('div');
+    orb.style.cssText = `width:${orbSize}px;height:${orbSize}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#fff 0 35%,#F0FFF8cc 55%,#C0FFE000 72%);box-shadow:0 0 14px 4px #ffffffaa`;
+    Fx.place(orb, hover);
+    layer.append(web, orb);
+
+    const dx = launch.x - hover.x;
+    const dy = launch.y - hover.y;
+    const peak = Math.max(70, Math.abs(dx) * 0.25);
+    const arc = (k0: number, spin = 0): Keyframe[] => {
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 8; k++) {
+        const t = k / 8;
+        // The arc ends at `hover` (0,0); its top lies a little above it.
+        const lift = 4 * peak * t * (1 - t) * 0.6;
+        frames.push({ transform: `translate(${dx * (1 - t)}px,${dy * (1 - t) - lift}px) scale(${k0}) rotate(${spin * t}deg)`, opacity: t === 0 ? 0 : 1 });
+      }
+      return frames;
+    };
+    const s0 = 0.32;
+    const fly = 520;
+    await Promise.all([
+      Fx.anim(orb, arc(1), { duration: fly, easing: 'ease-out' }),
+      Fx.anim(web, arc(s0, 96), { duration: fly, easing: 'ease-out' })
+    ]);
+
+    // The web opens wide round the orb.
+    await Fx.anim(web, [
+      { transform: `scale(${s0}) rotate(96deg)` },
+      { transform: 'scale(1) rotate(120deg)' }
+    ], { duration: 300, easing: 'ease-out' });
+
+    // It drops over the target and settles flat on the ground; the orb sinks with it and goes out.
+    const down = foot.y - hover.y;
+    const drop = 330;
+    await Promise.all([
+      Fx.anim(web, [
+        { transform: 'translateY(0) scale(1,1) rotate(120deg)' },
+        { transform: `translateY(${down}px) scale(1.15,${flat * 1.15}) rotate(120deg)` }
+      ], { duration: drop, easing: 'ease-in' }),
+      Fx.anim(orb, [
+        { transform: 'translateY(0) scale(1)', opacity: 1 },
+        { transform: `translateY(${down}px) scale(.3)`, opacity: 0 }
+      ], { duration: drop, easing: 'ease-in' })
+    ]);
+    orb.remove();
+    Fx.shake(targetEl, 2);
+
+    // A white web spreads over the ground from the target outward, lies a moment and fades.
+    const groundSize = Math.max(r.width * 3.6, 260);
+    const ground = BugMoveAnimations.webGlyph(groundSize, '#FFFFFF', '#C8FFE8', 2.2);
+    ground.style.transform = `scale(1,${flat})`;
+    Fx.place(ground, foot);
+    layer.insertBefore(ground, web);
+    const greenGone = Fx.anim(web, [{ opacity: 1 }, { opacity: 0 }], { duration: 260, easing: 'ease-in' });
+    const spread = 550;
+    const lie = 400;
+    const fade = 350;
+    const total = spread + lie + fade;
+    await Promise.all([
+      greenGone,
+      Fx.anim(ground, [
+        { transform: `scale(.6,${0.6 * flat})`, clipPath: 'circle(8%)', opacity: 1 },
+        { transform: `scale(1,${flat})`, clipPath: 'circle(71%)', opacity: 1, offset: spread / total },
+        { transform: `scale(1,${flat})`, clipPath: 'circle(71%)', opacity: 1, offset: (spread + lie) / total },
+        { transform: `scale(1,${flat})`, clipPath: 'circle(71%)', opacity: 0 }
+      ], { duration: total, easing: 'ease-out' })
+    ]);
+    layer.remove();
+  }
+
+  /**
+   * A round spider web `size` px across: ten spokes and five rings of threads
+   * that sag a little toward the centre between the spokes, with a soft glow.
+   */
+  private static webGlyph(size: number, thread: string, glow: string, stroke = 1.3): HTMLElement {
+    const spokes = 10;
+    const at = (rad: number, i: number) => {
+      const a = (Math.PI * 2 * i) / spokes - Math.PI / 2;
+      return [rad * Math.cos(a), rad * Math.sin(a)].map((n) => n.toFixed(1)).join(' ');
+    };
+    let d = '';
+    for (let i = 0; i < spokes; i++) d += `M0 0L${at(49, i)}`;
+    for (const rad of [9, 18, 27, 36, 45]) {
+      d += `M${at(rad, 0)}`;
+      for (let i = 0; i < spokes; i++) d += `Q${at(rad * 0.86, i + 0.5)} ${at(rad, i + 1)}`;
+    }
+    const el = document.createElement('div');
+    el.style.cssText = `width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 3px ${glow})`;
+    el.innerHTML =
+      `<svg viewBox="-50 -50 100 100" width="100%" height="100%" style="display:block;overflow:visible">` +
+      `<path d="${d}" fill="none" stroke="${thread}" stroke-width="${stroke}" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+    return el;
+  }
 
   /**
    * Signal Beam, after the DPPt animation: a beam of glowing squares - blue

@@ -14,9 +14,114 @@ export class SteelMoveAnimations {
     doomdesire: (refs) => SteelMoveAnimations.playDoomDesireHit(refs),
     irondefense: (refs, launch) => SteelMoveAnimations.playIronDefense(refs, launch),
     irontail: (refs, launch, target, v) => SteelMoveAnimations.playIronTail(refs, launch, target, v),
+    kingsshield: (refs, launch, _target, v) => SteelMoveAnimations.playKingsShield(refs, launch, v),
     meteormash: (refs, _launch, target) => SteelMoveAnimations.playMeteorMash(refs, target),
     steelwing: (refs, launch, target, v) => SteelMoveAnimations.playSteelWing(refs, launch, target, v)
   };
+
+  /**
+   * King's Shield, after the XY animation: magenta sparks crackle round the
+   * user while a small grey orb forms in front of it, facing the foe
+   * (0-0.4 s). The orb opens into a glowing white-lilac honeycomb shield
+   * (0.35-0.6 s) that shimmers (to 1.3 s) and fades (to ~1.6 s).
+   */
+  private static async playKingsShield(refs: BattleStageRefs, launch: Point, v: MoveVisual) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const front: Point = { x: launch.x + v.dir * r.width * 0.3, y: launch.y - r.height * 0.1 };
+
+    // Magenta sparks crackle round the user.
+    const sparks: Promise<void>[] = [];
+    for (let i = 0; i < 6; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const d = Math.max(r.width, 60) * (0.35 + Math.random() * 0.2);
+      const x0 = launch.x + Math.cos(ang) * d;
+      const y0 = launch.y + Math.sin(ang) * d;
+      const len = 14 + Math.random() * 12;
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('style', 'position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 3px #FF40E0)');
+      const bolt = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      bolt.setAttribute('points', Fx.zigzagPoints(x0, y0 - len / 2, x0 + (Math.random() * 2 - 1) * 6, y0 + len / 2, 5));
+      bolt.setAttribute('fill', 'none');
+      bolt.setAttribute('stroke', '#FF70F0');
+      bolt.setAttribute('stroke-width', '2');
+      svg.appendChild(bolt);
+      fxEl.appendChild(svg);
+      sparks.push(
+        Fx.anim(svg, [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0.2, offset: 0.5 }, { opacity: 1, offset: 0.7 }, { opacity: 0 }], {
+          duration: 260,
+          delay: i * 50,
+          easing: 'linear'
+        }).then(() => svg.remove())
+      );
+    }
+
+    // The orb forms in front of the user, then opens into the shield.
+    const h = Math.max(r.height * 1.05, 80);
+    const orbSize = h * 0.3;
+    const orb = document.createElement('div');
+    orb.style.cssText = `width:${orbSize}px;height:${orbSize}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 40% 35%,#E8E8F0aa,#8A8A98aa 60%,#5A5A6888);border:1px solid #C8C8D8`;
+    Fx.place(orb, front);
+    fxEl.appendChild(orb);
+    await Fx.anim(orb, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 350, easing: 'ease-out' });
+
+    const glow = document.createElement('div');
+    glow.style.cssText = `width:${h * 1.1}px;height:${h * 1.3}px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,#ffffff 0 18%,#F0E0FFcc 35%,#C8A0FF55 55%,#A070FF00 70%)`;
+    const shield = SteelMoveAnimations.honeycomb(h * 0.8, h);
+    Fx.place(glow, front);
+    Fx.place(shield, front);
+    fxEl.append(glow, shield);
+    orb.remove();
+    const total = 1250;
+    await Promise.all([
+      ...sparks,
+      Fx.anim(glow, [
+        { transform: 'scale(.3)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.2 },
+        { transform: 'scale(.95)', opacity: 0.8, offset: 0.45 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.7 },
+        { transform: 'scale(1.05)', opacity: 0 }
+      ], { duration: total, easing: 'ease-out' }).then(() => glow.remove()),
+      Fx.anim(shield, [
+        { transform: 'scale(.3)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.2 },
+        { transform: 'scale(1)', opacity: 0.75, offset: 0.4 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.6 },
+        { transform: 'scale(1)', opacity: 0.85, offset: 0.78 },
+        { transform: 'scale(1.03)', opacity: 0 }
+      ], { duration: total, easing: 'ease-out' }).then(() => shield.remove())
+    ]);
+  }
+
+  /** An oval shield of lilac-outlined hexagon cells, `w` × `h` px, brightest in the middle. */
+  private static honeycomb(w: number, h: number): HTMLElement {
+    const hex = (cx: number, cy: number, rad: number) => {
+      const pts: string[] = [];
+      for (let k = 0; k < 6; k++) {
+        const a = (Math.PI / 3) * k + Math.PI / 6;
+        pts.push(`${(cx + Math.cos(a) * rad).toFixed(1)},${(cy + Math.sin(a) * rad).toFixed(1)}`);
+      }
+      return `<polygon points="${pts.join(' ')}"/>`;
+    };
+    const rad = 8;
+    const dx = rad * Math.sqrt(3);
+    let cells = '';
+    for (let row = -7; row <= 7; row++) {
+      const cy = row * rad * 1.5;
+      for (let col = -4; col <= 4; col++) cells += hex(col * dx + (row % 2 ? dx / 2 : 0), cy, rad - 0.6);
+    }
+    const id = `kingsShield${SteelMoveAnimations.shieldId++}`;
+    const el = document.createElement('div');
+    el.style.cssText = `width:${w}px;height:${h}px;pointer-events:none;filter:drop-shadow(0 0 4px #C080FF)`;
+    el.innerHTML =
+      `<svg viewBox="-40 -50 80 100" width="100%" height="100%" style="display:block">` +
+      `<defs><clipPath id="${id}c"><ellipse cx="0" cy="0" rx="38" ry="48"/></clipPath>` +
+      `<radialGradient id="${id}g"><stop offset="0" stop-color="#ffffff" stop-opacity=".75"/><stop offset=".6" stop-color="#E8D0FF" stop-opacity=".35"/><stop offset="1" stop-color="#B080FF" stop-opacity=".2"/></radialGradient></defs>` +
+      `<g clip-path="url(#${id}c)" fill="url(#${id}g)" stroke="#C890FF" stroke-width="1.2">${cells}</g></svg>`;
+    return el;
+  }
+
+  private static shieldId = 0;
 
   /** Animations of the turn a delayed Steel attack is used, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {

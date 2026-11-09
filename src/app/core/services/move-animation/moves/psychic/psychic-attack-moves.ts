@@ -4,6 +4,7 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { PsychicFx } from './psychic-fx';
+import { HyperspaceHole } from './hyperspace-hole';
 
 /** Hand-made animations for Psychic-type attacks. */
 export class PsychicAttackMoveAnimations {
@@ -12,6 +13,7 @@ export class PsychicAttackMoveAnimations {
     dreameater: (refs, launch, target, v) => PsychicAttackMoveAnimations.playDreamEater(refs, launch, target, v),
     extrasensory: (refs, launch) => PsychicAttackMoveAnimations.playExtrasensory(refs, launch),
     futuresight: (refs) => PsychicAttackMoveAnimations.playFutureSightHit(refs),
+    hyperspacehole: (refs, launch, target, v) => HyperspaceHole.play(refs, launch, target, v),
     lusterpurge: (refs, launch, target) => PsychicAttackMoveAnimations.playLusterPurge(refs, launch, target),
     psychic: (refs) => PsychicAttackMoveAnimations.playPsychic(refs),
     psychoboost: (refs, launch, target) => PsychicAttackMoveAnimations.playPsychoBoost(refs, launch, target)

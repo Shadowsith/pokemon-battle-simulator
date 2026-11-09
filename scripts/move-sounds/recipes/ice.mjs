@@ -44,14 +44,21 @@ export const ICE = {
     return s;
   },
 
-  /** Generic projectile (impact at 0.43 s) + freeze fleck: a dry, crackling chill flash-freezes the target. */
+  /**
+   * Custom (2.35 s): a warm hum (0-0.5 s), a swirling icy whistle as the
+   * shards circle in (0.35-0.95 s), crackling frost as the target whitens and
+   * the crystal closes (0.95-1.5 s), then it shatters at 1.65 s with tinkling ice.
+   */
   freezedry: () => {
-    const s = new MoveSfx(1.25, 0xf2d7);
-    s.noise(0.0, 0.43, { clock: (u) => 6000 + 6000 * u, gain: env.ramp(0.06, 0.22) });
-    s.wave(0.0, 0.43, { freq: (u) => 1400 + 600 * u, gain: env.ramp(0.05, 0.14) });
-    s.noise(0.43, 0.08, { clock: () => 14000, gain: env.decay(0.4, 1) });
-    s.sparkle(0.43, 0.3, 7, { lo: 3500, hi: 6000, gain: 0.16 });
-    s.freeze(0.58);
+    const s = new MoveSfx(2.5, 0xf2d7);
+    s.wave(0.0, 0.5, { freq: (u) => 300 + 100 * u, gain: env.swell(0.1) });
+    s.noise(0.35, 0.6, { clock: (u) => 6000 + 6000 * u, gain: env.swell(0.16) });
+    s.wave(0.35, 0.6, { freq: (u) => 1400 + 600 * Math.sin(Math.PI * 2 * u), gain: env.swell(0.1) });
+    s.sparkle(0.95, 0.4, 6, { lo: 3500, hi: 6000, gain: 0.12 });
+    s.noise(1.15, 0.35, { clock: env.ramp(8000, 14000), gain: env.swell(0.14), short: true });
+    s.noise(1.65, 0.08, { clock: () => 14000, gain: env.decay(0.45, 1) });
+    s.thud(1.65, 0.3, 0.3);
+    s.sparkle(1.67, 0.6, 10, { lo: 4000, hi: 7500, gain: 0.15 });
     return s;
   },
 

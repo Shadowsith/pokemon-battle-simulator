@@ -9,8 +9,180 @@ export class GhostMoveAnimations {
     curse: (refs, launch) => GhostMoveAnimations.playCurse(refs, launch),
     destinybond: (refs, launch, target) => GhostMoveAnimations.playDestinyBond(refs, launch, target),
     nightshade: (refs, launch) => GhostMoveAnimations.playNightShade(refs, launch),
+    phantomforce: (refs, launch, target, v) => GhostMoveAnimations.playPhantomForceStrike(refs, launch, target, v),
     shadowball: (refs, launch, target, v) => GhostMoveAnimations.playShadowBall(refs, launch, target, v)
   };
+
+  /** Turn-1 animations of two-turn Ghost moves, by @pkmn/sim move id. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    phantomforce: (refs) => GhostMoveAnimations.playPhantomForceVanish(refs)
+  };
+
+  /**
+   * Phantom Force, turn 1 (XY): the scene goes black, a glowing purple portal
+   * opens under the user (0.25-0.5 s) and the user sinks into it (to 0.95 s);
+   * the portal closes and the scene clears (to ~1.2 s). The user stays away until turn 2.
+   */
+  private static async playPhantomForceVanish(refs: BattleStageRefs) {
+    const { launchEl: el, fieldEl, fxEl } = refs;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    const r = Fx.rect(el);
+    const foot = Fx.footOf(el, fieldEl);
+
+    const dark = Fx.backdrop(fieldEl, 'background:#050008');
+    await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+    const portal = GhostMoveAnimations.portal(Math.max(r.width * 1.2, 80));
+    Fx.place(portal, foot);
+    fxEl.appendChild(portal);
+    await Fx.anim(portal, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    // The user sinks into the portal: it slides down while its lower part is cut off at the ground line.
+    await Fx.anim(el, [
+      { transform: 'translateY(0)', clipPath: 'inset(0 0 -40px 0)', filter: 'none' },
+      { transform: `translateY(${r.height}px)`, clipPath: `inset(0 0 ${r.height}px 0)`, filter: 'brightness(.6) sepia(1) hue-rotate(230deg) saturate(3)' }
+    ], { duration: 450, easing: 'ease-in', fill: 'none' });
+    el.style.opacity = '0';
+
+    await Fx.anim(portal, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0)', opacity: 0 }], { duration: 220, easing: 'ease-in' });
+    portal.remove();
+    await Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' });
+    dark.remove();
+  }
+
+  /**
+   * Phantom Force, turn 2 (XY): the scene goes black, a purple portal opens
+   * above the target with ghostly purple wisp rings beside it (0.2-0.6 s). The
+   * user drops out of the portal next to the target (to 0.85 s) and strikes:
+   * a white-purple burst with a spreading ring and streaks (0.85-1.25 s).
+   * Purple flames rise off the target while the user fades back to its own
+   * place and the scene clears (to ~1.8 s).
+   */
+  private static async playPhantomForceStrike(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { launchEl: el, fieldEl, fxEl, targetEl } = refs;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    const tr = Fx.rect(targetEl);
+    const tFoot = Fx.footOf(targetEl, fieldEl);
+    const lFoot = Fx.footOf(el, fieldEl);
+
+    const dark = Fx.backdrop(fieldEl, 'background:#050008');
+    await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+
+    // Portal overhead and two flickering wisp rings.
+    const portalAt: Point = { x: target.x, y: target.y - Math.max(tr.height * 0.9, 60) };
+    const portal = GhostMoveAnimations.portal(Math.max(tr.width * 1.3, 90));
+    Fx.place(portal, portalAt);
+    fxEl.appendChild(portal);
+    Fx.anim(portal, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 250, easing: 'ease-out' });
+    const wisps: Promise<void>[] = [];
+    for (const side of [-1, 1]) {
+      const s = Math.max(tr.width * 0.28, 22);
+      const wisp = document.createElement('div');
+      wisp.style.cssText = `width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;border:3px solid #D050FF;box-shadow:0 0 8px #B020FF,inset 0 0 6px #B020FF`;
+      Fx.place(wisp, { x: target.x + side * tr.width * 0.75, y: target.y - tr.height * 0.1 });
+      fxEl.appendChild(wisp);
+      wisps.push(
+        Fx.anim(wisp, [
+          { transform: 'scale(.3)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.2 },
+          { transform: 'scale(.85)', opacity: 0.6, offset: 0.4 },
+          { transform: 'scale(1.05)', opacity: 1, offset: 0.6 },
+          { transform: 'translateY(-14px) scale(.6)', opacity: 0 }
+        ], { duration: 800, easing: 'ease-in-out' }).then(() => wisp.remove())
+      );
+    }
+    await Fx.wait(400);
+
+    // The user drops out of the portal right in front of the target (no turning).
+    const dx = target.x - v.dir * tr.width * 0.45 - launch.x;
+    const dy = tFoot.y - lFoot.y;
+    el.style.opacity = '1';
+    const drop = Math.max(tr.height * 0.9, 60);
+    await Fx.anim(el, [
+      { transform: `translate(${dx}px,${dy - drop}px) scale(.6)`, opacity: 0 },
+      { transform: `translate(${dx}px,${dy}px) scale(.8)`, opacity: 1 }
+    ], { duration: 250, easing: 'ease-in', fill: 'forwards' });
+    Fx.anim(portal, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0)', opacity: 0 }], { duration: 250, easing: 'ease-in' })
+      .then(() => portal.remove());
+
+    // The strike: a white-purple burst, a ring and streaks.
+    const size = Math.max(tr.width * 1.3, 100);
+    const burst = document.createElement('div');
+    burst.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#ffffff 0 25%,#F8D8FFee 40%,#D060FF88 58%,#9020E000 72%)`;
+    const ring = document.createElement('div');
+    ring.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;border:4px solid #E070FF;box-shadow:0 0 12px #C030FF`;
+    Fx.place(burst, target);
+    Fx.place(ring, target);
+    fxEl.append(burst, ring);
+    const effects: Promise<void>[] = [
+      ...wisps,
+      Fx.anim(burst, [
+        { transform: 'scale(.2)', opacity: 1 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(1.2)', opacity: 0 }
+      ], { duration: 450, easing: 'ease-out' }).then(() => burst.remove()),
+      Fx.anim(ring, [{ transform: 'scale(.4)', opacity: 1 }, { transform: 'scale(1.6)', opacity: 0 }], { duration: 500, easing: 'ease-out' }).then(() => ring.remove())
+    ];
+    for (let i = 0; i < 6; i++) {
+      const len = size * (0.6 + Math.random() * 0.5);
+      const ang = (v.dir > 0 ? 0 : 180) + (Math.random() * 2 - 1) * 25;
+      const streak = document.createElement('div');
+      streak.style.cssText = `position:absolute;width:${len}px;height:3px;border-radius:2px;pointer-events:none;background:linear-gradient(90deg,#ffffff,#E070FF 60%,#E070FF00);box-shadow:0 0 4px #C030FF`;
+      Fx.place(streak, target);
+      fxEl.appendChild(streak);
+      effects.push(
+        Fx.anim(streak, [
+          { transform: `rotate(${ang}deg) translateX(0) scaleX(.2)`, opacity: 1 },
+          { transform: `rotate(${ang}deg) translateX(${len * 0.6}px) scaleX(1)`, opacity: 0 }
+        ], { duration: 380, delay: Math.random() * 80, easing: 'ease-out' }).then(() => streak.remove())
+      );
+    }
+    Fx.shake(targetEl, 7);
+    Fx.shakeField(fieldEl, 0.5);
+    await Fx.wait(250);
+
+    // Purple flames rise off the target, which glows purple.
+    effects.push(
+      Fx.anim(targetEl, [
+        { filter: 'none' },
+        { filter: 'brightness(1.15) drop-shadow(0 0 8px #C030FF)', offset: 0.2 },
+        { filter: 'none' }
+      ], { duration: 650, easing: 'ease-out', fill: 'none' })
+    );
+    for (let i = 0; i < 9; i++) {
+      const s = 14 + Math.random() * 14;
+      const flame = document.createElement('div');
+      flame.style.cssText = `width:${s}px;height:${s * 1.5}px;border-radius:50% 50% 45% 45% / 65% 65% 35% 35%;pointer-events:none;background:radial-gradient(circle at 50% 70%,#FFE0FF,#E060FF 40%,#9020E000 75%)`;
+      Fx.place(flame, { x: target.x + (Math.random() * 2 - 1) * tr.width * 0.35, y: target.y + tr.height * 0.1 });
+      fxEl.appendChild(flame);
+      const rise = tr.height * (0.5 + Math.random() * 0.4);
+      effects.push(
+        Fx.anim(flame, [
+          { transform: 'translateY(0) scale(.4)', opacity: 0 },
+          { transform: `translateY(${-rise * 0.4}px) scale(1)`, opacity: 1, offset: 0.35 },
+          { transform: `translateY(${-rise}px) scale(.5)`, opacity: 0 }
+        ], { duration: 550, delay: i * 40, easing: 'ease-out' }).then(() => flame.remove())
+      );
+    }
+
+    // The user fades out at the target and back in at its own place.
+    await Fx.anim(el, [
+      { transform: `translate(${dx}px,${dy}px) scale(.8)`, opacity: 1 },
+      { transform: `translate(${dx}px,${dy}px) scale(.8)`, opacity: 0 }
+    ], { duration: 200, easing: 'ease-in', fill: 'forwards' });
+    el.getAnimations?.().forEach((a) => a.cancel());
+    el.style.opacity = '1';
+    effects.push(Fx.anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'none' }));
+    effects.push(Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, delay: 150, easing: 'ease-in' }));
+    await Promise.all(effects);
+    dark.remove();
+  }
+
+  /** A glowing flat purple portal (an ellipse seen from the side), `w` px wide. */
+  private static portal(w: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `width:${w}px;height:${w * 0.3}px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,#FFB0FF 0 15%,#E040FF 45%,#A010E0aa 65%,#6000A000 75%);box-shadow:0 0 18px 4px #C020FF88`;
+    return el;
+  }
 
   /**
    * Shadow Ball: a dark purple ball of shadow with a wispy, flickering edge

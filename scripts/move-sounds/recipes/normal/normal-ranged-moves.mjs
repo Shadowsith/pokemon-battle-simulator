@@ -16,17 +16,22 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic sonic: four sound rings (0.11 s apart) blast out, impact at 0.43 s. */
+  /**
+   * NormalSoundMoveAnimations.playBoomburst (1.9 s): a rising roar with
+   * crackles as the user rears up (0-0.65 s), then five booming shockwaves
+   * 0.12 s apart from 0.6 s, hitting the target at 0.95 s, and a fading rumble.
+   */
   boomburst: () => {
-    const s = new MoveSfx(1.1, 0xb00b);
-    for (let i = 0; i < 4; i++) {
-      const at = i * 0.11;
-      s.pulse(at, 0.25, { freq: (u) => 180 * Math.pow(0.6, u), gain: env.decay(0.45, 1.5), duty: 0.5 });
-      s.pulse(at, 0.2, { freq: () => 360 + i * 45, gain: env.decay(0.18, 1.5), duty: 0.25 });
+    const s = new MoveSfx(2.0, 0xb00b);
+    s.noise(0.0, 0.6, { clock: env.ramp(3000, 8000), gain: env.swell(0.22) });
+    for (let i = 0; i < 5; i++) s.noise(0.15 + i * 0.06, 0.03, { clock: () => 10000, gain: env.decay(0.18, 1), short: true });
+    for (let i = 0; i < 5; i++) {
+      const at = 0.6 + i * 0.12;
+      s.pulse(at, 0.25, { freq: (u) => 180 * Math.pow(0.6, u), gain: env.decay(0.42, 1.5), duty: 0.5 });
+      s.pulse(at, 0.2, { freq: () => 360 + i * 45, gain: env.decay(0.16, 1.5), duty: 0.25 });
     }
-    s.noise(0.0, 0.5, { clock: env.ramp(8000, 3000), gain: env.swell(0.25) });
-    s.thud(0.43, 0.8, 1);
-    s.rumble(0.45, 0.6, { from: 500, to: 150, gain: 0.3 });
+    s.thud(0.95, 0.8, 1);
+    s.rumble(0.97, 0.9, { from: 500, to: 150, gain: 0.3 });
     return s;
   },
 

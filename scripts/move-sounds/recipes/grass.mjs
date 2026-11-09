@@ -271,13 +271,19 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic field (≈0.6 s): a storm of petals rushing over all adjacent Pokémon. */
+  /**
+   * Custom (2.2 s): the scene dims (0-0.35 s), a petal storm rushes across the
+   * field (0.2-1.9 s), the green sphere swells on the target and bursts at
+   * ~1.15 s, then the wind dies down (to 2.2 s).
+   */
   petalblizzard: () => {
-    const s = new MoveSfx(1.15, 0x9e7b);
-    s.noise(0.0, 0.9, { clock: (u) => 3000 + 2500 * Math.sin(Math.PI * u), gain: env.attackDecay(0.4, 0.25) });
-    s.noise(0.0, 0.8, { clock: () => 800, gain: env.swell(0.25) });
-    s.sparkle(0.05, 0.75, 10, { lo: 1800, hi: 3600, gain: 0.15 });
-    s.thud(0.3, 0.35, 0.4);
+    const s = new MoveSfx(2.35, 0x9e7b);
+    s.noise(0.15, 1.85, { clock: (u) => 2500 + 2500 * Math.sin(Math.PI * u), gain: (u) => 0.32 * Math.min(1, u * 5) * Math.pow(1 - u, 0.6) });
+    s.noise(0.15, 1.7, { clock: () => 800, gain: (u) => 0.2 * Math.sin(Math.PI * u) });
+    s.sparkle(0.3, 1.5, 16, { lo: 1800, hi: 3600, gain: 0.13 });
+    s.wave(0.9, 0.25, { freq: env.ramp(400, 900), gain: env.swell(0.14) });
+    s.thud(1.15, 0.4, 0.4);
+    s.sparkle(1.15, 0.4, 5, { lo: 3500, hi: 6000, gain: 0.14 });
     return s;
   },
 
@@ -375,12 +381,18 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic self aura (priority): a thorny shell bristles up with prickly clicks. */
+  /**
+   * Custom (1.3 s): the user turns green and the ring opens with a rising tone
+   * (0-0.35 s), the spike cone bursts out with sharp crackles (0.3-0.6 s), then
+   * it bristles and fades with a bright ping (to 1.3 s).
+   */
   spikyshield: () => {
-    const s = new MoveSfx(1.0, 0x5b5d);
-    s.wave(0.02, 0.6, { freq: env.ramp(400, 800), gain: env.swell(0.22) });
-    for (let i = 0; i < 6; i++) s.noise(0.05 + i * 0.09, 0.04, { clock: () => 12000, gain: env.decay(0.3, 1), short: true });
-    s.pulse(0.6, 0.3, { freq: () => 1046, gain: env.decay(0.18, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.45, 0x5b5d);
+    s.wave(0.0, 0.4, { freq: env.ramp(400, 800), gain: env.swell(0.2) });
+    s.whoosh(0.3, 0.25, { from: 3000, to: 8000, gain: 0.3 });
+    for (let i = 0; i < 7; i++) s.noise(0.3 + i * 0.045, 0.04, { clock: () => 12000, gain: env.decay(0.28, 1), short: true });
+    s.pulse(0.65, 0.4, { freq: () => 1046, gain: env.decay(0.16, 1.5), duty: 0.125 });
+    s.sparkle(0.7, 0.5, 3, { lo: 3000, hi: 5000, gain: 0.08 });
     return s;
   },
 

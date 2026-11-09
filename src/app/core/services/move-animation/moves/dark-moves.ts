@@ -10,8 +10,228 @@ export class DarkMoveAnimations {
     bite: (refs, _launch, target) => DarkMoveAnimations.playBite(refs, target),
     crunch: (refs, _launch, target) => DarkMoveAnimations.playCrunch(refs, target),
     darkpulse: (refs, launch, target) => DarkMoveAnimations.playDarkPulse(refs, launch, target),
+    hyperspacefury: (refs, launch, target) => DarkMoveAnimations.playHyperspaceFury(refs, launch, target),
+    partingshot: (refs, launch, target, v) => DarkMoveAnimations.playPartingShot(refs, launch, target, v),
     taunt: (refs, launch, target, v) => DarkMoveAnimations.playTaunt(refs, launch, target, v)
   };
+
+  /**
+   * Hyperspace Fury, after the ORAS animation: the scene turns magenta and
+   * golden portal rings circle the user with pink swirls (0.3-1.0 s). The
+   * background melts into a swirling psychedelic pink round the target, then
+   * portals pop open all round it one after another and from each a white
+   * glove punches in, landing six dark purple hits in smoke (hits at
+   * 1.48-2.33 s, 0.17 s apart). The scene clears and the user's Defense drops
+   * (2.95 s to ~3.8 s).
+   */
+  private static async playHyperspaceFury(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    const magenta = Fx.backdrop(fieldEl, `background:radial-gradient(circle at ${launch.x}px ${launch.y}px,#D02870,#7A0E3A 50%,#30061A)`);
+    await Fx.anim(magenta, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // Golden portal rings circle the user, with pink swirls.
+    const orbit: Promise<void>[] = [];
+    const rx = Math.max(lr.width * 0.75, 55);
+    const ry = rx * 0.45;
+    for (let i = 0; i < 5; i++) {
+      const ring = DarkMoveAnimations.portalRing(Math.max(lr.width * 0.35, 26));
+      Fx.place(ring, launch);
+      fxEl.appendChild(ring);
+      const phase = (Math.PI * 2 * i) / 5;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 12; k++) {
+        const a = phase + (k / 12) * Math.PI * 2;
+        frames.push({ transform: `translate(${Math.cos(a) * rx}px,${Math.sin(a) * ry}px) scale(${0.75 + 0.25 * Math.sin(a)})`, opacity: k === 12 ? 0 : 1 });
+      }
+      orbit.push(Fx.anim(ring, frames, { duration: 700, easing: 'linear' }).then(() => ring.remove()));
+    }
+    for (const delay of [0, 200]) {
+      const swirl = document.createElement('div');
+      swirl.style.cssText = `width:${rx * 2.4}px;height:${ry * 2.4}px;border-radius:50%;pointer-events:none;border:4px solid #FF8AC8;border-left-color:#FF8AC800;border-bottom-color:#FF8AC800;box-shadow:0 0 8px #FF60B0`;
+      Fx.place(swirl, launch);
+      fxEl.appendChild(swirl);
+      orbit.push(
+        Fx.anim(swirl, [
+          { transform: 'scale(.5) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(160deg)', opacity: 1, offset: 0.5 },
+          { transform: 'scale(1.2) rotate(320deg)', opacity: 0 }
+        ], { duration: 500, delay, easing: 'ease-out' }).then(() => swirl.remove())
+      );
+    }
+    await Promise.all(orbit);
+
+    // The psychedelic swirl round the target.
+    const c = `${target.x}px ${target.y}px`;
+    const psy = Fx.backdrop(
+      fieldEl,
+      `background:repeating-radial-gradient(circle at ${c},#E86AA0 0 18px,#F0A070 26px,#B05AC8 38px,#E86AA0 50px)`
+    );
+    const warp = psy.animate([{ filter: 'hue-rotate(0deg)' }, { filter: 'hue-rotate(40deg)' }, { filter: 'hue-rotate(0deg)' }], { duration: 600, iterations: Infinity });
+    await Promise.all([
+      Fx.anim(psy, [{ opacity: 0 }, { opacity: 0.9 }], { duration: 200, easing: 'ease-out', fill: 'forwards' }),
+      Fx.anim(magenta, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in', fill: 'forwards' })
+    ]);
+    magenta.remove();
+
+    // Portals pop open round the target; a glove punches out of each.
+    const hits: Promise<unknown>[] = [];
+    const reach = Math.max(tr.width * 0.9, 70);
+    const count = 6;
+    for (let i = 0; i < count; i++) {
+      const ang = -Math.PI / 2 + (i % 2 ? 1 : -1) * (0.4 + (i / count) * 1.6);
+      const at: Point = { x: target.x + Math.cos(ang) * reach, y: target.y + Math.sin(ang) * reach * 0.8 };
+      hits.push(Fx.wait(i * 170).then(() => DarkMoveAnimations.portalPunch(refs, at, target)));
+    }
+    await Promise.all(hits);
+    warp.cancel();
+    await Fx.anim(psy, [{ opacity: 0.9 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    psy.remove();
+
+    // The user's Defense drops.
+    await FxEffects.statDownBubbles(refs, launch);
+  }
+
+  /** A portal opens at `at`, a white glove punches out of it into the target, and a dark hit lands in smoke. */
+  private static async portalPunch(refs: BattleStageRefs, at: Point, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const ring = DarkMoveAnimations.portalRing(Math.max(tr.width * 0.4, 30));
+    Fx.place(ring, at);
+    fxEl.appendChild(ring);
+    await Fx.anim(ring, [{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 150, easing: 'ease-out', fill: 'forwards' });
+
+    const glove = FxGlyphs.gloveGlyph(Math.max(tr.width * 0.3, 22));
+    Fx.place(glove, at);
+    fxEl.appendChild(glove);
+    const dx = (target.x - at.x) * 0.8;
+    const dy = (target.y - at.y) * 0.8;
+    await Fx.anim(glove, [
+      { transform: 'translate(0,0) scale(.5)', opacity: 0 },
+      { transform: `translate(${dx}px,${dy}px) scale(1)`, opacity: 1 }
+    ], { duration: 130, easing: 'ease-in' });
+
+    // The hit: purple sparks and grey smoke.
+    Fx.shake(targetEl, 5);
+    const hit: Point = { x: at.x + dx, y: at.y + dy };
+    const sparks: Promise<unknown>[] = [FxEffects.smokePuff(fxEl, hit, Math.max(tr.width * 0.7, 50), ['#6A6A74', '#3A3A44'])];
+    for (let i = 0; i < 4; i++) {
+      const len = 14 + Math.random() * 14;
+      const spark = document.createElement('div');
+      spark.style.cssText = `position:absolute;width:${len}px;height:4px;border-radius:2px;pointer-events:none;background:linear-gradient(90deg,#8A40FF00,#A060FF,#E8D0FF);box-shadow:0 0 5px #8A40FF`;
+      Fx.place(spark, hit);
+      fxEl.appendChild(spark);
+      const ang = Math.random() * 360;
+      sparks.push(
+        Fx.anim(spark, [
+          { transform: `rotate(${ang}deg) translateX(0) scaleX(.3)`, opacity: 1 },
+          { transform: `rotate(${ang}deg) translateX(${len}px) scaleX(1)`, opacity: 0 }
+        ], { duration: 250, easing: 'ease-out' }).then(() => spark.remove())
+      );
+    }
+    sparks.push(
+      Fx.anim(glove, [
+        { transform: `translate(${dx}px,${dy}px) scale(1)`, opacity: 1 },
+        { transform: 'translate(0,0) scale(.5)', opacity: 0 }
+      ], { duration: 200, easing: 'ease-out' }).then(() => glove.remove()),
+      Fx.anim(ring, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(0)', opacity: 0 }], { duration: 200, delay: 120, easing: 'ease-in' }).then(() => ring.remove())
+    );
+    await Promise.all(sparks);
+  }
+
+  /** A gold-rimmed black portal ring `s` px across. */
+  private static portalRing(s: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#050005 0 52%,#FFE070 56%,#E0A820 64%,#8A5A08 69%,#8A5A0800 72%);box-shadow:0 0 6px #FFD04088`;
+    return el;
+  }
+
+  /**
+   * Parting Shot, after the XY animation: black letterbox bars slide in over a
+   * dark scene with speed lines while the user rears back (0-0.3 s) and yells:
+   * a white jagged shout bursts from it and blasts toward the foe, flickering
+   * (0.3-0.9 s). The bars and darkness clear, then a dark purple cloud gathers
+   * over the target and rains violet streaks onto it (1.0-2.0 s).
+   */
+  private static async playPartingShot(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+
+    // Dark scene with speed lines rushing toward the foe, and letterbox bars.
+    const dark = Fx.backdrop(fieldEl, 'background:#0C0C10');
+    FxEffects.speedLines(dark, W, H, v.dir, ['#3A3A44', '#5A6A70']);
+    const bars: HTMLElement[] = [];
+    for (const edge of ['top', 'bottom']) {
+      const bar = document.createElement('div');
+      bar.style.cssText = `position:absolute;left:0;right:0;${edge}:0;height:${H * 0.16}px;background:#000;pointer-events:none;z-index:5`;
+      fxEl.appendChild(bar);
+      bars.push(bar);
+      Fx.anim(bar, [{ transform: `translateY(${edge === 'top' ? -100 : 100}%)` }, { transform: 'translateY(0)' }], { duration: 250, easing: 'ease-out' });
+    }
+    Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    // The user rears back for the yell (no turning).
+    const original = launchEl.style.transform;
+    const rear = Fx.anim(launchEl, [
+      { transform: `${original} translate(0,0) scale(1,1)` },
+      { transform: `${original} translate(${-v.dir * 10}px,-6px) scale(.97,1.05)`, offset: 0.35 },
+      { transform: `${original} translate(${v.dir * 6}px,0) scale(1.02,.98)`, offset: 0.55 },
+      { transform: `${original} translate(0,0) scale(1,1)` }
+    ], { duration: 900, easing: 'ease-out', fill: 'none' });
+    await Fx.wait(300);
+
+    // The shout: a white jagged burst grows out of the user's mouth toward the foe, flickering.
+    const mouth: Point = { x: launch.x + v.dir * lr.width * 0.25, y: launch.y - lr.height * 0.2 };
+    const size = Math.max(lr.height * 1.1, 90);
+    const shout = DarkMoveAnimations.shoutBurst(size);
+    Fx.place(shout, mouth);
+    fxEl.appendChild(shout);
+    const dx = (target.x - mouth.x) * 0.55;
+    const dy = (target.y - mouth.y) * 0.55;
+    const flick: Keyframe[] = [];
+    for (let k = 0; k <= 8; k++) {
+      const t = k / 8;
+      flick.push({
+        transform: `translate(${dx * t}px,${dy * t}px) scale(${0.3 + t * 0.9}) rotate(${k % 2 ? 4 : -4}deg)`,
+        opacity: k === 8 ? 0 : k % 2 ? 0.85 : 1
+      });
+    }
+    await Fx.anim(shout, flick, { duration: 600, easing: 'ease-out' });
+    shout.remove();
+    Fx.shake(targetEl, 4);
+
+    // The bars and darkness clear.
+    await Promise.all([
+      rear,
+      ...bars.map((bar, i) => Fx.anim(bar, [{ transform: 'translateY(0)' }, { transform: `translateY(${i ? 100 : -100}%)` }], { duration: 220, easing: 'ease-in' })),
+      Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 220, easing: 'ease-in' })
+    ]);
+    bars.forEach((b) => b.remove());
+    dark.remove();
+
+    // A dark purple cloud gathers over the target and rains violet streaks onto it.
+    await FxEffects.statDropCloud(refs, target);
+  }
+
+  /** A white jagged shout burst `size` px across with a thin dark outline (a comic yell). */
+  private static shoutBurst(size: number): HTMLElement {
+    const pts: string[] = [];
+    const spikes = 14;
+    for (let i = 0; i < spikes * 2; i++) {
+      const a = (Math.PI * 2 * i) / (spikes * 2);
+      const rad = i % 2 ? 30 + Math.random() * 6 : 46 + Math.random() * 4;
+      pts.push(`${(50 + Math.cos(a) * rad).toFixed(1)},${(50 + Math.sin(a) * rad * 0.8).toFixed(1)}`);
+    }
+    const el = document.createElement('div');
+    el.style.cssText = `width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 4px #ffffffaa)`;
+    el.innerHTML =
+      `<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block"><polygon points="${pts.join(' ')}" fill="#ffffff" stroke="#2A2A30" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+    return el;
+  }
 
   /**
    * Taunt, after the DPPt animation: a white smoke puff billows up in front of

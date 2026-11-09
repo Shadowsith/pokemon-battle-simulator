@@ -11,10 +11,130 @@ export class IceMoveAnimations {
     aurorabeam: (refs, launch, target) => IceMoveAnimations.playAuroraBeam(refs, launch, target),
     icepunch: (refs, _launch, target) => FxEffects.playElementalPunch(refs, target, 'ice', '#9CD6FF', () => FxGlyphs.iceChunk()),
     blizzard: (refs, launch, target) => IceMoveAnimations.playBlizzard(refs, launch, target),
+    freezedry: (refs, _launch, target) => IceMoveAnimations.playFreezeDry(refs, target),
     icebeam: (refs, launch, target) => IceMoveAnimations.playIceBeam(refs, launch, target),
     hail: (refs) => IceMoveAnimations.playHail(refs),
     haze: (refs) => IceMoveAnimations.playHaze(refs)
   };
+
+  /**
+   * Freeze-Dry, after the XY animation: the user glows a warm orange
+   * (0-0.5 s) while ice shards swirl in round the target (0.35-0.95 s). The
+   * target turns white with sparkles (from 0.95 s) and a faceted ice crystal
+   * closes round it (1.15-1.5 s). A white flash at 1.65 s, then the crystal
+   * shatters into a ring of snowflakes and flying ice chunks as the target
+   * thaws (to ~2.35 s).
+   */
+  private static async playFreezeDry(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, screenFxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const r = Fx.rect(targetEl);
+
+    const warm = Fx.anim(launchEl, [
+      { filter: 'none' },
+      { filter: 'sepia(1) saturate(3) hue-rotate(-20deg) brightness(1.15)', offset: 0.5 },
+      { filter: 'none' }
+    ], { duration: 500, easing: 'ease-in-out', fill: 'none' });
+    await Fx.wait(350);
+
+    // Ice shards swirl in round the target.
+    const rad = Math.max(r.width * 0.8, 60);
+    const shards: Promise<void>[] = [];
+    for (let i = 0; i < 10; i++) {
+      const shard = FxGlyphs.iceShard(8 + Math.random() * 6);
+      Fx.place(shard, target);
+      fxEl.appendChild(shard);
+      const phase = (Math.PI * 2 * i) / 10;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 6; k++) {
+        const t = k / 6;
+        const a = phase + t * Math.PI * 1.5;
+        const d = rad * (1 - t * 0.7);
+        frames.push({ transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d * 0.7}px) rotate(${t * 360}deg)`, opacity: t === 0 ? 0 : t === 1 ? 0 : 1 });
+      }
+      shards.push(Fx.anim(shard, frames, { duration: 450, delay: i * 15, easing: 'ease-in' }).then(() => shard.remove()));
+    }
+    await Promise.all([warm, ...shards]);
+
+    // The target turns white with sparkles.
+    const white = 'grayscale(1) brightness(1.8)';
+    const effects: Promise<unknown>[] = [];
+    for (let i = 0; i < 8; i++) {
+      const star = FxGlyphs.sparkStar(8 + Math.random() * 6, '#ffffff');
+      Fx.place(star, { x: target.x + (Math.random() * 2 - 1) * r.width * 0.5, y: target.y + (Math.random() * 2 - 1) * r.height * 0.5 });
+      fxEl.appendChild(star);
+      effects.push(
+        Fx.anim(star, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1, offset: 0.4 }, { transform: 'scale(0)', opacity: 0 }], {
+          duration: 400,
+          delay: Math.random() * 250,
+          easing: 'ease-out'
+        }).then(() => star.remove())
+      );
+    }
+    const freeze = Fx.anim(targetEl, [
+      { filter: 'none' },
+      { filter: white, offset: 0.2 },
+      { filter: white, offset: 0.8 },
+      { filter: 'none' }
+    ], { duration: 1400, easing: 'linear', fill: 'none' });
+    await Fx.wait(200);
+
+    // The ice crystal closes round the target.
+    const size = Math.max(r.height * 1.2, 90);
+    const crystal = IceMoveAnimations.iceCrystal(size);
+    Fx.place(crystal, target);
+    fxEl.appendChild(crystal);
+    await Fx.anim(crystal, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 350, easing: 'ease-out', fill: 'forwards' });
+    await Fx.wait(150);
+
+    // Flash, then the crystal shatters into snowflakes and ice chunks.
+    Fx.screenWash(screenFxEl, '#FFFFFFdd', 50, 120, `${((target.x / W) * 100).toFixed(0)}%`);
+    Fx.shake(targetEl, 5);
+    crystal.remove();
+    for (let i = 0; i < 12; i++) {
+      const flake = document.createElement('div');
+      const s = 14 + Math.random() * 8;
+      flake.textContent = '❄';
+      flake.style.cssText = `width:${s}px;height:${s}px;pointer-events:none;text-align:center;font:${s}px/${s}px sans-serif;color:#ffffff;text-shadow:0 0 4px #9CD6FF`;
+      Fx.place(flake, target);
+      fxEl.appendChild(flake);
+      const ang = (Math.PI * 2 * i) / 12;
+      const d = size * 0.6;
+      effects.push(
+        Fx.anim(flake, [
+          { transform: 'translate(0,0) scale(.4) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) scale(1) rotate(90deg)`, opacity: 1, offset: 0.5 },
+          { transform: `translate(${Math.cos(ang) * d * 1.2}px,${Math.sin(ang) * d * 1.2}px) scale(.8) rotate(150deg)`, opacity: 0 }
+        ], { duration: 650, easing: 'ease-out' }).then(() => flake.remove())
+      );
+    }
+    for (let i = 0; i < 8; i++) {
+      const chunk = FxGlyphs.iceChunk();
+      Fx.place(chunk, target);
+      fxEl.appendChild(chunk);
+      const ang = Math.random() * Math.PI * 2;
+      const d = size * (0.6 + Math.random() * 0.5);
+      effects.push(
+        Fx.anim(chunk, [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d - 20}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+        ], { duration: 600, easing: 'ease-out' }).then(() => chunk.remove())
+      );
+    }
+    await Promise.all([freeze, ...effects]);
+  }
+
+  /** A faceted, see-through ice crystal `size` px tall, with light facet lines. */
+  private static iceCrystal(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `width:${size * 0.85}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 6px #CFF0FF)`;
+    el.innerHTML =
+      '<svg viewBox="0 0 85 100" width="100%" height="100%" style="display:block">' +
+      '<polygon points="42,2 72,14 83,48 70,86 42,98 14,86 2,48 13,14" fill="#DDF3FF66" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>' +
+      '<path d="M42 2 L42 98 M13 14 L70 86 M72 14 L14 86 M2 48 L83 48 M42 2 L2 48 L42 98 L83 48 Z" stroke="#ffffffaa" stroke-width="1" fill="none"/>' +
+      '<polygon points="42,2 72,14 42,48 13,14" fill="#ffffff55"/></svg>';
+    return el;
+  }
 
   /**
    * Hail: the scene darkens to a cold grey-blue (0-0.3 s), then a storm of

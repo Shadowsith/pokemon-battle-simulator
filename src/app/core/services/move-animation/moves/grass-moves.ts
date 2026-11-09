@@ -3,8 +3,10 @@ import { DIM_BACKDROP, FLECK_COLOR } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { PetalBlizzard } from './grass/petal-blizzard';
+import { SpikyShield } from './grass/spiky-shield';
 
-/** Hand-made animations for Grass-type moves. */
+/** Hand-made animations for Grass-type moves (Petal Blizzard and Spiky Shield live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -14,9 +16,11 @@ export class GrassMoveAnimations {
     gigadrain: (refs, launch, target) => GrassMoveAnimations.playGigaDrain(refs, launch, target),
     leafblade: (refs, _launch, target) => GrassMoveAnimations.playLeafBlade(refs, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
+    petalblizzard: (refs, _launch, target, v) => PetalBlizzard.play(refs, target, v),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     sleeppowder: (refs, _launch, target, v) => GrassMoveAnimations.playSleepPowder(refs, target, v),
     solarbeam: (refs, _launch, target) => GrassMoveAnimations.playSolarBeam(refs, target),
+    spikyshield: (refs, launch, _target, v) => SpikyShield.play(refs, launch, v),
     spore: (refs, _launch, target, v) => GrassMoveAnimations.playSpore(refs, target, v),
     synthesis: (refs, launch) => GrassMoveAnimations.playSynthesis(refs, launch)
   };
@@ -252,7 +256,7 @@ export class GrassMoveAnimations {
     // Pink petals and green motes drift across the field on a gentle breeze.
     for (let i = 0; i < 34; i++) {
       const petal = i % 2 === 0;
-      const el = petal ? GrassMoveAnimations.petalGlyph(8 + Math.random() * 6, '#F27A9C') : document.createElement('div');
+      const el = petal ? FxGlyphs.petalGlyph(8 + Math.random() * 6, '#F27A9C') : document.createElement('div');
       if (!petal) {
         const sz = 4 + Math.random() * 4;
         el.style.cssText = `position:absolute;width:${sz}px;height:${sz}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#F0FFE8,#8CE85A 50%,#5ACB3A00 75%);box-shadow:0 0 6px #8CE85A`;
@@ -693,7 +697,7 @@ export class GrassMoveAnimations {
 
     const done: Promise<void>[] = [];
     for (let i = 0; i < count; i++) {
-      const petal = GrassMoveAnimations.petalGlyph(9 + Math.random() * 7, pink);
+      const petal = FxGlyphs.petalGlyph(9 + Math.random() * 7, pink);
       Fx.place(petal, launch);
       fxEl.appendChild(petal);
       const a0 = Math.random() * Math.PI * 2;
@@ -747,13 +751,6 @@ export class GrassMoveAnimations {
       }, total * flyEnd + k * 260);
     }
     await Promise.all(done);
-  }
-
-  /** A pink flower petal: a soft oval with pointed ends and a lighter centre line. */
-  private static petalGlyph(s: number, color: string): HTMLElement {
-    const petal = document.createElement('div');
-    petal.style.cssText = `position:absolute;width:${s}px;height:${s * 0.7}px;pointer-events:none;border-radius:80% 10% 80% 10%;background:linear-gradient(135deg,#FFD0DE,${color} 55%,#D84A72);box-shadow:0 0 2px #00000033`;
-    return petal;
   }
 }
 

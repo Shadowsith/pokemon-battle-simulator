@@ -336,14 +336,20 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + Sp. Atk drop fleck (~0.55 s): a mystic flame whirls over with a magic shimmer and bursts. */
+  /**
+   * Custom (2.8 s): a magic shimmer while the flame tip draws the fire ring
+   * (0-0.6 s), it flares (0.6-0.8 s) and whooshes at the target (to 1.1 s),
+   * the fireball roars at 1.1 s, then the purple cloud's stat drop (~1.9 s).
+   */
   mysticalfire: () => {
-    const s = new MoveSfx(1.05, 0x3f1e);
-    s.noise(0.0, 0.45, { clock: env.ramp(500, 1500), gain: env.swell(0.28) });
-    s.chord(0.0, 0.45, [74, 78, 81], { rate: 0.04, gain: 0.14, vibrato: 0.02 });
-    s.noise(0.43, 0.3, { clock: (u) => 5000 - 3800 * u, gain: env.attackDecay(0.45, 0.04) });
-    s.thud(0.43, 0.4, 0.5);
-    s.statDown(0.58);
+    const s = new MoveSfx(2.9, 0x3f1e);
+    s.noise(0.0, 0.6, { clock: env.ramp(500, 1500), gain: env.swell(0.24) });
+    s.chord(0.0, 0.8, [74, 78, 81], { rate: 0.04, gain: 0.14, vibrato: 0.02 });
+    s.wave(0.6, 0.2, { freq: env.ramp(600, 1200), gain: env.swell(0.12) });
+    s.whoosh(0.8, 0.3, { from: 1500, to: 6000, gain: 0.25 });
+    s.noise(1.1, 0.6, { clock: (u) => 5000 - 3800 * u, gain: env.attackDecay(0.45, 0.04) });
+    s.thud(1.1, 0.5, 0.6);
+    s.statDown(1.95);
     return s;
   },
 

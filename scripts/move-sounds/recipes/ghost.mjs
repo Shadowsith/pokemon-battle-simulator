@@ -125,18 +125,20 @@ export const GHOST = {
   },
 
   /**
-   * Two-turn move (plays on both turns). Turn 1: the user vanishes (0.4 s fade).
-   * Turn 2: it drops back in (0.26 s), then a generic beam (grows 0.26 s, holds
-   * 0.28 s, fades 0.2 s → ends ≈1.0 s). An eerie vanishing warble into a ghostly surge.
+   * Two-turn move (plays on both turns), custom. Turn 1 (1.2 s): darkness and
+   * the portal open (0-0.5 s), the user sinks in (0.5-0.95 s), it closes.
+   * Turn 2 (1.8 s): darkness, portal and wisps (0-0.6 s), the user drops out
+   * and strikes at 0.85 s, purple flames rise (to 1.8 s). An eerie warble
+   * swelling into a hollow ghostly boom at 0.85 s, then a fading moan.
    */
   phantomforce: () => {
-    const s = new MoveSfx(1.25, 0x9fa7);
-    s.wave(0.02, 0.4, { freq: (u) => (700 - 450 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 14 * u)), gain: env.decay(0.3, 0.8) });
-    s.noise(0.02, 0.35, { clock: (u) => 4000 - 3000 * u, gain: env.decay(0.18, 1) });
-    s.whoosh(0.15, 0.2, { from: 800, to: 4000, gain: 0.18 });
-    s.pulse(0.3, 0.72, { freq: (u) => (110 + 40 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 30 * u)), gain: (u) => 0.3 * Math.min(1, u * 5) * Math.pow(1 - u, 0.7), duty: 0.25 });
-    s.wave(0.3, 0.72, { freq: (u) => 466 * (1 + 0.03 * Math.sin(2 * Math.PI * 25 * u)), gain: (u) => 0.18 * Math.min(1, u * 5) * Math.pow(1 - u, 0.7) });
-    s.thud(0.55, 0.45, 0.6);
+    const s = new MoveSfx(1.95, 0x9fa7);
+    s.wave(0.0, 0.85, { freq: (u) => (300 + 300 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.2) });
+    s.noise(0.2, 0.6, { clock: (u) => 1200 + 1500 * u, gain: env.swell(0.12) });
+    s.whoosh(0.6, 0.25, { from: 4000, to: 800, gain: 0.2 });
+    s.thud(0.85, 0.55, 0.7);
+    s.pulse(0.85, 0.2, { freq: (u) => 900 - 500 * u, gain: env.decay(0.18, 1.5), duty: 0.25 });
+    s.wave(1.0, 0.8, { freq: (u) => 466 * (1 - 0.3 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 25 * u)), gain: env.decay(0.14, 1) });
     return s;
   },
 

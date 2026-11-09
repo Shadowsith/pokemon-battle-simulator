@@ -5,6 +5,7 @@ import { FxGlyphs } from '../../fx-glyphs';
 import { DeliveryAnimations } from '../../delivery-animations';
 import { FxEffects } from '../../fx-effects';
 import { FireFlames } from './fire-flames';
+import { MysticalFire } from './mystical-fire';
 
 /** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs. */
 export class FireRangedMoveAnimations {
@@ -20,6 +21,7 @@ export class FireRangedMoveAnimations {
     },
     heatwave: (refs, _launch, _target, v) => FireRangedMoveAnimations.playHeatWave(refs, v),
     flamethrower: (refs, launch, target, v) => FireRangedMoveAnimations.playFlamethrower(refs, launch, target, v),
+    mysticalfire: (refs, launch, target, v) => MysticalFire.play(refs, launch, target, v),
     overheat: (refs, launch, target) => FireRangedMoveAnimations.playOverheat(refs, launch, target),
     sacredfire: (refs, _launch, target) => FireRangedMoveAnimations.playSacredFire(refs, target)
   };

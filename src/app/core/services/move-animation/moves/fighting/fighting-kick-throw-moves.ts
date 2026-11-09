@@ -4,10 +4,11 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 
-/** Hand-made animations for Fighting-type kicks and throws. */
+/** Hand-made animations for Fighting-type kicks, throws and body dives. */
 export class FightingKickThrowMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    flyingpress: (refs, launch, target) => FightingKickThrowMoveAnimations.playFlyingPress(refs, launch, target),
     highjumpkick: (refs, _launch, target, v) => FightingKickThrowMoveAnimations.playHighJumpKick(refs, target, v),
     jumpkick: (refs, launch, target) => FightingKickThrowMoveAnimations.playJumpKick(refs, launch, target),
     lowkick: (refs, _launch, target) => FightingKickThrowMoveAnimations.playLowKick(refs, target),
@@ -15,6 +16,87 @@ export class FightingKickThrowMoveAnimations {
     submission: (refs, _launch, target) => FightingKickThrowMoveAnimations.playSubmission(refs, target),
     vitalthrow: (refs, _launch, target) => FightingKickThrowMoveAnimations.playVitalThrow(refs, target)
   };
+
+  /**
+   * Flying Press, after the XY animation: the user leaps up out of sight in a
+   * puff of dust (0-0.35 s). Dark speed lines streak toward the target while
+   * the user dives down out of the sky onto it (0.35-0.75 s) and lands a
+   * crushing body slam: a big grey dust cloud with flying rock chips while the
+   * target is squashed (0.75-1.4 s). The user is back in its place as the
+   * dust clears (to ~1.7 s).
+   */
+  private static async playFlyingPress(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl: el, targetEl } = refs;
+    el.getAnimations?.().forEach((a) => a.cancel());
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(el);
+    const tr = Fx.rect(targetEl);
+    const lFoot = Fx.footOf(el, fieldEl);
+    const tFoot = Fx.footOf(targetEl, fieldEl);
+
+    // The leap: a quick crouch, then up and out of sight.
+    FxEffects.smokePuff(fxEl, lFoot, Math.max(lr.width, 70));
+    await Fx.anim(el, [
+      { transform: 'translateY(0) scale(1,1)' },
+      { transform: 'translateY(6px) scale(1.05,.92)', offset: 0.25 },
+      { transform: `translateY(${-H}px) scale(.95,1.05)` }
+    ], { duration: 350, easing: 'ease-in', fill: 'forwards' });
+
+    // Dark speed lines converge on the target while the user dives onto it.
+    const c = `${target.x}px ${target.y}px`;
+    const lines = Fx.backdrop(
+      fieldEl,
+      `background:radial-gradient(circle at ${c},#0000 0 12%,#1A1C22cc 45%),repeating-conic-gradient(from 0deg at ${c},#2A2C34 0 6deg,#8A8C94 6deg 7deg,#2A2C34 7deg 15deg),#2A2C34`
+    );
+    Fx.anim(lines, [{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: 'ease-out', fill: 'forwards' });
+    const dx = target.x - launch.x;
+    const dy = tFoot.y - lFoot.y - tr.height * 0.25;
+    await Fx.anim(el, [
+      { transform: `translate(${dx}px,${dy - H * 0.8}px) scale(1.1)` },
+      { transform: `translate(${dx}px,${dy}px) scale(1.1)` }
+    ], { duration: 400, easing: 'ease-in', fill: 'forwards' });
+
+    // The slam: dust, rock chips and a squashed target.
+    Fx.shakeField(fieldEl, 1);
+    targetEl.style.transformOrigin = 'center bottom';
+    const effects: Promise<unknown>[] = [
+      Fx.anim(lines, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' }).then(() => lines.remove()),
+      Fx.anim(targetEl, [
+        { transform: 'scale(1,1)' },
+        { transform: 'scale(1.15,.75)', offset: 0.25 },
+        { transform: 'scale(1,1)' }
+      ], { duration: 500, easing: 'ease-out', fill: 'none' })
+    ];
+    for (let i = 0; i < 3; i++) {
+      const at: Point = { x: tFoot.x + (i - 1) * tr.width * 0.5, y: tFoot.y - tr.height * 0.2 };
+      effects.push(Fx.wait(i * 60).then(() => FxEffects.smokePuff(fxEl, at, Math.max(tr.width * 1.3, 100), ['#9A9AA2', '#5E5E68'])));
+    }
+    for (let i = 0; i < 9; i++) {
+      const rock = FxGlyphs.rockChunk(5 + Math.random() * 7);
+      rock.style.filter = 'grayscale(1) brightness(.6)';
+      Fx.place(rock, tFoot);
+      fxEl.appendChild(rock);
+      const ang = -Math.PI / 2 + (Math.random() * 2 - 1) * 1.3;
+      const d = tr.width * (0.6 + Math.random() * 0.7);
+      effects.push(
+        Fx.anim(rock, [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) rotate(${Math.random() * 360}deg)`, opacity: 1, offset: 0.55 },
+          { transform: `translate(${Math.cos(ang) * d * 1.2}px,${Math.sin(ang) * d + 30}px) rotate(${Math.random() * 540}deg)`, opacity: 0 }
+        ], { duration: 650, easing: 'ease-out' }).then(() => rock.remove())
+      );
+    }
+    await Fx.wait(250);
+
+    // The user fades out of the dust and back in at its own place.
+    await Fx.anim(el, [
+      { transform: `translate(${dx}px,${dy}px) scale(1.1)`, opacity: 1 },
+      { transform: `translate(${dx}px,${dy}px) scale(1.1)`, opacity: 0 }
+    ], { duration: 200, easing: 'ease-in', fill: 'forwards' });
+    el.getAnimations?.().forEach((a) => a.cancel());
+    effects.push(Fx.anim(el, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out', fill: 'none' }));
+    await Promise.all(effects);
+  }
 
   /**
    * Submission: caster and target tumble together - both run two laps round

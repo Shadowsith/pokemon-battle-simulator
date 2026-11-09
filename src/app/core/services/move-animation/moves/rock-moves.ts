@@ -1,4 +1,4 @@
-import { Point, BattleStageRefs, MoveAnimRegistry } from '../animation.types';
+import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../animation.types';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
@@ -7,9 +7,141 @@ import { FxEffects } from '../fx-effects';
 export class RockMoveAnimations {
   /** Hand-made Rock move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    diamondstorm: (refs, launch, target, v) => RockMoveAnimations.playDiamondStorm(refs, launch, target, v),
     rockslide: (refs, _launch, target) => RockMoveAnimations.playRockSlide(refs, target),
     sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs)
   };
+
+  /**
+   * Diamond Storm, after the XY animation: a white glow swells at the user
+   * (0-0.35 s) and turns into a big faceted diamond round it with pink gems
+   * popping out (0.35-0.75 s). The scene turns magenta (0.75-0.95 s) and a
+   * storm of pink diamond shards and sparkles sweeps over to the target
+   * (0.9-1.8 s), where a pink burst hits it amid pink gems (1.3-1.8 s); the
+   * scene clears (to ~2.1 s).
+   */
+  private static async playDiamondStorm(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    // A white glow swells into a faceted diamond round the user, with pink gems popping out.
+    const size = Math.max(lr.height * 1.2, 90);
+    const glow = document.createElement('div');
+    glow.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#ffffff 0 35%,#FFF4E0cc 50%,#FFE8A000 70%)`;
+    Fx.place(glow, launch);
+    fxEl.appendChild(glow);
+    await Fx.anim(glow, [{ transform: 'scale(.2)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 350, easing: 'ease-out', fill: 'forwards' });
+    const diamond = RockMoveAnimations.diamondGlyph(size * 1.1);
+    Fx.place(diamond, launch);
+    fxEl.appendChild(diamond);
+    const gems: Promise<void>[] = [];
+    for (let i = 0; i < 10; i++) {
+      const gem = RockMoveAnimations.pinkGem(8 + Math.random() * 8);
+      Fx.place(gem, launch);
+      fxEl.appendChild(gem);
+      const ang = (Math.PI * 2 * i) / 10 + Math.random() * 0.4;
+      const d = size * (0.55 + Math.random() * 0.2);
+      gems.push(
+        Fx.anim(gem, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) scale(1)`, opacity: 1, offset: 0.5 },
+          { transform: `translate(${Math.cos(ang) * d * 1.15}px,${Math.sin(ang) * d * 1.15}px) scale(.8)`, opacity: 0 }
+        ], { duration: 600, delay: i * 20, easing: 'ease-out' }).then(() => gem.remove())
+      );
+    }
+    await Fx.anim(diamond, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 400, easing: 'ease-out', fill: 'forwards' });
+
+    // The scene turns magenta as the diamond fades.
+    const back = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 50%,#B03A78,#7A1A50 60%,#4A0A30)');
+    await Promise.all([
+      Fx.anim(back, [{ opacity: 0 }, { opacity: 0.9 }], { duration: 200, easing: 'ease-out', fill: 'forwards' }),
+      Fx.anim(diamond, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in', fill: 'forwards' }),
+      Fx.anim(glow, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in', fill: 'forwards' })
+    ]);
+    diamond.remove();
+    glow.remove();
+
+    // The storm: pink shards and sparkles sweep over to the target.
+    const storm: Promise<void>[] = [...gems];
+    for (let i = 0; i < 30; i++) {
+      const shard = RockMoveAnimations.pinkGem(8 + Math.random() * 10);
+      const from: Point = { x: launch.x + (Math.random() * 2 - 1) * W * 0.12, y: launch.y + (Math.random() * 2 - 1) * H * 0.25 };
+      const to: Point = { x: target.x + v.dir * W * 0.15 + (Math.random() * 2 - 1) * W * 0.1, y: target.y + (Math.random() * 2 - 1) * H * 0.25 };
+      Fx.place(shard, from);
+      fxEl.appendChild(shard);
+      const spin = (Math.random() < 0.5 ? -1 : 1) * (180 + Math.random() * 360);
+      storm.push(
+        Fx.anim(shard, [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 0 },
+          { transform: `translate(${(to.x - from.x) * 0.15}px,${(to.y - from.y) * 0.15}px) rotate(${spin * 0.15}deg)`, opacity: 1, offset: 0.15 },
+          { transform: `translate(${to.x - from.x}px,${to.y - from.y}px) rotate(${spin}deg)`, opacity: 0 }
+        ], { duration: 450 + Math.random() * 150, delay: i * 18, easing: 'linear' }).then(() => shard.remove())
+      );
+    }
+    for (let i = 0; i < 16; i++) {
+      const dot = FxGlyphs.sparkStar(6 + Math.random() * 6, '#FFB0E0');
+      Fx.place(dot, { x: Math.random() * W, y: Math.random() * H });
+      fxEl.appendChild(dot);
+      storm.push(
+        Fx.anim(dot, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1, offset: 0.4 }, { transform: 'scale(0)', opacity: 0 }], {
+          duration: 400,
+          delay: Math.random() * 700,
+          easing: 'ease-out'
+        }).then(() => dot.remove())
+      );
+    }
+
+    // The pink burst on the target, with gems popping round it.
+    await Fx.wait(400);
+    const burst = FxGlyphs.spikyBurst(Math.max(tr.width * 1.1, 80), '#FF5AB0', '#FFB0D8', '#ffffff');
+    Fx.place(burst, target);
+    fxEl.appendChild(burst);
+    Fx.shake(targetEl, 6);
+    storm.push(
+      Fx.anim(burst, [
+        { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+        { transform: 'scale(1) rotate(10deg)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(1.2) rotate(18deg)', opacity: 0 }
+      ], { duration: 450, easing: 'ease-out' }).then(() => burst.remove())
+    );
+    for (let i = 0; i < 6; i++) {
+      const gem = RockMoveAnimations.pinkGem(10 + Math.random() * 6);
+      Fx.place(gem, { x: target.x + (Math.random() * 2 - 1) * tr.width * 0.6, y: target.y + (Math.random() * 2 - 1) * tr.height * 0.5 });
+      fxEl.appendChild(gem);
+      storm.push(
+        Fx.anim(gem, [{ transform: 'scale(0)', opacity: 0 }, { transform: 'scale(1)', opacity: 1, offset: 0.4 }, { transform: 'scale(.6)', opacity: 0 }], {
+          duration: 450,
+          delay: 100 + i * 50,
+          easing: 'ease-out'
+        }).then(() => gem.remove())
+      );
+    }
+    await Promise.all(storm);
+    await Fx.anim(back, [{ opacity: 0.9 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    back.remove();
+  }
+
+  /** A big faceted blue-white diamond `size` px tall, see-through, with bright facets. */
+  private static diamondGlyph(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 8px #C8E0FF)`;
+    el.innerHTML =
+      '<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block">' +
+      '<polygon points="50,2 85,20 98,55 75,92 25,92 2,55 15,20" fill="#C8DCFF55" stroke="#ffffff" stroke-width="1.5" stroke-linejoin="round"/>' +
+      '<path d="M15 20 L50 40 L85 20 M50 2 L50 40 M2 55 L50 40 L98 55 M25 92 L50 40 L75 92" stroke="#ffffffbb" stroke-width="1" fill="none"/>' +
+      '<polygon points="15,20 50,2 50,40" fill="#ffffff66"/><polygon points="50,40 98,55 75,92" fill="#A8C8FF55"/></svg>';
+    return el;
+  }
+
+  /** A small pink diamond shard `s` px tall. */
+  private static pinkGem(s: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `width:${s * 0.7}px;height:${s}px;pointer-events:none;clip-path:polygon(50% 0,100% 40%,50% 100%,0 40%);background:linear-gradient(135deg,#ffffff,#FF8AC8 45%,#D0408A)`;
+    return el;
+  }
 
   /**
    * Sandstorm: a sandy haze sweeps over the whole scene, sprites included,

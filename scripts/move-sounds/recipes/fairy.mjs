@@ -41,12 +41,21 @@ export const FAIRY = {
     return s;
   },
 
-  /** Generic field move: a dazzling flash of fairy light. */
+  /**
+   * Custom (2.1 s): a soft airy swell into white (0-0.3 s), a shimmering
+   * prismatic chord as the rainbow ring flares (0.3-0.9 s), quick swishes as
+   * the streaks fly (0.8-1.25 s), then the dazzling flash at 1.25 s - a bright
+   * crash of chimes.
+   */
   dazzlinggleam: () => {
-    const s = new MoveSfx(1.0, 0xda22);
-    s.chord(0.0, 0.5, [88, 92, 95, 100], { rate: 0.025, gain: 0.26 });
-    s.noise(0.0, 0.4, { clock: () => 14000, gain: env.attackDecay(0.2, 0.05) });
-    s.sparkle(0.05, 0.7, 14, { lo: 3500, hi: 7000, gain: 0.15 });
+    const s = new MoveSfx(2.25, 0xda22);
+    s.noise(0.0, 0.3, { clock: () => 5000, gain: env.swell(0.08) });
+    s.chord(0.3, 0.6, [79, 83, 86, 91], { rate: 0.03, gain: 0.15, vibrato: 0.01 });
+    s.sparkle(0.35, 0.55, 8, { lo: 3500, hi: 6500, gain: 0.13 });
+    s.whoosh(0.8, 0.45, { from: 2500, to: 7000, gain: 0.2 });
+    s.noise(1.25, 0.35, { clock: (u) => 14000 - 7000 * u, gain: env.attackDecay(0.4, 0.04) });
+    s.chord(1.25, 0.7, [88, 91, 96, 100], { rate: 0.02, gain: 0.14 });
+    s.sparkle(1.3, 0.5, 8, { lo: 4000, hi: 7500, gain: 0.12 });
     return s;
   },
 
@@ -106,15 +115,20 @@ export const FAIRY = {
   },
 
   /**
-   * CHARGE: turn 1 FxEffects.chargeUp (~0.5 s), turn 2 generic self aura with stat-up fleck at 0.85 s.
-   * The same clip plays on both turns: shimmering energy gathers, then a bright rising chime.
+   * Two-turn move, custom; the same clip plays on both turns. Turn 1 (1.65 s):
+   * darkness, light pillars and swirling gems - covered by the shimmering
+   * chord (0.25-1.4 s). Turn 2 (3.3 s): pillars, the rainbow fan bursts at
+   * 0.7 s, the ground glow at 1.55 s and the stat rise at 2.3 s (on turn 1
+   * that tail plays as the charge message shows).
    */
   geomancy: () => {
-    const s = new MoveSfx(1.55, 0x9e0a);
-    s.chord(0.0, 0.75, [72, 76, 79, 84], { rate: 0.035, gain: 0.18, vibrato: 0.01 });
-    s.wave(0.0, 0.6, { freq: env.ramp(330, 990), gain: env.swell(0.12) });
-    s.sparkle(0.05, 0.65, 9, { lo: 3000, hi: 6000, gain: 0.12 });
-    s.statUp(0.85);
+    const s = new MoveSfx(3.2, 0x9e0a);
+    s.chord(0.25, 1.15, [72, 76, 79, 84], { rate: 0.035, gain: 0.16, vibrato: 0.01 });
+    s.wave(0.25, 1.1, { freq: env.ramp(330, 990), gain: env.swell(0.12) });
+    s.sparkle(0.3, 1.1, 12, { lo: 3000, hi: 6000, gain: 0.11 });
+    s.noise(0.7, 0.4, { clock: env.ramp(3000, 8000), gain: env.attackDecay(0.22, 0.1) });
+    s.chord(1.55, 0.6, [84, 88, 91, 96], { rate: 0.03, gain: 0.12 });
+    s.statUp(2.3);
     return s;
   },
 
@@ -140,15 +154,24 @@ export const FAIRY = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + stat-down fleck: a glowing moon orb hums across and bursts in a shower of chimes. */
+  /**
+   * Custom (2.85 s): a soft swell as the scene turns magenta, a rising
+   * shimmering chord as the moon sinks in and glows (0.3-1.1 s), a bright flare
+   * (1.1 s), a swish round the user (1.35 s), the orb hums across
+   * (1.5-1.88 s) and bursts in a shower of chimes at 1.88 s.
+   */
   moonblast: () => {
-    const s = new MoveSfx(1.25, 0x3b1a);
-    s.chord(0.0, 0.43, [81, 84, 88], { rate: 0.03, gain: 0.22 });
-    s.wave(0.0, 0.43, { freq: env.ramp(330, 660), gain: env.ramp(0.1, 0.24) });
-    s.noise(0.43, 0.3, { clock: (u) => 14000 - 8000 * u, gain: env.attackDecay(0.4, 0.04) });
-    s.thud(0.43, 0.45, 0.4);
-    s.sparkle(0.45, 0.25, 6, { lo: 3500, hi: 7000, gain: 0.12 });
-    s.statDown(0.58, 0.22);
+    const s = new MoveSfx(3.0, 0x3b1a);
+    s.noise(0.0, 0.3, { clock: () => 1500, gain: env.swell(0.1) });
+    s.chord(0.3, 0.8, [76, 81, 84], { rate: 0.04, gain: 0.16, vibrato: 0.01 });
+    s.wave(0.3, 0.8, { freq: env.ramp(330, 660), gain: env.ramp(0.06, 0.18) });
+    s.sparkle(1.05, 0.3, 5, { lo: 4000, hi: 7000, gain: 0.14 });
+    s.whoosh(1.35, 0.2, { from: 2000, to: 5000, gain: 0.14 });
+    s.wave(1.5, 0.38, { freq: env.ramp(660, 990), gain: env.swell(0.16) });
+    s.noise(1.88, 0.35, { clock: (u) => 14000 - 8000 * u, gain: env.attackDecay(0.42, 0.04) });
+    s.thud(1.88, 0.45, 0.4);
+    s.chord(1.88, 0.7, [84, 88, 91, 96], { rate: 0.03, gain: 0.14 });
+    s.sparkle(1.9, 0.6, 8, { lo: 3500, hi: 7000, gain: 0.12 });
     return s;
   },
 
@@ -161,15 +184,19 @@ export const FAIRY = {
     return s;
   },
 
-  /** Generic melee (0.17 s impact) + Attack-drop fleck: a rough-and-tumble flurry with a sweet twinkle. */
+  /**
+   * Custom (1.7 s): the user dashes in (0-0.28 s), the brawl cloud puffs up
+   * with a thump, scuffle hits at 0.43 / 0.73 / 1.03 s while stars and hearts
+   * twinkle out (0.36-1.3 s), then the cloud blows away (1.28-1.66 s).
+   */
   playrough: () => {
-    const s = new MoveSfx(1.15, 0xfa1a);
-    s.whoosh(0.0, 0.15, { from: 2000, to: 7000, gain: 0.25 });
-    s.thud(0.17, 0.5, 0.5);
-    s.thud(0.27, 0.4, 0.3);
-    s.thud(0.36, 0.45, 0.4);
-    s.sparkle(0.18, 0.3, 6, { lo: 3000, hi: 5500, gain: 0.15 });
-    s.statDown(0.6);
+    const s = new MoveSfx(1.85, 0xfa1a);
+    s.whoosh(0.0, 0.28, { from: 2000, to: 7000, gain: 0.25 });
+    s.thud(0.28, 0.5, 0.5);
+    s.noise(0.28, 1.0, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.14), short: true });
+    for (const at of [0.43, 0.58, 0.73, 0.88, 1.03]) s.thud(at + s.random() * 0.03, 0.35, 0.35);
+    s.sparkle(0.36, 0.9, 10, { lo: 3000, hi: 5500, gain: 0.13 });
+    s.whoosh(1.28, 0.38, { from: 5000, to: 1500, gain: 0.18 });
     return s;
   },
 

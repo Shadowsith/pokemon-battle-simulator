@@ -166,14 +166,20 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee (impact at 0.17 s): a flying body-splash dive - wind rush, then a heavy belly-flop. */
+  /**
+   * Custom (1.45 s): a puff and a whoosh up as the user leaps (0-0.35 s), a
+   * falling whistle as it dives (0.35-0.75 s), then a heavy belly-flop at
+   * 0.75 s with rumbling dust and pattering rubble.
+   */
   flyingpress: () => {
-    const s = new MoveSfx(0.95, 0xf1e5);
-    s.whoosh(0.0, 0.17, { from: 1200, to: 8000, gain: 0.35 });
-    s.pulse(0.0, 0.17, { freq: (u) => 1500 - 900 * u, gain: env.ramp(0.05, 0.14), duty: 0.125 });
-    s.thud(0.17, 0.85, 1);
-    s.rumble(0.2, 0.45, { from: 500, to: 150, gain: 0.3 });
-    s.whoosh(0.2, 0.3, { from: 5000, to: 1500, gain: 0.15 });
+    const s = new MoveSfx(1.6, 0xf1e5);
+    s.noise(0.0, 0.1, { clock: () => 2500, gain: env.decay(0.18, 1) });
+    s.whoosh(0.05, 0.3, { from: 1500, to: 6000, gain: 0.25 });
+    s.pulse(0.35, 0.4, { freq: (u) => 1800 - 1200 * u, gain: env.ramp(0.05, 0.14), duty: 0.125 });
+    s.whoosh(0.35, 0.4, { from: 2000, to: 8000, gain: 0.3 });
+    s.thud(0.75, 0.9, 1);
+    s.rumble(0.78, 0.5, { from: 500, to: 150, gain: 0.3 });
+    for (let i = 0; i < 5; i++) s.thud(0.95 + i * 0.07 + s.random() * 0.03, 0.12, 0.2);
     return s;
   },
 

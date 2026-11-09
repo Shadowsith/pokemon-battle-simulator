@@ -115,14 +115,20 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic field (field shake + waves ~0.6 s), bp 90: the land itself heaves - a deep quake rumble with two heavy jolts and scattering clods. */
+  /**
+   * Custom (2.7 s): darkness, then a deep swelling hum with a shimmer as the
+   * golden rings swirl and light rises round the user (0.25-1.25 s); the land
+   * heaves at 1.25 s - a quake rumble under a rushing curtain of light with
+   * jolts at 1.25 / 1.55 / 1.85 s - and dies away (to 2.7 s).
+   */
   landswrath: () => {
-    const s = new MoveSfx(1.3, 0x1a9d);
-    s.thud(0.02, 0.75, 1);
-    s.noise(0.0, 1.05, { clock: (u) => 420 - 220 * u, gain: (u) => 0.45 * Math.min(1, u * 8) * Math.pow(1 - u, 1.0) * (0.8 + 0.2 * Math.sin(2 * Math.PI * 9 * u)) });
-    s.pulse(0.0, 0.95, { freq: (u) => 55 + 8 * Math.sin(2 * Math.PI * 7 * u), gain: env.decay(0.32, 1.2), duty: 0.5 });
-    s.thud(0.3, 0.55, 1);
-    for (let i = 0; i < 6; i++) s.noise(0.12 + i * 0.1 + s.random() * 0.04, 0.04, { clock: () => 1400 + s.random() * 1800, gain: env.decay(0.2, 1) });
+    const s = new MoveSfx(2.85, 0x1a9d);
+    s.pulse(0.25, 1.0, { freq: (u) => 55 + 25 * u, gain: env.swell(0.26), duty: 0.5 });
+    s.chord(0.3, 0.95, [57, 64, 69], { rate: 0.05, gain: 0.1 });
+    s.sparkle(0.4, 0.8, 6, { lo: 2500, hi: 4500, gain: 0.1 });
+    s.noise(1.25, 1.2, { clock: (u) => 420 - 220 * u, gain: (u) => 0.45 * Math.min(1, u * 8) * Math.pow(1 - u, 1.0) * (0.8 + 0.2 * Math.sin(2 * Math.PI * 9 * u)) });
+    s.noise(1.25, 1.1, { clock: env.ramp(3000, 6000), gain: (u) => 0.16 * Math.sin(Math.PI * u) });
+    for (const at of [1.25, 1.55, 1.85]) s.thud(at, 0.6, 1);
     return s;
   },
 
@@ -181,15 +187,25 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic field (≈0.6 s) at high power: the ground splits and jagged blades of rock erupt. */
+  /**
+   * Custom (2.6 s): darkness and a bubbling lava rumble (0-0.4 s), rock blades
+   * crack up out of the ground (0.4-1.0 s), the fiery blast with the crystal
+   * spear at ~1.1 s, then rolling smoke fades out (1.5-2.6 s).
+   */
   precipiceblades: () => {
-    const s = new MoveSfx(1.25, 0x9bec);
-    s.rumble(0.0, 1.05, { from: 600, to: 180, gain: 0.45 });
-    s.thud(0.05, 0.55, 1);
-    for (const at of [0.2, 0.35, 0.5]) {
-      s.noise(at, 0.12, { clock: (u) => 9000 - 6000 * u, gain: env.attackDecay(0.35, 0.05) });
-      s.thud(at, 0.35, 0.7);
+    const s = new MoveSfx(2.75, 0x9bec);
+    s.rumble(0.0, 1.1, { from: 180, to: 320, gain: 0.3 });
+    s.bubbles(0.1, 0.9, 8, { lo: 150, hi: 400, gain: 0.15 });
+    for (let i = 0; i < 6; i++) {
+      const at = 0.4 + i * 0.1 + s.random() * 0.04;
+      s.noise(at, 0.1, { clock: (u) => 9000 - 6000 * u, gain: env.attackDecay(0.28, 0.05) });
+      s.thud(at, 0.3, 0.7);
     }
+    s.thud(1.1, 0.7, 1);
+    s.noise(1.1, 0.5, { clock: env.ramp(6000, 1500), gain: env.attackDecay(0.4, 0.05) });
+    s.pulse(1.1, 0.2, { freq: (u) => 1600 - 800 * u, gain: env.decay(0.14, 1.5), duty: 0.25 });
+    s.rumble(1.5, 1.1, { from: 300, to: 120, gain: 0.25 });
+    s.noise(1.5, 1.1, { clock: () => 2500, gain: env.decay(0.12, 1) });
     return s;
   },
 

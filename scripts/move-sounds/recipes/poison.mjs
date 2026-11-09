@@ -38,17 +38,23 @@ export const POISON = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): a mighty, gassy burp. */
+  /**
+   * Custom (2.4 s): a mighty gassy burp (0-0.6 s) as the rings leave, a
+   * wobbling hum while they travel and close in on the target (0.4-1.6 s),
+   * then the pink gas bursts round it (1.5 s) with bubbling pops.
+   */
   belch: () => {
-    const s = new MoveSfx(1.1, 0xbe1c);
-    s.pulse(0.02, 0.55, {
+    const s = new MoveSfx(2.5, 0xbe1c);
+    s.pulse(0.05, 0.55, {
       freq: (u) => (95 - 25 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 22 * u)),
       gain: (u) => 0.4 * Math.min(1, u * 10) * Math.pow(1 - u, 0.6),
       duty: 0.25,
     });
-    s.noise(0.02, 0.55, { clock: (u) => 700 - 200 * u, gain: (u) => 0.25 * Math.min(1, u * 10) * Math.pow(1 - u, 0.6) });
-    s.noise(0.43, 0.5, { clock: env.ramp(3000, 800), gain: env.attackDecay(0.35, 0.1) });
-    s.bubbles(0.5, 0.4, 5, { lo: 200, hi: 450, gain: 0.15 });
+    s.noise(0.05, 0.55, { clock: (u) => 700 - 200 * u, gain: (u) => 0.25 * Math.min(1, u * 10) * Math.pow(1 - u, 0.6) });
+    s.wave(0.4, 1.2, { freq: (u) => 220 * (1 + 0.06 * Math.sin(2 * Math.PI * 9 * u)), gain: (u) => 0.12 * Math.sin(Math.PI * u) });
+    s.thud(1.0, 0.25, 0.3);
+    s.noise(1.5, 0.5, { clock: env.ramp(3000, 800), gain: env.attackDecay(0.32, 0.1) });
+    s.bubbles(1.55, 0.6, 7, { lo: 200, hi: 450, gain: 0.15 });
     return s;
   },
 

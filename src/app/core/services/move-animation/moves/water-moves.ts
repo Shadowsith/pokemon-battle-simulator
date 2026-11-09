@@ -2,10 +2,12 @@ import { Point, BattleStageRefs, BubbleStyle, MoveAnimRegistry } from '../animat
 import { BUBBLE_DRIFT, BUBBLE_BEAM, DIM_BACKDROP, WATERFALL_WAVES } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
+import { OriginPulse } from './water/origin-pulse';
+import { SteamEruption } from './water/steam-eruption';
 import { SurfWave } from './water/surf-wave';
 import { WaterCrash } from './water/water-crash';
 
-/** Hand-made animations for Water-type moves (the Surf wave and the shared water crash live in `water/`). */
+/** Hand-made animations for Water-type moves (the Surf wave, Steam Eruption, Origin Pulse and the shared water crash live in `water/`). */
 export class WaterMoveAnimations {
   /** Hand-made Water move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -15,8 +17,10 @@ export class WaterMoveAnimations {
     dive: (refs, _launch, target) => WaterMoveAnimations.playDiveHit(refs, target),
     hydrocannon: (refs, launch, target) => WaterMoveAnimations.playHydroCannon(refs, launch, target),
     hydropump: (refs, launch, target) => WaterMoveAnimations.playHydroPump(refs, launch, target),
+    originpulse: (refs, launch, target) => OriginPulse.play(refs, launch, target),
     raindance: (refs) => WaterMoveAnimations.playRainDance(refs),
     muddywater: (refs, launch, target, v) => SurfWave.play(refs, launch, target, v, SurfWave.MUD),
+    steameruption: (refs, launch, target) => SteamEruption.play(refs, launch, target),
     surf: (refs, launch, target, v) => SurfWave.play(refs, launch, target, v, SurfWave.SURF),
     waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target),
     waterspout: (refs, launch, target) => WaterMoveAnimations.playWaterSpout(refs, launch, target)

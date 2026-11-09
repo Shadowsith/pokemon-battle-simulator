@@ -2,15 +2,18 @@ import { Point, BattleStageRefs, MoveVisual, MoveAnimRegistry } from '../animati
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { DragonAscent } from './flying/dragon-ascent';
 
-/** Hand-made animations for Flying-type moves. */
+/** Hand-made animations for Flying-type moves (Dragon Ascent lives in `flying/`). */
 export class FlyingMoveAnimations {
   /** Hand-made Flying move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     aeroblast: (refs, launch, target, v) => FlyingMoveAnimations.playAeroblast(refs, launch, target, v),
     bounce: (refs, _launch, target) => FlyingMoveAnimations.playBounceDown(refs, target),
+    dragonascent: (refs, launch, target, v) => DragonAscent.play(refs, launch, target, v),
     drillpeck: (refs, _launch, target, v) => FlyingMoveAnimations.playDrillPeck(refs, target, v),
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target),
+    oblivionwing: (refs, launch, target, v) => FlyingMoveAnimations.playOblivionWing(refs, launch, target, v),
     skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target)
   };
 
@@ -20,6 +23,133 @@ export class FlyingMoveAnimations {
     fly: (refs, launch) => FlyingMoveAnimations.playFlyUp(refs, launch),
     skyattack: (refs, launch) => FlyingMoveAnimations.playSkyAttackCharge(refs, launch)
   };
+
+  /**
+   * Oblivion Wing, after the XY animation: letterbox bars slide in over a dark
+   * teal scene (0-0.25 s) and a crimson sphere swells round the user with red
+   * flares (0.25-0.85 s). The bars leave and a huge crimson beam slashes down
+   * from the sky onto the target (1.0-1.75 s, hit at 1.15 s), throwing up
+   * smoke and rubble. Magenta energy then drains from the target back to the
+   * user (1.75-2.65 s), which glows and gets green heal sparkles (to ~3.55 s).
+   */
+  private static async playOblivionWing(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+
+    const dark = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 50%,#123A3A,#041414)');
+    Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+    const bars: HTMLElement[] = [];
+    for (const edge of ['top', 'bottom']) {
+      const bar = document.createElement('div');
+      bar.style.cssText = `position:absolute;left:0;right:0;${edge}:0;height:${H * 0.16}px;background:#000;pointer-events:none;z-index:5`;
+      fxEl.appendChild(bar);
+      bars.push(bar);
+      Fx.anim(bar, [{ transform: `translateY(${edge === 'top' ? -100 : 100}%)` }, { transform: 'translateY(0)' }], { duration: 250, easing: 'ease-out' });
+    }
+    await Fx.wait(250);
+
+    // The crimson sphere round the user, with red flares licking off it.
+    const size = Math.max(lr.height * 1.3, 100);
+    const sphere = document.createElement('div');
+    sphere.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FF8AA866 0 30%,#E0204A88 55%,#A00A2Acc 68%,#60001A00 72%);box-shadow:0 0 18px #E0204A`;
+    Fx.place(sphere, launch);
+    fxEl.appendChild(sphere);
+    const sphereDone = Fx.anim(sphere, [
+      { transform: 'scale(.2)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.5 },
+      { transform: 'scale(1.1)', opacity: 1, offset: 0.8 },
+      { transform: 'scale(1.3)', opacity: 0 }
+    ], { duration: 600, easing: 'ease-out' }).then(() => sphere.remove());
+    for (let i = 0; i < 5; i++) {
+      const len = size * (0.6 + Math.random() * 0.4);
+      const ang = -90 + v.dir * (20 + Math.random() * 50);
+      const flare = document.createElement('div');
+      flare.style.cssText = `position:absolute;left:${launch.x}px;top:${launch.y - 3}px;width:${len}px;height:6px;transform-origin:0 50%;border-radius:3px;pointer-events:none;background:linear-gradient(90deg,#FF204A00,#FF204A,#FFB0C0)`;
+      fxEl.appendChild(flare);
+      Fx.anim(flare, [
+        { transform: `rotate(${ang}deg) scaleX(0)`, opacity: 1 },
+        { transform: `rotate(${ang}deg) scaleX(1)`, opacity: 0 }
+      ], { duration: 380, delay: 150 + i * 50, easing: 'ease-out' }).then(() => flare.remove());
+    }
+    await sphereDone;
+    await Promise.all(bars.map((bar, i) => Fx.anim(bar, [{ transform: 'translateY(0)' }, { transform: `translateY(${i ? 100 : -100}%)` }], { duration: 150, easing: 'ease-in' })));
+    bars.forEach((b) => b.remove());
+
+    // The beam slashes down from the sky (on the user's side) onto the target.
+    const from: Point = { x: target.x - v.dir * W * 0.3, y: -30 };
+    const dx = foot.x - from.x;
+    const dy = foot.y - from.y;
+    const len = Math.hypot(dx, dy);
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const thick = Math.max(tr.width * 0.9, 60);
+    const beam = document.createElement('div');
+    beam.style.cssText =
+      `position:absolute;left:${from.x}px;top:${from.y - thick / 2}px;width:${len + thick * 0.3}px;height:${thick}px;transform-origin:0 50%;pointer-events:none;` +
+      'background:linear-gradient(180deg,#FF103A00,#E0103Acc 20%,#FF4A6A 40%,#FFD0DA 50%,#FF4A6A 60%,#E0103Acc 80%,#FF103A00);filter:blur(1px)';
+    fxEl.appendChild(beam);
+    const beamDone = Fx.anim(beam, [
+      { transform: `rotate(${angle}deg) scaleX(0) scaleY(.6)`, opacity: 1 },
+      { transform: `rotate(${angle}deg) scaleX(1) scaleY(1)`, opacity: 1, offset: 0.2 },
+      { transform: `rotate(${angle}deg) scaleX(1) scaleY(.9)`, opacity: 1, offset: 0.7 },
+      { transform: `rotate(${angle}deg) scaleX(1) scaleY(0)`, opacity: 0.6 }
+    ], { duration: 750, easing: 'ease-out' }).then(() => beam.remove());
+    await Fx.wait(150);
+    Fx.flash(targetEl, '#FF6A8A', 0.9);
+    Fx.shake(targetEl, 7);
+    Fx.shakeField(fieldEl, 0.7);
+    const hitTint = Fx.anim(targetEl, [
+      { filter: 'none' },
+      { filter: 'sepia(1) saturate(4) hue-rotate(-50deg) brightness(1.1)', offset: 0.25 },
+      { filter: 'none' }
+    ], { duration: 650, easing: 'ease-out', fill: 'none' });
+    const rubble: Promise<unknown>[] = [FxEffects.smokePuff(fxEl, foot, Math.max(tr.width * 1.5, 110), ['#8A8A90', '#5A5A62'])];
+    for (let i = 0; i < 7; i++) {
+      const rock = FxGlyphs.rockChunk(6 + Math.random() * 8);
+      rock.style.filter = 'brightness(.5) saturate(.4)';
+      Fx.place(rock, foot);
+      fxEl.appendChild(rock);
+      const ang = -Math.PI / 2 + (Math.random() * 2 - 1) * 1.1;
+      const d = tr.width * (0.6 + Math.random() * 0.6);
+      rubble.push(
+        Fx.anim(rock, [
+          { transform: 'translate(0,0)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) rotate(${Math.random() * 360}deg)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(${Math.cos(ang) * d * 1.2}px,${Math.sin(ang) * d + 25}px) rotate(${Math.random() * 540}deg)`, opacity: 0 }
+        ], { duration: 600, easing: 'ease-out' }).then(() => rock.remove())
+      );
+    }
+    await Promise.all([beamDone, hitTint, ...rubble]);
+
+    // The drain: magenta orbs flow from the target back to the user, then green heal sparkles.
+    const orbs: Promise<void>[] = [];
+    for (let i = 0; i < 10; i++) {
+      const s = 10 + Math.random() * 10;
+      const orb = document.createElement('div');
+      orb.style.cssText = `width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#ffffff 0 20%,#FF70D0 50%,#C020A000 72%);box-shadow:0 0 8px #FF40C0`;
+      const start: Point = { x: target.x + (Math.random() * 2 - 1) * tr.width * 0.3, y: target.y + (Math.random() * 2 - 1) * tr.height * 0.3 };
+      Fx.place(orb, start);
+      fxEl.appendChild(orb);
+      const ex = launch.x - start.x;
+      const ey = launch.y - start.y;
+      const lift = 30 + Math.random() * 40;
+      orbs.push(
+        Fx.anim(orb, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${ex * 0.5}px,${ey * 0.5 - lift}px) scale(1)`, opacity: 1, offset: 0.5 },
+          { transform: `translate(${ex}px,${ey}px) scale(.6)`, opacity: 0.8 }
+        ], { duration: 550, delay: i * 40, easing: 'ease-in-out' }).then(() => orb.remove())
+      );
+    }
+    await Promise.all(orbs);
+    Fx.flash(launchEl, '#FF40C0', 0.6);
+    const clear = Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 400, delay: 300, easing: 'ease-in' });
+    await Promise.all([FxEffects.healSparkles(refs, launch), clear]);
+    dark.remove();
+  }
 
   /**
    * Aeroblast: a cyan vortex swirls up behind the battle while streams of air

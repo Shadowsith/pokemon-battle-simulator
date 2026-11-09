@@ -225,14 +225,22 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): space warps open with a woozy warble and the target is swallowed by a rift. */
+  /**
+   * Custom (2.9 s): a soft whoosh into white (0-0.3 s), a woozy downward
+   * warble as the user sinks into the hole (0.3-1.1 s), a rising warp as it
+   * reappears under the target (1.35-1.85 s), the strike crack at 1.85 s with
+   * a sinking rift tone, then a soft return.
+   */
   hyperspacehole: () => {
-    const s = new MoveSfx(1.1, 0x4d50);
-    s.wave(0.0, 0.45, { freq: (u) => 300 + 600 * u + 150 * Math.sin(2 * Math.PI * 8 * u), gain: env.ramp(0.12, 0.28) });
-    s.chord(0.0, 0.45, [72, 78], { rate: 0.04, gain: 0.1, voice: 'pulse' });
-    s.noise(0.43, 0.15, { clock: env.ramp(9000, 2000), gain: env.attackDecay(0.35, 0.05) });
-    s.wave(0.43, 0.55, { freq: (u) => 900 * Math.pow(0.25, u) * (1 + 0.05 * Math.sin(2 * Math.PI * 10 * u)), gain: env.decay(0.3, 1.2) });
-    s.pulse(0.43, 0.4, { freq: (u) => 120 * Math.pow(0.6, u), gain: env.decay(0.2, 1.5), duty: 0.5 });
+    const s = new MoveSfx(3.0, 0x4d50);
+    s.whoosh(0.0, 0.3, { from: 3000, to: 6000, gain: 0.14 });
+    s.wave(0.3, 0.8, { freq: (u) => (700 - 450 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 8 * u)), gain: env.swell(0.22) });
+    s.chord(0.3, 0.8, [72, 78], { rate: 0.04, gain: 0.08, voice: 'pulse' });
+    s.wave(1.35, 0.5, { freq: (u) => (300 + 600 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 10 * u)), gain: env.ramp(0.1, 0.24) });
+    s.noise(1.85, 0.2, { clock: env.ramp(9000, 2000), gain: env.attackDecay(0.4, 0.04) });
+    s.thud(1.85, 0.4, 0.5);
+    s.wave(1.85, 0.6, { freq: (u) => 900 * Math.pow(0.25, u) * (1 + 0.05 * Math.sin(2 * Math.PI * 10 * u)), gain: env.decay(0.28, 1.2) });
+    s.whoosh(2.4, 0.4, { from: 5000, to: 2000, gain: 0.1 });
     return s;
   },
 
