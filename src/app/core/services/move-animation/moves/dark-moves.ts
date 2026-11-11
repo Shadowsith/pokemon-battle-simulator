@@ -5,8 +5,9 @@ import { FxEffects } from '../fx-effects';
 import { NastyPlot } from './dark/nasty-plot';
 import { NightSlash } from './dark/night-slash';
 import { SuckerPunch } from './dark/sucker-punch';
+import { Switcheroo } from './dark/switcheroo';
 
-/** Hand-made animations for Dark-type moves (Nasty Plot, Night Slash and Sucker Punch live in `dark/`). */
+/** Hand-made animations for Dark-type moves (Nasty Plot, Night Slash, Sucker Punch and Switcheroo live in `dark/`). */
 export class DarkMoveAnimations {
   /** Hand-made Dark move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -18,6 +19,7 @@ export class DarkMoveAnimations {
     nightslash: (refs, _launch, target, v) => NightSlash.play(refs, target, v),
     partingshot: (refs, launch, target, v) => DarkMoveAnimations.playPartingShot(refs, launch, target, v),
     suckerpunch: (refs, launch, target, v) => SuckerPunch.play(refs, launch, target, v),
+    switcheroo: (refs, launch, target, v) => Switcheroo.play(refs, launch, target, v),
     taunt: (refs, launch, target, v) => DarkMoveAnimations.playTaunt(refs, launch, target, v)
   };
 

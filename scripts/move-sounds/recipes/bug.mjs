@@ -289,25 +289,26 @@ export const BUG = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a buzzing dive-in hit, then the user zips back out. */
+  /** Custom (orb shoots off 0.05-0.45 s, hit 0.45 s, rings whirl to ~0.95 s, orb back 0.6-0.95 s, user returns ~1.05 s): a rising rush, a thump, a whirring shimmer and a whoosh back. */
   uturn: () => {
-    const s = new MoveSfx(0.85, 0x07a2);
-    s.noise(0.0, 0.17, { clock: env.ramp(3000, 7000), gain: env.ramp(0.08, 0.25), short: true });
-    s.whoosh(0.0, 0.17, { from: 2000, to: 7000, gain: 0.2 });
-    s.thud(0.17, 0.6, 0.5);
-    s.whoosh(0.3, 0.35, { from: 8000, to: 2000, gain: 0.22 });
-    s.pulse(0.3, 0.3, { freq: (u) => 600 + 900 * u, gain: env.swell(0.1), duty: 0.125 });
+    const s = new MoveSfx(1.25, 0x07a2);
+    s.noise(0.05, 0.4, { clock: env.ramp(3000, 7000), gain: env.ramp(0.08, 0.25), short: true });
+    s.whoosh(0.05, 0.4, { from: 2000, to: 7000, gain: 0.2 });
+    s.thud(0.45, 0.6, 0.5);
+    s.pulse(0.45, 0.45, { freq: (u) => 900 + 300 * Math.sin(2 * Math.PI * 4 * u), gain: env.decay(0.12, 1.5), duty: 0.125 });
+    s.whoosh(0.6, 0.35, { from: 8000, to: 2000, gain: 0.22 });
+    s.pulse(0.6, 0.35, { freq: (u) => 600 + 900 * u, gain: env.swell(0.1), duty: 0.125 });
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): two crossed blades scissor through the target - an X of quick cuts. */
+  /** Custom (dart 0-0.26 s, slashes 0.1-0.22 s and 0.2-0.32 s, hit 0.32 s, glints to ~0.9 s): two crossing cuts, then a glinting shimmer. */
   xscissor: () => {
-    const s = new MoveSfx(0.7, 0x3fb9);
-    s.whoosh(0.0, 0.15, { from: 2500, to: 9000, gain: 0.3 });
-    s.slash(0.13, 0.45);
-    s.slash(0.19, 0.5);
-    s.thud(0.19, 0.35, 0.3);
-    s.noise(0.25, 0.12, { clock: () => 7000, gain: env.decay(0.1, 1.5), short: true });
+    const s = new MoveSfx(1.05, 0x3fb9);
+    s.whoosh(0.0, 0.2, { from: 2500, to: 9000, gain: 0.3 });
+    s.slash(0.12, 0.45);
+    s.slash(0.22, 0.5);
+    s.thud(0.32, 0.35, 0.3);
+    s.sparkle(0.34, 0.5, 5, { lo: 3500, hi: 6500, gain: 0.12 });
     return s;
   },
 };

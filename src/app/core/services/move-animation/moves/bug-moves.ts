@@ -3,8 +3,10 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { GrassMoveAnimations } from './grass-moves';
+import { UTurn } from './bug/u-turn';
+import { XScissor } from './bug/x-scissor';
 
-/** Hand-made animations for Bug-type moves. */
+/** Hand-made animations for Bug-type moves (U-turn and X-Scissor live in `bug/`). */
 export class BugMoveAnimations {
   /** Hand-made Bug move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -14,7 +16,9 @@ export class BugMoveAnimations {
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
     megahorn: (refs, launch, target) => BugMoveAnimations.playMegahorn(refs, launch, target),
     signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target),
-    stickyweb: (refs, launch, target) => BugMoveAnimations.playStickyWeb(refs, launch, target)
+    stickyweb: (refs, launch, target) => BugMoveAnimations.playStickyWeb(refs, launch, target),
+    uturn: (refs, launch, target) => UTurn.play(refs, launch, target),
+    xscissor: (refs, _launch, target, v) => XScissor.play(refs, target, v)
   };
 
   /**

@@ -532,13 +532,15 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a stinging open-palm slap, then a startled "wake up!" ping. */
+  /** Custom (slaps at 0.22 s and 0.52 s, stars to ~1.0 s): two sharp smacks and a bright wake-up chime. */
   wakeupslap: () => {
-    const s = new MoveSfx(0.8, 0x5a1a);
-    s.whoosh(0.0, 0.17, { from: 3000, to: 10000, gain: 0.25 });
-    s.noise(0.17, 0.1, { clock: (u) => 20000 - 8000 * u, gain: env.attackDecay(0.6, 0.03) });
-    s.thud(0.17, 0.4, 0.2);
-    s.arpeggio(0.32, [84, 91], 0.06, { gain: 0.16, duty: 0.25, hold: 0.1 });
+    const s = new MoveSfx(1.15, 0x5a1a);
+    for (const at of [0.22, 0.52]) {
+      s.whoosh(at - 0.12, 0.12, { from: 3000, to: 10000, gain: 0.22 });
+      s.noise(at, 0.1, { clock: (u) => 20000 - 8000 * u, gain: env.attackDecay(0.6, 0.03) });
+      s.thud(at, 0.35, 0.2);
+    }
+    s.arpeggio(0.62, [84, 91], 0.06, { gain: 0.16, duty: 0.25, hold: 0.1 });
     return s;
   },
 };

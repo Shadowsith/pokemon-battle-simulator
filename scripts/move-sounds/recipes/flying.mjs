@@ -301,13 +301,13 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s, no fleck): a strong following breeze sweeps over the team - rising and falling gusts. */
+  /** Custom (pale scene 0-0.25 s, wind streaks 0.1-1.3 s, gust sways at 0.55 s and 1.1 s, clear to 1.55 s): a long, breathy gale with two gusts. */
   tailwind: () => {
-    const s = new MoveSfx(1.15, 0x7a17);
-    s.noise(0.0, 1.05, { clock: (u) => 2500 + 3500 * Math.sin(Math.PI * u) + 800 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.4) });
-    s.whoosh(0.15, 0.35, { from: 3000, to: 9000, gain: 0.2 });
-    s.whoosh(0.5, 0.4, { from: 9000, to: 3500, gain: 0.18 });
-    s.wave(0.05, 0.9, { freq: (u) => 700 + 250 * Math.sin(2 * Math.PI * 1.5 * u), gain: env.swell(0.08) });
+    const s = new MoveSfx(1.75, 0x7a17);
+    s.noise(0.0, 1.5, { clock: (u) => 2500 + 3500 * Math.sin(Math.PI * u) + 800 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.4) });
+    s.whoosh(0.3, 0.4, { from: 3000, to: 9000, gain: 0.2 });
+    s.whoosh(0.85, 0.45, { from: 9000, to: 3500, gain: 0.18 });
+    s.wave(0.05, 1.35, { freq: (u) => 700 + 250 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.08) });
     return s;
   },
 

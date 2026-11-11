@@ -7,8 +7,9 @@ import { BraveBird } from './flying/brave-bird';
 import { Defog } from './flying/defog';
 import { DragonAscent } from './flying/dragon-ascent';
 import { Roost } from './flying/roost';
+import { Tailwind } from './flying/tailwind';
 
-/** Hand-made animations for Flying-type moves (Air Slash, Brave Bird, Defog, Dragon Ascent and Roost live in `flying/`). */
+/** Hand-made animations for Flying-type moves (Air Slash, Brave Bird, Defog, Dragon Ascent, Roost and Tailwind live in `flying/`). */
 export class FlyingMoveAnimations {
   /** Hand-made Flying move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -22,7 +23,8 @@ export class FlyingMoveAnimations {
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target),
     oblivionwing: (refs, launch, target, v) => FlyingMoveAnimations.playOblivionWing(refs, launch, target, v),
     roost: (refs, launch) => Roost.play(refs, launch),
-    skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target)
+    skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target),
+    tailwind: (refs, launch) => Tailwind.play(refs, launch)
   };
 
   /** Turn-1 animations of two-turn Flying moves, by @pkmn/sim move id. */

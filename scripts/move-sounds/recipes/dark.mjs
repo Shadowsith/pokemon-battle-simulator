@@ -301,13 +301,14 @@ export const DARK = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a sneaky swap - two items whisk past each other. */
+  /** Custom (scene darkens 0-0.3 s, bags pop up 0.3 s, swap 0.45-1.05 s, land 1.05 s, fade 1.2-1.45 s, clear to 1.75 s): a sly pop, two items whisking past each other, a sneaky chime. */
   switcheroo: () => {
-    const s = new MoveSfx(1.0, 0x5c7e);
-    s.whoosh(0.02, 0.3, { from: 2000, to: 6000, gain: 0.25 });
-    s.whoosh(0.3, 0.3, { from: 6000, to: 2000, gain: 0.25 });
-    s.arpeggio(0.05, [62, 69], 0.3, { gain: 0.24, duty: 0.25, hold: 0.2 });
-    s.arpeggio(0.62, [69, 62], 0.1, { gain: 0.22, voice: 'wave', hold: 0.18 });
+    const s = new MoveSfx(1.6, 0x5c7e);
+    s.pulse(0.0, 0.3, { freq: env.ramp(180, 110), gain: env.swell(0.12), duty: 0.25 });
+    s.arpeggio(0.3, [62, 69], 0.06, { gain: 0.22, duty: 0.25, hold: 0.08 });
+    s.whoosh(0.45, 0.3, { from: 2000, to: 6000, gain: 0.25 });
+    s.whoosh(0.75, 0.3, { from: 6000, to: 2000, gain: 0.25 });
+    s.arpeggio(1.05, [69, 62], 0.1, { gain: 0.2, voice: 'wave', hold: 0.18 });
     return s;
   },
 

@@ -494,6 +494,25 @@ export class FxGlyphs {
     return petal;
   }
 
+  /** A glossy purple poison bubble, `size` px across (Sludge Bomb, Toxic, Toxic Spikes, …). */
+  static poisonBubble(size: number): HTMLElement {
+    const b = document.createElement('div');
+    b.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#FFF3FF,#D77CF0 40%,#7A2E9ECC 85%);box-shadow:0 0 6px #D77CF0`;
+    return b;
+  }
+
+  /** A cream sack, `size` px wide: domed top, wider at the bottom, shaded round its sides (Trick, Switcheroo). */
+  static itemBag(size: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${size}px;height:${size * 1.05}px;pointer-events:none;filter:drop-shadow(0 1px 2px #00000088)`;
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 24 25"><defs><linearGradient id="itemBag" x1="0" y1="0" x2="1" y2="0">' +
+      '<stop offset="0" stop-color="#C8C098"/><stop offset=".35" stop-color="#FFFBE6"/><stop offset=".7" stop-color="#ECE4C0"/><stop offset="1" stop-color="#B8B088"/></linearGradient></defs>' +
+      '<path d="M2,23 L5,6 Q6,1 12,1 Q18,1 19,6 L22,23 Q12,25 2,23 Z" fill="url(#itemBag)" stroke="#8A8466" stroke-width=".8" stroke-linejoin="round"/>' +
+      '</svg>';
+    return el;
+  }
+
   /** A green leaf: pointed oval, lighter towards one tip (Frenzy Plant, Leaf Blade, Grass Knot). */
   static leafGlyph(s: number): HTMLElement {
     const el = document.createElement('div');

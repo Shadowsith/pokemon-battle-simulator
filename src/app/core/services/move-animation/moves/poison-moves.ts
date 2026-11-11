@@ -3,8 +3,9 @@ import { Fx } from '../fx';
 import { FxEffects } from '../fx-effects';
 import { FxGlyphs } from '../fx-glyphs';
 import { PoisonJab } from './poison/poison-jab';
+import { ToxicSpikes } from './poison/toxic-spikes';
 
-/** Hand-made animations for Poison-type moves. */
+/** Hand-made animations for Poison-type moves (Poison Jab and Toxic Spikes live in `poison/`). */
 export class PoisonMoveAnimations {
   /** Hand-made Poison move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -14,7 +15,8 @@ export class PoisonMoveAnimations {
     gunkshot: (refs, launch, target) => PoisonMoveAnimations.playGunkShot(refs, launch, target),
     poisonjab: (refs, _launch, target, v) => PoisonJab.play(refs, target, v),
     sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
-    toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target)
+    toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target),
+    toxicspikes: (refs, launch, target) => ToxicSpikes.play(refs, launch, target)
   };
 
   /**
@@ -141,14 +143,6 @@ export class PoisonMoveAnimations {
   private static readonly DARK = '#3A0F55';
   private static readonly BUBBLE = '#D77CF0';
 
-  /** A glossy pink-purple poison bubble (Toxic, Sludge Bomb). */
-  private static poisonBubble(size: number): HTMLElement {
-    const { PURPLE, BUBBLE } = PoisonMoveAnimations;
-    const b = document.createElement('div');
-    b.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 35% 30%,#FFF3FF,${BUBBLE} 40%,${PURPLE}CC 85%);box-shadow:0 0 6px ${BUBBLE}`;
-    return b;
-  }
-
   /** A lumpy, cloud-like glob of purple sludge, `size` px across. */
   private static sludgeGlob(size: number): HTMLElement {
     const el = document.createElement('div');
@@ -222,7 +216,7 @@ export class PoisonMoveAnimations {
     // Poison bubbles bob up and wobble around the sludge.
     for (let i = 0; i < 14; i++) {
       const size = 8 + Math.random() * 12;
-      const b = PoisonMoveAnimations.poisonBubble(size);
+      const b = FxGlyphs.poisonBubble(size);
       const ang = Math.random() * Math.PI * 2;
       Fx.place(b, {
         x: target.x + Math.cos(ang) * spreadX * (0.8 + Math.random() * 0.5),
@@ -298,7 +292,7 @@ export class PoisonMoveAnimations {
     const bubbles: Promise<void>[] = [];
     for (let i = 0; i < 16; i++) {
       const size = 9 + Math.random() * 14;
-      const b = PoisonMoveAnimations.poisonBubble(size);
+      const b = FxGlyphs.poisonBubble(size);
       Fx.place(b, {
         x: target.x + (Math.random() * 2 - 1) * spreadX,
         y: target.y + (0.2 + Math.random() * 0.8) * spreadY
@@ -441,7 +435,7 @@ export class PoisonMoveAnimations {
       ], { duration: 850, easing: 'ease-in-out', fill: 'none' })
     ];
     for (let i = 0; i < 14; i++) {
-      const bubble = PoisonMoveAnimations.poisonBubble(7 + Math.random() * 9);
+      const bubble = FxGlyphs.poisonBubble(7 + Math.random() * 9);
       Fx.place(bubble, target);
       fxEl.appendChild(bubble);
       const ang = (Math.PI * 2 * i) / 14 + Math.random() * 0.4;
@@ -524,7 +518,7 @@ export class PoisonMoveAnimations {
       const t = (i + 1) / 6;
       effects.push(
         Fx.wait(t * flight).then(() => {
-          const b = PoisonMoveAnimations.poisonBubble(6 + Math.random() * 5);
+          const b = FxGlyphs.poisonBubble(6 + Math.random() * 5);
           Fx.place(b, { x: launch.x + dx * t, y: launch.y + dy * t - Math.sin(t * Math.PI) * lift });
           fxEl.appendChild(b);
           return Fx.anim(b, [{ transform: 'translateY(0)', opacity: 0.9 }, { transform: 'translateY(14px) scale(.5)', opacity: 0 }], { duration: 400, easing: 'ease-in' }).then(() => b.remove());
@@ -540,7 +534,7 @@ export class PoisonMoveAnimations {
     const spread = Math.max(tr.width, 60);
     for (let i = 0; i < 18; i++) {
       const s = 10 + Math.random() * 16;
-      const b = PoisonMoveAnimations.poisonBubble(s);
+      const b = FxGlyphs.poisonBubble(s);
       Fx.place(b, target);
       fxEl.appendChild(b);
       const ang = -Math.PI / 2 + (Math.random() * 2 - 1) * Math.PI * 0.75;

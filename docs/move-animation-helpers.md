@@ -63,16 +63,16 @@ static readonly anims: MoveAnimRegistry = {
 ## `FxGlyphs` — particles and props (`fx-glyphs.ts`)
 All return an absolutely positioned element; place it with `Fx.place`.
 - **Energy:** `sparkStar(size, color)` 4-point star · `fivePointStar(size, glow)` · `ringSparkle(size, color, ring)` · `psySparkle(size)` · `spikyBurst(size, outer, inner, centre?)` comic impact burst · `glyph(v, size)` type particle · `boltGlyph(color, size)` · `sparkBolt()`.
-- **Elements:** `firePuff(size, 'hot'|'red')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `pointedRock(w)` sharp stone, tip up · `petalGlyph(s, color)` · `leafGlyph(s)`.
+- **Elements:** `firePuff(size, 'hot'|'red')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `pointedRock(w)` sharp stone, tip up · `poisonBubble(size)` glossy purple bubble · `petalGlyph(s, color)` · `leafGlyph(s)`.
 - **Body parts:** `fistGlyph(w, tone)` (tones in `FIST_TONES`: yellow, red, ice, blue, dark, brown) · `footGlyph(w, color?)` · `chopHandGlyph(w)` · `gloveGlyph(w)` · `pointingHandGlyph(w)` · `jawGlyph(w, h, lower)` · `incisorGlyph(h)` · `snakeEyeGlyph(w, side)`.
-- **Props:** `swordGlyph(h)` · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
+- **Props:** `swordGlyph(h)` · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `itemBag(size)` cream item sack (Trick, Switcheroo) · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
 
 ## Constants (`animation.constants.ts`)
 `DIM_BACKDROP` (dark scene) · `HEAT_BACKDROP` (red-hot) · `PSYCHIC_WAVES`, `WATERFALL_WAVES` (tiling backgrounds) · `FIST_TONES` · `FLECK_COLOR` (statUp green, statDown red, poison purple, …) · `TYPE_STYLE` · `BUBBLE_DRIFT` / `BUBBLE_BEAM`.
 
 ## Reusable pieces inside type files (private, but worth knowing)
 - `ElectricMoveAnimations.crackle(el, size, color)` flickering sparks, `groundStreak(...)` (electric-moves.ts).
-- `PoisonMoveAnimations.poisonBubble(size)`, `sludgeGlob(size)` (poison-moves.ts).
+- `PoisonMoveAnimations.sludgeGlob(size)` (poison-moves.ts).
 - `BugMoveAnimations.webGlyph(...)`, `beeGlyph(w)` (bug-moves.ts).
 - `PsychicFx` dim / tremble effects (psychic/psychic-fx.ts), `FireFlames` (fire/fire-flames.ts), `WaterCrash` splash (water/water-crash.ts).
 

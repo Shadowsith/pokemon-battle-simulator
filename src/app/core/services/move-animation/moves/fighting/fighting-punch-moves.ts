@@ -4,8 +4,9 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { HammerArm } from './hammer-arm';
+import { WakeUpSlap } from './wake-up-slap';
 
-/** Hand-made animations for Fighting-type punches, chops and full-power blows (Hammer Arm lives in `hammer-arm.ts`). */
+/** Hand-made animations for Fighting-type punches, chops and full-power blows (Hammer Arm and Wake-Up Slap live in `hammer-arm.ts` / `wake-up-slap.ts`). */
 export class FightingPunchMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -17,7 +18,8 @@ export class FightingPunchMoveAnimations {
     focuspunch: (refs, launch, target) => FightingPunchMoveAnimations.playFocusPunch(refs, launch, target),
     hammerarm: (refs, launch, target, v) => HammerArm.play(refs, launch, target, v),
     skyuppercut: (refs) => FightingPunchMoveAnimations.playSkyUppercut(refs),
-    superpower: (refs, launch, target, v) => FightingPunchMoveAnimations.playSuperpower(refs, launch, target, v)
+    superpower: (refs, launch, target, v) => FightingPunchMoveAnimations.playSuperpower(refs, launch, target, v),
+    wakeupslap: (refs, launch, target) => WakeUpSlap.play(refs, launch, target)
   };
 
   /**

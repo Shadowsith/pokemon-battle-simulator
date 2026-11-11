@@ -449,14 +449,16 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + recoil (~0.29 s): a heavy wooden whack and a hollow knock back on the user. */
+  /** Custom (green glow 0 s and 0.15 s, ram 0.3 s, impact 0.5 s, logs and leaves to ~1.35 s, recoil 0.62 s): two leafy shimmers, a heavy wooden crack, rustling debris. */
   woodhammer: () => {
-    const s = new MoveSfx(0.9, 0x3f6a);
-    s.whoosh(0.0, 0.17, { from: 800, to: 3500, gain: 0.3 });
-    s.thud(0.17, 0.85, 1);
-    s.wave(0.17, 0.25, { freq: (u) => 330 * Math.pow(0.6, u), gain: env.decay(0.35, 1.5) });
-    s.noise(0.2, 0.25, { clock: () => 3000, gain: env.decay(0.15, 1.5) });
-    s.thud(0.29, 0.3, 0.3);
+    const s = new MoveSfx(1.5, 0x3f6a);
+    s.wave(0.0, 0.12, { freq: () => 660, gain: env.decay(0.12, 1.5) });
+    s.wave(0.15, 0.12, { freq: () => 784, gain: env.decay(0.12, 1.5) });
+    s.whoosh(0.3, 0.2, { from: 800, to: 3500, gain: 0.3 });
+    s.thud(0.5, 0.85, 1);
+    s.wave(0.5, 0.25, { freq: (u) => 330 * Math.pow(0.6, u), gain: env.decay(0.35, 1.5) });
+    s.noise(0.53, 0.5, { clock: () => 3000, gain: env.decay(0.15, 1.5) });
+    s.thud(0.62, 0.3, 0.3);
     return s;
   },
 

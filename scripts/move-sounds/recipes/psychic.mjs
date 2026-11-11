@@ -636,14 +636,16 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) on the whole field: space twists inside out, a warped tone flips direction. */
+  /** Custom (white flash 0-0.3 s, grid room 0.15-0.45 s, drift and pulse 0.45-1.25 s, flicker out 1.25-1.8 s): a bright shimmer, a twisting warble, a stuttering low hum. */
   trickroom: () => {
-    const s = new MoveSfx(1.3, 0x7c00);
-    s.wave(0.02, 0.9, { freq: (u) => (u < 0.5 ? 300 + 600 * u * 2 : 900 - 600 * (u - 0.5) * 2) * (1 + 0.04 * Math.sin(2 * Math.PI * 12 * u)), gain: env.swell(0.25) });
-    s.pulse(0.02, 0.9, { freq: (u) => (u < 0.5 ? 900 - 600 * u * 2 : 300 + 600 * (u - 0.5) * 2), gain: env.swell(0.09), duty: 0.125 });
-    s.noise(0.4, 0.15, { clock: () => 5000, gain: env.swell(0.12), short: true });
-    s.pulse(0.85, 0.35, { freq: () => 220, gain: env.decay(0.18, 1.5), duty: 0.25 });
-    s.pulse(0.85, 0.35, { freq: () => 233, gain: env.decay(0.12, 1.5), duty: 0.25 });
+    const s = new MoveSfx(2.0, 0x7c00);
+    s.noise(0.0, 0.3, { clock: env.ramp(9000, 4000), gain: env.decay(0.2, 2), short: true });
+    s.sparkle(0.0, 0.3, 5, { lo: 3000, hi: 6000, gain: 0.12 });
+    s.wave(0.15, 1.1, { freq: (u) => (u < 0.5 ? 300 + 600 * u * 2 : 900 - 600 * (u - 0.5) * 2) * (1 + 0.04 * Math.sin(2 * Math.PI * 12 * u)), gain: env.swell(0.25) });
+    s.pulse(0.15, 1.1, { freq: (u) => (u < 0.5 ? 900 - 600 * u * 2 : 300 + 600 * (u - 0.5) * 2), gain: env.swell(0.09), duty: 0.125 });
+    for (const at of [1.25, 1.36, 1.47]) s.pulse(at, 0.06, { freq: () => 220, gain: env.decay(0.16, 1.5), duty: 0.25 });
+    s.pulse(1.58, 0.3, { freq: () => 220, gain: env.decay(0.16, 1.5), duty: 0.25 });
+    s.pulse(1.58, 0.3, { freq: () => 233, gain: env.decay(0.12, 1.5), duty: 0.25 });
     return s;
   },
 
@@ -657,14 +659,15 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + flinch fleck: a headbutt charged with a warbling psychic hum. */
+  /** Custom (dim 0-0.25 s, energy gathers 0.25-0.8 s, ram 0.8 s, hit 0.95 s, sparkles to ~1.75 s, clear to 2.05 s): a rising psychic warble, a ringing head-butt, a sparkly scatter. */
   zenheadbutt: () => {
-    const s = new MoveSfx(0.95, 0x2e4b);
-    s.wave(0.0, 0.2, { freq: (u) => (400 + 500 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 8 * u)), gain: env.ramp(0.1, 0.3) });
-    s.whoosh(0.0, 0.18, { from: 1500, to: 6000, gain: 0.25 });
-    s.thud(0.17, 0.6, 0.6);
-    s.wave(0.18, 0.35, { freq: (u) => 900 * Math.pow(0.6, u), gain: env.decay(0.25, 1.5) });
-    s.flinch(0.45);
+    const s = new MoveSfx(2.15, 0x2e4b);
+    s.wave(0.25, 0.55, { freq: (u) => (400 + 500 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 8 * u)), gain: env.ramp(0.08, 0.3) });
+    s.sparkle(0.25, 0.5, 5, { lo: 2500, hi: 4500, gain: 0.08 });
+    s.whoosh(0.8, 0.15, { from: 1500, to: 6000, gain: 0.25 });
+    s.thud(0.95, 0.6, 0.6);
+    s.wave(0.95, 0.35, { freq: (u) => 900 * Math.pow(0.6, u), gain: env.decay(0.25, 1.5) });
+    s.sparkle(1.05, 0.7, 8, { lo: 2500, hi: 5000, gain: 0.1 });
     return s;
   },
 };

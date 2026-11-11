@@ -6,8 +6,9 @@ import { FxEffects } from '../../fx-effects';
 import { PsychicFx } from './psychic-fx';
 import { HyperspaceHole } from './hyperspace-hole';
 import { PsychoCut } from './psycho-cut';
+import { ZenHeadbutt } from './zen-headbutt';
 
-/** Hand-made animations for Psychic-type attacks. */
+/** Hand-made animations for Psychic-type attacks (Hyperspace Hole, Psycho Cut and Zen Headbutt have their own files). */
 export class PsychicAttackMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -18,7 +19,8 @@ export class PsychicAttackMoveAnimations {
     lusterpurge: (refs, launch, target) => PsychicAttackMoveAnimations.playLusterPurge(refs, launch, target),
     psychic: (refs) => PsychicAttackMoveAnimations.playPsychic(refs),
     psychoboost: (refs, launch, target) => PsychicAttackMoveAnimations.playPsychoBoost(refs, launch, target),
-    psychocut: (refs, launch, target, v) => PsychoCut.play(refs, launch, target, v)
+    psychocut: (refs, launch, target, v) => PsychoCut.play(refs, launch, target, v),
+    zenheadbutt: (refs, launch, target, v) => ZenHeadbutt.play(refs, launch, target, v)
   };
 
   static readonly chargeAnims: MoveAnimRegistry = {

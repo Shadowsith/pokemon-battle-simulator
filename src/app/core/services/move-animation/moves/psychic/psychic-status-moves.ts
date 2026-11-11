@@ -5,8 +5,9 @@ import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { HealingWish } from './healing-wish';
 import { PsychicFx } from './psychic-fx';
+import { TrickRoom } from './trick-room';
 
-/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Healing Wish lives in `healing-wish.ts`). */
+/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Healing Wish and Trick Room live in `healing-wish.ts` / `trick-room.ts`). */
 export class PsychicStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -20,7 +21,8 @@ export class PsychicStatusMoveAnimations {
     magiccoat: (refs, launch) => PsychicStatusMoveAnimations.playMagicCoat(refs, launch),
     reflect: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.REFLECT),
     rest: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playRest(refs, launch, v),
-    trick: (refs, launch, target) => PsychicStatusMoveAnimations.playTrick(refs, launch, target)
+    trick: (refs, launch, target) => PsychicStatusMoveAnimations.playTrick(refs, launch, target),
+    trickroom: (refs) => TrickRoom.play(refs)
   };
 
   /**
@@ -57,7 +59,7 @@ export class PsychicStatusMoveAnimations {
     const bags = [0, Math.PI].map(async (a0) => {
       const wrap = document.createElement('div');
       wrap.style.cssText = 'position:absolute;width:0;height:0;pointer-events:none';
-      const bag = PsychicStatusMoveAnimations.trickBag(size);
+      const bag = FxGlyphs.itemBag(size);
       bag.style.left = `${-size / 2}px`;
       bag.style.top = `${-size * 0.55}px`;
       wrap.appendChild(bag);
@@ -82,18 +84,6 @@ export class PsychicStatusMoveAnimations {
 
     await Fx.anim(grey, [{ opacity: 0.85 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     grey.remove();
-  }
-
-  /** A cream sack, `size` px wide: domed top, wider at the bottom, shaded round its sides (Trick). */
-  private static trickBag(size: number): HTMLElement {
-    const el = document.createElement('div');
-    el.style.cssText = `position:absolute;width:${size}px;height:${size * 1.05}px;pointer-events:none;filter:drop-shadow(0 1px 2px #00000088)`;
-    el.innerHTML =
-      '<svg width="100%" height="100%" viewBox="0 0 24 25"><defs><linearGradient id="trickBag" x1="0" y1="0" x2="1" y2="0">' +
-      '<stop offset="0" stop-color="#C8C098"/><stop offset=".35" stop-color="#FFFBE6"/><stop offset=".7" stop-color="#ECE4C0"/><stop offset="1" stop-color="#B8B088"/></linearGradient></defs>' +
-      '<path d="M2,23 L5,6 Q6,1 12,1 Q18,1 19,6 L22,23 Q12,25 2,23 Z" fill="url(#trickBag)" stroke="#8A8466" stroke-width=".8" stroke-linejoin="round"/>' +
-      '</svg>';
-    return el;
   }
 
   /**

@@ -678,44 +678,44 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Tiefschlag
   - Gen 4 APNG: https://www.pokewiki.de/images/7/7d/Tiefschlag_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/36/Tiefschlag_Gen5.png
-- [ ] ⭐ **Switcheroo** / Wechseldich — `switcheroo` · Dark · Status · `targetAura`
+- [x] ⭐ **Switcheroo** / Wechseldich — `switcheroo` · Dark · Status · the scene darkens, a cream item bag pops up in front of each Pokémon and the two swap places in one crossing arc, then fade (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Wechseldich
   - Gen 4 APNG: https://www.pokewiki.de/images/8/84/Wechseldich_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/d9/Wechseldich_Gen5.png
-- [ ] ⭐ **Tailwind** / Rückenwind — `tailwind` · Flying · Status · `selfAura`
+- [x] ⭐ **Tailwind** / Rückenwind — `tailwind` · Flying · Status · pale scene, white wind streaks blow across the whole field from behind the user, which sways forward with the gusts (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/R%C3%BCckenwind
   - Gen 4 APNG: https://www.pokewiki.de/images/f/f7/R%C3%BCckenwind_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/7/7d/R%C3%BCckenwind_Gen5.png
 - [ ] **Thunder Fang** / Donnerzahn — `thunderfang` · Electric · Physical · `melee`
-- [ ] ⭐ **Toxic Spikes** / Giftspitzen — `toxicspikes` · Poison · Status · `targetAura`
+- [x] ⭐ **Toxic Spikes** / Giftspitzen — `toxicspikes` · Poison · Status · four purple three-pronged spikes are lobbed onto the foe's side one after another, poison bubbles bubble up from them, then they fade (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Giftspitzen
   - Gen 4 APNG: https://www.pokewiki.de/images/9/95/Giftspitzen_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/85/Giftspitzen_Gen5.png
-- [ ] ⭐ **Trick Room** / Bizarroraum — `trickroom` · Psychic · Status · `targetAura`
+- [x] ⭐ **Trick Room** / Bizarroraum — `trickroom` · Psychic · Status · white-cyan flash, the scene becomes a dark room of glowing cyan grid lines (floor in perspective and back wall) that drifts, pulses and flickers out (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Bizarroraum
   - Gen 4 APNG: https://www.pokewiki.de/images/2/24/Bizarroraum_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/ae/Bizarroraum_Gen5.png
 - [ ] **Trump Card** / Trumpfkarte — `trumpcard` · Normal · Special · `projectile`
-- [ ] ⭐ **U-turn** / Kehrtwende — `uturn` · Bug · Physical · `melee`
+- [x] ⭐ **U-turn** / Kehrtwende — `uturn` · Bug · Physical · the user fades out as a white orb that arcs onto the target, white rings whirl round it with sparkles, the orb arcs back and the user fades in (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kehrtwende
   - Gen 4 APNG: https://www.pokewiki.de/images/e/ee/Kehrtwende_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e8/Kehrtwende_Gen5.png
 - [ ] **Vacuum Wave** / Vakuumwelle — `vacuumwave` · Fighting · Special · `projectile`
-- [ ] ⭐ **Wake-Up Slap** / Weckruf — `wakeupslap` · Fighting · Physical · `melee`
+- [x] ⭐ **Wake-Up Slap** / Weckruf — `wakeupslap` · Fighting · Physical · a dark grey hand slaps the target's face from the far side, then from the near side, each slap spraying pale blue stars (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Weckruf
   - Gen 4 APNG: https://www.pokewiki.de/images/4/42/Weckruf_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/88/Weckruf_Gen5.png
-- [ ] ⭐ **Wood Hammer** / Holzhammer — `woodhammer` · Grass · Physical · `melee`
+- [x] ⭐ **Wood Hammer** / Holzhammer — `woodhammer` · Grass · Physical · the user glows green twice and rams, splintered logs, green leaves and yellow stars burst off the target, recoil flash on the user (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Holzhammer
   - Gen 4 APNG: https://www.pokewiki.de/images/9/95/Holzhammer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/55/Holzhammer_Gen5.png
 - [ ] **Worry Seed** / Sorgensamen — `worryseed` · Grass · Status · `targetAura`
 - [ ] **Wring Out** / Auswringen — `wringout` · Normal · Special · `projectile`
-- [ ] ⭐ **X-Scissor** / Kreuzschere — `xscissor` · Bug · Physical · `melee`
+- [x] ⭐ **X-Scissor** / Kreuzschere — `xscissor` · Bug · Physical · the user darts while two red blade streaks sweep across the target into an X, a big white starburst glints and red specks scatter (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kreuzschere
   - Gen 4 APNG: https://www.pokewiki.de/images/5/52/Kreuzschere_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/3d/Kreuzschere_Gen5.png
-- [ ] ⭐ **Zen Headbutt** / Zen-Kopfstoß — `zenheadbutt` · Psychic · Physical · `melee`
+- [x] ⭐ **Zen Headbutt** / Zen-Kopfstoß — `zenheadbutt` · Psychic · Physical · dim scene, cyan streaks rush onto the user's head as a pale blue orb swells, the user rams, white stars burst and purple / cyan sparkles scatter (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Zen-Kopfsto%C3%9F
   - Gen 4 APNG: https://www.pokewiki.de/images/1/1d/Zen-Kopfsto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/fc/Zen-Kopfsto%C3%9F_Gen5.png

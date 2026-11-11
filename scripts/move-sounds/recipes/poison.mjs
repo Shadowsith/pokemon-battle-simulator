@@ -230,16 +230,17 @@ export const POISON = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) on the foe side: toxic barbs scatter and clink onto the ground. */
+  /** Custom (four spikes thrown 0-0.36 s, landing 0.45-0.81 s every 0.12 s, bubbles to ~1.4 s, fade to 1.65 s): spikes whizz over and clink down, then poison bubbles gurgle. */
   toxicspikes: () => {
-    const s = new MoveSfx(1.2, 0x7059);
-    s.whoosh(0.0, 0.35, { from: 2000, to: 5000, gain: 0.18 });
-    for (let i = 0; i < 6; i++) {
-      const at = 0.25 + i * 0.09 + s.random() * 0.03;
+    const s = new MoveSfx(1.85, 0x7059);
+    for (let i = 0; i < 4; i++) {
+      s.whoosh(i * 0.12, 0.3, { from: 2000, to: 5000, gain: 0.12 });
+      const at = 0.45 + i * 0.12;
       s.pulse(at, 0.05, { freq: () => 2400 + s.random() * 1200, gain: env.decay(0.22, 1.5), duty: 0.125 });
       s.noise(at, 0.04, { clock: () => 9000, gain: env.decay(0.15, 1), short: true });
     }
-    s.pulse(0.55, 0.45, { freq: (u) => (280 - 90 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.15), duty: 0.25 });
+    s.bubbles(0.5, 0.9, 10, { lo: 400, hi: 1100, gain: 0.18 });
+    s.pulse(0.6, 0.9, { freq: (u) => (280 - 90 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.13), duty: 0.25 });
     return s;
   },
 

@@ -11,8 +11,9 @@ import { PowerWhip } from './grass/power-whip';
 import { SeedBomb } from './grass/seed-bomb';
 import { SeedFlare } from './grass/seed-flare';
 import { SpikyShield } from './grass/spiky-shield';
+import { WoodHammer } from './grass/wood-hammer';
 
-/** Hand-made animations for Grass-type moves (Energy Ball, Grass Knot, Leaf Storm, Petal Blizzard, Power Whip, Seed Bomb, Seed Flare and Spiky Shield live in `grass/`). */
+/** Hand-made animations for Grass-type moves (Energy Ball, Grass Knot, Leaf Storm, Petal Blizzard, Power Whip, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -34,7 +35,8 @@ export class GrassMoveAnimations {
     solarbeam: (refs, _launch, target) => GrassMoveAnimations.playSolarBeam(refs, target),
     spikyshield: (refs, launch, _target, v) => SpikyShield.play(refs, launch, v),
     spore: (refs, _launch, target, v) => GrassMoveAnimations.playSpore(refs, target, v),
-    synthesis: (refs, launch) => GrassMoveAnimations.playSynthesis(refs, launch)
+    synthesis: (refs, launch) => GrassMoveAnimations.playSynthesis(refs, launch),
+    woodhammer: (refs, launch, target, v) => WoodHammer.play(refs, launch, target, v)
   };
 
   /** Turn-1 animations of two-turn Grass moves, by @pkmn/sim move id. */
