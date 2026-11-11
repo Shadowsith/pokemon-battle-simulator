@@ -313,14 +313,17 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic field (field shake + waves ~0.6 s) + burn fleck (~0.7 s): lava erupts in a ring - a bubbling, boiling roar with molten gloops. */
+  /** Custom (three waves of fire and smoke at 0 / 0.28 / 0.56 s, target glows red at 0.6 s, smoke fades to ~1.7 s): rolling eruptions - a boiling roar with molten gloops. */
   lavaplume: () => {
-    const s = new MoveSfx(1.25, 0x1a7a);
-    s.thud(0.02, 0.6, 0.8);
-    s.noise(0.0, 0.7, { clock: (u) => 1600 - 900 * u, gain: env.swell(0.45) });
-    s.pulse(0.0, 0.65, { freq: (u) => 90 + 25 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.22), duty: 0.5 });
-    s.bubbles(0.08, 0.55, 7, { lo: 160, hi: 320, gain: 0.22 });
-    s.burn(0.7);
+    const s = new MoveSfx(1.85, 0x1a7a);
+    for (const at of [0, 0.28, 0.56]) {
+      s.thud(at + 0.02, 0.45, 0.8);
+      s.noise(at, 0.5, { clock: (u) => 1600 - 900 * u, gain: env.attackDecay(0.32, 0.1) });
+    }
+    s.pulse(0.0, 1.1, { freq: (u) => 90 + 25 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.2), duty: 0.5 });
+    s.thud(0.6, 0.6, 0.7);
+    s.bubbles(0.1, 1.0, 9, { lo: 160, hi: 320, gain: 0.2 });
+    s.noise(0.9, 0.8, { clock: () => 700, gain: env.decay(0.18, 1.5) });
     return s;
   },
 

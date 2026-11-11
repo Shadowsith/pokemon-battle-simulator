@@ -358,14 +358,16 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s), bp 140: a long wind-up rush and an all-out, booming body blow. */
+  /** Custom (stars swirl in 0-0.8 s, dart 0.8 s, hit 0.92 s, golden burst and scattering stars to ~1.65 s): twinkling stars swirl in, an all-out blow, a starry burst. */
   lastresort: () => {
-    const s = new MoveSfx(0.95, 0x1a57);
-    s.pulse(0.0, 0.17, { freq: env.ramp(300, 900), gain: env.ramp(0.08, 0.2), duty: 0.25 });
-    s.whoosh(0.0, 0.18, { from: 1500, to: 8000, gain: 0.35 });
-    s.thud(0.17, 0.8, 1);
-    s.noise(0.17, 0.3, { clock: (u) => 12000 - 9000 * u, gain: env.attackDecay(0.4, 0.03) });
-    s.pulse(0.2, 0.45, { freq: (u) => 110 * Math.pow(0.5, u), gain: env.decay(0.3, 1.5), duty: 0.5 });
+    const s = new MoveSfx(1.8, 0x1a57);
+    s.sparkle(0.0, 0.8, 14, { lo: 2000, hi: 4000, gain: 0.1 });
+    s.pulse(0.0, 0.8, { freq: env.ramp(300, 900), gain: env.ramp(0.04, 0.16), duty: 0.25 });
+    s.whoosh(0.78, 0.14, { from: 1500, to: 8000, gain: 0.3 });
+    s.thud(0.92, 0.8, 1);
+    s.noise(0.92, 0.3, { clock: (u) => 12000 - 9000 * u, gain: env.attackDecay(0.4, 0.03) });
+    s.pulse(0.95, 0.45, { freq: (u) => 110 * Math.pow(0.5, u), gain: env.decay(0.3, 1.5), duty: 0.5 });
+    s.arpeggio(1.0, [84, 88, 91], 0.06, { gain: 0.12, voice: 'wave', hold: 0.12 });
     return s;
   },
 

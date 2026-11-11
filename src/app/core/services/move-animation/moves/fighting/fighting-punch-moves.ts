@@ -3,8 +3,9 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { HammerArm } from './hammer-arm';
 
-/** Hand-made animations for Fighting-type punches, chops and full-power blows. */
+/** Hand-made animations for Fighting-type punches, chops and full-power blows (Hammer Arm lives in `hammer-arm.ts`). */
 export class FightingPunchMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -14,6 +15,7 @@ export class FightingPunchMoveAnimations {
     drainpunch: (refs, launch, target) => FightingPunchMoveAnimations.playDrainPunch(refs, launch, target),
     dynamicpunch: (refs, _launch, target) => FightingPunchMoveAnimations.playDynamicPunch(refs, target),
     focuspunch: (refs, launch, target) => FightingPunchMoveAnimations.playFocusPunch(refs, launch, target),
+    hammerarm: (refs, launch, target, v) => HammerArm.play(refs, launch, target, v),
     skyuppercut: (refs) => FightingPunchMoveAnimations.playSkyUppercut(refs),
     superpower: (refs, launch, target, v) => FightingPunchMoveAnimations.playSuperpower(refs, launch, target, v)
   };

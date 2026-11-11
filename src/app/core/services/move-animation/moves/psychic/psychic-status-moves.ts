@@ -3,9 +3,10 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { HealingWish } from './healing-wish';
 import { PsychicFx } from './psychic-fx';
 
-/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks). */
+/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Healing Wish lives in `healing-wish.ts`). */
 export class PsychicStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -14,6 +15,7 @@ export class PsychicStatusMoveAnimations {
     barrier: (refs, launch) => PsychicStatusMoveAnimations.playBarrier(refs, launch),
     calmmind: (refs, launch) => PsychicStatusMoveAnimations.playCalmMind(refs, launch),
     cosmicpower: (refs, launch) => PsychicStatusMoveAnimations.playCosmicPower(refs, launch),
+    healingwish: (refs, launch) => HealingWish.play(refs, launch),
     lightscreen: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.LIGHT_SCREEN),
     magiccoat: (refs, launch) => PsychicStatusMoveAnimations.playMagicCoat(refs, launch),
     reflect: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.REFLECT),

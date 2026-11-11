@@ -304,15 +304,16 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a divine orb of light that bursts on the target. */
+  /** Custom (pale 0-0.3 s, dark orbs gather 0.3-0.8 s, streaks flash 0.8-1.25 s, black burst 1.25 s to ~1.65 s): a solemn gathering chord, a rising charge, a divine blast. */
   judgment: () => {
-    const s = new MoveSfx(1.25, 0x10d6);
-    s.chord(0.0, 0.48, [72, 79, 84, 88], { rate: 0.03, gain: 0.34 });
-    s.wave(0.0, 0.45, { freq: (u) => 523 * Math.pow(2, u), gain: env.ramp(0.08, 0.2) });
-    s.thud(0.43, 0.6, 0.8);
-    s.noise(0.43, 0.3, { clock: (u) => 14000 - 9000 * u, gain: env.attackDecay(0.4, 0.03) });
-    s.sparkle(0.48, 0.6, 10, { lo: 3500, hi: 6500, gain: 0.14 });
-    s.rumble(0.45, 0.6, { from: 400, to: 150, gain: 0.2 });
+    const s = new MoveSfx(2.1, 0x10d6);
+    s.chord(0.0, 0.8, [60, 67, 72, 76], { rate: 0.04, gain: 0.26 });
+    s.sparkle(0.3, 0.5, 6, { lo: 2500, hi: 4500, gain: 0.08 });
+    s.wave(0.8, 0.45, { freq: (u) => 523 * Math.pow(2, u), gain: env.ramp(0.08, 0.22) });
+    s.noise(0.8, 0.45, { clock: env.ramp(3000, 12000), gain: env.ramp(0.04, 0.16), short: true });
+    s.thud(1.25, 0.65, 0.8);
+    s.noise(1.25, 0.35, { clock: (u) => 14000 - 9000 * u, gain: env.attackDecay(0.4, 0.03) });
+    s.rumble(1.27, 0.6, { from: 400, to: 150, gain: 0.22 });
     return s;
   },
 

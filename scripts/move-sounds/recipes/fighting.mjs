@@ -237,14 +237,15 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee punch (impact 0.17 s): a heavy overhead hammer-fist, then the fighter slows down. */
+  /** Custom (hammer swings down 0-0.45 s, hit 0.45 s, bounces off to ~1.05 s, Speed-drop bubbles 1.05-1.95 s): a heavy swing, a huge clonk, then a slowing tone. */
   hammerarm: () => {
-    const s = new MoveSfx(0.9, 0x4a3a);
-    s.whoosh(0.0, 0.18, { from: 700, to: 2500, gain: 0.35 });
-    s.thud(0.17, 0.9, 1);
-    s.thud(0.21, 0.4, 0.8);
-    s.rumble(0.18, 0.45, { from: 400, to: 120, gain: 0.25 });
-    s.pulse(0.45, 0.25, { freq: (u) => 330 - 120 * u, gain: env.decay(0.12, 1.5), duty: 0.5 });
+    const s = new MoveSfx(2.1, 0x4a3a);
+    s.whoosh(0.05, 0.4, { from: 500, to: 2500, gain: 0.35 });
+    s.thud(0.45, 1.0, 1);
+    s.pulse(0.45, 0.35, { freq: () => 880, gain: env.decay(0.12, 2), duty: 0.5 });
+    s.rumble(0.46, 0.5, { from: 400, to: 120, gain: 0.3 });
+    s.pulse(1.05, 0.7, { freq: (u) => 523 * Math.pow(0.5, u), gain: env.decay(0.14, 1.2), duty: 0.5 });
+    s.bubbles(1.1, 0.7, 6, { lo: 700, hi: 300, gain: 0.1 });
     return s;
   },
 

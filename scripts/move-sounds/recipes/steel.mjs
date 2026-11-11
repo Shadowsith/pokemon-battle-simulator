@@ -67,15 +67,17 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic lob (arc 0.52 s → impact): a whirring steel top spins through the air and clanks into the target. */
+  /** Custom (glint ring spins up 0-0.8 s, dart and hit 0.92 s, white whirl grinds to ~1.65 s): a whirring spin-up, a clank, a grinding whirr. */
   gyroball: () => {
-    const s = new MoveSfx(1.2, 0x9b0a);
-    s.noise(0.0, 0.55, { clock: (u) => 3000 + 2000 * Math.sin(2 * Math.PI * 9 * u), gain: env.ramp(0.12, 0.32), short: true });
-    s.pulse(0.0, 0.55, { freq: (u) => 600 + 500 * u + 120 * Math.sin(2 * Math.PI * 12 * u), gain: env.ramp(0.1, 0.24), duty: 0.25 });
-    s.thud(0.52, 0.45, 0.6);
-    s.noise(0.52, 0.08, { clock: () => 9000, gain: env.decay(0.4, 1), short: true });
-    s.pulse(0.52, 0.6, { freq: () => 1760, gain: env.decay(0.22, 1.5), duty: 0.5 });
-    s.pulse(0.52, 0.5, { freq: () => 2490, gain: env.decay(0.08, 2), duty: 0.5 });
+    const s = new MoveSfx(1.8, 0x9b0a);
+    s.noise(0.0, 0.8, { clock: (u) => 3000 + 2500 * u + 2000 * Math.sin(2 * Math.PI * 12 * u), gain: env.ramp(0.08, 0.3), short: true });
+    s.pulse(0.0, 0.8, { freq: (u) => 400 + 900 * u + 120 * Math.sin(2 * Math.PI * 16 * u), gain: env.ramp(0.06, 0.22), duty: 0.25 });
+    s.whoosh(0.8, 0.12, { from: 2000, to: 7000, gain: 0.25 });
+    s.thud(0.92, 0.5, 0.6);
+    s.noise(0.92, 0.08, { clock: () => 9000, gain: env.decay(0.4, 1), short: true });
+    s.pulse(0.92, 0.6, { freq: () => 1760, gain: env.decay(0.2, 1.5), duty: 0.5 });
+    s.noise(0.95, 0.6, { clock: (u) => 6000 + 2000 * Math.sin(2 * Math.PI * 14 * u), gain: env.decay(0.18, 1.5), short: true });
+    s.sparkle(1.0, 0.45, 6, { lo: 3000, hi: 5500, gain: 0.1 });
     return s;
   },
 
@@ -108,14 +110,15 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + flinch fleck (0.45 s): a heavy headbutt with a ringing metal clang. */
+  /** Custom (steel rush 0-0.25 s, glint and ram 0.25 s, impact 0.45 s, shards fall to ~1.3 s): a rushing dash, a heavy ringing clang, tinkling shards. */
   ironhead: () => {
-    const s = new MoveSfx(0.85, 0x1d4e);
-    s.whoosh(0.0, 0.17, { from: 1500, to: 6000, gain: 0.3 });
-    s.thud(0.17, 0.65, 0.8);
-    s.noise(0.17, 0.08, { clock: () => 8000, gain: env.decay(0.4, 1), short: true });
-    s.pulse(0.17, 0.4, { freq: () => 1175, gain: env.decay(0.2, 1.5), duty: 0.5 });
-    s.flinch(0.47);
+    const s = new MoveSfx(1.7, 0x1d4e);
+    s.whoosh(0.0, 0.45, { from: 1500, to: 6000, gain: 0.28 });
+    s.pulse(0.25, 0.08, { freq: () => 2490, gain: env.decay(0.1, 1.5), duty: 0.25 });
+    s.thud(0.45, 0.75, 0.8);
+    s.noise(0.45, 0.08, { clock: () => 8000, gain: env.decay(0.4, 1), short: true });
+    s.pulse(0.45, 0.5, { freq: () => 1175, gain: env.decay(0.2, 1.5), duty: 0.5 });
+    s.sparkle(0.55, 0.6, 7, { lo: 2500, hi: 4500, gain: 0.1 });
     return s;
   },
 

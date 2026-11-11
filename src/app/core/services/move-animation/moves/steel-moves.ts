@@ -3,18 +3,22 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { GyroBall } from './steel/gyro-ball';
+import { IronHead } from './steel/iron-head';
 
 /** Silver tones of Steel moves: sparkle, dust light, dust shade. */
 const SILVER = '#DDE2EC';
 const DUST: [string, string] = ['#E4E8F0', '#A9B0BE'];
 
-/** Hand-made animations for Steel-type moves. */
+/** Hand-made animations for Steel-type moves (Gyro Ball and Iron Head live in `steel/`). */
 export class SteelMoveAnimations {
   /** Hand-made Steel move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     doomdesire: (refs) => SteelMoveAnimations.playDoomDesireHit(refs),
     flashcannon: (refs, launch, target) => SteelMoveAnimations.playFlashCannon(refs, launch, target),
+    gyroball: (refs, launch, target, v) => GyroBall.play(refs, launch, target, v),
     irondefense: (refs, launch) => SteelMoveAnimations.playIronDefense(refs, launch),
+    ironhead: (refs, launch, target, v) => IronHead.play(refs, launch, target, v),
     irontail: (refs, launch, target, v) => SteelMoveAnimations.playIronTail(refs, launch, target, v),
     kingsshield: (refs, launch, _target, v) => SteelMoveAnimations.playKingsShield(refs, launch, v),
     meteormash: (refs, _launch, target) => SteelMoveAnimations.playMeteorMash(refs, target),

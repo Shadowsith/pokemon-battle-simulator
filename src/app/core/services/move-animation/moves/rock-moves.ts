@@ -2,12 +2,14 @@ import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../animati
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { HeadSmash } from './rock/head-smash';
 
-/** Hand-made animations for Rock-type moves. */
+/** Hand-made animations for Rock-type moves (Head Smash lives in `rock/`). */
 export class RockMoveAnimations {
   /** Hand-made Rock move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     diamondstorm: (refs, launch, target, v) => RockMoveAnimations.playDiamondStorm(refs, launch, target, v),
+    headsmash: (refs, _launch, target, v) => HeadSmash.play(refs, target, v),
     rockslide: (refs, _launch, target) => RockMoveAnimations.playRockSlide(refs, target),
     sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs)
   };

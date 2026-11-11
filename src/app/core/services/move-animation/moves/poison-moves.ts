@@ -10,6 +10,7 @@ export class PoisonMoveAnimations {
     acid: (refs, launch, target) => PoisonMoveAnimations.playAcidSpit(refs, launch, target),
     belch: (refs, launch, target) => PoisonMoveAnimations.playBelch(refs, launch, target),
     crosspoison: (refs, _launch, target) => PoisonMoveAnimations.playCrossPoison(refs, target),
+    gunkshot: (refs, launch, target) => PoisonMoveAnimations.playGunkShot(refs, launch, target),
     sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
     toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target)
   };
@@ -454,5 +455,109 @@ export class PoisonMoveAnimations {
       );
     }
     await Promise.all(effects);
+  }
+
+  /**
+   * Gunk Shot, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/2/20/M%C3%BClltreffer_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/c/c5/M%C3%BClltreffer_Gen5.png
+   *
+   * The scene turns purple with light streaks rushing past (0-0.3 s). A dark
+   * glob of sludge swells at the user inside a pulsing magenta ring
+   * (0.3-0.7 s), then is hurled at the target in an arc, dropping bubbles
+   * (0.7-1.05 s). It splats there (hit at 1.05 s): a spray of poison bubbles
+   * bursts outward and drifts up while the target flashes purple (to ~1.8 s);
+   * the scene clears (to ~2.1 s).
+   */
+  private static async playGunkShot(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const { PURPLE, BUBBLE } = PoisonMoveAnimations;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+
+    const bg = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#8A2EB8,#C468E8 45%,#A040D0 70%,#6A1A94)');
+    FxEffects.speedLines(bg, W, H, target.x >= launch.x ? -1 : 1, ['#F4D8FF', '#E0A8FF']);
+    await Fx.anim(bg, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // The glob swells at the user inside a pulsing magenta ring.
+    const size = Math.max(Math.max(lr.width, lr.height) * 0.45, 34);
+    const glob = PoisonMoveAnimations.sludgeGlob(size);
+    Fx.place(glob, launch);
+    fxEl.appendChild(glob);
+    const ring = document.createElement('div');
+    ring.style.cssText = `position:absolute;width:${size * 1.5}px;height:${size * 1.5}px;border-radius:50%;pointer-events:none;border:4px solid #FF4AB8;box-shadow:0 0 8px #FF7AD0,inset 0 0 8px #FF7AD0`;
+    Fx.place(ring, launch);
+    fxEl.appendChild(ring);
+    const pulse = Fx.anim(ring, [
+      { transform: 'scale(1.6)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.4 },
+      { transform: 'scale(1.1)', opacity: 0.8, offset: 0.7 },
+      { transform: 'scale(.8)', opacity: 0 }
+    ], { duration: 400, easing: 'ease-in-out' }).then(() => ring.remove());
+    await Promise.all([
+      pulse,
+      Fx.anim(glob, [
+        { transform: 'scale(.2)', opacity: 0 },
+        { transform: 'scale(1.1,.9)', opacity: 1, offset: 0.5 },
+        { transform: 'scale(.92,1.08)', opacity: 1, offset: 0.75 },
+        { transform: 'scale(1)', opacity: 1 }
+      ], { duration: 400, easing: 'ease-out', fill: 'forwards' })
+    ]);
+
+    // The throw: an arc to the target, dropping bubbles.
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const lift = 40 + Math.abs(dx) * 0.1;
+    const flight = 350;
+    const frames: Keyframe[] = [];
+    for (let k = 0; k <= 8; k++) {
+      const t = k / 8;
+      const wob = k % 2 ? 1.1 : 0.92;
+      frames.push({ transform: `translate(${dx * t}px,${dy * t - Math.sin(t * Math.PI) * lift}px) scale(${(1 + t * 0.3) * wob},${(1 + t * 0.3) / wob})` });
+    }
+    const effects: Promise<void>[] = [];
+    for (let i = 0; i < 5; i++) {
+      const t = (i + 1) / 6;
+      effects.push(
+        Fx.wait(t * flight).then(() => {
+          const b = PoisonMoveAnimations.poisonBubble(6 + Math.random() * 5);
+          Fx.place(b, { x: launch.x + dx * t, y: launch.y + dy * t - Math.sin(t * Math.PI) * lift });
+          fxEl.appendChild(b);
+          return Fx.anim(b, [{ transform: 'translateY(0)', opacity: 0.9 }, { transform: 'translateY(14px) scale(.5)', opacity: 0 }], { duration: 400, easing: 'ease-in' }).then(() => b.remove());
+        })
+      );
+    }
+    await Fx.anim(glob, frames, { duration: flight, easing: 'linear' });
+    glob.remove();
+
+    // The splat: a spray of bubbles bursts out and drifts up.
+    Fx.flash(targetEl, PURPLE, 0.8);
+    Fx.shake(targetEl, 7);
+    const spread = Math.max(tr.width, 60);
+    for (let i = 0; i < 18; i++) {
+      const s = 10 + Math.random() * 16;
+      const b = PoisonMoveAnimations.poisonBubble(s);
+      Fx.place(b, target);
+      fxEl.appendChild(b);
+      const ang = -Math.PI / 2 + (Math.random() * 2 - 1) * Math.PI * 0.75;
+      const d = spread * (0.35 + Math.random() * 0.45);
+      const x = Math.cos(ang) * d;
+      const y = Math.sin(ang) * d * 0.8;
+      effects.push(
+        Fx.anim(b, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `translate(${x * 0.8}px,${y * 0.8}px) scale(1)`, opacity: 1, offset: 0.35 },
+          { transform: `translate(${x}px,${y - 18}px) scale(1.2)`, opacity: 0 }
+        ], { duration: 650 + Math.random() * 200, delay: Math.random() * 120, easing: 'ease-out' }).then(() => b.remove())
+      );
+    }
+    effects.push(FxEffects.smokePuff(fxEl, target, Math.max(tr.width * 0.8, 60), [BUBBLE, PURPLE]));
+    setTimeout(() => Fx.shake(targetEl, 4), 250);
+    await Promise.all(effects);
+
+    await Fx.anim(bg, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    bg.remove();
   }
 }

@@ -185,13 +185,15 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) then ~1.5 s clip: a hushed, rising wish that sparkles and gently fades away. */
+  /** Custom (dark 0-0.3 s, cyan sphere and twinkles 0.3-1.1 s, user flares white and a sparkle rises 1.1-1.85 s, clears to ~2.15 s): a hushed wish, a shimmering glow, a sparkle drifting away. */
   healingwish: () => {
-    const s = new MoveSfx(1.6, 0x4e15);
-    s.chord(0.0, 0.9, [72, 76, 79, 84], { rate: 0.05, gain: 0.2, vibrato: 0.01 });
-    s.wave(0.0, 0.9, { freq: (u) => 400 + 400 * u, gain: env.swell(0.14) });
-    s.arpeggio(0.8, [84, 88, 91, 96], 0.09, { gain: 0.16, voice: 'wave', hold: 0.3 });
-    s.sparkle(0.3, 1.0, 12, { lo: 4000, hi: 7500, gain: 0.1 });
+    const s = new MoveSfx(2.3, 0x4e15);
+    s.chord(0.3, 0.85, [72, 76, 79, 84], { rate: 0.05, gain: 0.2, vibrato: 0.01 });
+    s.wave(0.3, 0.8, { freq: (u) => 400 + 300 * u, gain: env.swell(0.12) });
+    s.sparkle(0.4, 0.7, 8, { lo: 4000, hi: 7000, gain: 0.1 });
+    s.wave(1.1, 0.4, { freq: (u) => 700 + 700 * u, gain: env.swell(0.12) });
+    s.arpeggio(1.45, [84, 88, 91, 96], 0.09, { gain: 0.15, voice: 'wave', hold: 0.3 });
+    s.sparkle(1.5, 0.5, 6, { lo: 5000, hi: 8000, gain: 0.08 });
     return s;
   },
 

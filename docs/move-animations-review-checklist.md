@@ -532,48 +532,48 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Gen 5 APNG: https://www.pokewiki.de/images/1/10/Strauchler_Gen5.png
 - [ ] **Gravity** / Erdanziehung — `gravity` · Psychic · Status · `targetAura`
 - [ ] **Guard Swap** / Schutztausch — `guardswap` · Psychic · Status · `targetAura`
-- [ ] ⭐ **Gunk Shot** / Mülltreffer — `gunkshot` · Poison · Physical · `projectile`
+- [x] ⭐ **Gunk Shot** / Mülltreffer — `gunkshot` · Poison · Physical · purple rush backdrop, sludge glob swells in a magenta ring, is hurled over and splats into a spray of poison bubbles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/M%C3%BClltreffer
   - Gen 4 APNG: https://www.pokewiki.de/images/2/20/M%C3%BClltreffer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c5/M%C3%BClltreffer_Gen5.png
-- [ ] ⭐ **Gyro Ball** / Gyroball — `gyroball` · Steel · Physical · `lob`
+- [x] ⭐ **Gyro Ball** / Gyroball — `gyroball` · Steel · Physical · ring of white glints spins up round the user, it darts in, white whirl of spinning arcs grinds on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Gyroball
   - Gen 4 APNG: https://www.pokewiki.de/images/0/05/Gyroball_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/6b/Gyroball_Gen5.png
-- [ ] ⭐ **Hammer Arm** / Hammerarm — `hammerarm` · Fighting · Physical · `melee`
+- [x] ⭐ **Hammer Arm** / Hammerarm — `hammerarm` · Fighting · Physical · grey hammer swings down onto the target, which turns black for a moment, then Speed-drop bubbles on the user (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Hammerarm
   - Gen 4 APNG: https://www.pokewiki.de/images/0/08/Hammerarm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/4/42/Hammerarm_Gen5.png
-- [ ] ⭐ **Head Smash** / Kopfstoß — `headsmash` · Rock · Physical · `melee`
+- [x] ⭐ **Head Smash** / Kopfstoß — `headsmash` · Rock · Physical · dark, white ring closes in with rocks and stars, user rams, orange burst backdrop, dust cloud, target glows red, recoil (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kopfsto%C3%9F
   - Gen 4 APNG: https://www.pokewiki.de/images/1/17/Kopfsto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/67/Kopfsto%C3%9F_Gen5.png
 - [ ] **Heal Block** / Heilblockade — `healblock` · Psychic · Status · `targetAura`
 - [ ] **Heal Order** / Heilbefehl — `healorder` · Bug · Status · `selfAura`
-- [ ] ⭐ **Healing Wish** / Heilopfer — `healingwish` · Psychic · Status · `selfAura`
+- [x] ⭐ **Healing Wish** / Heilopfer — `healingwish` · Psychic · Status · dark, cyan glowing sphere with swirling ring and twinkles round the user, it flares white, a sparkle rises away (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Heilopfer
   - Gen 4 APNG: https://www.pokewiki.de/images/2/2f/Heilopfer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/18/Heilopfer_Gen5.png
 - [ ] **Heart Swap** / Statustausch — `heartswap` · Psychic · Status · `targetAura`
 - [ ] **Ice Fang** / Eiszahn — `icefang` · Ice · Physical · `melee`
 - [ ] **Ice Shard** / Eissplitter — `iceshard` · Ice · Physical · `projectile`
-- [ ] ⭐ **Iron Head** / Eisenschädel — `ironhead` · Steel · Physical · `melee`
+- [x] ⭐ **Iron Head** / Eisenschädel — `ironhead` · Steel · Physical · steel speed-line backdrop, user rams, silver burst with red core, metal shards fly off (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Eisensch%C3%A4del
   - Gen 4 APNG: https://www.pokewiki.de/images/3/3e/Eisensch%C3%A4del_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/62/Eisensch%C3%A4del_Gen5.png
-- [ ] ⭐ **Judgment** / Urteilskraft — `judgment` · Normal · Special · `projectile`
+- [x] ⭐ **Judgment** / Urteilskraft — `judgment` · Normal · Special · pale scene, dark orbs gather into a black orb on the target, grey streaks flash out, big black burst with white rays (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Urteilskraft
   - Gen 4 APNG: https://www.pokewiki.de/images/2/20/Urteilskraft_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/1a/Urteilskraft_Gen5.png
-- [ ] ⭐ **Last Resort** / Zuflucht — `lastresort` · Normal · Physical · `melee`
+- [x] ⭐ **Last Resort** / Zuflucht — `lastresort` · Normal · Physical · yellow stars swirl in on the target, user darts, golden burst and the stars scatter (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Zuflucht
   - Gen 4 APNG: https://www.pokewiki.de/images/c/ce/Zuflucht_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/5f/Zuflucht_Gen5.png
-- [ ] ⭐ **Lava Plume** / Flammensturm — `lavaplume` · Fire · Special · `field`
+- [x] ⭐ **Lava Plume** / Flammensturm — `lavaplume` · Fire · Special · three waves of fireballs and dark red smoke roll out from the user over the field, target glows red (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Flammensturm
   - Gen 4 APNG: https://www.pokewiki.de/images/3/38/Flammensturm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b1/Flammensturm_Gen5.png
-- [ ] ⭐ **Leaf Storm** / Blättersturm — `leafstorm` · Grass · Special · `projectile`
+- [x] ⭐ **Leaf Storm** / Blättersturm — `leafstorm` · Grass · Special · light green sky, storm of spinning leaves streams to the target, green flare and white flash, Sp. Atk-drop bubbles on the user (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Bl%C3%A4ttersturm
   - Gen 4 APNG: https://www.pokewiki.de/images/2/23/Bl%C3%A4ttersturm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/6b/Bl%C3%A4ttersturm_Gen5.png

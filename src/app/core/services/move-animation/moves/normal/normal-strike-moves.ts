@@ -3,11 +3,12 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { ClawStyle, FxEffects } from '../../fx-effects';
+import { LastResort } from './last-resort';
 
 /** Crush Claw's marks: black with a red glow. */
 const CRUSH_CLAW: ClawStyle = { glow: ['#FF2A2A', '#E01818'] };
 
-/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up. */
+/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Last Resort lives in `last-resort.ts`). */
 export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -15,6 +16,7 @@ export class NormalStrikeMoveAnimations {
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
     gigaimpact: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playGigaImpact(refs, target, v),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
+    lastresort: (refs, _launch, target, v) => LastResort.play(refs, target, v),
     skullbash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSkullBash(refs, target, v),
     slash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v),
     smellingsalts: (refs, _launch, target) => NormalStrikeMoveAnimations.playSmellingSalts(refs, target),

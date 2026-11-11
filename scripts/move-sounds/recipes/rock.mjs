@@ -33,14 +33,16 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + heavy recoil (~0.29 s): a stone skull smashes in, cracking rock, and the user reels hard. */
+  /** Custom (dark 0-0.2 s, ring closes with rocks 0.2-0.6 s while the user charges, impact 0.6 s, orange burst to ~1.65 s, recoil 1.65 s): a charging rush, a crushing smash with cracking rock, the user reels. */
   headsmash: () => {
-    const s = new MoveSfx(1.1, 0x45a5);
-    s.whoosh(0.0, 0.18, { from: 600, to: 3000, gain: 0.35 });
-    s.thud(0.17, 1.0, 1);
-    s.noise(0.17, 0.15, { clock: (u) => 5000 - 3500 * u, gain: env.attackDecay(0.5, 0.05) });
-    s.rumble(0.19, 0.75, { from: 600, to: 120, gain: 0.4 });
-    s.thud(0.29, 0.55, 0.7);
+    const s = new MoveSfx(2.15, 0x45a5);
+    s.wave(0.2, 0.4, { freq: (u) => 200 + 400 * u, gain: env.ramp(0.05, 0.18) });
+    s.whoosh(0.3, 0.3, { from: 600, to: 3500, gain: 0.35 });
+    s.thud(0.6, 1.0, 1);
+    s.noise(0.6, 0.2, { clock: (u) => 5000 - 3500 * u, gain: env.attackDecay(0.5, 0.05) });
+    s.rumble(0.62, 0.9, { from: 600, to: 120, gain: 0.4 });
+    s.thud(0.9, 0.4, 0.5);
+    s.thud(1.65, 0.55, 0.7);
     return s;
   },
 

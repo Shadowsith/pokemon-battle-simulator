@@ -197,14 +197,16 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s), bp 130: a fierce storm of leaves rushes over - roaring rustle, flurry of chips and a big leafy burst. */
+  /** Custom (green sky 0-0.25 s, leaf storm 0.25-1.43 s with a burst on the target at 0.85 s, clears to 1.68 s, Sp. Atk-drop bubbles 1.68-2.58 s): a roaring rush of leaves, a leafy burst, then a sinking tone. */
   leafstorm: () => {
-    const s = new MoveSfx(1.0, 0x1e57);
-    s.noise(0.0, 0.45, { clock: (u) => 2500 + 3000 * u + 600 * Math.sin(2 * Math.PI * 14 * u), gain: env.ramp(0.12, 0.4) });
-    s.sparkle(0.02, 0.4, 9, { lo: 1500, hi: 3000, gain: 0.13 });
-    s.thud(0.43, 0.6, 0.6);
-    s.noise(0.43, 0.4, { clock: (u) => 7000 - 4500 * u, gain: env.attackDecay(0.4, 0.04) });
-    s.arpeggio(0.46, [76, 72, 67], 0.06, { gain: 0.14, voice: 'wave', hold: 0.12 });
+    const s = new MoveSfx(2.7, 0x1e57);
+    s.noise(0.25, 1.15, { clock: (u) => 2500 + 2500 * Math.sin(Math.PI * u) + 600 * Math.sin(2 * Math.PI * 14 * u), gain: env.swell(0.38) });
+    s.sparkle(0.3, 1.0, 14, { lo: 1500, hi: 3000, gain: 0.12 });
+    s.thud(0.85, 0.6, 0.6);
+    s.noise(0.85, 0.4, { clock: (u) => 7000 - 4500 * u, gain: env.attackDecay(0.35, 0.04) });
+    s.arpeggio(0.88, [76, 72, 67], 0.06, { gain: 0.14, voice: 'wave', hold: 0.12 });
+    s.pulse(1.68, 0.8, { freq: (u) => 523 * Math.pow(0.5, u), gain: env.decay(0.14, 1.2), duty: 0.5 });
+    s.bubbles(1.72, 0.75, 6, { lo: 700, hi: 300, gain: 0.1 });
     return s;
   },
 

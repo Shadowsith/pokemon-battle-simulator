@@ -3,8 +3,9 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { Judgment } from './judgment';
 
-/** Hand-made animations for Normal-type ranged moves (orbs, beams, blasts, gazes). */
+/** Hand-made animations for Normal-type ranged moves (orbs, beams, blasts, gazes; Judgment lives in `judgment.ts`). */
 export class NormalRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -12,6 +13,7 @@ export class NormalRangedMoveAnimations {
     eggbomb: (refs, launch, target) => NormalRangedMoveAnimations.playEggBomb(refs, launch, target),
     explosion: (refs, launch, target, v) => NormalRangedMoveAnimations.playExplosion(refs, launch, target, v),
     glare: (refs, launch, target) => NormalRangedMoveAnimations.playGlare(refs, launch, target),
+    judgment: (refs, _launch, target) => Judgment.play(refs, target),
     hypervoice: (refs, launch, target) => NormalRangedMoveAnimations.playHyperVoice(refs, launch, target),
     hyperbeam: (refs, launch, target) => NormalRangedMoveAnimations.playHyperBeam(refs, launch, target),
     triattack: (refs, launch, target) => NormalRangedMoveAnimations.playTriAttack(refs, launch, target),

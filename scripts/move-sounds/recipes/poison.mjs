@@ -96,14 +96,16 @@ export const POISON = {
     return s;
   },
 
-  /** Generic lob (impact 0.52 s) + poison fleck (≈0.65 s): a heavy glob of filth splats onto the foe. */
+  /** Custom (purple rush 0-0.3 s, glob swells 0.3-0.7 s, hurled 0.7-1.05 s, splats into bubbles 1.05 s, bubbles drift to ~1.8 s): a gurgling build, a heavy throw, a filthy splat. */
   gunkshot: () => {
-    const s = new MoveSfx(1.2, 0x6c57);
-    s.pulse(0, 0.08, { freq: (u) => 180 + 220 * u, gain: env.decay(0.3, 1), duty: 0.5 });
-    s.pulse(0.04, 0.48, { freq: (u) => (420 - 200 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 7 * u)), gain: (u) => 0.1 * (1 - 0.5 * u), duty: 0.25 });
-    s.thud(0.52, 0.55, 0.7);
-    s.noise(0.52, 0.3, { clock: (u) => 3000 - 2200 * u, gain: env.attackDecay(0.35, 0.05) });
-    s.poison(0.65, 0.25);
+    const s = new MoveSfx(2.25, 0x6c57);
+    s.whoosh(0.0, 0.3, { from: 1200, to: 4000, gain: 0.18 });
+    s.pulse(0.3, 0.4, { freq: (u) => (160 + 140 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 11 * u)), gain: env.swell(0.2), duty: 0.5 });
+    s.bubbles(0.32, 0.36, 5, { lo: 180, hi: 360, gain: 0.2 });
+    s.pulse(0.7, 0.35, { freq: (u) => (420 - 200 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 7 * u)), gain: (u) => 0.1 * (1 - 0.5 * u), duty: 0.25 });
+    s.thud(1.05, 0.6, 0.8);
+    s.noise(1.05, 0.35, { clock: (u) => 3000 - 2200 * u, gain: env.attackDecay(0.4, 0.05) });
+    s.bubbles(1.1, 0.65, 10, { lo: 300, hi: 800, gain: 0.2 });
     return s;
   },
 

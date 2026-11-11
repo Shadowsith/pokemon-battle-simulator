@@ -5,9 +5,10 @@ import { FxGlyphs } from '../../fx-glyphs';
 import { DeliveryAnimations } from '../../delivery-animations';
 import { FxEffects } from '../../fx-effects';
 import { FireFlames } from './fire-flames';
+import { LavaPlume } from './lava-plume';
 import { MysticalFire } from './mystical-fire';
 
-/** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs. */
+/** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs (Lava Plume lives in `lava-plume.ts`). */
 export class FireRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -21,6 +22,7 @@ export class FireRangedMoveAnimations {
     },
     heatwave: (refs, _launch, _target, v) => FireRangedMoveAnimations.playHeatWave(refs, v),
     flamethrower: (refs, launch, target, v) => FireRangedMoveAnimations.playFlamethrower(refs, launch, target, v),
+    lavaplume: (refs, launch, target) => LavaPlume.play(refs, launch, target),
     mysticalfire: (refs, launch, target, v) => MysticalFire.play(refs, launch, target, v),
     overheat: (refs, launch, target) => FireRangedMoveAnimations.playOverheat(refs, launch, target),
     sacredfire: (refs, _launch, target) => FireRangedMoveAnimations.playSacredFire(refs, target)
