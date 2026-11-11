@@ -5,6 +5,7 @@ import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { PsychicFx } from './psychic-fx';
 import { HyperspaceHole } from './hyperspace-hole';
+import { PsychoCut } from './psycho-cut';
 
 /** Hand-made animations for Psychic-type attacks. */
 export class PsychicAttackMoveAnimations {
@@ -16,7 +17,8 @@ export class PsychicAttackMoveAnimations {
     hyperspacehole: (refs, launch, target, v) => HyperspaceHole.play(refs, launch, target, v),
     lusterpurge: (refs, launch, target) => PsychicAttackMoveAnimations.playLusterPurge(refs, launch, target),
     psychic: (refs) => PsychicAttackMoveAnimations.playPsychic(refs),
-    psychoboost: (refs, launch, target) => PsychicAttackMoveAnimations.playPsychoBoost(refs, launch, target)
+    psychoboost: (refs, launch, target) => PsychicAttackMoveAnimations.playPsychoBoost(refs, launch, target),
+    psychocut: (refs, launch, target, v) => PsychoCut.play(refs, launch, target, v)
   };
 
   static readonly chargeAnims: MoveAnimRegistry = {

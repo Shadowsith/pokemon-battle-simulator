@@ -309,14 +309,15 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic melee at high power (0.17 s impact): a vine cracks like a heavy whip. */
+  /** Custom (dark 0-0.2 s, vine swings down 0.15-0.45 s, crack on the hit at 0.4 s, green ray backdrop 0.45-1.15 s, fades to 1.4 s): a vine swishes down and cracks like a heavy whip, then a rushing flare. */
   powerwhip: () => {
-    const s = new MoveSfx(0.8, 0x90e1);
-    s.whoosh(0.0, 0.17, { from: 1200, to: 9000, gain: 0.3 });
-    s.noise(0.17, 0.06, { clock: () => 20000, gain: env.decay(0.35, 1) });
-    s.slash(0.17, 0.4);
-    s.thud(0.18, 0.45, 0.6);
-    s.noise(0.22, 0.35, { clock: (u) => 3000 - 2000 * u, gain: env.decay(0.25, 1.2) });
+    const s = new MoveSfx(1.55, 0x90e1);
+    s.whoosh(0.15, 0.25, { from: 1200, to: 9000, gain: 0.3 });
+    s.noise(0.4, 0.06, { clock: () => 20000, gain: env.decay(0.35, 1) });
+    s.slash(0.4, 0.4);
+    s.thud(0.41, 0.5, 0.6);
+    s.noise(0.45, 0.75, { clock: (u) => 3000 - 1500 * u, gain: env.swell(0.2) });
+    s.chord(0.5, 0.6, [64, 71, 76], { rate: 0.02, gain: 0.08 });
     return s;
   },
 

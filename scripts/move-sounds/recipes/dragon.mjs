@@ -128,15 +128,19 @@ export const DRAGON = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s), bp 150 + recharge: time itself bends – a warped, rising chord flies out and bursts with a deep, echoing boom. */
+  /** Custom (specks gather 0.1-0.55 s, sparkling ring bursts 0.55 s, blue time-warp rays 0.8-1.2 s, pale flash 1.2 s, rolling blasts 1.32-2.17 s with the hit at 1.67 s, clears to 2.47 s): time bends - a warped rising chord, then a rolling, echoing barrage. */
   roaroftime: () => {
-    const s = new MoveSfx(1.5, 0xd1a1);
-    s.pulse(0.0, 0.45, { freq: (u) => (110 + 110 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.25), duty: 0.25 });
-    s.wave(0.0, 0.45, { freq: (u) => (165 + 165 * u) * (1 - 0.04 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.2) });
-    s.noise(0.0, 0.45, { clock: env.ramp(1000, 4000), gain: env.swell(0.2) });
-    s.thud(0.43, 0.9, 1);
-    s.rumble(0.43, 0.95, { from: 700, to: 120, gain: 0.4 });
-    for (const [d, g] of [[0, 0.28], [0.18, 0.18], [0.36, 0.1]]) s.pulse(0.45 + d, 0.4, { freq: (u) => 147 * (1 + 0.03 * Math.sin(2 * Math.PI * 5 * u)), gain: env.decay(g, 1.5), duty: 0.5 });
+    const s = new MoveSfx(2.7, 0xd1a1);
+    s.wave(0.1, 0.45, { freq: env.ramp(600, 1600), gain: env.swell(0.12) });
+    s.thud(0.55, 0.5, 0.8);
+    s.sparkle(0.55, 0.4, 6, { lo: 4000, hi: 7000, gain: 0.12 });
+    s.pulse(0.75, 0.5, { freq: (u) => (110 + 110 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.22), duty: 0.25 });
+    s.wave(0.75, 0.5, { freq: (u) => (165 + 165 * u) * (1 - 0.05 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.18) });
+    s.noise(1.2, 0.1, { clock: () => 12000, gain: env.decay(0.25, 1) });
+    for (let i = 0; i < 6; i++) s.noise(1.32 + i * 0.13, 0.25, { clock: (u) => 2500 - 1500 * u, gain: env.attackDecay(0.22, 0.1) });
+    s.thud(1.67, 0.9, 1);
+    s.rumble(1.67, 0.8, { from: 600, to: 110, gain: 0.35 });
+    for (const [d, g] of [[0, 0.22], [0.2, 0.14], [0.4, 0.08]]) s.pulse(1.75 + d, 0.4, { freq: (u) => 147 * (1 + 0.03 * Math.sin(2 * Math.PI * 5 * u)), gain: env.decay(g, 1.5), duty: 0.5 });
     return s;
   },
 

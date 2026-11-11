@@ -177,13 +177,17 @@ export const DARK = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Sp. Atk +2 fleck (~0.85 s): a sly, scheming chuckle of low creeping notes, then a stat jingle. */
+  /** Custom (smoke puff 0-0.5 s, "?" clouds pop at 0.25 / 0.38 / 0.51 s, idea hand with shine at 1.15 s, orange sparkles 1.75-2.95 s): sly scheming notes, then a bright "aha" ping and a stat jingle. */
   nastyplot: () => {
-    const s = new MoveSfx(1.5, 0x9a57);
-    s.pulse(0.02, 0.75, { freq: () => 98, gain: env.swell(0.14), duty: 0.25 });
-    s.arpeggio(0.05, [57, 58, 57, 63, 62, 61], 0.12, { gain: 0.22, duty: 0.25, hold: 0.11 });
-    s.arpeggio(0.05, [69, 70, 69, 75, 74, 73], 0.12, { gain: 0.08, voice: 'wave', hold: 0.11 });
-    s.statUp(0.85);
+    const s = new MoveSfx(3.05, 0x9a57);
+    s.noise(0.0, 0.4, { clock: env.ramp(1500, 600), gain: env.swell(0.2) });
+    for (const at of [0.25, 0.38, 0.51]) s.pulse(at, 0.07, { freq: env.ramp(400, 700), gain: env.decay(0.18, 1), duty: 0.5 });
+    s.arpeggio(0.55, [57, 58, 57, 63, 62], 0.12, { gain: 0.2, duty: 0.25, hold: 0.11 });
+    s.arpeggio(0.55, [69, 70, 69, 75, 74], 0.12, { gain: 0.07, voice: 'wave', hold: 0.11 });
+    s.noise(1.15, 0.2, { clock: env.ramp(2000, 600), gain: env.decay(0.15, 1.5) });
+    s.arpeggio(1.2, [84, 91], 0.07, { gain: 0.2, duty: 0.25, hold: 0.2 });
+    s.sparkle(1.3, 0.3, 4, { lo: 4000, hi: 7000, gain: 0.1 });
+    s.statUp(1.8);
     return s;
   },
 
@@ -198,13 +202,15 @@ export const DARK = {
     return s;
   },
 
-  /** Generic melee slash (impact 0.17 s), no fleck: a swift dark swipe with a keen, ringing cut. */
+  /** Custom (dark speed lines 0-0.25 s, three red slashes 0.3 / 0.41 / 0.52 s, red orbs burst, purple swipe 0.65 s, clears to 1.3 s): a dark rush, three keen cuts and a closing swipe. */
   nightslash: () => {
-    const s = new MoveSfx(0.7, 0x5a54);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 7000, gain: 0.35 });
-    s.slash(0.17, 0.6);
-    s.pulse(0.17, 0.35, { freq: env.ramp(130, 80), gain: env.decay(0.22, 1.2), duty: 0.125 });
-    s.pulse(0.2, 0.15, { freq: () => 3200, gain: env.decay(0.08, 2), duty: 0.125 });
+    const s = new MoveSfx(1.4, 0x5a54);
+    s.whoosh(0.0, 0.28, { from: 800, to: 4000, gain: 0.25 });
+    for (const [at, g] of [[0.3, 0.55], [0.41, 0.45], [0.52, 0.45]]) s.slash(at, g);
+    s.pulse(0.3, 0.4, { freq: env.ramp(130, 80), gain: env.decay(0.22, 1.2), duty: 0.125 });
+    s.sparkle(0.35, 0.5, 5, { lo: 1800, hi: 3200, gain: 0.1 });
+    s.whoosh(0.65, 0.3, { from: 5000, to: 1200, gain: 0.3 });
+    s.pulse(0.7, 0.25, { freq: () => 3200, gain: env.decay(0.07, 2), duty: 0.125 });
     return s;
   },
 

@@ -466,14 +466,15 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + confusion fleck (~0.6 s): a rugged climbing charge that shakes the target dizzy. */
+  /** Custom (dust rises while the user bobs up at 0.15 / 0.45 s, charge 0.6-0.9 s, hit 0.73 s, rocks scatter to 1.45 s): scrabbling up rock, a rugged charge and a gravelly crash. */
   rockclimb: () => {
-    const s = new MoveSfx(1.2, 0xc11b);
-    s.rumble(0.0, 0.2, { from: 300, to: 600, gain: 0.3 });
-    s.whoosh(0.0, 0.18, { from: 800, to: 3000, gain: 0.3 });
-    s.thud(0.17, 0.85, 0.9);
-    for (let i = 0; i < 4; i++) s.noise(0.22 + i * 0.06, 0.04, { clock: () => 1500 + s.random() * 1500, gain: env.decay(0.25 - i * 0.04, 1) });
-    s.confusion(0.6, 0.18);
+    const s = new MoveSfx(1.6, 0xc11b);
+    s.rumble(0.0, 0.6, { from: 250, to: 400, gain: 0.22 });
+    for (const at of [0.15, 0.45]) s.noise(at - 0.08, 0.14, { clock: () => 1500 + s.random() * 1000, gain: env.attackDecay(0.25, 0.2) });
+    s.whoosh(0.6, 0.15, { from: 800, to: 3000, gain: 0.3 });
+    s.thud(0.73, 0.85, 0.9);
+    for (let i = 0; i < 5; i++) s.noise(0.78 + i * 0.07, 0.05, { clock: () => 1500 + s.random() * 1500, gain: env.decay(0.25 - i * 0.04, 1) });
+    s.noise(0.75, 0.6, { clock: () => 900, gain: env.decay(0.12, 1.5) });
     return s;
   },
 

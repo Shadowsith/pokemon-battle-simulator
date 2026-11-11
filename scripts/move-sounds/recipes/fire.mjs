@@ -327,15 +327,16 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s), trapping: a roaring swell of magma bursts on the foe and keeps swirling around it. */
+  /** Custom (molten wall 0-0.3 s, magma vortex coils up round the foe 0.3-1.55 s with hits at 0.5 / 0.9 s, wall fades to 1.9 s): a boiling roar that swirls into a churning magma whirl. */
   magmastorm: () => {
-    const s = new MoveSfx(1.35, 0xa6a5);
-    s.noise(0.0, 0.45, { clock: env.ramp(500, 1500), gain: env.swell(0.35) });
-    s.pulse(0.0, 0.45, { freq: (u) => 90 + 60 * u, gain: env.swell(0.2), duty: 0.5 });
-    s.thud(0.43, 0.6, 0.9);
-    s.noise(0.43, 0.8, { clock: (u) => 900 + 400 * Math.sin(2 * Math.PI * 5 * u), gain: env.decay(0.4, 1.2) });
-    s.rumble(0.45, 0.8, { from: 400, to: 150, gain: 0.3 });
-    s.sparkle(0.5, 0.5, 4, { lo: 5000, hi: 8000, gain: 0.12 });
+    const s = new MoveSfx(2.05, 0xa6a5);
+    s.noise(0.0, 0.35, { clock: env.ramp(400, 1200), gain: env.swell(0.28) });
+    s.pulse(0.0, 1.6, { freq: (u) => 85 + 20 * Math.sin(2 * Math.PI * 5 * u), gain: env.swell(0.18), duty: 0.5 });
+    s.noise(0.3, 1.25, { clock: (u) => 1000 + 600 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.32) });
+    s.thud(0.5, 0.65, 0.9);
+    s.thud(0.9, 0.5, 0.8);
+    s.bubbles(0.35, 1.1, 10, { lo: 150, hi: 320, gain: 0.2 });
+    s.rumble(1.4, 0.5, { from: 300, to: 100, gain: 0.25 });
     return s;
   },
 

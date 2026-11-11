@@ -54,7 +54,7 @@ static readonly anims: MoveAnimRegistry = {
 | `orbit(el, radius, laps, duration, spin)` | Sprite circles along a path (no turning). |
 | `speedLines(layer, W, H, flow, [c1, c2])` | Endless speed lines inside `layer` (stop when it is removed). |
 | `smokePuff(fxEl, at, size, [c1, c2]?)` | Puff cloud; white by default, also dust / spray. |
-| `burstBackdrop(fieldEl, at, 'red'\|'blue'\|'ember'\|'magenta')` | Backdrop with flickering burst rays; caller fades out + removes it. |
+| `burstBackdrop(fieldEl, at, 'red'\|'blue'\|'ember'\|'magenta'\|'orange'\|'green')` | Backdrop with flickering burst rays; caller fades out + removes it. |
 | `cornerSun(fxEl, sun, size, total)` | Pulsing sun with sparkles. |
 | `healSparkles(refs, launch)` | Green heal stars round the caster (~0.9 s). |
 | `fireBlastCloud(fxEl, hit, size, count, sparkColor)` | Fiery explosion cloud with sparks. |
@@ -65,7 +65,7 @@ All return an absolutely positioned element; place it with `Fx.place`.
 - **Energy:** `sparkStar(size, color)` 4-point star · `fivePointStar(size, glow)` · `ringSparkle(size, color, ring)` · `psySparkle(size)` · `spikyBurst(size, outer, inner, centre?)` comic impact burst · `glyph(v, size)` type particle · `boltGlyph(color, size)` · `sparkBolt()`.
 - **Elements:** `firePuff(size, 'hot'|'red')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `petalGlyph(s, color)` · `leafGlyph(s)`.
 - **Body parts:** `fistGlyph(w, tone)` (tones in `FIST_TONES`: yellow, red, ice, blue, dark, brown) · `footGlyph(w, color?)` · `chopHandGlyph(w)` · `gloveGlyph(w)` · `pointingHandGlyph(w)` · `jawGlyph(w, h, lower)` · `incisorGlyph(h)` · `snakeEyeGlyph(w, side)`.
-- **Props:** `swordGlyph(h)` · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `birdGlyph(w)` · `angerMark(size)` · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
+- **Props:** `swordGlyph(h)` · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
 
 ## Constants (`animation.constants.ts`)
 `DIM_BACKDROP` (dark scene) · `HEAT_BACKDROP` (red-hot) · `PSYCHIC_WAVES`, `WATERFALL_WAVES` (tiling backgrounds) · `FIST_TONES` · `FLECK_COLOR` (statUp green, statDown red, poison purple, …) · `TYPE_STYLE` · `BUBBLE_DRIFT` / `BUBBLE_BEAM`.

@@ -131,14 +131,16 @@ export const POISON = {
     return s;
   },
 
-  /** Generic melee (0.17 s impact) + poison fleck: a stabbing, toxic jab. */
+  /** Custom (three pink jabs land at 0.15 / 0.35 / 0.55 s, purple tint 0.35-1.1 s): three stabbing toxic jabs with a bubbling sting. */
   poisonjab: () => {
-    const s = new MoveSfx(1.15, 0xf41a);
-    s.whoosh(0.0, 0.15, { from: 2000, to: 8000, gain: 0.25 });
-    s.thud(0.17, 0.6, 0.5);
-    s.noise(0.19, 0.3, { clock: () => 9000, gain: env.decay(0.15, 1.5) });
-    s.bubbles(0.2, 0.2, 3, { lo: 200, hi: 400, gain: 0.15 });
-    s.poison(0.6);
+    const s = new MoveSfx(1.25, 0xf41a);
+    for (const at of [0.15, 0.35, 0.55]) {
+      s.whoosh(at - 0.1, 0.1, { from: 2000, to: 8000, gain: 0.2 });
+      s.thud(at, 0.45, 0.4);
+      s.noise(at + 0.02, 0.15, { clock: () => 9000, gain: env.decay(0.12, 1.5) });
+    }
+    s.bubbles(0.4, 0.6, 7, { lo: 200, hi: 420, gain: 0.16 });
+    s.wave(0.4, 0.6, { freq: (u) => 300 * (1 + 0.15 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.1) });
     return s;
   },
 

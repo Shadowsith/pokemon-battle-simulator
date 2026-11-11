@@ -579,7 +579,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Gen 5 APNG: https://www.pokewiki.de/images/6/6b/Bl%C3%A4ttersturm_Gen5.png
 - [ ] **Lucky Chant** / Beschwörung — `luckychant` · Normal · Status · `selfAura`
 - [ ] **Lunar Dance** / Lunartanz — `lunardance` · Psychic · Status · `selfAura`
-- [ ] ⭐ **Magma Storm** / Lavasturm — `magmastorm` · Fire · Special · `projectile`
+- [x] ⭐ **Magma Storm** / Lavasturm — `magmastorm` · Fire · Special · molten yellow-orange scene, a vortex of red magma balls and white swirl rings coils up round the target, which glows red (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Lavasturm
   - Gen 4 APNG: https://www.pokewiki.de/images/6/6e/Lavasturm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/fa/Lavasturm_Gen5.png
@@ -590,49 +590,49 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Miracle Eye** / Wunderauge — `miracleeye` · Psychic · Status · `targetAura`
 - [ ] **Mirror Shot** / Spiegelsalve — `mirrorshot` · Steel · Special · `projectile`
 - [ ] **Mud Bomb** / Schlammbombe — `mudbomb` · Ground · Special · `lob`
-- [ ] ⭐ **Nasty Plot** / Ränkeschmied — `nastyplot` · Dark · Status · `selfAura`
+- [x] ⭐ **Nasty Plot** / Ränkeschmied — `nastyplot` · Dark · Status · grey smoke puff, three "?" clouds pop up round the user's head, a white hand raises its finger with yellow shine lines, orange sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/R%C3%A4nkeschmied
   - Gen 4 APNG: https://www.pokewiki.de/images/5/5d/R%C3%A4nkeschmied_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/5f/R%C3%A4nkeschmied_Gen5.png
 - [ ] **Natural Gift** / Beerenkräfte — `naturalgift` · Normal · Physical · `projectile`
-- [ ] ⭐ **Night Slash** / Nachthieb — `nightslash` · Dark · Physical · `melee`
+- [x] ⭐ **Night Slash** / Nachthieb — `nightslash` · Dark · Physical · dark scene with purple speed lines, three red blades slash the target, red orbs burst out, a purple streak swipes across (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Nachthieb
   - Gen 4 APNG: https://www.pokewiki.de/images/a/a8/Nachthieb_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/dd/Nachthieb_Gen5.png
 - [ ] **Ominous Wind** / Unheilböen — `ominouswind` · Ghost · Special · `projectile`
 - [ ] **Payback** / Gegenstoß — `payback` · Dark · Physical · `melee`
 - [ ] **Pluck** / Pflücker — `pluck` · Flying · Physical · `melee`
-- [ ] ⭐ **Poison Jab** / Gifthieb — `poisonjab` · Poison · Physical · `melee`
+- [x] ⭐ **Poison Jab** / Gifthieb — `poisonjab` · Poison · Physical · three glowing pink jabs thrust into the target from different angles, each with a magenta star, the target turns purple (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Gifthieb
   - Gen 4 APNG: https://www.pokewiki.de/images/f/ff/Gifthieb_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/37/Gifthieb_Gen5.png
-- [ ] ⭐ **Power Gem** / Juwelenkraft — `powergem` · Rock · Special · `projectile`
+- [x] ⭐ **Power Gem** / Juwelenkraft — `powergem` · Rock · Special · dark, white gems pop up round the user and fire at the target in a glittering stream, yellow sparkles and white arcs on the hit (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Juwelenkraft
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/9/99/Juwelenkraft_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/a/a6/Juwelenkraft_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/df/Juwelenkraft_Gen5.png
 - [ ] **Power Swap** / Krafttausch — `powerswap` · Psychic · Status · `targetAura`
 - [ ] **Power Trick** / Krafttrick — `powertrick` · Psychic · Status · `selfAura`
-- [ ] ⭐ **Power Whip** / Blattgeißel — `powerwhip` · Grass · Physical · `melee`
+- [x] ⭐ **Power Whip** / Blattgeißel — `powerwhip` · Grass · Physical · dark, a green vine swings down onto the target, spiky green burst with scattering orbs, bright green ray backdrop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Blattgei%C3%9Fel
   - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/9/93/Blattgei%C3%9Fel_DPPt.png
   - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/4/4c/Blattgei%C3%9Fel_HGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/d9/Blattgei%C3%9Fel_Gen5.png
-- [ ] ⭐ **Psycho Cut** / Psychoklinge — `psychocut` · Psychic · Physical · `projectile`
+- [x] ⭐ **Psycho Cut** / Psychoklinge — `psychocut` · Psychic · Physical · purple swirl spins up in front of the user, a pink crescent blade forms and flies spinning to the target, pink slice (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Psychoklinge
   - Gen 4 APNG: https://www.pokewiki.de/images/7/76/Psychoklinge_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c7/Psychoklinge_Gen5.png
 - [ ] **Psycho Shift** / Psybann — `psychoshift` · Psychic · Status · `targetAura`
 - [ ] **Punishment** / Strafattacke — `punishment` · Dark · Physical · `melee`
-- [ ] ⭐ **Roar of Time** / Zeitenlärm — `roaroftime` · Dragon · Special · `projectile`
+- [x] ⭐ **Roar of Time** / Zeitenlärm — `roaroftime` · Dragon · Special · dark, white specks gather into the user, a sparkling ring bursts out, blue time-warp rays, pale scene with a rolling stream of cream, gold and pink blasts over the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Zeitenl%C3%A4rm
   - Gen 4 APNG: https://www.pokewiki.de/images/d/dc/Zeitenl%C3%A4rm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a4/Zeitenl%C3%A4rm_Gen5.png
-- [ ] ⭐ **Rock Climb** / Kraxler — `rockclimb` · Normal · Physical · `melee`
+- [x] ⭐ **Rock Climb** / Kraxler — `rockclimb` · Normal · Physical · olive dust and pebbles rise while the user bobs up twice, it charges, yellowish dust cloud with scattering rocks on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kraxler
   - Gen 4 APNG: https://www.pokewiki.de/images/a/a8/Kraxler_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/bc/Kraxler_Gen5.png
-- [ ] ⭐ **Rock Polish** / Steinpolitur — `rockpolish` · Rock · Status · `selfAura`
+- [x] ⭐ **Rock Polish** / Steinpolitur — `rockpolish` · Rock · Status · dark, three white shine streaks sweep across the user with pink sparkles, orange sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Steinpolitur
   - Gen 4 APNG: https://www.pokewiki.de/images/5/5e/Steinpolitur_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/9/96/Steinpolitur_Gen5.png

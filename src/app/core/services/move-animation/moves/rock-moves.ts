@@ -3,6 +3,8 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { HeadSmash } from './rock/head-smash';
+import { PowerGem } from './rock/power-gem';
+import { RockPolish } from './rock/rock-polish';
 
 /** Hand-made animations for Rock-type moves (Head Smash lives in `rock/`). */
 export class RockMoveAnimations {
@@ -10,6 +12,8 @@ export class RockMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     diamondstorm: (refs, launch, target, v) => RockMoveAnimations.playDiamondStorm(refs, launch, target, v),
     headsmash: (refs, _launch, target, v) => HeadSmash.play(refs, target, v),
+    powergem: (refs, launch, target) => PowerGem.play(refs, launch, target),
+    rockpolish: (refs, launch) => RockPolish.play(refs, launch),
     rockslide: (refs, _launch, target) => RockMoveAnimations.playRockSlide(refs, target),
     sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs)
   };

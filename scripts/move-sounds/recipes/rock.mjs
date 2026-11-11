@@ -46,14 +46,16 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic projectile (0.43 s impact): a glittering gem beam that strikes with a crystal clang. */
+  /** Custom (dark 0-0.25 s, gems pop up glinting 0.25-0.6 s, glittering stream 0.57-1.4 s, hit 0.95 s, clears to 1.67 s): crystal chimes gather, rush out and strike with a clang. */
   powergem: () => {
-    const s = new MoveSfx(1.0, 0x90e3);
-    s.chord(0.02, 0.42, [76, 80, 83, 88], { rate: 0.03, gain: 0.15, voice: 'pulse' });
-    s.thud(0.43, 0.5, 0.5);
-    s.pulse(0.43, 0.35, { freq: () => 1660, gain: env.decay(0.22, 1.5), duty: 0.25 });
-    s.pulse(0.44, 0.35, { freq: () => 2490, gain: env.decay(0.14, 1.5), duty: 0.125 });
-    s.sparkle(0.45, 0.35, 6, { gain: 0.14 });
+    const s = new MoveSfx(1.8, 0x90e3);
+    s.sparkle(0.25, 0.35, 8, { lo: 3000, hi: 6000, gain: 0.14 });
+    s.chord(0.3, 0.6, [76, 80, 83, 88], { rate: 0.03, gain: 0.12, voice: 'pulse' });
+    s.whoosh(0.57, 0.8, { from: 3000, to: 9000, gain: 0.18 });
+    s.thud(0.95, 0.5, 0.5);
+    s.pulse(0.95, 0.4, { freq: () => 1660, gain: env.decay(0.22, 1.5), duty: 0.25 });
+    s.pulse(0.96, 0.4, { freq: () => 2490, gain: env.decay(0.14, 1.5), duty: 0.125 });
+    s.sparkle(1.0, 0.4, 8, { gain: 0.14 });
     return s;
   },
 
@@ -70,12 +72,16 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Speed rise fleck (0.85 s): stone is polished smooth – a grinding scrape that turns glossy. */
+  /** Custom (dark 0-0.25 s, shine streaks at 0.25 / 0.49 / 0.73 s with pink sparkles to 1.13 s, orange sparkles 1.38-2.6 s): three glossy polishing swipes that glint, then a stat jingle. */
   rockpolish: () => {
-    const s = new MoveSfx(1.5, 0x9011);
-    for (let i = 0; i < 4; i++) s.noise(i * 0.2, 0.18, { clock: (u) => 3000 + 4000 * Math.sin(Math.PI * u), gain: (u) => 0.22 * Math.sin(Math.PI * u) });
-    s.sparkle(0.3, 0.5, 6, { lo: 3500, hi: 6000, gain: 0.14 });
-    s.statUp(0.85, 0.26);
+    const s = new MoveSfx(2.7, 0x9011);
+    for (let i = 0; i < 3; i++) {
+      const at = 0.25 + i * 0.24;
+      s.noise(at, 0.28, { clock: (u) => 3000 + 4000 * Math.sin(Math.PI * u), gain: (u) => 0.2 * Math.sin(Math.PI * u) });
+      s.pulse(at + 0.14, 0.12, { freq: () => 3520 + i * 440, gain: env.decay(0.1, 1.5), duty: 0.125 });
+    }
+    s.sparkle(0.35, 0.75, 7, { lo: 3500, hi: 6500, gain: 0.12 });
+    s.statUp(1.43, 0.26);
     return s;
   },
 

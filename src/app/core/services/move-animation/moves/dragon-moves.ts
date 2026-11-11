@@ -3,6 +3,7 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { ClawStyle, FxEffects } from '../fx-effects';
+import { RoarOfTime } from './dragon/roar-of-time';
 
 /** Dragon Claw's marks: black with a white edge and a blue light on the tip. */
 const DRAGON_CLAW: ClawStyle = { glow: ['#ffffff', '#ffffffaa'], tip: '#3FA8FF' };
@@ -19,7 +20,8 @@ export class DragonMoveAnimations {
     dragondance: (refs, launch) => DragonMoveAnimations.playDragonDance(refs, launch),
     dragonpulse: (refs, launch, target) => DragonMoveAnimations.playDragonPulse(refs, launch, target),
     dragonrush: (refs, _launch, target) => DragonMoveAnimations.playDragonRush(refs, target),
-    outrage: (refs, launch) => DragonMoveAnimations.playOutrage(refs, launch)
+    outrage: (refs, launch) => DragonMoveAnimations.playOutrage(refs, launch),
+    roaroftime: (refs, launch, target) => RoarOfTime.play(refs, launch, target)
   };
 
   /**

@@ -169,6 +169,37 @@ export class FxGlyphs {
     return el;
   }
 
+  /**
+   * A white thought cloud, `w` px wide, with a grey "?" inside (Amnesia, Nasty Plot).
+   * Overlapping bumps share one fill and one glow (on the wrapper), so they read as
+   * one shape; the "?" is the last child, so callers can wobble it.
+   */
+  static questionCloud(w: number): HTMLElement {
+    const h = w * 0.62;
+    const cloud = document.createElement('div');
+    cloud.style.cssText = `position:absolute;width:${w}px;height:${h}px;pointer-events:none;filter:drop-shadow(0 0 6px #ffffffaa)`;
+    const fill = 'background:radial-gradient(circle at 40% 30%,#fff,#E8ECF5 70%,#D2D8E6)';
+    // [left, top, size] in % of the cloud width / height.
+    for (const [x, y, size] of [
+      [4, 38, 42],
+      [22, 8, 52],
+      [50, 14, 46],
+      [58, 40, 38]
+    ]) {
+      const bump = document.createElement('div');
+      bump.style.cssText = `position:absolute;left:${x}%;top:${y}%;width:${size}%;aspect-ratio:1;border-radius:50%;${fill}`;
+      cloud.appendChild(bump);
+    }
+    const base = document.createElement('div');
+    base.style.cssText = `position:absolute;left:12%;right:12%;bottom:4%;height:42%;border-radius:${h}px;${fill}`;
+    cloud.appendChild(base);
+    const mark = document.createElement('div');
+    mark.textContent = '?';
+    mark.style.cssText = `position:absolute;left:0;right:0;top:50%;margin-top:-${h * 0.3}px;height:${h * 0.6}px;text-align:center;font:bold ${h * 0.6}px/${h * 0.6}px sans-serif;color:#6F7894`;
+    cloud.appendChild(mark);
+    return cloud;
+  }
+
   /** A four-point glowing star used for energy / sparkle effects. */
   static sparkStar(size: number, color: string): HTMLElement {
     // The glow sits on a wrapper: clip-path on the same element would cut the drop-shadow off.

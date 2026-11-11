@@ -2,6 +2,7 @@ import { Point, BattleStageRefs, MoveAnimRegistry } from '../animation.types';
 import { Fx } from '../fx';
 import { FxEffects } from '../fx-effects';
 import { FxGlyphs } from '../fx-glyphs';
+import { PoisonJab } from './poison/poison-jab';
 
 /** Hand-made animations for Poison-type moves. */
 export class PoisonMoveAnimations {
@@ -11,6 +12,7 @@ export class PoisonMoveAnimations {
     belch: (refs, launch, target) => PoisonMoveAnimations.playBelch(refs, launch, target),
     crosspoison: (refs, _launch, target) => PoisonMoveAnimations.playCrossPoison(refs, target),
     gunkshot: (refs, launch, target) => PoisonMoveAnimations.playGunkShot(refs, launch, target),
+    poisonjab: (refs, _launch, target, v) => PoisonJab.play(refs, target, v),
     sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
     toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target)
   };

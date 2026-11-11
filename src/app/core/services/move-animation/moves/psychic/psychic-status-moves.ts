@@ -139,31 +139,9 @@ export class PsychicStatusMoveAnimations {
     const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
     const dimIn = Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
 
-    // One cloud: overlapping bumps share a fill and a single glow (on the
-    // wrapper), so they read as one shape with the "?" inside it.
     const cw = Math.max(r.width * 0.8, 72);
-    const ch = cw * 0.62;
-    const cloud = document.createElement('div');
-    cloud.style.cssText = `position:absolute;width:${cw}px;height:${ch}px;pointer-events:none;filter:drop-shadow(0 0 6px #ffffffaa)`;
-    const fill = 'background:radial-gradient(circle at 40% 30%,#fff,#E8ECF5 70%,#D2D8E6)';
-    // [left, top, size] in % of the cloud width / height.
-    for (const [x, y, size] of [
-      [4, 38, 42],
-      [22, 8, 52],
-      [50, 14, 46],
-      [58, 40, 38]
-    ]) {
-      const bump = document.createElement('div');
-      bump.style.cssText = `position:absolute;left:${x}%;top:${y}%;width:${size}%;aspect-ratio:1;border-radius:50%;${fill}`;
-      cloud.appendChild(bump);
-    }
-    const base = document.createElement('div');
-    base.style.cssText = `position:absolute;left:12%;right:12%;bottom:4%;height:42%;border-radius:${ch}px;${fill}`;
-    cloud.appendChild(base);
-    const mark = document.createElement('div');
-    mark.textContent = '?';
-    mark.style.cssText = `position:absolute;left:0;right:0;top:50%;margin-top:-${ch * 0.3}px;height:${ch * 0.6}px;text-align:center;font:bold ${ch * 0.6}px/${ch * 0.6}px sans-serif;color:#6F7894`;
-    cloud.appendChild(mark);
+    const cloud = FxGlyphs.questionCloud(cw);
+    const mark = cloud.lastElementChild as HTMLElement;
     Fx.place(cloud, head);
     fxEl.appendChild(cloud);
 

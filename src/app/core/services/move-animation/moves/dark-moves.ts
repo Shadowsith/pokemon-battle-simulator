@@ -2,6 +2,8 @@ import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../animati
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { NastyPlot } from './dark/nasty-plot';
+import { NightSlash } from './dark/night-slash';
 
 /** Hand-made animations for Dark-type moves. */
 export class DarkMoveAnimations {
@@ -11,6 +13,8 @@ export class DarkMoveAnimations {
     crunch: (refs, _launch, target) => DarkMoveAnimations.playCrunch(refs, target),
     darkpulse: (refs, launch, target) => DarkMoveAnimations.playDarkPulse(refs, launch, target),
     hyperspacefury: (refs, launch, target) => DarkMoveAnimations.playHyperspaceFury(refs, launch, target),
+    nastyplot: (refs, launch) => NastyPlot.play(refs, launch),
+    nightslash: (refs, _launch, target, v) => NightSlash.play(refs, target, v),
     partingshot: (refs, launch, target, v) => DarkMoveAnimations.playPartingShot(refs, launch, target, v),
     taunt: (refs, launch, target, v) => DarkMoveAnimations.playTaunt(refs, launch, target, v)
   };

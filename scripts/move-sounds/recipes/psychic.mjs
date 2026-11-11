@@ -458,13 +458,14 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a psychic blade flies and slices. */
+  /** Custom (purple swirl 0-0.5 s, blade forms 0.3-0.5 s, flies 0.5-0.8 s, cuts at 0.8 s, arc fades to 1.15 s): a warbling psychic swirl, a whirring blade flight and a keen slice. */
   psychocut: () => {
-    const s = new MoveSfx(0.85, 0x9c07);
-    s.wave(0.0, 0.43, { freq: (u) => 900 * (1 + 0.1 * Math.sin(2 * Math.PI * 8 * u)) * (1 + 0.5 * u), gain: env.swell(0.22) });
-    s.whoosh(0.05, 0.4, { from: 3000, to: 11000, gain: 0.25 });
-    s.slash(0.43, 0.6);
-    s.wave(0.45, 0.3, { freq: (u) => 1400 * Math.pow(0.6, u), gain: env.decay(0.18, 1.5) });
+    const s = new MoveSfx(1.3, 0x9c07);
+    s.wave(0.0, 0.5, { freq: (u) => 500 * (1 + 0.15 * Math.sin(2 * Math.PI * 10 * u)) * (1 + 0.4 * u), gain: env.swell(0.2) });
+    s.wave(0.3, 0.2, { freq: env.ramp(900, 1400), gain: env.swell(0.16) });
+    s.whoosh(0.5, 0.3, { from: 3000, to: 11000, gain: 0.25 });
+    s.slash(0.8, 0.6);
+    s.wave(0.82, 0.3, { freq: (u) => 1400 * Math.pow(0.6, u), gain: env.decay(0.18, 1.5) });
     return s;
   },
 
