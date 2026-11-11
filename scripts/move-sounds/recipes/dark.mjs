@@ -290,13 +290,14 @@ export const DARK = {
     return s;
   },
 
-  /** Generic melee (priority, impact 0.12 s): a sly, sudden jab from the shadows. */
+  /** Custom (priority; user darts 0-0.26 s, pink orb zips in 0.04-0.24 s, hit 0.24 s, specks to ~0.85 s): a sly whoosh, a sudden jab and a sparkly scatter. */
   suckerpunch: () => {
-    const s = new MoveSfx(0.6, 0x5c4e);
-    s.pulse(0.0, 0.12, { freq: env.ramp(110, 75), gain: env.swell(0.2), duty: 0.25 });
-    s.whoosh(0.0, 0.12, { from: 2500, to: 7000, gain: 0.3 });
-    s.thud(0.12, 0.75, 0.5);
-    s.pulse(0.16, 0.25, { freq: (u) => 140 * Math.pow(0.6, u), gain: env.decay(0.2, 1.5), duty: 0.125 });
+    const s = new MoveSfx(0.95, 0x5c4e);
+    s.pulse(0.0, 0.24, { freq: env.ramp(110, 75), gain: env.swell(0.2), duty: 0.25 });
+    s.whoosh(0.04, 0.2, { from: 2500, to: 7000, gain: 0.3 });
+    s.thud(0.24, 0.75, 0.5);
+    s.pulse(0.28, 0.25, { freq: (u) => 140 * Math.pow(0.6, u), gain: env.decay(0.2, 1.5), duty: 0.125 });
+    s.sparkle(0.3, 0.45, 5, { lo: 2500, hi: 5000, gain: 0.1 });
     return s;
   },
 

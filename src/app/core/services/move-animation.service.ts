@@ -79,8 +79,8 @@ export class MoveAnimationService {
 
   /** Turn 2 of a semi-invulnerable move: the user drops back into view. */
   private async playReleaseIntro(move: Move, refs: BattleStageRefs) {
-    // Dig's, Fly's, Bounce's, Dive's and Phantom Force's own animations bring the user back.
-    if (!SEMI_INVULN_ANIM.has(move.showdownId) || ['dig', 'fly', 'bounce', 'dive', 'phantomforce'].includes(move.showdownId)) return;
+    // A hand-made vanish (Dig, Fly, Shadow Force …) pairs with a hand-made strike that brings the user back itself.
+    if (!SEMI_INVULN_ANIM.has(move.showdownId) || CUSTOM_CHARGE_ANIMATIONS[move.showdownId]) return;
     await FxEffects.dropBackIn(refs.launchEl);
   }
 

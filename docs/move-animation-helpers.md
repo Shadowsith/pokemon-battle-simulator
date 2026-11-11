@@ -63,7 +63,7 @@ static readonly anims: MoveAnimRegistry = {
 ## `FxGlyphs` — particles and props (`fx-glyphs.ts`)
 All return an absolutely positioned element; place it with `Fx.place`.
 - **Energy:** `sparkStar(size, color)` 4-point star · `fivePointStar(size, glow)` · `ringSparkle(size, color, ring)` · `psySparkle(size)` · `spikyBurst(size, outer, inner, centre?)` comic impact burst · `glyph(v, size)` type particle · `boltGlyph(color, size)` · `sparkBolt()`.
-- **Elements:** `firePuff(size, 'hot'|'red')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `petalGlyph(s, color)` · `leafGlyph(s)`.
+- **Elements:** `firePuff(size, 'hot'|'red')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `pointedRock(w)` sharp stone, tip up · `petalGlyph(s, color)` · `leafGlyph(s)`.
 - **Body parts:** `fistGlyph(w, tone)` (tones in `FIST_TONES`: yellow, red, ice, blue, dark, brown) · `footGlyph(w, color?)` · `chopHandGlyph(w)` · `gloveGlyph(w)` · `pointingHandGlyph(w)` · `jawGlyph(w, h, lower)` · `incisorGlyph(h)` · `snakeEyeGlyph(w, side)`.
 - **Props:** `swordGlyph(h)` · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
 

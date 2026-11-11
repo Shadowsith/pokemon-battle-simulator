@@ -5,8 +5,11 @@ import { FxEffects } from '../fx-effects';
 import { HeadSmash } from './rock/head-smash';
 import { PowerGem } from './rock/power-gem';
 import { RockPolish } from './rock/rock-polish';
+import { RockWrecker } from './rock/rock-wrecker';
+import { StealthRock } from './rock/stealth-rock';
+import { StoneEdge } from './rock/stone-edge';
 
-/** Hand-made animations for Rock-type moves (Head Smash lives in `rock/`). */
+/** Hand-made animations for Rock-type moves (Head Smash, Power Gem, Rock Polish, Rock Wrecker, Stealth Rock and Stone Edge live in `rock/`). */
 export class RockMoveAnimations {
   /** Hand-made Rock move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -15,7 +18,10 @@ export class RockMoveAnimations {
     powergem: (refs, launch, target) => PowerGem.play(refs, launch, target),
     rockpolish: (refs, launch) => RockPolish.play(refs, launch),
     rockslide: (refs, _launch, target) => RockMoveAnimations.playRockSlide(refs, target),
-    sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs)
+    rockwrecker: (refs, launch, target, v) => RockWrecker.play(refs, launch, target, v),
+    sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs),
+    stealthrock: (refs, launch, target) => StealthRock.play(refs, launch, target),
+    stoneedge: (refs, _launch, target) => StoneEdge.play(refs, target)
   };
 
   /**

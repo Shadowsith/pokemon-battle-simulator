@@ -144,14 +144,16 @@ export const DRAGON = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): space itself is torn open with a warped, ripping roar. */
+  /** Custom (dark 0-0.25 s, rift swirls round the user 0.25-0.85 s, blackout 0.85 s, black holes tear on the target, hits 1.05 / 1.37 s, clears to 2.1 s): warped space swirls, then rips open twice with a roar. */
   spacialrend: () => {
-    const s = new MoveSfx(1.0, 0x5ace);
-    s.wave(0.0, 0.43, { freq: (u) => 200 + 500 * u + 40 * Math.sin(2 * Math.PI * 12 * u), gain: env.ramp(0.15, 0.3) });
-    s.noise(0.0, 0.43, { clock: env.ramp(1000, 6000), gain: env.ramp(0.05, 0.2) });
-    s.slash(0.43, 0.5);
-    s.thud(0.43, 0.6, 0.9);
-    s.pulse(0.45, 0.45, { freq: (u) => 900 * Math.pow(0.3, u) * (1 + 0.05 * Math.sin(2 * Math.PI * 20 * u)), gain: env.decay(0.25, 1.2), duty: 0.25 });
+    const s = new MoveSfx(2.3, 0x5ace);
+    s.wave(0.25, 0.6, { freq: (u) => 200 + 300 * Math.sin(Math.PI * u) + 40 * Math.sin(2 * Math.PI * 12 * u), gain: env.swell(0.22) });
+    s.noise(0.25, 0.6, { clock: (u) => 1500 + 2500 * Math.sin(Math.PI * u), gain: env.swell(0.15) });
+    for (const [at, g] of [[1.05, 0.9], [1.37, 0.65]]) {
+      s.slash(at - 0.02, 0.45 * g);
+      s.thud(at, 0.6 * g, 0.9);
+      s.pulse(at, 0.4, { freq: (u) => 900 * Math.pow(0.3, u) * (1 + 0.05 * Math.sin(2 * Math.PI * 20 * u)), gain: env.decay(0.25 * g, 1.2), duty: 0.25 });
+    }
     return s;
   },
 

@@ -4,6 +4,7 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { ClawStyle, FxEffects } from '../fx-effects';
 import { RoarOfTime } from './dragon/roar-of-time';
+import { SpacialRend } from './dragon/spacial-rend';
 
 /** Dragon Claw's marks: black with a white edge and a blue light on the tip. */
 const DRAGON_CLAW: ClawStyle = { glow: ['#ffffff', '#ffffffaa'], tip: '#3FA8FF' };
@@ -11,7 +12,7 @@ const DRAGON_CLAW: ClawStyle = { glow: ['#ffffff', '#ffffffaa'], tip: '#3FA8FF' 
 /** Sprite filter that turns a Pokémon magenta red, with a pink glow (Dragon Claw, Dragon Dance). */
 const DRAGON_RED = 'grayscale(1) brightness(.55) sepia(1) saturate(12) hue-rotate(-40deg) drop-shadow(0 0 6px #FF3C8C)';
 
-/** Hand-made animations for Dragon-type moves. */
+/** Hand-made animations for Dragon-type moves (Roar of Time and Spacial Rend live in `dragon/`). */
 export class DragonMoveAnimations {
   /** Hand-made Dragon move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -21,7 +22,8 @@ export class DragonMoveAnimations {
     dragonpulse: (refs, launch, target) => DragonMoveAnimations.playDragonPulse(refs, launch, target),
     dragonrush: (refs, _launch, target) => DragonMoveAnimations.playDragonRush(refs, target),
     outrage: (refs, launch) => DragonMoveAnimations.playOutrage(refs, launch),
-    roaroftime: (refs, launch, target) => RoarOfTime.play(refs, launch, target)
+    roaroftime: (refs, launch, target) => RoarOfTime.play(refs, launch, target),
+    spacialrend: (refs, launch, target) => SpacialRend.play(refs, launch, target)
   };
 
   /**

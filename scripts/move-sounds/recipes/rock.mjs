@@ -118,15 +118,18 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic lob (impact 0.52 s), bp 150 + recharge: a huge boulder arcs over and smashes apart in a thundering crash. */
+  /** Custom (dark 0-0.25 s, blazing sky 0.25-0.5 s, rocks rise 0.5-1.0 s, boulder swells 0.9-1.1 s, flies 1.1-1.45 s, crash 1.45 s, debris to 2.1 s, clears to 2.35 s): a rising roar, a hurtling boulder and a thundering crash. */
   rockwrecker: () => {
-    const s = new MoveSfx(1.45, 0x7ec4);
-    s.whoosh(0.0, 0.5, { from: 400, to: 1800, gain: 0.25 });
-    s.pulse(0.0, 0.5, { freq: env.ramp(70, 110), gain: env.swell(0.18), duty: 0.125 });
-    s.thud(0.52, 1.0, 1);
-    s.noise(0.52, 0.2, { clock: (u) => 5000 - 3500 * u, gain: env.attackDecay(0.45, 0.05) });
-    s.rumble(0.54, 0.85, { from: 600, to: 100, gain: 0.45 });
-    for (let i = 0; i < 6; i++) s.noise(0.6 + i * 0.07 + s.random() * 0.03, 0.05, { clock: () => 1200 + s.random() * 2000, gain: env.decay(0.25 - i * 0.03, 1) });
+    const s = new MoveSfx(2.6, 0x7ec4);
+    s.whoosh(0.25, 0.3, { from: 800, to: 3000, gain: 0.18 });
+    s.rumble(0.5, 0.6, { from: 150, to: 400, gain: 0.3 });
+    s.pulse(0.5, 0.95, { freq: env.ramp(70, 120), gain: env.swell(0.16), duty: 0.125 });
+    s.thud(0.95, 0.35, 0.6);
+    s.whoosh(1.1, 0.35, { from: 400, to: 1800, gain: 0.3 });
+    s.thud(1.45, 1.0, 1);
+    s.noise(1.45, 0.25, { clock: (u) => 5000 - 3500 * u, gain: env.attackDecay(0.45, 0.05) });
+    s.rumble(1.47, 0.85, { from: 600, to: 100, gain: 0.45 });
+    for (let i = 0; i < 6; i++) s.noise(1.55 + i * 0.07 + s.random() * 0.03, 0.05, { clock: () => 1200 + s.random() * 2000, gain: env.decay(0.25 - i * 0.03, 1) });
     return s;
   },
 
@@ -160,26 +163,32 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), on the foe side: sharp stones float up and settle with clacks. */
+  /** Custom (stones tossed 0-0.6 s, landing 0.45-1.05 s every 0.15 s, rise 1.05-1.45 s, glint 1.45 s, fade to 1.75 s): stones whizz over and land with clacks, then hover with a glint. */
   stealthrock: () => {
-    const s = new MoveSfx(1.0, 0x57ea);
-    s.rumble(0.02, 0.5, { from: 200, to: 450, gain: 0.25 });
+    const s = new MoveSfx(1.95, 0x57ea);
     for (let i = 0; i < 5; i++) {
-      const at = 0.2 + i * 0.12;
+      const at = 0.45 + i * 0.15;
+      s.whoosh(at - 0.45, 0.3, { from: 1500, to: 3500, gain: 0.12 });
       s.noise(at, 0.05, { clock: () => 3000 + s.random() * 2000, gain: env.decay(0.35, 1) });
       s.pulse(at, 0.06, { freq: () => 500 + i * 60, gain: env.decay(0.2, 2), duty: 0.5 });
     }
+    s.rumble(1.05, 0.4, { from: 200, to: 450, gain: 0.2 });
+    s.sparkle(1.45, 0.25, 4, { lo: 3000, hi: 5500, gain: 0.12 });
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s, bp 100): sharp stone blades fly in and shatter on the foe. */
+  /** Custom (stones rise and circle the target 0-0.65 s, six stabs 0.7-1.0 s every 0.06 s, streaks fade to ~1.35 s): a grinding rise, then a volley of sharp stone stabs. */
   stoneedge: () => {
-    const s = new MoveSfx(0.95, 0x570e);
-    s.whoosh(0.0, 0.43, { from: 1500, to: 5000, gain: 0.25 });
-    s.pulse(0.0, 0.4, { freq: env.ramp(150, 240), gain: env.swell(0.12), duty: 0.25 });
-    s.thud(0.43, 0.75, 0.8);
-    for (let i = 0; i < 5; i++) s.noise(0.45 + s.random() * 0.25, 0.04, { clock: () => 5000 + s.random() * 4000, gain: env.decay(0.25, 1) });
-    s.rumble(0.45, 0.4, { from: 400, to: 150, gain: 0.22 });
+    const s = new MoveSfx(1.55, 0x570e);
+    s.rumble(0.0, 0.65, { from: 200, to: 500, gain: 0.28 });
+    s.whoosh(0.1, 0.55, { from: 1500, to: 5000, gain: 0.15 });
+    s.thud(0.7, 0.75, 0.8);
+    for (let i = 0; i < 6; i++) {
+      const at = 0.7 + i * 0.06;
+      s.noise(at, 0.04, { clock: () => 5000 + s.random() * 4000, gain: env.decay(0.28, 1) });
+      s.pulse(at, 0.05, { freq: () => 1400 + i * 120, gain: env.decay(0.12, 2), duty: 0.25 });
+    }
+    s.rumble(0.75, 0.45, { from: 400, to: 150, gain: 0.22 });
     return s;
   },
 

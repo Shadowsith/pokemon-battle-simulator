@@ -36,6 +36,20 @@ export class FxGlyphs {
     return el;
   }
 
+  /** A sharp, pointed stone `w` px wide (tip up), brown with a lit face and a dark edge (Stealth Rock, Stone Edge). */
+  static pointedRock(w: number): HTMLElement {
+    // The shadow sits on a wrapper: clip-path on the same element would cut the drop-shadow off.
+    const wrap = document.createElement('div');
+    wrap.style.cssText = `position:absolute;width:${w}px;height:${w * 1.3}px;pointer-events:none;filter:drop-shadow(0 2px 2px #00000077)`;
+    const shape = document.createElement('div');
+    const tip = 35 + Math.round(Math.random() * 30);
+    shape.style.cssText =
+      `width:100%;height:100%;clip-path:polygon(${tip}% 0,92% 48%,100% 88%,55% 100%,6% 90%,0 52%);` +
+      'background:linear-gradient(110deg,#F2CF6B 0 30%,#C8932E 30% 62%,#7A5418 62%)';
+    wrap.appendChild(shape);
+    return wrap;
+  }
+
   /** A plain white egg, `w` px wide (Egg Bomb, Soft-Boiled). */
   static eggGlyph(w: number): HTMLElement {
     const el = document.createElement('div');

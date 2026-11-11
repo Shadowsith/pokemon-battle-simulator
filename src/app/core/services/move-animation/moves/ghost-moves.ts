@@ -1,8 +1,10 @@
 import { BattleStageRefs, MoveAnimRegistry, MoveVisual, Point } from '../animation.types';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
+import { ShadowClaw } from './ghost/shadow-claw';
+import { ShadowForce } from './ghost/shadow-force';
 
-/** Hand-made animations for Ghost-type moves. */
+/** Hand-made animations for Ghost-type moves (Shadow Claw and Shadow Force live in `ghost/`). */
 export class GhostMoveAnimations {
   /** Hand-made Ghost move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -10,12 +12,15 @@ export class GhostMoveAnimations {
     destinybond: (refs, launch, target) => GhostMoveAnimations.playDestinyBond(refs, launch, target),
     nightshade: (refs, launch) => GhostMoveAnimations.playNightShade(refs, launch),
     phantomforce: (refs, launch, target, v) => GhostMoveAnimations.playPhantomForceStrike(refs, launch, target, v),
-    shadowball: (refs, launch, target, v) => GhostMoveAnimations.playShadowBall(refs, launch, target, v)
+    shadowball: (refs, launch, target, v) => GhostMoveAnimations.playShadowBall(refs, launch, target, v),
+    shadowclaw: (refs, _launch, target, v) => ShadowClaw.play(refs, target, v),
+    shadowforce: (refs, _launch, target, v) => ShadowForce.strike(refs, target, v)
   };
 
   /** Turn-1 animations of two-turn Ghost moves, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {
-    phantomforce: (refs) => GhostMoveAnimations.playPhantomForceVanish(refs)
+    phantomforce: (refs) => GhostMoveAnimations.playPhantomForceVanish(refs),
+    shadowforce: (refs) => ShadowForce.vanish(refs)
   };
 
   /**

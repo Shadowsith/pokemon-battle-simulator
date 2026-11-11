@@ -258,13 +258,13 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): the user lands and rests – soft wing flaps settling into a gentle healing chime. */
+  /** Custom (feathers burst and flutter down 0-0.85 s, white star shines 0.75-1.1 s, heal sparkles 1.1-2.0 s): soft wing flaps, a bright glint and a gentle healing chime. */
   roost: () => {
-    const s = new MoveSfx(1.4, 0x9005);
+    const s = new MoveSfx(2.2, 0x9005);
     for (let i = 0; i < 3; i++) s.whoosh(i * 0.18, 0.16, { from: 1500, to: 4000, gain: 0.25 - i * 0.05 });
-    s.thud(0.55, 0.2, 0.2);
-    s.arpeggio(0.6, [72, 76, 79, 84], 0.08, { gain: 0.2, voice: 'wave', hold: 0.2 });
-    s.sparkle(0.7, 0.5, 6, { lo: 2500, hi: 4500, gain: 0.12 });
+    s.pulse(0.8, 0.15, { freq: () => 2637, gain: env.decay(0.14, 1.5), duty: 0.125 });
+    s.arpeggio(1.1, [72, 76, 79, 84], 0.08, { gain: 0.2, voice: 'wave', hold: 0.2 });
+    s.sparkle(1.2, 0.7, 7, { lo: 2500, hi: 4500, gain: 0.12 });
     return s;
   },
 

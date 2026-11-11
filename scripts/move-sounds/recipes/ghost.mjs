@@ -153,30 +153,30 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic melee slash (impact 0.17 s), no fleck: a shadowy claw - an eerie hiss, then a cut with a sour, ghostly ring. */
+  /** Custom (three black claws rake 0-0.75 s, hit 0.1 s, red specks to 0.9 s, black smoke 0.45-1.0 s): an eerie hiss, three quick cuts with a sour ring and a dark puff. */
   shadowclaw: () => {
-    const s = new MoveSfx(0.75, 0x5c1a);
-    s.wave(0.0, 0.18, { freq: (u) => (300 + 500 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 4 * u)), gain: env.ramp(0.05, 0.2) });
-    s.whoosh(0.0, 0.18, { from: 2500, to: 9000, gain: 0.25 });
-    s.slash(0.17, 0.6);
-    s.chord(0.2, 0.4, [73, 74], { rate: 0.04, gain: 0.14, vibrato: 0.03 });
+    const s = new MoveSfx(1.15, 0x5c1a);
+    s.wave(0.0, 0.15, { freq: (u) => (300 + 500 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 4 * u)), gain: env.ramp(0.05, 0.2) });
+    for (let i = 0; i < 3; i++) s.slash(0.04 + i * 0.06, 0.5 - i * 0.08);
+    s.chord(0.15, 0.4, [73, 74], { rate: 0.04, gain: 0.14, vibrato: 0.03 });
+    s.noise(0.45, 0.45, { clock: env.ramp(1200, 400), gain: env.swell(0.2) });
     return s;
   },
 
   /**
-   * CHARGE (semi-invulnerable), played on both turns: turn 1 the user rises out of sight (0.4 s); turn 2 it drops
-   * back in (0.26 s), then a generic beam (grows to 0.52 s, holds to ~0.85 s, fades ~1.05 s).
-   * Sound: a vanishing ghostly swoosh, then a crushing, dissonant shadow surge and a hit.
+   * CHARGE, played on both turns. Turn 1 (ShadowForce.vanish): the user flickers out (0-0.6 s). Turn 2 (ShadowForce.strike):
+   * grey scene 0-0.3 s, the user reappears mid-lunge 0.3-0.6 s, purple flash on the target 0.6 s, black clouds 0.6-1.3 s, clears to 1.6 s.
+   * Sound: a vanishing ghostly swoosh, then a crushing, dissonant shadow surge, a hit and billowing darkness.
    */
   shadowforce: () => {
-    const s = new MoveSfx(1.3, 0x5f0c);
-    s.wave(0.0, 0.4, { freq: (u) => 900 * Math.pow(0.4, u), gain: env.attackDecay(0.22, 0.3) });
-    s.whoosh(0.0, 0.35, { from: 4000, to: 1200, gain: 0.2 });
-    s.pulse(0.26, 0.8, { freq: (u) => 110 * (1 + 0.04 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.22), duty: 0.25 });
-    s.pulse(0.26, 0.8, { freq: () => 116.5, gain: env.swell(0.14), duty: 0.125 });
-    s.noise(0.26, 0.8, { clock: env.ramp(800, 2500), gain: env.swell(0.2) });
-    s.thud(0.6, 0.6, 0.8);
+    const s = new MoveSfx(1.7, 0x5f0c);
+    s.wave(0.0, 0.5, { freq: (u) => 900 * Math.pow(0.4, u), gain: env.attackDecay(0.22, 0.3) });
+    s.whoosh(0.0, 0.45, { from: 4000, to: 1200, gain: 0.2 });
+    s.pulse(0.3, 0.8, { freq: (u) => 110 * (1 + 0.04 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.22), duty: 0.25 });
+    s.pulse(0.3, 0.8, { freq: () => 116.5, gain: env.swell(0.14), duty: 0.125 });
+    s.thud(0.6, 0.7, 0.8);
     s.chord(0.62, 0.45, [61, 62, 68], { rate: 0.035, gain: 0.16, vibrato: 0.03 });
+    s.noise(0.65, 0.7, { clock: env.ramp(1500, 400), gain: env.swell(0.22) });
     return s;
   },
 

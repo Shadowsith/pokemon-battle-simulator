@@ -333,26 +333,29 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic lob (0.52 s), no fleck: a hard seed tossed in an arc that bursts with a woody pop and scattered husks. */
+  /** Custom (five seeds lobbed 0-0.48 s, 0.12 s apart; fiery bursts on landing 0.5-0.98 s; clouds fade to ~1.8 s): seeds whistle over and pop in a run of woody blasts. */
   seedbomb: () => {
-    const s = new MoveSfx(0.95, 0x5eb0);
-    s.pulse(0.0, 0.52, { freq: (u) => 500 + 500 * Math.sin(Math.PI * u), gain: env.ramp(0.08, 0.16), duty: 0.25 });
-    s.whoosh(0.05, 0.45, { from: 1500, to: 3500, gain: 0.15 });
-    s.thud(0.52, 0.7, 0.6);
-    s.noise(0.52, 0.25, { clock: env.ramp(5000, 1500), gain: env.attackDecay(0.4, 0.05) });
-    for (let i = 0; i < 4; i++) s.noise(0.62 + i * 0.06, 0.03, { clock: () => 4000 + s.random() * 2000, gain: env.decay(0.18, 1) });
+    const s = new MoveSfx(1.85, 0x5eb0);
+    for (let i = 0; i < 5; i++) {
+      const at = 0.5 + i * 0.12;
+      s.pulse(at - 0.5, 0.5, { freq: (u) => 500 + 500 * Math.sin(Math.PI * u), gain: env.ramp(0.05, 0.1), duty: 0.25 });
+      s.thud(at, 0.55 - i * 0.04, 0.6);
+      s.noise(at, 0.25, { clock: env.ramp(5000, 1500), gain: env.attackDecay(0.32, 0.05) });
+    }
+    for (let i = 0; i < 4; i++) s.noise(1.1 + i * 0.08, 0.03, { clock: () => 4000 + s.random() * 2000, gain: env.decay(0.14, 1) });
     return s;
   },
 
-  /** Generic lob (0.52 s) + Sp. Def drop fleck (~0.65 s): a glowing seed blooms into a big shockwave of bright flowering light. */
+  /** Custom (pale 0-0.3 s, cyan sparks gather 0.3-0.9 s, beams shoot up 0.9-1.4 s, flare on the target 1.35 s, to ~1.9 s, clears to 2.15 s): light gathers, beams soar up and a bright flowering shockwave bursts. */
   seedflare: () => {
-    const s = new MoveSfx(1.3, 0x5ef1);
-    s.wave(0.0, 0.52, { freq: (u) => 600 + 600 * u, gain: env.ramp(0.1, 0.22) });
-    s.sparkle(0.05, 0.45, 5, { lo: 2500, hi: 4500, gain: 0.12 });
-    s.thud(0.52, 0.6, 0.8);
-    s.noise(0.52, 0.4, { clock: env.ramp(6000, 800), gain: env.attackDecay(0.4, 0.05) });
-    s.chord(0.55, 0.3, [72, 76, 79], { rate: 0.03, gain: 0.16 });
-    s.statDown(0.7, 0.24);
+    const s = new MoveSfx(2.35, 0x5ef1);
+    s.sparkle(0.3, 0.6, 8, { lo: 2500, hi: 4500, gain: 0.12 });
+    s.wave(0.3, 0.6, { freq: (u) => 400 + 400 * u, gain: env.ramp(0.05, 0.18) });
+    s.whoosh(0.9, 0.45, { from: 1500, to: 8000, gain: 0.22 });
+    s.wave(0.9, 0.45, { freq: (u) => 800 + 1200 * u, gain: env.attackDecay(0.16, 0.2) });
+    s.thud(1.35, 0.7, 0.8);
+    s.noise(1.35, 0.45, { clock: env.ramp(6000, 800), gain: env.attackDecay(0.4, 0.05) });
+    s.chord(1.38, 0.45, [72, 76, 79], { rate: 0.03, gain: 0.16 });
     return s;
   },
 

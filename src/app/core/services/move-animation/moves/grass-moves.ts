@@ -8,9 +8,11 @@ import { GrassKnot } from './grass/grass-knot';
 import { LeafStorm } from './grass/leaf-storm';
 import { PetalBlizzard } from './grass/petal-blizzard';
 import { PowerWhip } from './grass/power-whip';
+import { SeedBomb } from './grass/seed-bomb';
+import { SeedFlare } from './grass/seed-flare';
 import { SpikyShield } from './grass/spiky-shield';
 
-/** Hand-made animations for Grass-type moves (Energy Ball, Grass Knot, Leaf Storm, Petal Blizzard and Spiky Shield live in `grass/`). */
+/** Hand-made animations for Grass-type moves (Energy Ball, Grass Knot, Leaf Storm, Petal Blizzard, Power Whip, Seed Bomb, Seed Flare and Spiky Shield live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -26,6 +28,8 @@ export class GrassMoveAnimations {
     petalblizzard: (refs, _launch, target, v) => PetalBlizzard.play(refs, target, v),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     powerwhip: (refs, _launch, target) => PowerWhip.play(refs, target),
+    seedbomb: (refs, launch, target) => SeedBomb.play(refs, launch, target),
+    seedflare: (refs, launch, target, v) => SeedFlare.play(refs, launch, target, v),
     sleeppowder: (refs, _launch, target, v) => GrassMoveAnimations.playSleepPowder(refs, target, v),
     solarbeam: (refs, _launch, target) => GrassMoveAnimations.playSolarBeam(refs, target),
     spikyshield: (refs, launch, _target, v) => SpikyShield.play(refs, launch, v),

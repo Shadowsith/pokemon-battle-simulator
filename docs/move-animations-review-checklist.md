@@ -636,45 +636,45 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Steinpolitur
   - Gen 4 APNG: https://www.pokewiki.de/images/5/5e/Steinpolitur_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/9/96/Steinpolitur_Gen5.png
-- [ ] ⭐ **Rock Wrecker** / Felswerfer — `rockwrecker` · Rock · Physical · `lob`
+- [x] ⭐ **Rock Wrecker** / Felswerfer — `rockwrecker` · Rock · Physical · dark, then a blazing orange sky with speed lines, rocks rise round the glowing user, a huge boulder hurtles at the target and smashes into a yellow dust cloud with debris (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Felswerfer
   - Gen 4 APNG: https://www.pokewiki.de/images/8/8d/Felswerfer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c3/Felswerfer_Gen5.png
-- [ ] ⭐ **Roost** / Ruheort — `roost` · Flying · Status · `selfAura`
+- [x] ⭐ **Roost** / Ruheort — `roost` · Flying · Status · white-grey feathers burst out and flutter down round the user, a white star shines on it, green heal sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Ruheort
   - Gen 4 APNG: https://www.pokewiki.de/images/8/8b/Ruheort_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/19/Ruheort_Gen5.png
-- [ ] ⭐ **Seed Bomb** / Samenbomben — `seedbomb` · Grass · Physical · `lob`
+- [x] ⭐ **Seed Bomb** / Samenbomben — `seedbomb` · Grass · Physical · five olive seeds lobbed in arcs one after another, each bursting into a fiery yellow-orange explosion on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Samenbomben
   - Gen 4 APNG: https://www.pokewiki.de/images/5/5a/Samenbomben_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/3e/Samenbomben_Gen5.png
-- [ ] ⭐ **Seed Flare** / Schocksamen — `seedflare` · Grass · Special · `projectile`
+- [x] ⭐ **Seed Flare** / Schocksamen — `seedflare` · Grass · Special · pale scene, cyan sparks gather into the glowing user, three cyan beams shoot up into the sky, a lilac-white flare with spraying cyan streaks bursts on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schocksamen
   - Gen 4 APNG: https://www.pokewiki.de/images/8/89/Schocksamen_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/9/9e/Schocksamen_Gen5.png
-- [ ] ⭐ **Shadow Claw** / Dunkelklaue — `shadowclaw` · Ghost · Physical · `melee`
+- [x] ⭐ **Shadow Claw** / Dunkelklaue — `shadowclaw` · Ghost · Physical · three black claws with red glints rake down across the target, red specks scatter, black smoke puff (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Dunkelklaue
   - Gen 4 APNG: https://www.pokewiki.de/images/4/4d/Dunkelklaue_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/9/9e/Dunkelklaue_Gen5.png
-- [ ] ⭐ **Shadow Force** / Schemenkraft — `shadowforce` · Ghost · Physical · `beam`
+- [x] ⭐ **Shadow Force** / Schemenkraft — `shadowforce` · Ghost · Physical · turn 1: the user flickers and fades out; turn 2: grey scene, the user reappears mid-lunge, purple flash on the target, black shadow clouds billow round it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schemenkraft
   - Gen 4 APNG: https://www.pokewiki.de/images/f/f4/Schemenkraft_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/14/Schemenkraft_Gen5.png
 - [ ] **Shadow Sneak** / Schattenstoß — `shadowsneak` · Ghost · Physical · `melee`
-- [ ] ⭐ **Spacial Rend** / Raumschlag — `spacialrend` · Dragon · Special · `projectile`
+- [x] ⭐ **Spacial Rend** / Raumschlag — `spacialrend` · Dragon · Special · dark, a pink-rimmed rift swirls round the user, blackout, pink rays round the target where space tears into a black hole twice (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Raumschlag
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/8/88/Raumschlag_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/d/d8/Raumschlag_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/38/Raumschlag_Gen5.png
-- [ ] ⭐ **Stealth Rock** / Tarnsteine — `stealthrock` · Rock · Status · `targetAura`
+- [x] ⭐ **Stealth Rock** / Tarnsteine — `stealthrock` · Rock · Status · five pointed stones tossed in arcs onto the foe's side, each landing in a dust puff, they rise to hover round the target and glint (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Tarnsteine
   - Gen 4 APNG: https://www.pokewiki.de/images/b/b0/Tarnsteine_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/19/Tarnsteine_Gen5.png
-- [ ] ⭐ **Stone Edge** / Steinkante — `stoneedge` · Rock · Physical · `projectile`
+- [x] ⭐ **Stone Edge** / Steinkante — `stoneedge` · Rock · Physical · pointed stones rise and circle the target, then stab into it one after another, each with a white star and a golden streak shooting up (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Steinkante
   - Gen 4 APNG: https://www.pokewiki.de/images/8/83/Steinkante_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/8f/Steinkante_Gen5.png
-- [ ] ⭐ **Sucker Punch** / Tiefschlag — `suckerpunch` · Dark · Physical · `melee`
+- [x] ⭐ **Sucker Punch** / Tiefschlag — `suckerpunch` · Dark · Physical · the user darts, a pink orb with a tail zips low into the target, pink ring burst and scattering pink specks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Tiefschlag
   - Gen 4 APNG: https://www.pokewiki.de/images/7/7d/Tiefschlag_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/36/Tiefschlag_Gen5.png
