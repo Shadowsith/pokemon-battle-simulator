@@ -3,16 +3,20 @@ import { env } from '../track.mjs';
 
 /** Dragon-type move sounds: deep roars, raw draconic energy. */
 export const DRAGON = {
-  /** Generic projectile at high power (0.43 s): a roar, then meteors rain down and explode. */
+  /** Custom (night 0-0.3 s, streaks 0.3-0.8 s, meteor hits 1.06 / 1.24 / 1.42 / 1.6 / 1.78 s, Sp. Atk drop from 2.35 s): falling stars, then five meteor crashes. */
   dracometeor: () => {
-    const s = new MoveSfx(1.6, 0xd2ac);
-    s.pulse(0.0, 0.3, { freq: (u) => 110 * (1 + 0.1 * Math.sin(2 * Math.PI * 12 * u)), gain: env.swell(0.3), duty: 0.25 });
-    for (const [at, g] of [[0.43, 0.75], [0.6, 0.6], [0.78, 0.65]]) {
-      s.pulse(at - 0.22, 0.22, { freq: (u) => 1800 - 1300 * u, gain: env.ramp(0.05, 0.14), duty: 0.125 });
-      s.thud(at, g, 0.9);
-      s.noise(at, 0.25, { clock: (u) => 9000 - 7000 * u, gain: env.attackDecay(g * 0.6, 0.03) });
+    const s = new MoveSfx(3.35, 0xd2ac);
+    s.pulse(0.0, 0.35, { freq: (u) => 110 * (1 + 0.1 * Math.sin(2 * Math.PI * 12 * u)), gain: env.swell(0.22), duty: 0.25 });
+    for (let i = 0; i < 5; i++) {
+      s.pulse(0.3 + s.random() * 0.4, 0.12, { freq: (u) => 3200 - 1800 * u, gain: env.decay(0.08, 1), duty: 0.125 });
     }
-    s.rumble(0.8, 0.75, { from: 500, to: 120, gain: 0.4 });
+    for (const at of [1.06, 1.24, 1.42, 1.6, 1.78]) {
+      s.pulse(at - 0.26, 0.26, { freq: (u) => 1800 - 1300 * u, gain: env.ramp(0.04, 0.13), duty: 0.125 });
+      s.thud(at, 0.65, 0.9);
+      s.noise(at, 0.3, { clock: (u) => 8000 - 6500 * u, gain: env.attackDecay(0.35, 0.03) });
+    }
+    s.rumble(1.8, 0.55, { from: 450, to: 120, gain: 0.35 });
+    s.statDown(2.38);
     return s;
   },
 
@@ -53,13 +57,16 @@ export const DRAGON = {
     return s;
   },
 
-  /** Generic pulse (rings every 0.13 s, impact ~0.56 s): roaring waves of draconic energy. */
+  /** Custom (dark 0-0.25 s, orb swells 0.25-0.75 s, shock stream 0.75-1.6 s, hits 1.09 / 1.31 s): a growling orb, then a roaring blast. */
   dragonpulse: () => {
-    const s = new MoveSfx(1.15, 0xd2be);
-    s.pulse(0.0, 0.55, { freq: (u) => 82 * (1 + 0.08 * Math.sin(2 * Math.PI * 14 * u)), gain: env.ramp(0.1, 0.3), duty: 0.25 });
-    for (const at of [0.02, 0.15, 0.28]) s.pulse(at, 0.15, { freq: env.ramp(330, 200), gain: env.decay(0.22, 1), duty: 0.5 });
-    s.thud(0.56, 0.75, 0.9);
-    s.noise(0.56, 0.35, { clock: (u) => 8000 - 6000 * u, gain: env.attackDecay(0.4, 0.03) });
+    const s = new MoveSfx(2.0, 0xd2be);
+    s.pulse(0.0, 0.75, { freq: (u) => 82 * (1 + 0.08 * Math.sin(2 * Math.PI * 14 * u)), gain: env.ramp(0.08, 0.28), duty: 0.25 });
+    s.wave(0.25, 0.5, { freq: (u) => 220 + 260 * u, gain: env.ramp(0.08, 0.22) });
+    s.noise(0.75, 0.85, { clock: (u) => 1800 + 2500 * Math.sin(Math.PI * u), gain: env.swell(0.35) });
+    for (let i = 0; i < 8; i++) s.pulse(0.75 + i * 0.11, 0.1, { freq: env.ramp(330, 200), gain: env.decay(0.14, 1), duty: 0.5 });
+    s.thud(1.09, 0.75, 0.9);
+    s.noise(1.09, 0.3, { clock: (u) => 8000 - 6000 * u, gain: env.attackDecay(0.3, 0.03) });
+    s.thud(1.31, 0.45, 0.6);
     return s;
   },
 
@@ -73,13 +80,20 @@ export const DRAGON = {
     return s;
   },
 
-  /** Generic melee at high power + flinch fleck: a menacing, crushing charge. */
+  /** Custom (crescent swipe, hit 0.15 s; dust tremors 0.3 / 0.52 / 0.74 s, rocks to ~1.45 s): a slash, then crashing earth and clattering rocks. */
   dragonrush: () => {
-    const s = new MoveSfx(0.85, 0xd2a7);
-    s.pulse(0.0, 0.18, { freq: (u) => 90 * (1 + 0.12 * Math.sin(2 * Math.PI * 9 * u)), gain: env.ramp(0.1, 0.3), duty: 0.25 });
-    s.whoosh(0.0, 0.18, { from: 800, to: 3500, gain: 0.35 });
-    s.thud(0.17, 0.9, 1);
-    s.flinch(0.42);
+    const s = new MoveSfx(1.6, 0xd2a7);
+    s.whoosh(0.0, 0.15, { from: 2000, to: 9000, gain: 0.3 });
+    s.slash(0.15, 0.55);
+    s.thud(0.15, 0.6, 0.7);
+    for (const at of [0.3, 0.52, 0.74]) {
+      s.thud(at, 0.7, 1);
+      s.noise(at, 0.3, { clock: (u) => 2500 - 1800 * u, gain: env.attackDecay(0.35, 0.05) });
+    }
+    for (let i = 0; i < 6; i++) {
+      s.noise(0.55 + s.random() * 0.75, 0.05, { clock: () => 3500, gain: env.decay(0.18, 1), short: true });
+    }
+    s.rumble(0.3, 0.9, { from: 300, to: 100, gain: 0.3 });
     return s;
   },
 

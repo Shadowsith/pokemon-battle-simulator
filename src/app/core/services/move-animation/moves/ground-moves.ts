@@ -11,6 +11,7 @@ export class GroundMoveAnimations {
     boneclub: (refs, launch, target, v) => GroundMoveAnimations.playBoneClub(refs, launch, target, v),
     bonemerang: (refs, launch, target, v) => GroundMoveAnimations.playBonemerang(refs, launch, target, v),
     dig: (refs, _launch, target) => GroundMoveAnimations.playDigUp(refs, target),
+    earthpower: (refs, _launch, target) => GroundMoveAnimations.playEarthPower(refs, target),
     earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs),
     landswrath: (refs, launch, target) => GroundMoveAnimations.playLandsWrath(refs, launch, target),
     precipiceblades: (refs, _launch, target) => GroundMoveAnimations.playPrecipiceBlades(refs, target),
@@ -438,6 +439,80 @@ export class GroundMoveAnimations {
       { transform: `rotate(${midRot * 2 + v.dir * 90}deg) scale(.5)`, opacity: 0 }
     ], { duration: 160, easing: 'ease-out' });
     bone.remove();
+  }
+
+  /**
+   * Earth Power, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/9/9d/Erdkr%C3%A4fte_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/e/ed/Erdkr%C3%A4fte_Gen5.png
+   *
+   * The scene turns a dark, glowing red (0-0.3 s) and the ground under the
+   * target glows orange (0.3-0.5 s). A geyser of fire erupts there, flinging
+   * red and yellow sparks high into the air (from 0.5 s; hits at 0.6, 0.82,
+   * 1.04 s); the sparks rain down (to ~1.7 s) and the scene clears (to ~2.0 s).
+   */
+  private static async playEarthPower(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+
+    const red = Fx.backdrop(fieldEl, `background:radial-gradient(circle at ${foot.x}px ${foot.y}px,#8A2A12,#4A0E06 45%,#1E0402)`);
+    await Fx.anim(red, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // The ground glows where the geyser will break out.
+    const glowW = Math.max(tr.width * 0.9, 60);
+    const glow = document.createElement('div');
+    glow.style.cssText = `width:${glowW}px;height:${glowW * 0.3}px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,#FFE07A,#FF7A1A 45%,#D0281C00 72%)`;
+    Fx.place(glow, foot);
+    fxEl.appendChild(glow);
+    await Fx.anim(glow, [{ transform: 'scale(.3)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 200, easing: 'ease-out' });
+
+    // The geyser: fire puffs shoot up from the ground in a column.
+    const effects: Promise<void>[] = [];
+    const height = Math.max(tr.height * 1.3, 90);
+    for (let i = 0; i < 14; i++) {
+      const s = glowW * (0.35 + Math.random() * 0.25);
+      const puff = FxGlyphs.firePuff(s, i % 3 ? 'hot' : 'red');
+      Fx.place(puff, { x: foot.x + (Math.random() * 2 - 1) * glowW * 0.12, y: foot.y });
+      fxEl.appendChild(puff);
+      const up = height * (0.5 + Math.random() * 0.5);
+      effects.push(
+        Fx.anim(puff, [
+          { transform: 'translateY(0) scale(.4)', opacity: 0 },
+          { transform: `translateY(${-up * 0.4}px) scale(1)`, opacity: 1, offset: 0.3 },
+          { transform: `translateY(${-up}px) scale(.5,.9)`, opacity: 0 }
+        ], { duration: 450, delay: i * 40, easing: 'ease-out' }).then(() => puff.remove())
+      );
+    }
+    // Sparks fly high, then rain down.
+    for (let i = 0; i < 20; i++) {
+      const s = 3 + Math.random() * 3;
+      const spark = document.createElement('div');
+      spark.style.cssText = `width:${s}px;height:${s}px;pointer-events:none;background:${i % 2 ? '#FF3A2A' : '#FFD84A'};box-shadow:0 0 3px ${i % 2 ? '#FF3A2A' : '#FFD84A'}`;
+      Fx.place(spark, foot);
+      fxEl.appendChild(spark);
+      const out = (Math.random() * 2 - 1) * tr.width * 0.8;
+      const up = height * (0.8 + Math.random() * 0.6);
+      effects.push(
+        Fx.anim(spark, [
+          { transform: 'translate(0,0)', opacity: 1 },
+          { transform: `translate(${out * 0.6}px,${-up}px)`, opacity: 1, offset: 0.45 },
+          { transform: `translate(${out}px,${-up * 0.35}px)`, opacity: 0 }
+        ], { duration: 700 + Math.random() * 200, delay: 50 + Math.random() * 250, easing: 'cubic-bezier(.2,.7,.5,1)' }).then(() => spark.remove())
+      );
+    }
+    for (let k = 0; k < 3; k++) {
+      setTimeout(() => {
+        Fx.flash(targetEl, '#FF8A3A', 0.7);
+        Fx.shake(targetEl, 6);
+        if (k === 0) Fx.shakeField(fieldEl, 0.6);
+      }, 100 + k * 220);
+    }
+    Fx.anim(glow, [{ opacity: 1 }, { opacity: 0 }], { duration: 700, delay: 300, easing: 'ease-in' }).then(() => glow.remove());
+    await Promise.all(effects);
+
+    await Fx.anim(red, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    red.remove();
   }
 
   /**

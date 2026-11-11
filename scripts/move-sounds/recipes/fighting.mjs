@@ -135,12 +135,15 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee punch + drain: a punch that saps energy back to the user. */
+  /** Custom (dim 0-0.2 s, fist hits 0.35 s, orbs drift back 0.5-1.5 s, heal stars 1.5-2.4 s): a punch, then sapped energy flows back. */
   drainpunch: () => {
-    const s = new MoveSfx(1.1, 0xd2a9);
-    s.whoosh(0.0, 0.18, { from: 2000, to: 7000, gain: 0.3 });
-    s.thud(0.17, 0.65, 0.6);
-    s.drain(0.4);
+    const s = new MoveSfx(2.5, 0xd2a9);
+    s.whoosh(0.2, 0.15, { from: 2000, to: 7000, gain: 0.3 });
+    s.thud(0.35, 0.7, 0.6);
+    s.drain(0.5);
+    s.wave(0.5, 1.0, { freq: (u) => 520 + 300 * u, gain: env.swell(0.1) });
+    s.arpeggio(1.5, [72, 76, 79, 84, 88], 0.09, { gain: 0.16, voice: 'wave', hold: 0.15 });
+    s.sparkle(1.5, 0.8, 7, { lo: 3500, hi: 6000, gain: 0.12 });
     return s;
   },
 
@@ -191,14 +194,17 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic lob (arcs 0.52 s, fleck at ~0.65 s): a humming ball of focused aura bursts, then a stat-down run. */
+  /** Custom (red rush 0-0.3 s, rings close in 0.3-0.95 s, shot 0.95-1.25 s, burst rings 1.25 / 1.39 s): a gathering hum, a launch, a huge blast. */
   focusblast: () => {
-    const s = new MoveSfx(1.35, 0xf0cb);
-    s.wave(0.0, 0.52, { freq: (u) => 200 + 250 * u, gain: env.ramp(0.12, 0.25) });
-    s.pulse(0.0, 0.52, { freq: (u) => 100 + 125 * u, gain: env.ramp(0.06, 0.15), duty: 0.25 });
-    s.thud(0.52, 0.75, 0.9);
-    s.noise(0.52, 0.3, { clock: (u) => 10000 - 7000 * u, gain: env.attackDecay(0.45, 0.03) });
-    s.statDown(0.68);
+    const s = new MoveSfx(2.25, 0xf0cb);
+    s.noise(0.0, 1.95, { clock: () => 1800, gain: (u) => 0.12 * Math.min(1, u * 6) * Math.min(1, (1 - u) * 5) });
+    s.wave(0.3, 0.65, { freq: (u) => 200 + 250 * u, gain: env.ramp(0.1, 0.25) });
+    for (const at of [0.3, 0.43, 0.56]) s.pulse(at, 0.3, { freq: env.ramp(900, 450), gain: env.swell(0.1), duty: 0.25 });
+    s.whoosh(0.95, 0.3, { from: 1200, to: 6000, gain: 0.3 });
+    s.thud(1.25, 0.8, 0.9);
+    s.noise(1.25, 0.3, { clock: (u) => 10000 - 7000 * u, gain: env.attackDecay(0.4, 0.03) });
+    s.thud(1.39, 0.4, 0.6);
+    s.sparkle(1.3, 0.45, 5, { lo: 3000, hi: 5500, gain: 0.12 });
     return s;
   },
 

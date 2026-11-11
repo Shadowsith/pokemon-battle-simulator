@@ -98,7 +98,8 @@ export const FIST_TONES = {
   red: { fill: '#D8342A', edge: '#6E1010', lines: '#8E1A14', glow: '#FF8A3C' },
   ice: { fill: '#8FD4FF', edge: '#2A6CB5', lines: '#4A90D0', glow: '#CFF0FF' },
   blue: { fill: '#5A6AF0', edge: '#1A2490', lines: '#2A3AB8', glow: '#9AB0FF' },
-  dark: { fill: '#262626', edge: '#0A0A0A', lines: '#5A5A5A', glow: '#FFF3A0' }
+  dark: { fill: '#262626', edge: '#0A0A0A', lines: '#5A5A5A', glow: '#FFF3A0' },
+  brown: { fill: '#A8682A', edge: '#4A2808', lines: '#6A3C10', glow: '#F0C860' }
 };
 
 export const WEATHER_COLOR: Record<Exclude<Weather, null>, string> = {

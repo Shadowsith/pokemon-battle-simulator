@@ -3,17 +3,21 @@ import { DIM_BACKDROP, FLECK_COLOR } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { EnergyBall } from './grass/energy-ball';
+import { GrassKnot } from './grass/grass-knot';
 import { PetalBlizzard } from './grass/petal-blizzard';
 import { SpikyShield } from './grass/spiky-shield';
 
-/** Hand-made animations for Grass-type moves (Petal Blizzard and Spiky Shield live in `grass/`). */
+/** Hand-made animations for Grass-type moves (Energy Ball, Grass Knot, Petal Blizzard and Spiky Shield live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     absorb: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target),
     aromatherapy: (refs, launch) => GrassMoveAnimations.playAromatherapy(refs, launch),
+    energyball: (refs, launch, target) => EnergyBall.play(refs, launch, target),
     frenzyplant: (refs, launch, target) => GrassMoveAnimations.playFrenzyPlant(refs, launch, target),
     gigadrain: (refs, launch, target) => GrassMoveAnimations.playGigaDrain(refs, launch, target),
+    grassknot: (refs, _launch, target) => GrassKnot.play(refs, target),
     leafblade: (refs, _launch, target) => GrassMoveAnimations.playLeafBlade(refs, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
     petalblizzard: (refs, _launch, target, v) => PetalBlizzard.play(refs, target, v),
@@ -123,7 +127,7 @@ export class GrassMoveAnimations {
     const leaves: Promise<void>[] = [];
     const reach = Math.max(r.width * 1.1, 80);
     for (let i = 0; i < 12; i++) {
-      const leaf = GrassMoveAnimations.leafGlyph(12 + Math.random() * 8);
+      const leaf = FxGlyphs.leafGlyph(12 + Math.random() * 8);
       Fx.place(leaf, target);
       fxEl.appendChild(leaf);
       const ang = (Math.PI * 2 * i) / 12 + Math.random() * 0.3;
@@ -146,19 +150,12 @@ export class GrassMoveAnimations {
     await Fx.wait(150);
   }
 
-  /** A green leaf: pointed oval, lighter towards one tip (Frenzy Plant, Leaf Blade). */
-  private static leafGlyph(s: number): HTMLElement {
-    const el = document.createElement('div');
-    el.style.cssText = `position:absolute;width:${s}px;height:${s * 0.6}px;pointer-events:none;border-radius:0 100% 0 100%;background:linear-gradient(135deg,#9AF07A,#3AA840 60%,#22802A);opacity:.9`;
-    return el;
-  }
-
   /** Green leaves and white motes drifting up across `layer` (`W` x `H` px) for about `total` ms. */
   private static risingLeaves(layer: HTMLElement, W: number, H: number, total: number) {
     for (let i = 0; i < 26; i++) {
       const isLeaf = i % 3 !== 2;
       const s = isLeaf ? 12 + Math.random() * 12 : 3 + Math.random() * 4;
-      const el = isLeaf ? GrassMoveAnimations.leafGlyph(s) : document.createElement('div');
+      const el = isLeaf ? FxGlyphs.leafGlyph(s) : document.createElement('div');
       if (!isLeaf) el.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;background:#fff;box-shadow:0 0 6px #fff`;
       el.style.left = `${Math.random() * W}px`;
       el.style.top = `${H}px`;

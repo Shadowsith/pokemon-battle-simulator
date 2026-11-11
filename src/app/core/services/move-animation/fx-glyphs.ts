@@ -449,6 +449,13 @@ export class FxGlyphs {
     return petal;
   }
 
+  /** A green leaf: pointed oval, lighter towards one tip (Frenzy Plant, Leaf Blade, Grass Knot). */
+  static leafGlyph(s: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${s}px;height:${s * 0.6}px;pointer-events:none;border-radius:0 100% 0 100%;background:linear-gradient(135deg,#9AF07A,#3AA840 60%,#22802A);opacity:.9`;
+    return el;
+  }
+
   /** A plain music note in `color` with a dark outline (Heal Bell). */
   static musicNote(size: number, color: string, note = '♪'): HTMLElement {
     const el = document.createElement('div');

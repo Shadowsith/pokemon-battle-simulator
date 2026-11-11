@@ -1,4 +1,5 @@
 import { Point, BattleStageRefs, MoveVisual, MoveAnimRegistry } from '../animation.types';
+import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
@@ -12,12 +13,117 @@ export class SteelMoveAnimations {
   /** Hand-made Steel move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     doomdesire: (refs) => SteelMoveAnimations.playDoomDesireHit(refs),
+    flashcannon: (refs, launch, target) => SteelMoveAnimations.playFlashCannon(refs, launch, target),
     irondefense: (refs, launch) => SteelMoveAnimations.playIronDefense(refs, launch),
     irontail: (refs, launch, target, v) => SteelMoveAnimations.playIronTail(refs, launch, target, v),
     kingsshield: (refs, launch, _target, v) => SteelMoveAnimations.playKingsShield(refs, launch, v),
     meteormash: (refs, _launch, target) => SteelMoveAnimations.playMeteorMash(refs, target),
     steelwing: (refs, launch, target, v) => SteelMoveAnimations.playSteelWing(refs, launch, target, v)
   };
+
+  /**
+   * Flash Cannon, after the Gen 4 / Gen 5 animation:
+   * - Gen 4 (DPPt): https://www.pokewiki.de/images/8/86/Lichtkanone_DPPt.png
+   * - Gen 4 (HGSS): https://www.pokewiki.de/images/2/28/Lichtkanone_HGSS.png
+   * - Gen 5: https://www.pokewiki.de/images/5/53/Lichtkanone_Gen5.png
+   *
+   * The scene goes dark (0-0.25 s) and streaks of white light rush in to the
+   * user while sparkles twinkle on it (0.25-0.75 s). A white orb with a
+   * magenta core and ring forms in front of it (0.6-0.95 s) and fires a
+   * white beam at the target (0.95-1.35 s, hit at 1.1 s), where red light
+   * puffs and white rings burst out (to ~2.0 s); the scene clears (to ~2.3 s).
+   */
+  private static async playFlashCannon(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dir = target.x >= launch.x ? 1 : -1;
+    const at: Point = { x: launch.x + dir * lr.width * 0.25, y: launch.y };
+
+    const dark = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    // Light gathers: white streaks rush in, sparkles twinkle on the user.
+    const reach = Math.max(lr.width, lr.height) * 1.4;
+    for (let i = 0; i < 12; i++) {
+      const ang = Math.random() * Math.PI * 2;
+      const len = 20 + Math.random() * 25;
+      const streak = document.createElement('div');
+      streak.style.cssText = `width:${len}px;height:2px;border-radius:2px;pointer-events:none;background:linear-gradient(90deg,#ffffff,#ffffff00)`;
+      Fx.place(streak, at);
+      fxEl.appendChild(streak);
+      const deg = (ang * 180) / Math.PI;
+      const from = `translate(${Math.cos(ang) * reach}px,${Math.sin(ang) * reach}px) rotate(${deg}deg)`;
+      Fx.anim(streak, [
+        { transform: from, opacity: 0 },
+        { transform: from, opacity: 1, offset: 0.2 },
+        { transform: `translate(0,0) rotate(${deg}deg)`, opacity: 0.6 }
+      ], { duration: 380, delay: Math.random() * 250, easing: 'ease-in' }).then(() => streak.remove());
+    }
+    for (let i = 0; i < 6; i++) {
+      const star = FxGlyphs.sparkStar(10 + Math.random() * 8, '#ffffff');
+      Fx.place(star, { x: launch.x + (Math.random() * 2 - 1) * lr.width * 0.4, y: launch.y + (Math.random() * 2 - 1) * lr.height * 0.4 });
+      fxEl.appendChild(star);
+      Fx.anim(star, [
+        { transform: 'scale(0)', opacity: 0 },
+        { transform: 'scale(1.1)', opacity: 1, offset: 0.5 },
+        { transform: 'scale(0)', opacity: 0 }
+      ], { duration: 350, delay: Math.random() * 300, easing: 'ease-in-out' }).then(() => star.remove());
+    }
+    await Fx.wait(350);
+
+    // The orb: magenta core and ring, turning white.
+    const size = Math.max(Math.max(lr.width, lr.height) * 0.5, 44);
+    const orb = document.createElement('div');
+    orb.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#ffffff 0 30%,#FF4AD0 52%,#FF4AD000 70%);border:3px solid #F07AF0;box-shadow:0 0 12px #FF6AE0`;
+    Fx.place(orb, at);
+    fxEl.appendChild(orb);
+    await Fx.anim(orb, [{ transform: 'scale(.2)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 350, easing: 'ease-out' });
+
+    // The beam.
+    const dx = target.x - at.x;
+    const dy = target.y - at.y;
+    const len = Math.hypot(dx, dy);
+    const beamH = size * 0.45;
+    const beam = document.createElement('div');
+    beam.style.cssText =
+      `position:absolute;left:${at.x}px;top:${at.y - beamH / 2}px;width:${len}px;height:${beamH}px;transform-origin:0 50%;pointer-events:none;` +
+      'border-radius:0 50% 50% 0 / 0 50% 50% 0;background:linear-gradient(180deg,#D0F0FF00,#E8F8FF 25%,#ffffff 50%,#E8F8FF 75%,#D0F0FF00);filter:drop-shadow(0 0 4px #9CE0FF)';
+    fxEl.insertBefore(beam, orb);
+    const rot = `rotate(${(Math.atan2(dy, dx) * 180) / Math.PI}deg)`;
+    const shot = Fx.anim(beam, [
+      { transform: `${rot} scaleX(0)`, opacity: 1 },
+      { transform: `${rot} scaleX(1)`, opacity: 1, offset: 0.4 },
+      { transform: `${rot} scaleX(1) scaleY(.2)`, opacity: 0 }
+    ], { duration: 400, easing: 'ease-out' }).then(() => beam.remove());
+    Fx.anim(orb, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(.3)', opacity: 0 }], { duration: 400, easing: 'ease-in' }).then(() => orb.remove());
+    await Fx.wait(160);
+
+    // The hit: red light puffs and white rings.
+    Fx.flash(targetEl, '#ffffff', 0.9);
+    Fx.shake(targetEl, 6);
+    const effects: Promise<void>[] = [shot, FxEffects.smokePuff(fxEl, target, Math.max(tr.width, 70), ['#FF5A6A', '#E0203A'])];
+    for (let i = 0; i < 10; i++) {
+      const s = 8 + Math.random() * 10;
+      const ring = document.createElement('div');
+      ring.style.cssText = `width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;border:1.5px solid #ffffff;box-shadow:0 0 3px #ffffff`;
+      Fx.place(ring, target);
+      fxEl.appendChild(ring);
+      const ang = Math.random() * Math.PI * 2;
+      const d = Math.max(tr.width, 60) * (0.4 + Math.random() * 0.4);
+      effects.push(
+        Fx.anim(ring, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${Math.cos(ang) * d * 0.6}px,${Math.sin(ang) * d * 0.6}px) scale(1)`, opacity: 1, offset: 0.4 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d - 10}px) scale(1.1)`, opacity: 0 }
+        ], { duration: 650, delay: 100 + Math.random() * 150, easing: 'ease-out' }).then(() => ring.remove())
+      );
+    }
+    await Promise.all(effects);
+
+    await Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    dark.remove();
+  }
 
   /**
    * King's Shield, after the XY animation: magenta sparks crackle round the

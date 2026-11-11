@@ -63,15 +63,16 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic lob + stat-down fleck: a humming ball of nature energy arcs over (0.52 s) and bursts. */
+  /** Custom (dim 0-0.25 s, green aura 0.25-0.75 s, ball flies 0.75-1.1 s, bursts into bubbles 1.1 s, sparkles to ~1.85 s): a humming charge, a flying ball, a bubbly pop. */
   energyball: () => {
-    const s = new MoveSfx(1.3, 0xeba1);
-    s.wave(0.0, 0.52, { freq: (u) => 520 * (1 + 0.05 * Math.sin(2 * Math.PI * 9 * u)), gain: env.ramp(0.15, 0.3) });
-    s.pulse(0.0, 0.52, { freq: () => 1040, gain: () => 0.06, duty: 0.25 });
-    s.noise(0.52, 0.3, { clock: (u) => 8000 - 5000 * u, gain: env.attackDecay(0.4, 0.04) });
-    s.thud(0.52, 0.4, 0.4);
-    s.sparkle(0.55, 0.25, 4, { lo: 1800, hi: 3200, gain: 0.15 });
-    s.statDown(0.68, 0.22);
+    const s = new MoveSfx(2.25, 0xeba1);
+    s.wave(0.25, 0.5, { freq: (u) => 520 * (1 + 0.05 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.25) });
+    s.pulse(0.25, 0.5, { freq: () => 1040, gain: env.swell(0.05), duty: 0.25 });
+    s.wave(0.75, 0.35, { freq: (u) => 600 + 300 * u, gain: env.ramp(0.12, 0.22) });
+    s.noise(1.1, 0.3, { clock: (u) => 8000 - 5000 * u, gain: env.attackDecay(0.35, 0.04) });
+    s.thud(1.1, 0.45, 0.4);
+    s.bubbles(1.15, 0.5, 6, { lo: 500, hi: 1200, gain: 0.2 });
+    s.sparkle(1.2, 0.6, 6, { lo: 1800, hi: 3200, gain: 0.12 });
     return s;
   },
 
@@ -115,13 +116,14 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): grass snaps up, tangles round the foe's feet and trips it. */
+  /** Custom (grass loop rises and tightens 0-0.5 s, trip 0.5 s, leaves flutter to ~1.55 s): rustling grass snaps tight and trips the foe. */
   grassknot: () => {
-    const s = new MoveSfx(0.85, 0x6a5c);
-    s.noise(0.02, 0.4, { clock: env.ramp(1500, 4000), gain: env.swell(0.14) });
-    s.pulse(0.3, 0.12, { freq: (u) => 600 + 900 * u, gain: env.decay(0.2, 1), duty: 0.25 });
-    s.noise(0.43, 0.05, { clock: () => 12000, gain: env.decay(0.3, 1) });
-    s.thud(0.45, 0.6, 0.6);
+    const s = new MoveSfx(1.65, 0x6a5c);
+    s.noise(0.0, 0.5, { clock: env.ramp(1500, 4000), gain: env.swell(0.14) });
+    s.pulse(0.38, 0.12, { freq: (u) => 600 + 900 * u, gain: env.decay(0.2, 1), duty: 0.25 });
+    s.noise(0.49, 0.05, { clock: () => 12000, gain: env.decay(0.3, 1) });
+    s.thud(0.5, 0.6, 0.6);
+    s.noise(0.55, 1.0, { clock: (u) => 3500 - 1500 * u, gain: env.decay(0.12, 2) });
     return s;
   },
 

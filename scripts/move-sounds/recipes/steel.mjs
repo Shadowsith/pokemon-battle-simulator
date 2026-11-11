@@ -41,15 +41,17 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic beam (grows 0.26 s, holds to ~0.52 s, fades to ~0.72 s) + Sp. Def drop fleck (0.8 s): a gleaming metallic ray. */
+  /** Custom (dark 0-0.25 s, light gathers 0.25-0.6 s, orb 0.6-0.95 s, beam 0.95-1.35 s, hit 1.1 s, rings to ~2.0 s): gathering light, a gleaming ray, a bright burst. */
   flashcannon: () => {
-    const s = new MoveSfx(1.45, 0xf1ac);
-    s.noise(0.0, 0.72, { clock: () => 6000, gain: (u) => 0.22 * Math.min(1, u * 3) * Math.min(1, (1 - u) * 3), short: true });
-    s.chord(0.0, 0.72, [79, 86, 91], { rate: 0.025, gain: 0.2, voice: 'pulse' });
-    s.wave(0.0, 0.7, { freq: env.ramp(500, 900), gain: env.swell(0.2) });
-    s.thud(0.26, 0.45, 0.4);
-    s.sparkle(0.26, 0.4, 6, { lo: 4000, hi: 7000, gain: 0.14 });
-    s.statDown(0.8);
+    const s = new MoveSfx(2.4, 0xf1ac);
+    s.whoosh(0.25, 0.35, { from: 6000, to: 2000, gain: 0.15 });
+    s.sparkle(0.25, 0.4, 5, { lo: 4000, hi: 7000, gain: 0.12 });
+    s.chord(0.6, 0.35, [79, 86, 91], { rate: 0.025, gain: 0.16, voice: 'pulse' });
+    s.noise(0.95, 0.4, { clock: () => 6000, gain: (u) => 0.22 * Math.min(1, u * 4) * Math.min(1, (1 - u) * 3), short: true });
+    s.wave(0.95, 0.4, { freq: env.ramp(500, 900), gain: env.swell(0.2) });
+    s.thud(1.1, 0.6, 0.6);
+    s.noise(1.1, 0.25, { clock: (u) => 9000 - 6000 * u, gain: env.attackDecay(0.3, 0.03) });
+    s.sparkle(1.25, 0.7, 7, { lo: 4500, hi: 7500, gain: 0.12 });
     return s;
   },
 

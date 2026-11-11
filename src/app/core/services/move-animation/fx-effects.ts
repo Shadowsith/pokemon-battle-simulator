@@ -430,7 +430,7 @@ export class FxEffects {
   /**
    * A backdrop with flickering burst rays centred on `at`, behind the sprites:
    * red with yellow rays (Dynamic Punch, Megahorn), blue with white rays
-   * (Focus Punch) or red-brown with peach rays (Psycho Boost). Resolves once it has faded in; the caller fades it out and removes it.
+   * (Focus Punch), red-brown with peach rays (Psycho Boost) or magenta with pink rays (Giga Impact). Resolves once it has faded in; the caller fades it out and removes it.
    */
   static async burstBackdrop(fieldEl: HTMLElement, at: Point, tone: keyof typeof BURST_TONES = 'red'): Promise<HTMLElement> {
     const t = BURST_TONES[tone];
@@ -610,5 +610,6 @@ export interface ClawStyle {
 const BURST_TONES = {
   red: { bg: ['#FF4A1A', '#D0140E', '#6A0404'], core: '#FFE07A', ray: '#FFB03A', rayHi: '#FFE87A' },
   blue: { bg: ['#D8F4FF', '#2AA8F0', '#0A3A8A'], core: '#FFFFFF', ray: '#E8F8FF', rayHi: '#FFFFFF' },
-  ember: { bg: ['#D8521E', '#A8340E', '#4A1004'], core: '#FF3A4A', ray: '#F4A47A', rayHi: '#FFD8B8' }
+  ember: { bg: ['#D8521E', '#A8340E', '#4A1004'], core: '#FF3A4A', ray: '#F4A47A', rayHi: '#FFD8B8' },
+  magenta: { bg: ['#FF6AA8', '#D0144E', '#5A0420'], core: '#FFFFFF', ray: '#FF9AC4', rayHi: '#FFE0EC' }
 };

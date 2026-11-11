@@ -13,6 +13,7 @@ export class NormalStrikeMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     bind: (refs, _launch, target) => NormalStrikeMoveAnimations.playBind(refs, target),
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
+    gigaimpact: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playGigaImpact(refs, target, v),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
     skullbash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSkullBash(refs, target, v),
     slash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v),
@@ -311,6 +312,110 @@ export class NormalStrikeMoveAnimations {
 
     await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 380, easing: 'ease-in' });
     dim.remove();
+  }
+
+  /**
+   * Giga Impact, after the Gen 4 / Gen 5 animation:
+   * - Gen 4 (DPPt): https://www.pokewiki.de/images/2/20/Gigasto%C3%9F_DPPt.png
+   * - Gen 4 (HGSS): https://www.pokewiki.de/images/b/ba/Gigasto%C3%9F_HGSS.png
+   * - Gen 5: https://www.pokewiki.de/images/d/da/Gigasto%C3%9F_Gen5.png
+   *
+   * The scene goes black (0-0.2 s) and a white ring closes in on the target
+   * (0.2-0.6 s), then the user lunges. On impact (0.78 s) a magenta backdrop
+   * with flickering pink rays bursts behind the target, a pink impact star
+   * flares and red sparks scatter while white streaks shoot across
+   * (0.78-1.8 s, a second jolt at 1.08 s); black again, then the scene comes
+   * back (to ~2.15 s).
+   */
+  private static async playGigaImpact(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const tr = Fx.rect(targetEl);
+
+    const black = Fx.backdrop(fieldEl, 'background:#000');
+    await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+
+    // A white ring closes in on the target while the user lunges.
+    const ringSize = Math.max(tr.width, tr.height) * 1.3;
+    const ring = document.createElement('div');
+    ring.style.cssText = `width:${ringSize}px;height:${ringSize}px;border-radius:50%;pointer-events:none;border:3px solid #E8E8F0;box-shadow:0 0 6px #ffffff`;
+    Fx.place(ring, target);
+    fxEl.appendChild(ring);
+    const close = Fx.anim(ring, [
+      { transform: 'scale(2.5)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(.9)', opacity: 0 }
+    ], { duration: 400, easing: 'ease-in' }).then(() => ring.remove());
+    await close;
+
+    // The user lunges; the burst backdrop fades in behind the black and shows on impact.
+    const lunge = Fx.anim(launchEl, [
+      { transform: 'translateX(0)' },
+      { transform: `translateX(${v.dir * 60}px)`, offset: 0.6 },
+      { transform: 'translateX(0)' }
+    ], { duration: 300, easing: 'ease-in', fill: 'none' });
+    const burstIn = FxEffects.burstBackdrop(fieldEl, target, 'magenta');
+    await Fx.wait(180);
+
+    // Impact: magenta burst backdrop, pink star, red sparks, white streaks.
+    black.remove();
+    const star = FxGlyphs.spikyBurst(Math.max(tr.width * 0.9, 70), '#FF4A8A', '#FFB0D0', '#ffffff');
+    Fx.place(star, target);
+    fxEl.appendChild(star);
+    const effects: Promise<void>[] = [
+      Fx.anim(star, [
+        { transform: 'scale(.3)', opacity: 1 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.3 },
+        { transform: 'scale(1.15)', opacity: 0 }
+      ], { duration: 500, easing: 'ease-out' }).then(() => star.remove())
+    ];
+    for (let i = 0; i < 14; i++) {
+      const s = 5 + Math.random() * 7;
+      const spark = document.createElement('div');
+      spark.style.cssText = `width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFE0E8,#FF2A4A 60%,#FF2A4A00);box-shadow:0 0 4px #FF4A6A`;
+      Fx.place(spark, target);
+      fxEl.appendChild(spark);
+      const ang = Math.random() * Math.PI * 2;
+      const d = Math.max(tr.width, 60) * (0.6 + Math.random() * 0.6);
+      effects.push(
+        Fx.anim(spark, [
+          { transform: 'translate(0,0)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px)`, opacity: 0 }
+        ], { duration: 550 + Math.random() * 250, delay: Math.random() * 200, easing: 'ease-out' }).then(() => spark.remove())
+      );
+    }
+    for (let i = 0; i < 8; i++) {
+      const len = 40 + Math.random() * 60;
+      const streak = document.createElement('div');
+      streak.style.cssText = `width:${len}px;height:3px;border-radius:3px;pointer-events:none;background:linear-gradient(90deg,#ffffff00,#ffffff,#ffffff00)`;
+      const ang = Math.random() * Math.PI * 2;
+      const deg = (ang * 180) / Math.PI;
+      const from = Math.max(tr.width * 0.6, 40);
+      const to = Math.max(W, H);
+      Fx.place(streak, target);
+      fxEl.appendChild(streak);
+      effects.push(
+        Fx.anim(streak, [
+          { transform: `rotate(${deg}deg) translateX(${from}px)`, opacity: 1 },
+          { transform: `rotate(${deg}deg) translateX(${to}px)`, opacity: 0 }
+        ], { duration: 400, delay: Math.random() * 500, easing: 'ease-out' }).then(() => streak.remove())
+      );
+    }
+    Fx.flash(targetEl, '#FF9AC4', 0.9);
+    Fx.shake(targetEl, 8);
+    Fx.shakeField(fieldEl, 0.9);
+    setTimeout(() => { Fx.flash(targetEl, '#ffffff', 0.7); Fx.shake(targetEl, 6); }, 300);
+    const burst = await burstIn;
+    await Promise.all([lunge, ...effects]);
+
+    // Black again, then the scene comes back.
+    const back = Fx.backdrop(fieldEl, 'background:#000');
+    burst.after(back);
+    await Fx.anim(back, [{ opacity: 0 }, { opacity: 1 }], { duration: 120, easing: 'ease-out' });
+    burst.remove();
+    await Fx.anim(back, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' });
+    back.remove();
   }
 
   /**

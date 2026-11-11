@@ -11,11 +11,63 @@ export class FightingPunchMoveAnimations {
     brickbreak: (refs, _launch, target) => FightingPunchMoveAnimations.playBrickBreak(refs, target),
     closecombat: (refs, launch, target) => FightingPunchMoveAnimations.playCloseCombat(refs, launch, target),
     crosschop: (refs, _launch, target) => FightingPunchMoveAnimations.playCrossChop(refs, target),
+    drainpunch: (refs, launch, target) => FightingPunchMoveAnimations.playDrainPunch(refs, launch, target),
     dynamicpunch: (refs, _launch, target) => FightingPunchMoveAnimations.playDynamicPunch(refs, target),
     focuspunch: (refs, launch, target) => FightingPunchMoveAnimations.playFocusPunch(refs, launch, target),
     skyuppercut: (refs) => FightingPunchMoveAnimations.playSkyUppercut(refs),
     superpower: (refs, launch, target, v) => FightingPunchMoveAnimations.playSuperpower(refs, launch, target, v)
   };
+
+  /**
+   * Drain Punch, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/3/34/Ableithieb_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/8/88/Ableithieb_Gen5.png
+   *
+   * The scene dims (0-0.2 s) and a brown fist slams into the target (hit at
+   * 0.35 s). Glowing yellow orbs float out of the target and drift back to the
+   * user on wavy arcs (0.5-1.5 s) while the scene clears; then green heal
+   * stars twinkle round the user (1.5-2.4 s).
+   */
+  private static async playDrainPunch(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 0.7 }], { duration: 200, easing: 'ease-out' });
+
+    // The punch.
+    const fist = FxGlyphs.fistGlyph(Math.max(tr.width * 0.5, 40), 'brown');
+    Fx.place(fist, target);
+    fxEl.appendChild(fist);
+    await Fx.anim(fist, [{ transform: 'scale(1.8)', opacity: 0 }, { transform: 'scale(1)', opacity: 1 }], { duration: 150, easing: 'ease-in' });
+    Fx.flash(targetEl, '#F0C860', 0.7);
+    Fx.shake(targetEl, 6);
+    await Fx.anim(fist, [{ transform: 'scale(1)', opacity: 1 }, { transform: 'scale(1.1)', opacity: 0 }], { duration: 150, easing: 'ease-out' });
+    fist.remove();
+
+    // The drained energy: yellow orbs float back to the user.
+    Fx.anim(dim, [{ opacity: 0.7 }, { opacity: 0 }], { duration: 900, easing: 'ease-in' }).then(() => dim.remove());
+    const dx = launch.x - target.x;
+    const dy = launch.y - target.y;
+    const orbs: Promise<void>[] = [];
+    for (let i = 0; i < 9; i++) {
+      const s = 8 + Math.random() * 6;
+      const orb = document.createElement('div');
+      orb.style.cssText = `width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFDE0,#FFE45A 45%,#E0B02A00 72%);box-shadow:0 0 ${s}px #FFE45A`;
+      Fx.place(orb, { x: target.x + (Math.random() * 2 - 1) * tr.width * 0.25, y: target.y + (Math.random() * 2 - 1) * tr.height * 0.25 });
+      fxEl.appendChild(orb);
+      const bend = (Math.random() * 2 - 1) * 50;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 8; k++) {
+        const t = k / 8;
+        const ease = t * t * (3 - 2 * t);
+        frames.push({ transform: `translate(${dx * ease}px,${dy * ease + Math.sin(t * Math.PI) * bend}px)`, opacity: Math.min(1, t * 6, (1 - t) * 5) });
+      }
+      orbs.push(Fx.anim(orb, frames, { duration: 700, easing: 'linear', delay: i * 35 }).then(() => orb.remove()));
+    }
+    await Promise.all(orbs);
+    await FxEffects.healSparkles(refs, launch);
+  }
 
   /**
    * Superpower, after the Gen 5 animation: pale yellow streaks of light shoot

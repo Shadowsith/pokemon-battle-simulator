@@ -79,14 +79,16 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic projectile + stat-down fleck: the earth cracks open under the target (impact 0.43 s) and erupts. */
+  /** Custom (red scene 0-0.3 s, ground glows 0.3-0.5 s, fire geyser from 0.5 s, hits 0.6 / 0.82 / 1.04 s, sparks to ~1.7 s): rumbling earth bursts into a roaring geyser. */
   earthpower: () => {
-    const s = new MoveSfx(1.3, 0xea27);
-    s.rumble(0.0, 0.45, { from: 300, to: 500, gain: 0.3 });
-    s.pulse(0.0, 0.43, { freq: env.ramp(55, 80), gain: env.ramp(0.05, 0.25), duty: 0.5 });
-    s.thud(0.43, 0.6, 0.9);
-    s.noise(0.43, 0.45, { clock: (u) => 3000 - 2400 * u, gain: env.attackDecay(0.45, 0.05) });
-    s.statDown(0.6, 0.22);
+    const s = new MoveSfx(2.1, 0xea27);
+    s.rumble(0.0, 0.55, { from: 120, to: 300, gain: 0.3 });
+    s.pulse(0.0, 0.5, { freq: env.ramp(55, 80), gain: env.ramp(0.05, 0.22), duty: 0.5 });
+    s.noise(0.5, 0.8, { clock: (u) => 2500 + 2000 * Math.sin(Math.PI * u), gain: env.attackDecay(0.4, 0.08) });
+    for (const at of [0.6, 0.82, 1.04]) s.thud(at, 0.55, 0.9);
+    for (let i = 0; i < 10; i++) {
+      s.noise(0.7 + s.random() * 0.9, 0.04, { clock: () => 9000, gain: env.decay(0.14, 1), short: true });
+    }
     return s;
   },
 

@@ -478,28 +478,28 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Gen 4 APNG: https://www.pokewiki.de/images/9/9e/Ladungssto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/09/Ladungssto%C3%9F_Gen5.png
 - [ ] **Double Hit** / Doppelschlag — `doublehit` · Normal · Physical · `melee`
-- [ ] ⭐ **Draco Meteor** / Draco Meteor — `dracometeor` · Dragon · Special · `projectile`
+- [x] ⭐ **Draco Meteor** / Draco Meteor — `dracometeor` · Dragon · Special · night-blue sky with falling streaks, five blue/red meteors crash onto the target in blue clouds, user Sp. Atk drop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Draco_Meteor
   - Gen 4 APNG: https://www.pokewiki.de/images/a/af/Draco_Meteor_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b1/Draco_Meteor_Gen5.png
-- [ ] ⭐ **Dragon Pulse** / Drachenpuls — `dragonpulse` · Dragon · Special · `pulse`
+- [x] ⭐ **Dragon Pulse** / Drachenpuls — `dragonpulse` · Dragon · Special · dark scene, purple orb with violet ring at the user, stream of white blue-rimmed shock puffs to the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Drachenpuls
   - Gen 4 APNG: https://www.pokewiki.de/images/8/8f/Drachenpuls_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a1/Drachenpuls_Gen5.png
-- [ ] ⭐ **Dragon Rush** / Drachenstoß — `dragonrush` · Dragon · Physical · `melee`
+- [x] ⭐ **Dragon Rush** / Drachenstoß — `dragonrush` · Dragon · Physical · pale pink crescent swipe, yellow dust cloud bursts up round the target while dark rocks fly out (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Drachensto%C3%9F
   - Gen 4 APNG: https://www.pokewiki.de/images/4/40/Drachensto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/6e/Drachensto%C3%9F_Gen5.png
-- [ ] ⭐ **Drain Punch** / Ableithieb — `drainpunch` · Fighting · Physical · `melee`
+- [x] ⭐ **Drain Punch** / Ableithieb — `drainpunch` · Fighting · Physical · brown fist hits, yellow orbs drift back to the user, green heal stars (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Ableithieb
   - Gen 4 APNG: https://www.pokewiki.de/images/3/34/Ableithieb_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/88/Ableithieb_Gen5.png
-- [ ] ⭐ **Earth Power** / Erdkräfte — `earthpower` · Ground · Special · `projectile`
+- [x] ⭐ **Earth Power** / Erdkräfte — `earthpower` · Ground · Special · dark red scene, ground glows under the target, fire geyser erupts flinging red/yellow sparks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Erdkr%C3%A4fte
   - Gen 4 APNG: https://www.pokewiki.de/images/9/9d/Erdkr%C3%A4fte_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/ed/Erdkr%C3%A4fte_Gen5.png
 - [ ] **Embargo** / Itemsperre — `embargo` · Dark · Status · `targetAura`
-- [ ] ⭐ **Energy Ball** / Energieball — `energyball` · Grass · Special · `lob`
+- [x] ⭐ **Energy Ball** / Energieball — `energyball` · Grass · Special · dark brown scene, spiky green aura on the user, green ball flies over and bursts into little bubbles and sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Energieball
   - Gen 4 APNG: https://www.pokewiki.de/images/3/36/Energieball_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/d4/Energieball_Gen5.png
@@ -509,24 +509,24 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Flammenblitz
   - Gen 4 APNG: https://www.pokewiki.de/images/c/c0/Flammenblitz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/59/Flammenblitz_Gen5.png
-- [ ] ⭐ **Flash Cannon** / Lichtkanone — `flashcannon` · Steel · Special · `beam`
+- [x] ⭐ **Flash Cannon** / Lichtkanone — `flashcannon` · Steel · Special · dark scene, white light streaks gather, white orb with magenta ring fires a white beam, red puffs + white rings on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Lichtkanone
   - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/8/86/Lichtkanone_DPPt.png
   - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/2/28/Lichtkanone_HGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/53/Lichtkanone_Gen5.png
 - [ ] **Fling** / Schleuder — `fling` · Dark · Physical · `projectile`
-- [ ] ⭐ **Focus Blast** / Fokusstoß — `focusblast` · Fighting · Special · `lob`
+- [x] ⭐ **Focus Blast** / Fokusstoß — `focusblast` · Fighting · Special · red backdrop with speed lines, golden rings close in on a growing orb, it shoots and bursts in golden rings (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Fokussto%C3%9F
   - Gen 4 APNG: https://www.pokewiki.de/images/3/32/Fokussto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/17/Fokussto%C3%9F_Gen5.png
 - [ ] **Force Palm** / Kraftwelle — `forcepalm` · Fighting · Physical · `melee`
 - [ ] **Gastro Acid** / Magensäfte — `gastroacid` · Poison · Status · `targetAura`
-- [ ] ⭐ **Giga Impact** / Gigastoß — `gigaimpact` · Normal · Physical · `melee`
+- [x] ⭐ **Giga Impact** / Gigastoß — `gigaimpact` · Normal · Physical · black, white ring closes on the target, user lunges, magenta burst backdrop with pink star, red sparks, white streaks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Gigasto%C3%9F
   - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/2/20/Gigasto%C3%9F_DPPt.png
   - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/b/ba/Gigasto%C3%9F_HGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/da/Gigasto%C3%9F_Gen5.png
-- [ ] ⭐ **Grass Knot** / Strauchler — `grassknot` · Grass · Special · `projectile`
+- [x] ⭐ **Grass Knot** / Strauchler — `grassknot` · Grass · Special · green grass loop rises and tightens round the target, it trips, leaves burst up and flutter down (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Strauchler
   - Gen 4 APNG: https://www.pokewiki.de/images/b/be/Strauchler_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/10/Strauchler_Gen5.png

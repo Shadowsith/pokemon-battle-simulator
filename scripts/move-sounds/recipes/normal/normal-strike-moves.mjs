@@ -266,13 +266,16 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s), 150 bp: a full-body charge smashes in with a huge, booming crash. */
+  /** Custom (black 0-0.2 s, ring closes 0.2-0.6 s, lunge, impact 0.78 s, second jolt 1.08 s, burst to ~1.8 s): a tense build-up, then a huge, booming crash. */
   gigaimpact: () => {
-    const s = new MoveSfx(1.0, 0x61a1);
-    s.whoosh(0.0, 0.18, { from: 800, to: 4000, gain: 0.3 });
-    s.thud(0.17, 0.75, 1);
-    s.noise(0.17, 0.25, { clock: (u) => 8000 - 6000 * u, gain: env.attackDecay(0.4, 0.03) });
-    s.rumble(0.2, 0.7, { from: 600, to: 150, gain: 0.35 });
+    const s = new MoveSfx(2.25, 0x61a1);
+    s.pulse(0.2, 0.4, { freq: (u) => 200 + 400 * u, gain: env.ramp(0.05, 0.15), duty: 0.25 });
+    s.whoosh(0.6, 0.18, { from: 800, to: 4000, gain: 0.35 });
+    s.thud(0.78, 0.85, 1);
+    s.noise(0.78, 0.3, { clock: (u) => 8000 - 6000 * u, gain: env.attackDecay(0.45, 0.03) });
+    s.rumble(0.8, 0.9, { from: 600, to: 120, gain: 0.35 });
+    s.thud(1.08, 0.5, 0.7);
+    for (let i = 0; i < 4; i++) s.whoosh(0.9 + s.random() * 0.5, 0.2, { from: 6000, to: 2500, gain: 0.1 });
     return s;
   },
 
