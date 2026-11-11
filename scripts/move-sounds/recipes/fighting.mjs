@@ -14,17 +14,19 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic pulse (rings every 0.13 s, impact at ~0.56 s): a sphere of aura energy. */
+  /**
+   * Custom (2.35 s): the scene darkens (0-0.45 s), the aura swirl charges
+   * (0.45-1.15 s), the sphere flies (1.15-1.45 s) and bursts at 1.45 s.
+   */
   aurasphere: () => {
-    const s = new MoveSfx(1.1, 0xa45f);
-    s.pulse(0.0, 0.5, { freq: env.ramp(150, 300), gain: env.ramp(0.05, 0.2), duty: 0.25 });
-    s.wave(0.0, 0.5, { freq: env.ramp(300, 600), gain: env.ramp(0.05, 0.22) });
-    for (const at of [0.02, 0.15, 0.28]) {
-      s.pulse(at, 0.12, { freq: env.ramp(420, 260), gain: env.decay(0.2, 1), duty: 0.5 });
-    }
-    s.thud(0.56, 0.7, 0.8);
-    s.noise(0.56, 0.2, { clock: (u) => 10000 - 6000 * u, gain: env.attackDecay(0.4, 0.03) });
-    s.wave(0.6, 0.45, { freq: () => 600, gain: env.decay(0.15, 2) });
+    const s = new MoveSfx(2.4, 0xa45f);
+    s.wave(0.0, 0.45, { freq: env.ramp(200, 300), gain: env.swell(0.1) });
+    s.pulse(0.45, 0.7, { freq: env.ramp(150, 320), gain: env.ramp(0.05, 0.2), duty: 0.25 });
+    s.wave(0.45, 0.7, { freq: (u) => (300 + 300 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 12 * u)), gain: env.ramp(0.05, 0.22) });
+    s.whoosh(1.15, 0.3, { from: 2000, to: 8000, gain: 0.35 });
+    s.thud(1.45, 0.7, 0.8);
+    s.noise(1.45, 0.2, { clock: (u) => 10000 - 6000 * u, gain: env.attackDecay(0.4, 0.03) });
+    s.wave(1.48, 0.45, { freq: () => 600, gain: env.decay(0.15, 2) });
     return s;
   },
 
@@ -66,14 +68,20 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee at high power: a flurry of close-range blows. */
+  /**
+   * Custom (2.45 s): black flash, then speed lines and eight blows every
+   * 0.11 s from 0.25 s (last and hardest at 1.02 s); the user's Defense and
+   * Sp. Def drop at 1.55 s.
+   */
   closecombat: () => {
-    const s = new MoveSfx(0.85, 0xc1cc);
-    for (const [at, g] of [[0.05, 0.4], [0.1, 0.4], [0.14, 0.45], [0.17, 0.75]]) {
+    const s = new MoveSfx(2.5, 0xc1cc);
+    s.whoosh(0.2, 1.0, { from: 3000, to: 6000, gain: 0.12 });
+    for (let i = 0; i < 8; i++) {
+      const at = 0.25 + i * 0.11;
       s.whoosh(at - 0.05, 0.06, { from: 2000, to: 6000, gain: 0.15 });
-      s.thud(at, g, 0.4);
+      s.thud(at, i === 7 ? 0.75 : 0.45, 0.4);
     }
-    for (const at of [0.24, 0.3, 0.36]) s.thud(at, 0.4, 0.3);
+    s.statDown(1.55);
     return s;
   },
 

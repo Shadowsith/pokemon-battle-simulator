@@ -2,14 +2,20 @@ import { Point, BattleStageRefs, MoveVisual, MoveAnimRegistry } from '../animati
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { AirSlash } from './flying/air-slash';
+import { BraveBird } from './flying/brave-bird';
+import { Defog } from './flying/defog';
 import { DragonAscent } from './flying/dragon-ascent';
 
-/** Hand-made animations for Flying-type moves (Dragon Ascent lives in `flying/`). */
+/** Hand-made animations for Flying-type moves (Air Slash, Brave Bird, Defog and Dragon Ascent live in `flying/`). */
 export class FlyingMoveAnimations {
   /** Hand-made Flying move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     aeroblast: (refs, launch, target, v) => FlyingMoveAnimations.playAeroblast(refs, launch, target, v),
+    airslash: (refs, launch, target) => AirSlash.play(refs, launch, target),
     bounce: (refs, _launch, target) => FlyingMoveAnimations.playBounceDown(refs, target),
+    bravebird: (refs, launch, target) => BraveBird.play(refs, launch, target),
+    defog: (refs, launch, target) => Defog.play(refs, launch, target),
     dragonascent: (refs, launch, target, v) => DragonAscent.play(refs, launch, target, v),
     drillpeck: (refs, _launch, target, v) => FlyingMoveAnimations.playDrillPeck(refs, target, v),
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target),

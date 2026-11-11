@@ -3,17 +3,21 @@ import { env } from '../track.mjs';
 
 /** Bug-type move sounds. */
 export const BUG = {
-  /** Generic projectile (0.43 s): a swarm flies in and lands many small hits. */
+  /** Custom (1.85 s): the swarm buzzes in (0-1.2 s) and stings inside a honeycomb cloud (hits at 0.6 / 0.85 / 1.1 s). */
   attackorder: () => {
-    const s = new MoveSfx(1.1, 0xa77d);
+    const s = new MoveSfx(1.95, 0xa77d);
     for (const f of [170, 183, 196, 211]) {
-      s.pulse(0.0, 0.9, {
+      s.pulse(0.0, 1.25, {
         freq: (u) => f * (1 + 0.03 * Math.sin(2 * Math.PI * 18 * u + f)),
         gain: (u) => 0.1 * Math.min(1, u * 4) * Math.min(1, (1 - u) * 3),
         duty: 0.25,
       });
     }
-    for (let i = 0; i < 6; i++) s.thud(0.43 + i * 0.055 + s.random() * 0.02, 0.28, 0.1);
+    for (const at of [0.6, 0.85, 1.1]) {
+      s.thud(at, 0.35, 0.25);
+      for (let i = 0; i < 3; i++) s.thud(at + 0.03 + i * 0.05 + s.random() * 0.02, 0.15, 0.1);
+    }
+    s.noise(0.6, 1.0, { clock: () => 2200, gain: env.swell(0.1) });
     return s;
   },
 
@@ -27,19 +31,18 @@ export const BUG = {
     return s;
   },
 
-  /** Generic sonic (rings every 0.11 s, impact 0.43 s) + Sp. Def drop fleck: a loud insect buzz. */
+  /** Custom (1.1 s): the user buzzes with pulsing rings (0-1.0 s); the sound waves hit at 0.4 / 0.65 / 0.9 s. */
   bugbuzz: () => {
     const s = new MoveSfx(1.2, 0xbb22);
     for (const f of [220, 233, 247]) {
-      s.pulse(0.0, 0.6, {
+      s.pulse(0.0, 1.0, {
         freq: (u) => f * (1 + 0.04 * Math.sin(2 * Math.PI * 25 * u)),
         gain: (u) => 0.14 * Math.min(1, u * 6) * (0.7 + 0.3 * Math.sin(2 * Math.PI * 7 * u)) * Math.min(1, (1 - u) * 4),
         duty: 0.25,
       });
     }
-    s.noise(0.0, 0.6, { clock: () => 7000, gain: env.swell(0.12), short: true });
-    s.thud(0.43, 0.45, 0.4);
-    s.statDown(0.6);
+    s.noise(0.0, 1.0, { clock: () => 7000, gain: env.swell(0.12), short: true });
+    for (const at of [0.4, 0.65, 0.9]) s.thud(at, 0.3, 0.3);
     return s;
   },
 

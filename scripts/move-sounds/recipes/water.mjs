@@ -22,13 +22,15 @@ export const WATER = {
     return s;
   },
 
-  /** Generic melee: a swirling tail swing and a heavy splash. */
+  /** Custom (1.45 s): ripples and rising bubbles (0-0.45 s), the water swipe (0.45-0.8 s), a big splash at 0.8 s. */
   aquatail: () => {
-    const s = new MoveSfx(0.85, 0xa97a);
-    s.noise(0.0, 0.2, { clock: (u) => 2000 + 1500 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.35) });
-    s.thud(0.17, 0.5, 0.6);
-    s.splash(0.17, 0.6);
-    s.bubbles(0.3, 0.4, 5, { gain: 0.12 });
+    const s = new MoveSfx(1.55, 0xa97a);
+    s.bubbles(0.0, 0.5, 6, { gain: 0.12 });
+    s.noise(0.0, 0.45, { clock: (u) => 1500 + 1000 * u, gain: env.swell(0.18) });
+    s.whoosh(0.45, 0.35, { from: 1500, to: 5000, gain: 0.35 });
+    s.thud(0.8, 0.5, 0.6);
+    s.splash(0.8, 0.6);
+    s.bubbles(0.9, 0.4, 5, { gain: 0.1 });
     return s;
   },
 

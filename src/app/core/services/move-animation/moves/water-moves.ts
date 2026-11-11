@@ -2,15 +2,17 @@ import { Point, BattleStageRefs, BubbleStyle, MoveAnimRegistry } from '../animat
 import { BUBBLE_DRIFT, BUBBLE_BEAM, DIM_BACKDROP, WATERFALL_WAVES } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
+import { AquaTail } from './water/aqua-tail';
 import { OriginPulse } from './water/origin-pulse';
 import { SteamEruption } from './water/steam-eruption';
 import { SurfWave } from './water/surf-wave';
 import { WaterCrash } from './water/water-crash';
 
-/** Hand-made animations for Water-type moves (the Surf wave, Steam Eruption, Origin Pulse and the shared water crash live in `water/`). */
+/** Hand-made animations for Water-type moves (the Surf wave, Steam Eruption, Origin Pulse, Aqua Tail and the shared water crash live in `water/`). */
 export class WaterMoveAnimations {
   /** Hand-made Water move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    aquatail: (refs, launch, target) => AquaTail.play(refs, launch, target),
     bubble: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_DRIFT),
     bubblebeam: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_BEAM),
     crabhammer: (refs, _launch, target) => WaterMoveAnimations.playCrabhammer(refs, target),

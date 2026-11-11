@@ -53,17 +53,15 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + flinch fleck: a spinning blade of air. */
+  /** Custom (1.0 s): the blade whistles to the target (0-0.3 s), then a flurry of cuts flickers over it (hit flashes at 0.3 / 0.48 / 0.66 s). */
   airslash: () => {
-    const s = new MoveSfx(0.85, 0xa15a);
-    s.pulse(0.0, 0.43, {
-      freq: env.ramp(1800, 3200),
-      gain: (u) => 0.12 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 14 * u)),
-      duty: 0.125,
-    });
-    s.whoosh(0.0, 0.45, { from: 3000, to: 10000, gain: 0.3 });
-    s.slash(0.43, 0.6);
-    s.flinch(0.6);
+    const s = new MoveSfx(1.15, 0xa15a);
+    s.whoosh(0.0, 0.3, { from: 3000, to: 10000, gain: 0.35 });
+    s.pulse(0.0, 0.3, { freq: env.ramp(1800, 3200), gain: env.ramp(0.06, 0.14), duty: 0.125 });
+    for (const at of [0.3, 0.48, 0.66]) s.slash(at, 0.45);
+    for (let i = 0; i < 8; i++) {
+      s.noise(0.32 + i * 0.07 + s.random() * 0.03, 0.04, { clock: () => 9000, gain: env.decay(0.12, 1), short: true });
+    }
     return s;
   },
 
@@ -81,14 +79,19 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic melee at high power + recoil: a shrieking dive bomb that hurts the user too. */
+  /**
+   * Custom (1.65 s): the user winds up (0-0.25 s), dives with a shriek
+   * (0.35-0.6 s), hits at 0.6 s with a sparkle burst, then takes recoil at 1.4 s.
+   */
   bravebird: () => {
-    const s = new MoveSfx(0.9, 0xb2b1);
-    s.pulse(0.0, 0.18, { freq: env.ramp(1200, 2600), gain: env.ramp(0.08, 0.22), duty: 0.125 });
-    s.whoosh(0.0, 0.18, { from: 2000, to: 10000, gain: 0.4 });
-    s.thud(0.17, 0.85, 1);
-    s.noise(0.17, 0.2, { clock: (u) => 12000 - 8000 * u, gain: env.attackDecay(0.5, 0.03) });
-    s.thud(0.5, 0.3, 0.4);
+    const s = new MoveSfx(1.7, 0xb2b1);
+    s.whoosh(0.0, 0.25, { from: 800, to: 2000, gain: 0.15 });
+    s.pulse(0.3, 0.3, { freq: env.ramp(1200, 2600), gain: env.ramp(0.08, 0.22), duty: 0.125 });
+    s.whoosh(0.3, 0.3, { from: 2000, to: 10000, gain: 0.4 });
+    s.thud(0.6, 0.85, 1);
+    s.noise(0.6, 0.2, { clock: (u) => 12000 - 8000 * u, gain: env.attackDecay(0.5, 0.03) });
+    s.sparkle(0.62, 0.4, 6, { gain: 0.15 });
+    s.thud(1.4, 0.3, 0.4);
     return s;
   },
 
@@ -106,11 +109,12 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic target aura: a strong gust blows the fog away. */
+  /** Custom (2.45 s): fog rolls in and a long gust blows through it (0-1.55 s), then the target's evasion drops (1.55 s). */
   defog: () => {
-    const s = new MoveSfx(1.0, 0xdef9);
-    s.noise(0.02, 0.85, { clock: (u) => 1800 + 4500 * Math.sin(Math.PI * u), gain: env.swell(0.45) });
-    s.wave(0.1, 0.6, { freq: (u) => 500 + 250 * Math.sin(Math.PI * u), gain: env.swell(0.08) });
+    const s = new MoveSfx(2.5, 0xdef9);
+    s.noise(0.02, 1.5, { clock: (u) => 1800 + 4500 * Math.sin(Math.PI * u), gain: env.swell(0.45) });
+    s.wave(0.2, 1.1, { freq: (u) => 500 + 250 * Math.sin(Math.PI * u), gain: env.swell(0.08) });
+    s.statDown(1.55);
     return s;
   },
 

@@ -36,6 +36,12 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - If a move looks wrong, add a short note after the entry, e.g. `— ❌ should be a beam, not a lob`.
 - **Reviewed** = watched at least once, as attacker on both sides.
 
+## Reference animations (Pokewiki)
+⭐ moves of Gen 4 and Gen 5 list the original in-game animations as APNG images from [Pokewiki](https://www.pokewiki.de), taken from the "Durchführung" gallery of the move's page. Open a URL in the browser to watch it.
+- Gen 4 moves have a Gen 4 and a Gen 5 image; Gen 5 moves only a Gen 5 image.
+- Where Pokewiki splits Gen 4 by game, both variants are listed (`DP` / `DPPt` / `Pt` / `PtHGSS` / `HGSS`). `SW` = Schwarz/Weiß.
+- Gen 1–3 and Gen 6 moves and non-⭐ moves have no references yet.
+
 ## When a new custom animation is added
 Every move has a self-made free sound (`public/assets/sounds/moves/free/<id>.mp3`). Its recipe in `scripts/move-sounds/recipes/<type>.mjs` (Normal: `recipes/normal/`) is timed to the animation the move had when the sound was made. **Only when a move gets a new hand-made animation** (an entry in a `moves/<type>-moves.ts` registry, including a custom charge turn), check that move's free sound again:
 - [ ] Compare the free sound with the original clip (`public/assets/sounds/moves/<id>.mp3`) and with the new animation: does it still fit?
@@ -411,69 +417,172 @@ Changes to the generic delivery animations or to this review list alone don't ne
 ## Gen 4 (113)
 
 - [ ] **Acupressure** / Akupressur — `acupressure` · Normal · Status · `targetAura`
-- [ ] ⭐ **Air Slash** / Luftschnitt — `airslash` · Flying · Special · `projectile`
+- [x] ⭐ **Air Slash** / Luftschnitt — `airslash` · Flying · Special · thin cyan air blade flies over, then a flurry of white cut lines flickers round the target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Luftschnitt
+  - Gen 4 APNG: https://www.pokewiki.de/images/c/cf/Luftschnitt_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/8f/Luftschnitt_Gen5.png
 - [ ] **Aqua Jet** / Wasserdüse — `aquajet` · Water · Physical · `melee`
 - [ ] **Aqua Ring** / Wasserring — `aquaring` · Water · Status · `selfAura`
-- [ ] ⭐ **Aqua Tail** / Nassschweif — `aquatail` · Water · Physical · `melee`
+- [x] ⭐ **Aqua Tail** / Nassschweif — `aquatail` · Water · Physical · water ripples + rising bubbles, a curved water swipe sweeps over, wide white splash on the target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Nassschweif
+  - Gen 4 APNG: https://www.pokewiki.de/images/9/9b/Nassschweif_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/f/f8/Nassschweif_Gen5.png
 - [ ] **Assurance** / Gewissheit — `assurance` · Dark · Physical · `melee`
-- [ ] ⭐ **Attack Order** / Schlagbefehl — `attackorder` · Bug · Physical · `projectile`
-- [ ] ⭐ **Aura Sphere** / Aurasphäre — `aurasphere` · Fighting · Special · `pulse`
+- [x] ⭐ **Attack Order** / Schlagbefehl — `attackorder` · Bug · Physical · swarm of little bees buzzes in from all sides, yellow honeycomb cloud on the target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Schlagbefehl
+  - Gen 4 APNG: https://www.pokewiki.de/images/d/d8/Schlagbefehl_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/3/3d/Schlagbefehl_Gen5.png
+- [x] ⭐ **Aura Sphere** / Aurasphäre — `aurasphere` · Fighting · Special · dark → glowing yellow band backdrop, blue swirl charges a white core, sphere shoots with a tail and bursts in blue light (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Aurasph%C3%A4re
+  - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/c/c6/Aurasph%C3%A4re_DPPt.png
+  - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/e/e0/Aurasph%C3%A4re_HGSS.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/b5/Aurasph%C3%A4re_Gen5.png
 - [ ] **Avalanche** / Lawine — `avalanche` · Ice · Physical · `melee`
-- [ ] ⭐ **Brave Bird** / Sturzflug — `bravebird` · Flying · Physical · `melee`
+- [x] ⭐ **Brave Bird** / Sturzflug — `bravebird` · Flying · Physical · dark wind-up, blue sky backdrop, user dives glowing red, white sparkle ring + red feather flares, recoil (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Sturzflug
+  - Gen 4 APNG: https://www.pokewiki.de/images/1/1c/Sturzflug_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/2/2f/Sturzflug_Gen5.png
 - [ ] **Brine** / Lake — `brine` · Water · Special · `projectile`
 - [ ] **Bug Bite** / Käferbiss — `bugbite` · Bug · Physical · `melee`
-- [ ] ⭐ **Bug Buzz** / Käfergebrumm — `bugbuzz` · Bug · Special · `sonic`
+- [x] ⭐ **Bug Buzz** / Käfergebrumm — `bugbuzz` · Bug · Special · user buzzes with pulsing orange rings, cream sound arcs roll to the target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/K%C3%A4fergebrumm
+  - Gen 4 APNG: https://www.pokewiki.de/images/4/41/K%C3%A4fergebrumm_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/a/a2/K%C3%A4fergebrumm_Gen5.png
 - [ ] **Bullet Punch** / Patronenhieb — `bulletpunch` · Steel · Physical · `melee`
 - [ ] **Captivate** / Liebreiz — `captivate` · Normal · Status · `selfAura`
 - [ ] **Charge Beam** / Ladestrahl — `chargebeam` · Electric · Special · `projectile`
 - [ ] **Chatter** / Geschwätz — `chatter` · Flying · Special · `sonic`
-- [ ] ⭐ **Close Combat** / Nahkampf — `closecombat` · Fighting · Physical · `melee`
+- [x] ⭐ **Close Combat** / Nahkampf — `closecombat` · Fighting · Physical · black flash, blue speed lines, barrage of red fists and feet with bursts, pale flash, user stat drop (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Nahkampf
+  - Gen 4 APNG: https://www.pokewiki.de/images/3/3c/Nahkampf_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/6/63/Nahkampf_Gen5.png
 - [ ] **Copycat** / Imitator — `copycat` · Normal · Status · `selfAura`
-- [ ] ⭐ **Cross Poison** / Giftstreich — `crosspoison` · Poison · Physical · `melee`
+- [x] ⭐ **Cross Poison** / Giftstreich — `crosspoison` · Poison · Physical · two purple blades slash an X, poison ball bursts, target turns purple, bubbles scatter (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Giftstreich
+  - Gen 4 APNG: https://www.pokewiki.de/images/e/ed/Giftstreich_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/2/2b/Giftstreich_Gen5.png
 - [ ] **Crush Grip** / Quetschgriff — `crushgrip` · Normal · Physical · `melee`
 - [x] ⭐ **Dark Pulse** / Finsteraura — `darkpulse` · Dark · Special · grey backdrop + dark ground waves + sparks (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Finsteraura
+  - Gen 4 APNG (DP): https://www.pokewiki.de/images/0/02/Finsteraura_DP.png
+  - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/5/54/Finsteraura_PtHGSS.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/6/6a/Finsteraura_Gen5.png
 - [ ] **Dark Void** / Schlummerort — `darkvoid` · Dark · Status · `targetAura`
 - [ ] **Defend Order** / Blockbefehl — `defendorder` · Bug · Status · `selfAura`
-- [ ] ⭐ **Defog** / Auflockern — `defog` · Flying · Status · `targetAura`
-- [ ] ⭐ **Discharge** / Ladungsstoß — `discharge` · Electric · Special · `field`
+- [x] ⭐ **Defog** / Auflockern — `defog` · Flying · Status · grey fog with white/pink gusts, target fades out and back, fog clears, evasion drop bubbles on target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Auflockern
+  - Gen 4 APNG: https://www.pokewiki.de/images/3/3d/Auflockern_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/7/77/Auflockern_Gen5.png
+- [x] ⭐ **Discharge** / Ladungsstoß — `discharge` · Electric · Special · dark scene, crackling yellow-green ball swells on the user and balloons over the field, target zapped (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Ladungssto%C3%9F
+  - Gen 4 APNG: https://www.pokewiki.de/images/9/9e/Ladungssto%C3%9F_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/0/09/Ladungssto%C3%9F_Gen5.png
 - [ ] **Double Hit** / Doppelschlag — `doublehit` · Normal · Physical · `melee`
 - [ ] ⭐ **Draco Meteor** / Draco Meteor — `dracometeor` · Dragon · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Draco_Meteor
+  - Gen 4 APNG: https://www.pokewiki.de/images/a/af/Draco_Meteor_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/b1/Draco_Meteor_Gen5.png
 - [ ] ⭐ **Dragon Pulse** / Drachenpuls — `dragonpulse` · Dragon · Special · `pulse`
+  - Pokewiki: https://www.pokewiki.de/Drachenpuls
+  - Gen 4 APNG: https://www.pokewiki.de/images/8/8f/Drachenpuls_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/a/a1/Drachenpuls_Gen5.png
 - [ ] ⭐ **Dragon Rush** / Drachenstoß — `dragonrush` · Dragon · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Drachensto%C3%9F
+  - Gen 4 APNG: https://www.pokewiki.de/images/4/40/Drachensto%C3%9F_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/6/6e/Drachensto%C3%9F_Gen5.png
 - [ ] ⭐ **Drain Punch** / Ableithieb — `drainpunch` · Fighting · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Ableithieb
+  - Gen 4 APNG: https://www.pokewiki.de/images/3/34/Ableithieb_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/88/Ableithieb_Gen5.png
 - [ ] ⭐ **Earth Power** / Erdkräfte — `earthpower` · Ground · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Erdkr%C3%A4fte
+  - Gen 4 APNG: https://www.pokewiki.de/images/9/9d/Erdkr%C3%A4fte_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/e/ed/Erdkr%C3%A4fte_Gen5.png
 - [ ] **Embargo** / Itemsperre — `embargo` · Dark · Status · `targetAura`
 - [ ] ⭐ **Energy Ball** / Energieball — `energyball` · Grass · Special · `lob`
+  - Pokewiki: https://www.pokewiki.de/Energieball
+  - Gen 4 APNG: https://www.pokewiki.de/images/3/36/Energieball_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/d4/Energieball_Gen5.png
 - [ ] **Feint** / Offenlegung — `feint` · Normal · Physical · `projectile`
 - [ ] **Fire Fang** / Feuerzahn — `firefang` · Fire · Physical · `melee`
 - [x] ⭐ **Flare Blitz** / Flammenblitz — `flareblitz` · Fire · Physical · rising flames → dark → red blast on blue (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Flammenblitz
+  - Gen 4 APNG: https://www.pokewiki.de/images/c/c0/Flammenblitz_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/59/Flammenblitz_Gen5.png
 - [ ] ⭐ **Flash Cannon** / Lichtkanone — `flashcannon` · Steel · Special · `beam`
+  - Pokewiki: https://www.pokewiki.de/Lichtkanone
+  - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/8/86/Lichtkanone_DPPt.png
+  - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/2/28/Lichtkanone_HGSS.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/53/Lichtkanone_Gen5.png
 - [ ] **Fling** / Schleuder — `fling` · Dark · Physical · `projectile`
 - [ ] ⭐ **Focus Blast** / Fokusstoß — `focusblast` · Fighting · Special · `lob`
+  - Pokewiki: https://www.pokewiki.de/Fokussto%C3%9F
+  - Gen 4 APNG: https://www.pokewiki.de/images/3/32/Fokussto%C3%9F_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/1/17/Fokussto%C3%9F_Gen5.png
 - [ ] **Force Palm** / Kraftwelle — `forcepalm` · Fighting · Physical · `melee`
 - [ ] **Gastro Acid** / Magensäfte — `gastroacid` · Poison · Status · `targetAura`
 - [ ] ⭐ **Giga Impact** / Gigastoß — `gigaimpact` · Normal · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Gigasto%C3%9F
+  - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/2/20/Gigasto%C3%9F_DPPt.png
+  - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/b/ba/Gigasto%C3%9F_HGSS.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/da/Gigasto%C3%9F_Gen5.png
 - [ ] ⭐ **Grass Knot** / Strauchler — `grassknot` · Grass · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Strauchler
+  - Gen 4 APNG: https://www.pokewiki.de/images/b/be/Strauchler_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/1/10/Strauchler_Gen5.png
 - [ ] **Gravity** / Erdanziehung — `gravity` · Psychic · Status · `targetAura`
 - [ ] **Guard Swap** / Schutztausch — `guardswap` · Psychic · Status · `targetAura`
 - [ ] ⭐ **Gunk Shot** / Mülltreffer — `gunkshot` · Poison · Physical · `projectile`
+  - Pokewiki: https://www.pokewiki.de/M%C3%BClltreffer
+  - Gen 4 APNG: https://www.pokewiki.de/images/2/20/M%C3%BClltreffer_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/c/c5/M%C3%BClltreffer_Gen5.png
 - [ ] ⭐ **Gyro Ball** / Gyroball — `gyroball` · Steel · Physical · `lob`
+  - Pokewiki: https://www.pokewiki.de/Gyroball
+  - Gen 4 APNG: https://www.pokewiki.de/images/0/05/Gyroball_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/6/6b/Gyroball_Gen5.png
 - [ ] ⭐ **Hammer Arm** / Hammerarm — `hammerarm` · Fighting · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Hammerarm
+  - Gen 4 APNG: https://www.pokewiki.de/images/0/08/Hammerarm_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/4/42/Hammerarm_Gen5.png
 - [ ] ⭐ **Head Smash** / Kopfstoß — `headsmash` · Rock · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Kopfsto%C3%9F
+  - Gen 4 APNG: https://www.pokewiki.de/images/1/17/Kopfsto%C3%9F_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/6/67/Kopfsto%C3%9F_Gen5.png
 - [ ] **Heal Block** / Heilblockade — `healblock` · Psychic · Status · `targetAura`
 - [ ] **Heal Order** / Heilbefehl — `healorder` · Bug · Status · `selfAura`
 - [ ] ⭐ **Healing Wish** / Heilopfer — `healingwish` · Psychic · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Heilopfer
+  - Gen 4 APNG: https://www.pokewiki.de/images/2/2f/Heilopfer_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/1/18/Heilopfer_Gen5.png
 - [ ] **Heart Swap** / Statustausch — `heartswap` · Psychic · Status · `targetAura`
 - [ ] **Ice Fang** / Eiszahn — `icefang` · Ice · Physical · `melee`
 - [ ] **Ice Shard** / Eissplitter — `iceshard` · Ice · Physical · `projectile`
 - [ ] ⭐ **Iron Head** / Eisenschädel — `ironhead` · Steel · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Eisensch%C3%A4del
+  - Gen 4 APNG: https://www.pokewiki.de/images/3/3e/Eisensch%C3%A4del_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/6/62/Eisensch%C3%A4del_Gen5.png
 - [ ] ⭐ **Judgment** / Urteilskraft — `judgment` · Normal · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Urteilskraft
+  - Gen 4 APNG: https://www.pokewiki.de/images/2/20/Urteilskraft_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/1/1a/Urteilskraft_Gen5.png
 - [ ] ⭐ **Last Resort** / Zuflucht — `lastresort` · Normal · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Zuflucht
+  - Gen 4 APNG: https://www.pokewiki.de/images/c/ce/Zuflucht_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/5f/Zuflucht_Gen5.png
 - [ ] ⭐ **Lava Plume** / Flammensturm — `lavaplume` · Fire · Special · `field`
+  - Pokewiki: https://www.pokewiki.de/Flammensturm
+  - Gen 4 APNG: https://www.pokewiki.de/images/3/38/Flammensturm_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/b1/Flammensturm_Gen5.png
 - [ ] ⭐ **Leaf Storm** / Blättersturm — `leafstorm` · Grass · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Bl%C3%A4ttersturm
+  - Gen 4 APNG: https://www.pokewiki.de/images/2/23/Bl%C3%A4ttersturm_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/6/6b/Bl%C3%A4ttersturm_Gen5.png
 - [ ] **Lucky Chant** / Beschwörung — `luckychant` · Normal · Status · `selfAura`
 - [ ] **Lunar Dance** / Lunartanz — `lunardance` · Psychic · Status · `selfAura`
 - [ ] ⭐ **Magma Storm** / Lavasturm — `magmastorm` · Fire · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Lavasturm
+  - Gen 4 APNG: https://www.pokewiki.de/images/6/6e/Lavasturm_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/f/fa/Lavasturm_Gen5.png
 - [ ] **Magnet Bomb** / Magnetbombe — `magnetbomb` · Steel · Physical · `lob`
 - [ ] **Magnet Rise** / Magnetflug — `magnetrise` · Electric · Status · `selfAura`
 - [ ] **Me First** / Egotrip — `mefirst` · Normal · Status · `targetAura`
@@ -482,47 +591,134 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Mirror Shot** / Spiegelsalve — `mirrorshot` · Steel · Special · `projectile`
 - [ ] **Mud Bomb** / Schlammbombe — `mudbomb` · Ground · Special · `lob`
 - [ ] ⭐ **Nasty Plot** / Ränkeschmied — `nastyplot` · Dark · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/R%C3%A4nkeschmied
+  - Gen 4 APNG: https://www.pokewiki.de/images/5/5d/R%C3%A4nkeschmied_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/5f/R%C3%A4nkeschmied_Gen5.png
 - [ ] **Natural Gift** / Beerenkräfte — `naturalgift` · Normal · Physical · `projectile`
 - [ ] ⭐ **Night Slash** / Nachthieb — `nightslash` · Dark · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Nachthieb
+  - Gen 4 APNG: https://www.pokewiki.de/images/a/a8/Nachthieb_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/dd/Nachthieb_Gen5.png
 - [ ] **Ominous Wind** / Unheilböen — `ominouswind` · Ghost · Special · `projectile`
 - [ ] **Payback** / Gegenstoß — `payback` · Dark · Physical · `melee`
 - [ ] **Pluck** / Pflücker — `pluck` · Flying · Physical · `melee`
 - [ ] ⭐ **Poison Jab** / Gifthieb — `poisonjab` · Poison · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Gifthieb
+  - Gen 4 APNG: https://www.pokewiki.de/images/f/ff/Gifthieb_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/3/37/Gifthieb_Gen5.png
 - [ ] ⭐ **Power Gem** / Juwelenkraft — `powergem` · Rock · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Juwelenkraft
+  - Gen 4 APNG (DP): https://www.pokewiki.de/images/9/99/Juwelenkraft_DP.png
+  - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/a/a6/Juwelenkraft_PtHGSS.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/df/Juwelenkraft_Gen5.png
 - [ ] **Power Swap** / Krafttausch — `powerswap` · Psychic · Status · `targetAura`
 - [ ] **Power Trick** / Krafttrick — `powertrick` · Psychic · Status · `selfAura`
 - [ ] ⭐ **Power Whip** / Blattgeißel — `powerwhip` · Grass · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Blattgei%C3%9Fel
+  - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/9/93/Blattgei%C3%9Fel_DPPt.png
+  - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/4/4c/Blattgei%C3%9Fel_HGSS.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/d9/Blattgei%C3%9Fel_Gen5.png
 - [ ] ⭐ **Psycho Cut** / Psychoklinge — `psychocut` · Psychic · Physical · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Psychoklinge
+  - Gen 4 APNG: https://www.pokewiki.de/images/7/76/Psychoklinge_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/c/c7/Psychoklinge_Gen5.png
 - [ ] **Psycho Shift** / Psybann — `psychoshift` · Psychic · Status · `targetAura`
 - [ ] **Punishment** / Strafattacke — `punishment` · Dark · Physical · `melee`
 - [ ] ⭐ **Roar of Time** / Zeitenlärm — `roaroftime` · Dragon · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Zeitenl%C3%A4rm
+  - Gen 4 APNG: https://www.pokewiki.de/images/d/dc/Zeitenl%C3%A4rm_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/a/a4/Zeitenl%C3%A4rm_Gen5.png
 - [ ] ⭐ **Rock Climb** / Kraxler — `rockclimb` · Normal · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Kraxler
+  - Gen 4 APNG: https://www.pokewiki.de/images/a/a8/Kraxler_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/bc/Kraxler_Gen5.png
 - [ ] ⭐ **Rock Polish** / Steinpolitur — `rockpolish` · Rock · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Steinpolitur
+  - Gen 4 APNG: https://www.pokewiki.de/images/5/5e/Steinpolitur_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/9/96/Steinpolitur_Gen5.png
 - [ ] ⭐ **Rock Wrecker** / Felswerfer — `rockwrecker` · Rock · Physical · `lob`
+  - Pokewiki: https://www.pokewiki.de/Felswerfer
+  - Gen 4 APNG: https://www.pokewiki.de/images/8/8d/Felswerfer_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/c/c3/Felswerfer_Gen5.png
 - [ ] ⭐ **Roost** / Ruheort — `roost` · Flying · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Ruheort
+  - Gen 4 APNG: https://www.pokewiki.de/images/8/8b/Ruheort_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/1/19/Ruheort_Gen5.png
 - [ ] ⭐ **Seed Bomb** / Samenbomben — `seedbomb` · Grass · Physical · `lob`
+  - Pokewiki: https://www.pokewiki.de/Samenbomben
+  - Gen 4 APNG: https://www.pokewiki.de/images/5/5a/Samenbomben_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/3/3e/Samenbomben_Gen5.png
 - [ ] ⭐ **Seed Flare** / Schocksamen — `seedflare` · Grass · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Schocksamen
+  - Gen 4 APNG: https://www.pokewiki.de/images/8/89/Schocksamen_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/9/9e/Schocksamen_Gen5.png
 - [ ] ⭐ **Shadow Claw** / Dunkelklaue — `shadowclaw` · Ghost · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Dunkelklaue
+  - Gen 4 APNG: https://www.pokewiki.de/images/4/4d/Dunkelklaue_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/9/9e/Dunkelklaue_Gen5.png
 - [ ] ⭐ **Shadow Force** / Schemenkraft — `shadowforce` · Ghost · Physical · `beam`
+  - Pokewiki: https://www.pokewiki.de/Schemenkraft
+  - Gen 4 APNG: https://www.pokewiki.de/images/f/f4/Schemenkraft_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/1/14/Schemenkraft_Gen5.png
 - [ ] **Shadow Sneak** / Schattenstoß — `shadowsneak` · Ghost · Physical · `melee`
 - [ ] ⭐ **Spacial Rend** / Raumschlag — `spacialrend` · Dragon · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Raumschlag
+  - Gen 4 APNG (DP): https://www.pokewiki.de/images/8/88/Raumschlag_DP.png
+  - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/d/d8/Raumschlag_PtHGSS.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/3/38/Raumschlag_Gen5.png
 - [ ] ⭐ **Stealth Rock** / Tarnsteine — `stealthrock` · Rock · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Tarnsteine
+  - Gen 4 APNG: https://www.pokewiki.de/images/b/b0/Tarnsteine_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/1/19/Tarnsteine_Gen5.png
 - [ ] ⭐ **Stone Edge** / Steinkante — `stoneedge` · Rock · Physical · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Steinkante
+  - Gen 4 APNG: https://www.pokewiki.de/images/8/83/Steinkante_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/8f/Steinkante_Gen5.png
 - [ ] ⭐ **Sucker Punch** / Tiefschlag — `suckerpunch` · Dark · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Tiefschlag
+  - Gen 4 APNG: https://www.pokewiki.de/images/7/7d/Tiefschlag_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/3/36/Tiefschlag_Gen5.png
 - [ ] ⭐ **Switcheroo** / Wechseldich — `switcheroo` · Dark · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Wechseldich
+  - Gen 4 APNG: https://www.pokewiki.de/images/8/84/Wechseldich_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/d9/Wechseldich_Gen5.png
 - [ ] ⭐ **Tailwind** / Rückenwind — `tailwind` · Flying · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/R%C3%BCckenwind
+  - Gen 4 APNG: https://www.pokewiki.de/images/f/f7/R%C3%BCckenwind_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/7/7d/R%C3%BCckenwind_Gen5.png
 - [ ] **Thunder Fang** / Donnerzahn — `thunderfang` · Electric · Physical · `melee`
 - [ ] ⭐ **Toxic Spikes** / Giftspitzen — `toxicspikes` · Poison · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Giftspitzen
+  - Gen 4 APNG: https://www.pokewiki.de/images/9/95/Giftspitzen_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/85/Giftspitzen_Gen5.png
 - [ ] ⭐ **Trick Room** / Bizarroraum — `trickroom` · Psychic · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Bizarroraum
+  - Gen 4 APNG: https://www.pokewiki.de/images/2/24/Bizarroraum_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/a/ae/Bizarroraum_Gen5.png
 - [ ] **Trump Card** / Trumpfkarte — `trumpcard` · Normal · Special · `projectile`
 - [ ] ⭐ **U-turn** / Kehrtwende — `uturn` · Bug · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Kehrtwende
+  - Gen 4 APNG: https://www.pokewiki.de/images/e/ee/Kehrtwende_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/e/e8/Kehrtwende_Gen5.png
 - [ ] **Vacuum Wave** / Vakuumwelle — `vacuumwave` · Fighting · Special · `projectile`
 - [ ] ⭐ **Wake-Up Slap** / Weckruf — `wakeupslap` · Fighting · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Weckruf
+  - Gen 4 APNG: https://www.pokewiki.de/images/4/42/Weckruf_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/88/Weckruf_Gen5.png
 - [ ] ⭐ **Wood Hammer** / Holzhammer — `woodhammer` · Grass · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Holzhammer
+  - Gen 4 APNG: https://www.pokewiki.de/images/9/95/Holzhammer_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/55/Holzhammer_Gen5.png
 - [ ] **Worry Seed** / Sorgensamen — `worryseed` · Grass · Status · `targetAura`
 - [ ] **Wring Out** / Auswringen — `wringout` · Normal · Special · `projectile`
 - [ ] ⭐ **X-Scissor** / Kreuzschere — `xscissor` · Bug · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Kreuzschere
+  - Gen 4 APNG: https://www.pokewiki.de/images/5/52/Kreuzschere_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/3/3d/Kreuzschere_Gen5.png
 - [ ] ⭐ **Zen Headbutt** / Zen-Kopfstoß — `zenheadbutt` · Psychic · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Zen-Kopfsto%C3%9F
+  - Gen 4 APNG: https://www.pokewiki.de/images/1/1d/Zen-Kopfsto%C3%9F_Gen4.png
+  - Gen 5 APNG: https://www.pokewiki.de/images/f/fc/Zen-Kopfsto%C3%9F_Gen5.png
 
 ## Gen 5 (92)
 
@@ -531,74 +727,152 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **After You** / Galanterie — `afteryou` · Normal · Status · `targetAura`
 - [ ] **Ally Switch** / Seitentausch — `allyswitch` · Psychic · Status · `selfAura`
 - [ ] ⭐ **Autotomize** / Autotomie — `autotomize` · Steel · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Autotomie
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/5a/Autotomie_Gen5.png
 - [ ] **Bestow** / Offerte — `bestow` · Normal · Status · `targetAura`
 - [ ] ⭐ **Blue Flare** / Blauflammen — `blueflare` · Fire · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Blauflammen
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/82/Blauflammen_Gen5.png
 - [ ] ⭐ **Bolt Strike** / Blitzschlag — `boltstrike` · Electric · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Blitzschlag
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/52/Blitzschlag_Gen5.png
 - [ ] **Bulldoze** / Dampfwalze — `bulldoze` · Ground · Physical · `field`
 - [ ] ⭐ **Chip Away** / Zermürben — `chipaway` · Normal · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Zerm%C3%BCrben
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/bb/Zerm%C3%BCrben_Gen5.png
 - [ ] **Circle Throw** / Überkopfwurf — `circlethrow` · Fighting · Physical · `melee`
 - [ ] **Clear Smog** / Klärsmog — `clearsmog` · Poison · Special · `projectile`
 - [ ] ⭐ **Coil** / Einrollen — `coil` · Poison · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Einrollen
+  - Gen 5 APNG: https://www.pokewiki.de/images/0/06/Einrollen_Gen5.png
 - [ ] ⭐ **Cotton Guard** / Watteschild — `cottonguard` · Grass · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Watteschild
+  - Gen 5 APNG: https://www.pokewiki.de/images/9/99/Watteschild_Gen5.png
 - [ ] **Dragon Tail** / Drachenrute — `dragontail` · Dragon · Physical · `melee`
 - [ ] ⭐ **Drill Run** / Schlagbohrer — `drillrun` · Ground · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Schlagbohrer
+  - Gen 5 APNG: https://www.pokewiki.de/images/e/ea/Schlagbohrer_Gen5.png
 - [ ] **Dual Chop** / Doppelhieb — `dualchop` · Dragon · Physical · `melee`
 - [ ] **Echoed Voice** / Widerhall — `echoedvoice` · Normal · Special · `sonic`
 - [ ] **Electro Ball** / Elektroball — `electroball` · Electric · Special · `lob`
 - [ ] **Electroweb** / Elektronetz — `electroweb` · Electric · Special · `field`
 - [ ] **Entrainment** / Zwango — `entrainment` · Normal · Status · `targetAura`
 - [ ] ⭐ **Fiery Dance** / Feuerreigen — `fierydance` · Fire · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Feuerreigen
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/5d/Feuerreigen_Gen5.png
 - [ ] **Final Gambit** / Wagemut — `finalgambit` · Fighting · Special · `projectile`
 - [ ] ⭐ **Fire Pledge** / Feuersäulen — `firepledge` · Fire · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Feuers%C3%A4ulen
+  - Gen 5 APNG: https://www.pokewiki.de/images/2/28/Feuers%C3%A4ulen_Gen5.png
 - [ ] ⭐ **Flame Burst** / Funkenflug — `flameburst` · Fire · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Funkenflug
+  - Gen 5 APNG: https://www.pokewiki.de/images/c/c2/Funkenflug_Gen5.png
 - [ ] **Flame Charge** / Nitroladung — `flamecharge` · Fire · Physical · `melee`
 - [ ] ⭐ **Foul Play** / Schmarotzer — `foulplay` · Dark · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Schmarotzer
+  - Gen 5 APNG: https://www.pokewiki.de/images/4/4f/Schmarotzer_Gen5.png
 - [ ] ⭐ **Freeze Shock** / Frostvolt — `freezeshock` · Ice · Physical · `beam`
+  - Pokewiki: https://www.pokewiki.de/Frostvolt
+  - Gen 5 APNG: https://www.pokewiki.de/images/7/73/Frostvolt_Gen5.png
 - [ ] **Frost Breath** / Eisesodem — `frostbreath` · Ice · Special · `projectile`
 - [ ] ⭐ **Fusion Bolt** / Kreuzdonner — `fusionbolt` · Electric · Physical · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Kreuzdonner
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/b1/Kreuzdonner_Gen5.png
 - [ ] ⭐ **Fusion Flare** / Kreuzflamme — `fusionflare` · Fire · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Kreuzflamme
+  - Gen 5 APNG (boosted variant only): https://www.pokewiki.de/images/8/8a/Kreuzflamme_%28Verst%C3%A4rkt%29_Gen5.png
 - [ ] **Gear Grind** / Klikkdiskus — `geargrind` · Steel · Physical · `melee`
 - [ ] **Glaciate** / Eiszeit — `glaciate` · Ice · Special · `field`
 - [ ] ⭐ **Grass Pledge** / Pflanzensäulen — `grasspledge` · Grass · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Pflanzens%C3%A4ulen
+  - Gen 5 APNG: https://www.pokewiki.de/images/4/4d/Pflanzens%C3%A4ulen_Gen5.png
 - [ ] **Guard Split** / Schutzteiler — `guardsplit` · Psychic · Status · `targetAura`
 - [ ] ⭐ **Head Charge** / Steinschädel — `headcharge` · Normal · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Steinsch%C3%A4del
+  - Gen 5 APNG: https://www.pokewiki.de/images/3/38/Steinsch%C3%A4del_Gen5.png
 - [ ] **Heal Pulse** / Heilwoge — `healpulse` · Psychic · Status · `selfAura`
 - [ ] **Heart Stamp** / Herzstempel — `heartstamp` · Psychic · Physical · `melee`
 - [ ] ⭐ **Heat Crash** / Brandstempel — `heatcrash` · Fire · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Brandstempel
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/be/Brandstempel_Gen5.png
 - [ ] ⭐ **Heavy Slam** / Rammboss — `heavyslam` · Steel · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Rammboss
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/df/Rammboss_Gen5.png
 - [ ] **Hex** / Bürde — `hex` · Ghost · Special · `projectile`
 - [ ] ⭐ **Hone Claws** / Klauenwetzer — `honeclaws` · Dark · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Klauenwetzer
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/5a/Klauenwetzer_Gen5.png
 - [ ] ⭐ **Horn Leech** / Holzgeweih — `hornleech` · Grass · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Holzgeweih
+  - Gen 5 APNG: https://www.pokewiki.de/images/e/e2/Holzgeweih_Gen5.png
 - [ ] ⭐ **Hurricane** / Orkan — `hurricane` · Flying · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Orkan
+  - Gen 5 APNG: https://www.pokewiki.de/images/4/4e/Orkan_Gen5.png
 - [ ] ⭐ **Ice Burn** / Frosthauch — `iceburn` · Ice · Special · `beam`
+  - Pokewiki: https://www.pokewiki.de/Frosthauch
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/8e/Frosthauch_Gen5.png
 - [ ] ⭐ **Icicle Crash** / Eiszapfhagel — `iciclecrash` · Ice · Physical · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Eiszapfhagel
+  - Gen 5 APNG: https://www.pokewiki.de/images/a/a1/Eiszapfhagel_Gen5.png
 - [ ] **Incinerate** / Einäschern — `incinerate` · Fire · Special · `field`
 - [ ] ⭐ **Inferno** / Inferno — `inferno` · Fire · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Inferno
+  - Gen 5 APNG: https://www.pokewiki.de/images/a/a5/Inferno_Gen5.png
 - [ ] **Leaf Tornado** / Grasmixer — `leaftornado` · Grass · Special · `projectile`
 - [ ] **Low Sweep** / Fußtritt — `lowsweep` · Fighting · Physical · `melee`
 - [ ] **Magic Room** / Magieraum — `magicroom` · Psychic · Status · `targetAura`
 - [ ] ⭐ **Night Daze** / Nachtflut — `nightdaze` · Dark · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Nachtflut
+  - Gen 5 APNG: https://www.pokewiki.de/images/e/ee/Nachtflut_Gen5.png
 - [ ] **Power Split** / Kraftteiler — `powersplit` · Psychic · Status · `targetAura`
 - [ ] ⭐ **Psyshock** / Psychoschock — `psyshock` · Psychic · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Psychoschock
+  - Gen 5 APNG: https://www.pokewiki.de/images/9/92/Psychoschock_Gen5.png
 - [ ] ⭐ **Psystrike** / Psychostoß — `psystrike` · Psychic · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Psychosto%C3%9F
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/85/Psychosto%C3%9F_Gen5.png
 - [ ] **Quash** / Verzögerung — `quash` · Dark · Status · `targetAura`
 - [ ] **Quick Guard** / Rapidschutz — `quickguard` · Fighting · Status · `selfAura`
 - [ ] ⭐ **Quiver Dance** / Falterreigen — `quiverdance` · Bug · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Falterreigen
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/80/Falterreigen_Gen5.png
 - [ ] ⭐ **Rage Powder** / Wutpulver — `ragepowder` · Bug · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Wutpulver
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/b7/Wutpulver_Gen5.png
 - [ ] ⭐ **Razor Shell** / Kalkklinge — `razorshell` · Water · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Kalkklinge
+  - Gen 5 APNG: https://www.pokewiki.de/images/a/ad/Kalkklinge_Gen5.png
 - [ ] **Reflect Type** / Typenspiegel — `reflecttype` · Normal · Status · `targetAura`
 - [ ] ⭐ **Relic Song** / Urgesang — `relicsong` · Normal · Special · `sonic`
+  - Pokewiki: https://www.pokewiki.de/Urgesang
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/56/Urgesang_Gen5.png
 - [ ] ⭐ **Retaliate** / Heimzahlung — `retaliate` · Normal · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Heimzahlung
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/5f/Heimzahlung_Gen5.png
 - [ ] **Round** / Kanon — `round` · Normal · Special · `sonic`
 - [ ] ⭐ **Sacred Sword** / Sanctoklinge — `sacredsword` · Fighting · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Sanctoklinge
+  - Gen 5 APNG: https://www.pokewiki.de/images/3/3e/Sanctoklinge_Gen5.png
 - [ ] ⭐ **Scald** / Siedewasser — `scald` · Water · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Siedewasser
+  - Gen 5 APNG: https://www.pokewiki.de/images/9/90/Siedewasser_Gen5.png
 - [ ] ⭐ **Searing Shot** / Flammenball — `searingshot` · Fire · Special · `lob`
+  - Pokewiki: https://www.pokewiki.de/Flammenball
+  - Gen 5 APNG: https://www.pokewiki.de/images/6/6c/Flammenball_Gen5.png
 - [ ] ⭐ **Secret Sword** / Mystoschwert — `secretsword` · Fighting · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Mystoschwert
+  - Gen 5 APNG: https://www.pokewiki.de/images/e/e0/Mystoschwert_Gen5.png
 - [ ] ⭐ **Shell Smash** / Hausbruch — `shellsmash` · Normal · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Hausbruch
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/dc/Hausbruch_Gen5.png
 - [ ] ⭐ **Shift Gear** / Gangwechsel — `shiftgear` · Steel · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Gangwechsel
+  - Gen 5 APNG: https://www.pokewiki.de/images/8/8f/Gangwechsel_Gen5.png
 - [ ] **Simple Beam** / Wankelstrahl — `simplebeam` · Normal · Status · `targetAura`
 - [ ] **Sky Drop** / Freier Fall — `skydrop` · Flying · Physical · `beam`
 - [ ] ⭐ **Sludge Wave** / Schlammwoge — `sludgewave` · Poison · Special · `field`
+  - Pokewiki: https://www.pokewiki.de/Schlammwoge
+  - Gen 5 APNG: https://www.pokewiki.de/images/4/42/Schlammwoge_Gen5.png
 - [ ] **Smack Down** / Katapult — `smackdown` · Rock · Physical · `projectile`
 - [ ] **Snarl** / Standpauke — `snarl` · Dark · Special · `sonic`
 - [ ] **Soak** / Überflutung — `soak` · Water · Status · `targetAura`
@@ -607,17 +881,33 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Storm Throw** / Bergsturm — `stormthrow` · Fighting · Physical · `melee`
 - [ ] **Struggle Bug** / Käfertrutz — `strugglebug` · Bug · Special · `field`
 - [ ] ⭐ **Synchronoise** / Synchrolärm — `synchronoise` · Psychic · Special · `field`
+  - Pokewiki: https://www.pokewiki.de/Synchrol%C3%A4rm
+  - Gen 5 APNG: https://www.pokewiki.de/images/e/e6/Synchrol%C3%A4rm_Gen5.png
 - [ ] **Tail Slap** / Kehrschelle — `tailslap` · Normal · Physical · `melee`
 - [ ] ⭐ **Techno Blast** / Techblaster — `technoblast` · Normal · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Techblaster
+  - Gen 5 APNG: https://www.pokewiki.de/images/0/00/Techblaster_Gen5.png
 - [ ] **Telekinesis** / Telekinese — `telekinesis` · Psychic · Status · `targetAura`
 - [ ] ⭐ **V-create** / V-Generator — `vcreate` · Fire · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/V-Generator
+  - Gen 5 APNG (SW): https://www.pokewiki.de/images/b/b7/V-Generator_SW.png
 - [ ] **Venoshock** / Giftschock — `venoshock` · Poison · Special · `projectile`
 - [ ] ⭐ **Volt Switch** / Voltwechsel — `voltswitch` · Electric · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Voltwechsel
+  - Gen 5 APNG: https://www.pokewiki.de/images/5/50/Voltwechsel_Gen5.png
 - [ ] ⭐ **Water Pledge** / Wassersäulen — `waterpledge` · Water · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Wassers%C3%A4ulen
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/dc/Wassers%C3%A4ulen_Gen5.png
 - [ ] ⭐ **Wide Guard** / Rundumschutz — `wideguard` · Rock · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Rundumschutz
+  - Gen 5 APNG: https://www.pokewiki.de/images/b/be/Rundumschutz_Gen5.png
 - [ ] ⭐ **Wild Charge** / Stromstoß — `wildcharge` · Electric · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Stromsto%C3%9F
+  - Gen 5 APNG: https://www.pokewiki.de/images/f/f3/Stromsto%C3%9F_Gen5.png
 - [ ] **Wonder Room** / Wunderraum — `wonderroom` · Psychic · Status · `targetAura`
 - [ ] ⭐ **Work Up** / Kraftschub — `workup` · Normal · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Kraftschub
+  - Gen 5 APNG: https://www.pokewiki.de/images/d/de/Kraftschub_Gen5.png
 
 ## Gen 6 (62)
 

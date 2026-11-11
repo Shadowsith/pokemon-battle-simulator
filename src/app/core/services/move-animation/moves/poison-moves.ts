@@ -9,6 +9,7 @@ export class PoisonMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     acid: (refs, launch, target) => PoisonMoveAnimations.playAcidSpit(refs, launch, target),
     belch: (refs, launch, target) => PoisonMoveAnimations.playBelch(refs, launch, target),
+    crosspoison: (refs, _launch, target) => PoisonMoveAnimations.playCrossPoison(refs, target),
     sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
     toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target)
   };
@@ -379,5 +380,79 @@ export class PoisonMoveAnimations {
         { transform: `translate(${Math.cos(ang) * dist}px,${Math.sin(ang) * dist + 8}px) scale(.4)`, opacity: 0 }
       ], { duration: 320, easing: 'ease-out' }).then(() => speck.remove());
     }
+  }
+
+  /**
+   * Cross Poison, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/e/ed/Giftstreich_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/2/2b/Giftstreich_Gen5.png
+   *
+   * Two purple blades slash across the target one after the other and form
+   * an X (0-0.3 s). A ball of purple poison bursts on it (0.3 s), the target
+   * turns purple and poison bubbles scatter outward and float up while it
+   * shakes (0.3-1.15 s).
+   */
+  private static async playCrossPoison(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const len = Math.max(Math.max(tr.width, tr.height) * 1.3, 90);
+
+    // The X: two slashes, top-right to bottom-left, then top-left to bottom-right.
+    const slashes = [-45, 45].map((deg, i) => {
+      const blade = document.createElement('div');
+      blade.style.cssText =
+        `position:absolute;left:${target.x - len / 2}px;top:${target.y - 4}px;width:${len}px;height:8px;pointer-events:none;` +
+        `transform-origin:${i ? 0 : 100}% 50%;clip-path:polygon(0 50%,15% 0,85% 0,100% 50%,85% 100%,15% 100%);` +
+        'background:linear-gradient(90deg,#7A2E9E,#C860F0 40%,#F8E0FF 50%,#C860F0 60%,#7A2E9E)';
+      fxEl.appendChild(blade);
+      return Fx.anim(blade, [
+        { transform: `rotate(${deg}deg) scaleX(0)`, opacity: 1 },
+        { transform: `rotate(${deg}deg) scaleX(1)`, opacity: 1, offset: 0.3 },
+        { transform: `rotate(${deg}deg) scaleX(1)`, opacity: 1, offset: 0.7 },
+        { transform: `rotate(${deg}deg) scaleX(1) scaleY(.3)`, opacity: 0 }
+      ], { duration: 450, delay: i * 100, easing: 'ease-out' }).then(() => blade.remove());
+    });
+    await Fx.wait(300);
+
+    // The poison burst: a purple ball, a purple tint and scattering bubbles.
+    const size = Math.max(tr.width * 0.9, 60);
+    const ball = document.createElement('div');
+    ball.style.cssText = `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#F0C8FFdd 0 20%,#C860F0bb 50%,#7A2E9E00 72%)`;
+    Fx.place(ball, target);
+    fxEl.appendChild(ball);
+    Fx.flash(targetEl, '#D77CF0', 0.7);
+    Fx.shake(targetEl, 6);
+    setTimeout(() => Fx.shake(targetEl, 4), 250);
+    const effects: Promise<void>[] = [
+      ...slashes,
+      Fx.anim(ball, [
+        { transform: 'scale(.3)', opacity: 1 },
+        { transform: 'scale(1.1)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(1.4)', opacity: 0 }
+      ], { duration: 500, easing: 'ease-out' }).then(() => ball.remove()),
+      Fx.anim(targetEl, [
+        { filter: 'none' },
+        { filter: 'sepia(1) saturate(4) hue-rotate(230deg) brightness(.9)', offset: 0.2 },
+        { filter: 'sepia(1) saturate(4) hue-rotate(230deg) brightness(.9)', offset: 0.7 },
+        { filter: 'none' }
+      ], { duration: 850, easing: 'ease-in-out', fill: 'none' })
+    ];
+    for (let i = 0; i < 14; i++) {
+      const bubble = PoisonMoveAnimations.poisonBubble(7 + Math.random() * 9);
+      Fx.place(bubble, target);
+      fxEl.appendChild(bubble);
+      const ang = (Math.PI * 2 * i) / 14 + Math.random() * 0.4;
+      const d = size * (0.6 + Math.random() * 0.6);
+      const x = Math.cos(ang) * d;
+      const y = Math.sin(ang) * d * 0.8;
+      effects.push(
+        Fx.anim(bubble, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${x * 0.6}px,${y * 0.6}px) scale(1)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${x}px,${y - 30}px) scale(.6)`, opacity: 0 }
+        ], { duration: 750 + Math.random() * 100, easing: 'ease-out', delay: Math.random() * 80 }).then(() => bubble.remove())
+      );
+    }
+    await Promise.all(effects);
   }
 }

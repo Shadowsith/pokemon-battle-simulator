@@ -9,6 +9,7 @@ export class FightingPunchMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     brickbreak: (refs, _launch, target) => FightingPunchMoveAnimations.playBrickBreak(refs, target),
+    closecombat: (refs, launch, target) => FightingPunchMoveAnimations.playCloseCombat(refs, launch, target),
     crosschop: (refs, _launch, target) => FightingPunchMoveAnimations.playCrossChop(refs, target),
     dynamicpunch: (refs, _launch, target) => FightingPunchMoveAnimations.playDynamicPunch(refs, target),
     focuspunch: (refs, launch, target) => FightingPunchMoveAnimations.playFocusPunch(refs, launch, target),
@@ -595,5 +596,95 @@ export class FightingPunchMoveAnimations {
       ...bursts,
       ...hands.map(({ hand }) => Fx.anim(hand, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' }).then(() => hand.remove()))
     ]);
+  }
+
+  /**
+   * Close Combat, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/3/3c/Nahkampf_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/6/63/Nahkampf_Gen5.png
+   *
+   * The scene flashes black (0-0.2 s), then blue speed lines rush past while
+   * a barrage of red fists and black feet slams into the target with red-orange
+   * bursts and flying specks (eight blows, 0.25-1.3 s). A pale flash clears
+   * the scene (to 1.55 s); last, blue stat-down bubbles drift over the user
+   * (its Defense and Sp. Def fall, to ~2.45 s).
+   */
+  private static async playCloseCombat(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const tr = Fx.rect(targetEl);
+
+    const black = Fx.backdrop(fieldEl, 'background:#000');
+    await Fx.anim(black, [{ opacity: 0 }, { opacity: 1 }], { duration: 150, easing: 'ease-out' });
+    await Fx.wait(50);
+    const blue = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#0A3A9A,#1E78E0 40%,#4AB4FF 50%,#1E78E0 60%,#0A3A9A)');
+    FxEffects.speedLines(blue, W, H, target.x >= launch.x ? -1 : 1, ['#ffffff', '#9CE4FF']);
+    black.remove();
+
+    // The barrage: fists and feet slam in round the target with bursts and specks.
+    const blowSize = Math.max(tr.width * 0.45, 34);
+    const blows: Promise<void>[] = [];
+    for (let i = 0; i < 8; i++) {
+      await Fx.wait(i ? 110 : 50);
+      const at: Point = {
+        x: target.x + (Math.random() * 2 - 1) * tr.width * 0.3,
+        y: target.y + (Math.random() * 2 - 1) * tr.height * 0.3
+      };
+      const burst = FxGlyphs.spikyBurst(blowSize * 1.4, '#E0301A', '#FF8A3A');
+      Fx.place(burst, at);
+      fxEl.appendChild(burst);
+      const blow = i % 2 ? FxGlyphs.footGlyph(blowSize * 0.75) : FxGlyphs.fistGlyph(blowSize, 'red');
+      Fx.place(blow, at);
+      fxEl.appendChild(blow);
+      blows.push(
+        Fx.anim(burst, [
+          { transform: 'scale(.3)', opacity: 1 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(1.2)', opacity: 0 }
+        ], { duration: 300, easing: 'ease-out' }).then(() => burst.remove()),
+        Fx.anim(blow, [
+          { transform: 'scale(1.7)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.35 },
+          { transform: 'scale(.95)', opacity: 0 }
+        ], { duration: 260, easing: 'ease-in' }).then(() => blow.remove()),
+        FightingPunchMoveAnimations.specks(fxEl, at, blowSize)
+      );
+      Fx.flash(targetEl, '#FF8A3A', 0.6);
+      Fx.shake(targetEl, 5);
+      if (i === 7) Fx.shakeField(fieldEl, 0.6);
+    }
+    await Promise.all(blows);
+
+    // A pale flash clears the scene.
+    const pale = Fx.backdrop(fieldEl, 'background:#F4E4DA');
+    blue.after(pale);
+    await Fx.anim(pale, [{ opacity: 0 }, { opacity: 1 }], { duration: 80, easing: 'ease-out' });
+    blue.remove();
+    await Fx.anim(pale, [{ opacity: 1 }, { opacity: 0 }], { duration: 170, easing: 'ease-in' });
+    pale.remove();
+
+    // The user's Defense and Sp. Def fall.
+    await FxEffects.statDownBubbles(refs, launch);
+  }
+
+  /** A few small orange-red specks flying out from a blow at `at`. */
+  private static specks(fxEl: HTMLElement, at: Point, reach: number): Promise<void> {
+    const parts: Promise<void>[] = [];
+    for (let i = 0; i < 5; i++) {
+      const speck = document.createElement('div');
+      speck.style.cssText = `width:${4 + Math.random() * 3}px;height:3px;pointer-events:none;background:${i % 2 ? '#FF6A2A' : '#E0301A'}`;
+      Fx.place(speck, at);
+      fxEl.appendChild(speck);
+      const ang = Math.random() * Math.PI * 2;
+      const d = reach * (1 + Math.random());
+      parts.push(
+        Fx.anim(speck, [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+        ], { duration: 400 + Math.random() * 200, easing: 'ease-out' }).then(() => speck.remove())
+      );
+    }
+    return Promise.all(parts).then(() => void 0);
   }
 }

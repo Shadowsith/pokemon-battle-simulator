@@ -1,6 +1,7 @@
 import { MoveAnimRegistry } from '../animation.types';
 import { FightingKickThrowMoveAnimations } from './fighting/fighting-kick-throw-moves';
 import { FightingPunchMoveAnimations } from './fighting/fighting-punch-moves';
+import { FightingRangedMoveAnimations } from './fighting/fighting-ranged-moves';
 import { FightingStatusMoveAnimations } from './fighting/fighting-status-moves';
 
 /**
@@ -12,6 +13,7 @@ export class FightingMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     ...FightingPunchMoveAnimations.anims,
     ...FightingKickThrowMoveAnimations.anims,
+    ...FightingRangedMoveAnimations.anims,
     ...FightingStatusMoveAnimations.anims
   };
 }

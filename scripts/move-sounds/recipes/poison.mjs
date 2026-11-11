@@ -76,14 +76,14 @@ export const POISON = {
     return s;
   },
 
-  /** Generic melee + poison fleck: two crossing poisonous slashes. */
+  /** Custom (1.15 s): two blades slash an X (0.05 / 0.15 s), poison bursts at 0.3 s and bubbles scatter. */
   crosspoison: () => {
-    const s = new MoveSfx(1.0, 0xc25b);
-    s.whoosh(0.0, 0.12, { from: 2000, to: 8000, gain: 0.3 });
-    s.slash(0.1, 0.4);
-    s.slash(0.17, 0.5);
-    s.thud(0.17, 0.4, 0.4);
-    s.poison(0.45);
+    const s = new MoveSfx(1.25, 0xc25b);
+    s.slash(0.05, 0.45);
+    s.slash(0.15, 0.5);
+    s.thud(0.3, 0.45, 0.4);
+    s.bubbles(0.3, 0.6, 6, { lo: 180, hi: 400, gain: 0.15 });
+    s.poison(0.35);
     return s;
   },
 

@@ -102,13 +102,18 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic field move + paralysis fleck: electricity bursts out in all directions. */
+  /**
+   * Custom (1.95 s): the scene darkens, a crackling ball charges (0.3-0.9 s),
+   * balloons over the field (0.9 s) and the target is zapped (1.1-1.75 s).
+   */
   discharge: () => {
-    const s = new MoveSfx(1.15, 0xd15c);
-    s.noise(0.0, 0.5, { clock: (u) => 18000 - 10000 * u, gain: env.attackDecay(0.5, 0.03), short: true });
-    s.pulse(0.0, 0.4, { freq: (u) => 1500 - 1100 * u, gain: env.decay(0.3, 1.5), duty: 0.25 });
-    s.sparkle(0.05, 0.5, 10, { lo: 2000, hi: 4500, gain: 0.18 });
-    s.paralyze(0.55);
+    const s = new MoveSfx(2.0, 0xd15c);
+    s.pulse(0.3, 0.6, { freq: (u) => 200 + 300 * u, gain: env.ramp(0.05, 0.18), duty: 0.25 });
+    s.sparkle(0.3, 0.6, 8, { lo: 2000, hi: 4500, gain: 0.12 });
+    s.noise(0.9, 0.5, { clock: (u) => 18000 - 10000 * u, gain: env.attackDecay(0.5, 0.03), short: true });
+    s.pulse(0.9, 0.4, { freq: (u) => 1500 - 1100 * u, gain: env.decay(0.3, 1.5), duty: 0.25 });
+    s.paralyze(1.1);
+    s.paralyze(1.4, 0.2);
     return s;
   },
 

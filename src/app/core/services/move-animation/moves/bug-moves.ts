@@ -8,6 +8,8 @@ import { GrassMoveAnimations } from './grass-moves';
 export class BugMoveAnimations {
   /** Hand-made Bug move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    attackorder: (refs, _launch, target) => BugMoveAnimations.playAttackOrder(refs, target),
+    bugbuzz: (refs, launch, target) => BugMoveAnimations.playBugBuzz(refs, launch, target),
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
     megahorn: (refs, launch, target) => BugMoveAnimations.playMegahorn(refs, launch, target),
@@ -311,5 +313,155 @@ export class BugMoveAnimations {
 
     await Fx.anim(red, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     red.remove();
+  }
+
+  /**
+   * Attack Order, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/d/d8/Schlagbefehl_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/3/3d/Schlagbefehl_Gen5.png
+   *
+   * A swarm of little bees buzzes in from all sides and closes in on the
+   * target (0-0.65 s). They sting it inside a swelling cloud of yellow
+   * honeycomb puffs (hits at 0.6 / 0.85 / 1.1 s), which drifts apart and
+   * fades (to ~1.65 s).
+   */
+  private static async playAttackOrder(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const tr = Fx.rect(targetEl);
+    const reach = Math.max(tr.width * 0.5, 36);
+    const effects: Promise<void>[] = [];
+
+    // The swarm flies in from the edges of the screen with a wobbly path.
+    for (let i = 0; i < 16; i++) {
+      const bee = BugMoveAnimations.beeGlyph(10 + Math.random() * 4);
+      const ang = (Math.PI * 2 * i) / 16 + Math.random() * 0.3;
+      const start: Point = {
+        x: Fx.clamp(target.x + Math.cos(ang) * W * 0.6, -10, W + 10),
+        y: Fx.clamp(target.y + Math.sin(ang) * H * 0.6, -10, H + 10)
+      };
+      const end: Point = { x: target.x + (Math.random() * 2 - 1) * reach, y: target.y + (Math.random() * 2 - 1) * reach };
+      const ex = end.x - start.x;
+      const ey = end.y - start.y;
+      const wob = 20 + Math.random() * 20;
+      Fx.place(bee, start);
+      fxEl.appendChild(bee);
+      effects.push(
+        Fx.anim(bee, [
+          { transform: 'translate(0,0)', opacity: 0 },
+          { transform: `translate(${ex * 0.35}px,${ey * 0.35 - wob}px)`, opacity: 1, offset: 0.35 },
+          { transform: `translate(${ex * 0.7}px,${ey * 0.7 + wob * 0.6}px)`, opacity: 1, offset: 0.7 },
+          { transform: `translate(${ex}px,${ey}px)`, opacity: 1, offset: 0.85 },
+          { transform: `translate(${ex + (Math.random() * 2 - 1) * 12}px,${ey - 10}px)`, opacity: 0 }
+        ], { duration: 650 + Math.random() * 300, delay: Math.random() * 200, easing: 'ease-in-out' }).then(() => bee.remove())
+      );
+    }
+    await Fx.wait(550);
+
+    // The honeycomb cloud: soft yellow hexagon puffs swell and drift apart round the target.
+    for (let i = 0; i < 14; i++) {
+      const s = reach * (0.6 + Math.random() * 0.6);
+      const puff = document.createElement('div');
+      puff.style.cssText =
+        `width:${s}px;height:${s}px;pointer-events:none;clip-path:polygon(25% 5%,75% 5%,100% 50%,75% 95%,25% 95%,0 50%);` +
+        'background:radial-gradient(circle,#FFFBC0 0 25%,#F8E84A 55%,#E0C02Acc);filter:blur(.6px)';
+      Fx.place(puff, { x: target.x + (Math.random() * 2 - 1) * reach * 0.8, y: target.y + (Math.random() * 2 - 1) * reach * 0.9 });
+      fxEl.appendChild(puff);
+      const ang = Math.random() * Math.PI * 2;
+      const d = reach * (0.3 + Math.random() * 0.5);
+      effects.push(
+        Fx.anim(puff, [
+          { transform: 'translate(0,0) scale(.2)', opacity: 0 },
+          { transform: 'translate(0,0) scale(1)', opacity: 0.95, offset: 0.3 },
+          { transform: `translate(${Math.cos(ang) * d * 0.4}px,${Math.sin(ang) * d * 0.4}px) scale(1.05)`, opacity: 0.85, offset: 0.7 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) scale(1.15)`, opacity: 0 }
+        ], { duration: 800 + Math.random() * 200, delay: i * 25, easing: 'ease-out' }).then(() => puff.remove())
+      );
+    }
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        Fx.flash(targetEl, '#F8E84A', 0.6);
+        Fx.shake(targetEl, 5);
+      }, 50 + i * 250);
+    }
+    await Promise.all(effects);
+  }
+
+  /** A tiny cartoon bee: yellow body with black stripes and two white wings, `w` px wide. */
+  private static beeGlyph(w: number): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 20 16');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${w * 0.8}px`);
+    svg.innerHTML =
+      '<ellipse cx="8" cy="4" rx="4" ry="3.5" fill="#ffffffdd" stroke="#9AA" stroke-width=".6"/>' +
+      '<ellipse cx="13" cy="4" rx="3.5" ry="3" fill="#ffffffdd" stroke="#9AA" stroke-width=".6"/>' +
+      '<ellipse cx="10" cy="10" rx="8" ry="5" fill="#F8D020" stroke="#3A2A0A" stroke-width="1"/>' +
+      '<path d="M7,5.5 V14.5 M11,5 V15 M15,6 V14" stroke="#2A1A0A" stroke-width="1.6"/>';
+    return svg;
+  }
+
+  /**
+   * Bug Buzz, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/4/41/K%C3%A4fergebrumm_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/a/a2/K%C3%A4fergebrumm_Gen5.png
+   *
+   * The user buzzes (a fast sideways jitter) while glowing orange rings pulse
+   * out round it and pale cream sound arcs roll from it over to the target
+   * (0-1.0 s). The target shakes as the waves reach it (0.4 / 0.65 / 0.9 s).
+   */
+  private static async playBugBuzz(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const effects: Promise<void>[] = [];
+
+    const original = launchEl.style.transform;
+    const jitter: Keyframe[] = [];
+    for (let k = 0; k <= 20; k++) jitter.push({ transform: `${original} translateX(${k % 2 ? -2 : 2}px)` });
+    jitter.push({ transform: original });
+    effects.push(Fx.anim(launchEl, jitter, { duration: 1000, easing: 'linear', fill: 'none' }));
+
+    // Orange rings pulsing round the user.
+    const ringSize = Math.max(Math.max(lr.width, lr.height) * 0.9, 60);
+    for (let i = 0; i < 4; i++) {
+      const ring = document.createElement('div');
+      ring.style.cssText = `width:${ringSize}px;height:${ringSize}px;border-radius:50%;pointer-events:none;border:${ringSize * 0.09}px solid #F0844Acc;filter:blur(1.5px);box-shadow:0 0 10px #F0844A`;
+      Fx.place(ring, launch);
+      fxEl.appendChild(ring);
+      effects.push(
+        Fx.anim(ring, [
+          { transform: 'scale(.4)', opacity: 0 },
+          { transform: 'scale(.8)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(1.2)', opacity: 0 }
+        ], { duration: 450, delay: i * 180, easing: 'ease-out' }).then(() => ring.remove())
+      );
+    }
+
+    // Sound arcs: the side of a ring facing the target, rolling over and growing.
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const side = dx >= 0 ? 'right' : 'left';
+    const arcSize = Math.max(lr.height * 0.9, 70);
+    for (let i = 0; i < 7; i++) {
+      const arc = document.createElement('div');
+      arc.style.cssText = `width:${arcSize}px;height:${arcSize}px;border-radius:50%;pointer-events:none;border-${side}:5px solid #F8E4B8;filter:drop-shadow(0 0 3px #F0B060)`;
+      Fx.place(arc, launch);
+      fxEl.appendChild(arc);
+      effects.push(
+        Fx.anim(arc, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${dx * 0.2}px,${dy * 0.2}px) scale(.8)`, opacity: 1, offset: 0.2 },
+          { transform: `translate(${dx}px,${dy}px) scale(1.6)`, opacity: 0 }
+        ], { duration: 550, delay: i * 90, easing: 'ease-out' }).then(() => arc.remove())
+      );
+    }
+    for (let i = 0; i < 3; i++) {
+      setTimeout(() => {
+        Fx.flash(targetEl, '#F8E4B8', 0.5);
+        Fx.shake(targetEl, 4);
+      }, 400 + i * 250);
+    }
+    await Promise.all(effects);
   }
 }

@@ -8,6 +8,7 @@ import { FxEffects } from '../fx-effects';
 export class ElectricMoveAnimations {
   /** Hand-made Electric move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    discharge: (refs, launch, target) => ElectricMoveAnimations.playDischarge(refs, launch, target),
     thunder: (refs, _launch, target) => ElectricMoveAnimations.playThunder(refs, target),
     thunderbolt: (refs, _launch, target) => ElectricMoveAnimations.playThunderbolt(refs, target),
     thunderwave: (refs, _launch, target) => ElectricMoveAnimations.playThunderWave(refs, target),
@@ -570,5 +571,83 @@ export class ElectricMoveAnimations {
     }
     el.innerHTML = `<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block;overflow:visible">${marks}</svg>`;
     return el;
+  }
+
+  /**
+   * Discharge, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/9/9e/Ladungssto%C3%9F_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/0/09/Ladungssto%C3%9F_Gen5.png
+   *
+   * The scene goes dark (0-0.3 s). A crackling yellow-green ball of
+   * electricity swells on the user (0.3-0.9 s), then balloons out over the
+   * whole field and fades (0.9-1.3 s). The target is struck: sparks crackle
+   * over it while it flashes yellow-green (1.1-1.75 s) and the dark lifts
+   * (to ~1.95 s).
+   */
+  private static async playDischarge(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // The ball swells on the user, crackling.
+    const size = Math.max(Math.max(lr.width, lr.height) * 0.8, 60);
+    const ball = document.createElement('div');
+    ball.style.cssText =
+      `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(circle,#FAFFE0 0 20%,#E0F84Aee 45%,#B8E02A99 62%,#B8E02A00 72%)';
+    Fx.place(ball, launch);
+    fxEl.appendChild(ball);
+    const stopBall = ElectricMoveAnimations.crackle(ball, size, '#E8F860');
+    const charged = 'brightness(1.5) sepia(.6) saturate(3) hue-rotate(30deg)';
+    Fx.anim(launchEl, [{ filter: 'none' }, { filter: charged, offset: 0.3 }, { filter: charged, offset: 0.8 }, { filter: 'none' }], {
+      duration: 1000,
+      easing: 'ease-in-out',
+      fill: 'none'
+    });
+    await Fx.anim(ball, [
+      { transform: 'scale(.2)', opacity: 0 },
+      { transform: 'scale(.8)', opacity: 1, offset: 0.4 },
+      { transform: 'scale(.65)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(1)', opacity: 1 }
+    ], { duration: 600, easing: 'ease-in-out' });
+
+    // It balloons out over the field and fades.
+    const span = Math.hypot(fieldEl.clientWidth, fieldEl.clientHeight) * 1.2;
+    const blowUp = Fx.anim(ball, [
+      { transform: 'scale(1)', opacity: 1 },
+      { transform: `scale(${span / size})`, opacity: 0.85, offset: 0.6 },
+      { transform: `scale(${(span / size) * 1.1})`, opacity: 0 }
+    ], { duration: 400, easing: 'ease-out' }).then(() => {
+      stopBall();
+      ball.remove();
+    });
+    await Fx.wait(200);
+
+    // The target is struck: sparks crackle over it while it flashes yellow-green.
+    const sparkSize = Math.max(Math.max(tr.width, tr.height) * 1.1, 60);
+    const sparks = document.createElement('div');
+    sparks.style.cssText = `width:${sparkSize}px;height:${sparkSize}px;pointer-events:none`;
+    Fx.place(sparks, target);
+    fxEl.appendChild(sparks);
+    const stopSparks = ElectricMoveAnimations.crackle(sparks, sparkSize, '#E8F860');
+    const struck = 'brightness(1.4) sepia(1) saturate(4) hue-rotate(25deg)';
+    const tint = Fx.anim(targetEl, [
+      { filter: 'none' },
+      { filter: struck, offset: 0.15 },
+      { filter: 'none', offset: 0.35 },
+      { filter: struck, offset: 0.55 },
+      { filter: struck, offset: 0.8 },
+      { filter: 'none' }
+    ], { duration: 650, easing: 'linear', fill: 'none' });
+    Fx.shake(targetEl, 5);
+    setTimeout(() => Fx.shake(targetEl, 5), 300);
+    await Promise.all([blowUp, tint]);
+    stopSparks();
+    sparks.remove();
+
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in' });
+    dim.remove();
   }
 }
