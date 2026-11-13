@@ -3,15 +3,18 @@ import { env } from '../track.mjs';
 
 /** Steel-type move sounds. */
 export const STEEL = {
-  /** Generic self aura + stat-up fleck: armor plates clank off, the body gets lighter. */
+  /** Custom (glow 0-0.45 s, tremble 0.35-0.6 s, flakes fall off 0.6-1.3 s, hop 1.1-1.45 s): a shimmer, a rattle, clinking plates, a light hop. */
   autotomize: () => {
-    const s = new MoveSfx(1.5, 0xa070);
-    for (const at of [0.05, 0.15, 0.25, 0.35]) {
-      s.noise(at, 0.04, { clock: () => 8000, gain: env.decay(0.3, 1), short: true });
-      s.pulse(at, 0.15, { freq: () => 2300 + s.random() * 600, gain: env.decay(0.14, 2), duty: 0.5 });
+    const s = new MoveSfx(1.6, 0xa070);
+    s.chord(0.0, 0.45, [76, 83, 88], { rate: 0.03, gain: 0.1, voice: 'wave' });
+    s.noise(0.35, 0.25, { clock: (u) => 3000 + 1500 * Math.sin(2 * Math.PI * 16 * u), gain: env.swell(0.18), short: true });
+    for (let i = 0; i < 7; i++) {
+      const at = 0.95 + s.random() * 0.35;
+      s.noise(at, 0.03, { clock: () => 8000, gain: env.decay(0.22, 1), short: true });
+      s.pulse(at, 0.12, { freq: () => 2100 + s.random() * 900, gain: env.decay(0.1, 2), duty: 0.5 });
     }
-    s.whoosh(0.35, 0.4, { from: 2000, to: 8000, gain: 0.25 });
-    s.statUp(0.85);
+    s.whoosh(1.1, 0.18, { from: 2000, to: 8000, gain: 0.22 });
+    s.arpeggio(1.15, [79, 84, 91], 0.05, { gain: 0.14, voice: 'wave', hold: 0.08 });
     return s;
   },
 

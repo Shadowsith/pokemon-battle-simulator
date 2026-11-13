@@ -238,13 +238,15 @@ export class FxGlyphs {
 
   /**
    * A swirling ball of fire. `hot` is the usual yellow-white core with an
-   * orange edge; `red` is a deeper red blast (Flare Blitz). Used by the fire moves.
+   * orange edge; `red` is a deeper red blast (Flare Blitz); `blue` a white-cyan
+   * core with a deep blue edge (Blue Flare). Used by the fire moves.
    */
-  static firePuff(size: number, tone: 'hot' | 'red' = 'hot'): HTMLElement {
-    const fill =
-      tone === 'red'
-        ? 'radial-gradient(circle at 45% 45%,#FFD2A8,#F2583A 30%,#D0281C 58%,#9A101000 78%)'
-        : 'radial-gradient(circle at 45% 45%,#FFF6C0,#FFC53C 35%,#F0803C 60%,#D2321A00 78%)';
+  static firePuff(size: number, tone: 'hot' | 'red' | 'blue' = 'hot'): HTMLElement {
+    const fill = {
+      hot: 'radial-gradient(circle at 45% 45%,#FFF6C0,#FFC53C 35%,#F0803C 60%,#D2321A00 78%)',
+      red: 'radial-gradient(circle at 45% 45%,#FFD2A8,#F2583A 30%,#D0281C 58%,#9A101000 78%)',
+      blue: 'radial-gradient(circle at 45% 45%,#F2FCFF,#7FE2FF 30%,#2A9CF0 58%,#0A3AB000 78%)'
+    }[tone];
     const puff = document.createElement('div');
     puff.style.cssText = `position:absolute;width:${size}px;height:${size}px;border-radius:50% 50% 45% 55%;pointer-events:none;background:${fill}`;
     return puff;

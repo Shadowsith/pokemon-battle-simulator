@@ -67,12 +67,13 @@ export const POISON = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: the body coils up with a hiss. */
+  /** Custom (rings rise 0-0.7 s, cyan coil 0.6-1.1 s, orange stat-up sparkles 1.0-2.2 s): a winding hiss, a shimmer, the stat-up jingle. */
   coil: () => {
-    const s = new MoveSfx(1.5, 0xc011);
-    s.noise(0.02, 0.6, { clock: () => 14000, gain: env.swell(0.2) });
-    for (const at of [0.05, 0.3]) s.pulse(at, 0.25, { freq: (u) => 300 * Math.pow(2.5, u), gain: env.swell(0.18), duty: 0.125 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.3, 0xc011);
+    s.noise(0.02, 0.65, { clock: () => 14000, gain: env.swell(0.2) });
+    for (const at of [0.05, 0.3]) s.pulse(at, 0.25, { freq: (u) => 300 * Math.pow(2.5, u), gain: env.swell(0.16), duty: 0.125 });
+    s.chord(0.6, 0.5, [74, 78, 81], { rate: 0.03, gain: 0.12, voice: 'wave' });
+    s.statUp(1.05);
     return s;
   },
 

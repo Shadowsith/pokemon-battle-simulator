@@ -726,30 +726,30 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Acrobatics** / Akrobatik — `acrobatics` · Flying · Physical · `melee`
 - [ ] **After You** / Galanterie — `afteryou` · Normal · Status · `targetAura`
 - [ ] **Ally Switch** / Seitentausch — `allyswitch` · Psychic · Status · `selfAura`
-- [ ] ⭐ **Autotomize** / Autotomie — `autotomize` · Steel · Status · `selfAura`
+- [x] ⭐ **Autotomize** / Autotomie — `autotomize` · Steel · Status · the user glows silver-white and trembles, grey metal flakes and orange sparks fall off it, then it hops up lightly with a silver glint (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Autotomie
   - Gen 5 APNG: https://www.pokewiki.de/images/5/5a/Autotomie_Gen5.png
 - [ ] **Bestow** / Offerte — `bestow` · Normal · Status · `targetAura`
-- [ ] ⭐ **Blue Flare** / Blauflammen — `blueflare` · Fire · Special · `projectile`
+- [x] ⭐ **Blue Flare** / Blauflammen — `blueflare` · Fire · Special · black scene, three waves of blue flames flare up all over the target while it glows orange-red (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Blauflammen
   - Gen 5 APNG: https://www.pokewiki.de/images/8/82/Blauflammen_Gen5.png
-- [ ] ⭐ **Bolt Strike** / Blitzschlag — `boltstrike` · Electric · Physical · `melee`
+- [x] ⭐ **Bolt Strike** / Blitzschlag — `boltstrike` · Electric · Physical · black scene, the user turns olive-yellow behind a crackling spark ball that flares white, charges, yellow ray backdrop on the target while blue-white sparks crackle over it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Blitzschlag
   - Gen 5 APNG: https://www.pokewiki.de/images/5/52/Blitzschlag_Gen5.png
 - [ ] **Bulldoze** / Dampfwalze — `bulldoze` · Ground · Physical · `field`
-- [ ] ⭐ **Chip Away** / Zermürben — `chipaway` · Normal · Physical · `melee`
+- [x] ⭐ **Chip Away** / Zermürben — `chipaway` · Normal · Physical · the user slips forward pale and see-through, a yellow-white spiky flash pops on the target with yellow sparks, orange specks drift down (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Zerm%C3%BCrben
   - Gen 5 APNG: https://www.pokewiki.de/images/b/bb/Zerm%C3%BCrben_Gen5.png
 - [ ] **Circle Throw** / Überkopfwurf — `circlethrow` · Fighting · Physical · `melee`
 - [ ] **Clear Smog** / Klärsmog — `clearsmog` · Poison · Special · `projectile`
-- [ ] ⭐ **Coil** / Einrollen — `coil` · Poison · Status · `selfAura`
+- [x] ⭐ **Coil** / Einrollen — `coil` · Poison · Status · grey wind rings wind up round the user and tighten, a glowing cyan coil swirls at its base, orange stat-up sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Einrollen
   - Gen 5 APNG: https://www.pokewiki.de/images/0/06/Einrollen_Gen5.png
-- [ ] ⭐ **Cotton Guard** / Watteschild — `cottonguard` · Grass · Status · `selfAura`
+- [x] ⭐ **Cotton Guard** / Watteschild — `cottonguard` · Grass · Status · cotton balls drift in and pile onto the user, glow white and puff away, orange stat-up sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Watteschild
   - Gen 5 APNG: https://www.pokewiki.de/images/9/99/Watteschild_Gen5.png
 - [ ] **Dragon Tail** / Drachenrute — `dragontail` · Dragon · Physical · `melee`
-- [ ] ⭐ **Drill Run** / Schlagbohrer — `drillrun` · Ground · Physical · `melee`
+- [x] ⭐ **Drill Run** / Schlagbohrer — `drillrun` · Ground · Physical · the user rushes in, a spinning dark drill bores into the target inside a flaring orange spiky ring, yellow sparks fly off (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schlagbohrer
   - Gen 5 APNG: https://www.pokewiki.de/images/e/ea/Schlagbohrer_Gen5.png
 - [ ] **Dual Chop** / Doppelhieb — `dualchop` · Dragon · Physical · `melee`
@@ -757,14 +757,14 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Electro Ball** / Elektroball — `electroball` · Electric · Special · `lob`
 - [ ] **Electroweb** / Elektronetz — `electroweb` · Electric · Special · `field`
 - [ ] **Entrainment** / Zwango — `entrainment` · Normal · Status · `targetAura`
-- [ ] ⭐ **Fiery Dance** / Feuerreigen — `fierydance` · Fire · Special · `projectile`
+- [x] ⭐ **Fiery Dance** / Feuerreigen — `fierydance` · Fire · Special · red-hot scene, the user sways in a dance with embers swirling up round it, then fire bursts pop all over the reddened target in two waves (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Feuerreigen
   - Gen 5 APNG: https://www.pokewiki.de/images/5/5d/Feuerreigen_Gen5.png
 - [ ] **Final Gambit** / Wagemut — `finalgambit` · Fighting · Special · `projectile`
-- [ ] ⭐ **Fire Pledge** / Feuersäulen — `firepledge` · Fire · Special · `projectile`
+- [x] ⭐ **Fire Pledge** / Feuersäulen — `firepledge` · Fire · Special · fire boils on the ground round the target and three flame pillars shoot up, the target glows red, dark smoke rises (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Feuers%C3%A4ulen
   - Gen 5 APNG: https://www.pokewiki.de/images/2/28/Feuers%C3%A4ulen_Gen5.png
-- [ ] ⭐ **Flame Burst** / Funkenflug — `flameburst` · Fire · Special · `projectile`
+- [x] ⭐ **Flame Burst** / Funkenflug — `flameburst` · Fire · Special · a small fireball flies to the target and bursts into a fire cloud, flinging red embers far out to both sides (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Funkenflug
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c2/Funkenflug_Gen5.png
 - [ ] **Flame Charge** / Nitroladung — `flamecharge` · Fire · Physical · `melee`

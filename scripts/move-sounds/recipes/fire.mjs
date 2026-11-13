@@ -71,14 +71,16 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + burn fleck: an intense, bright blue flame. */
+  /** Custom (black 0-0.3 s, blue flame waves at 0.3 / 0.65 / 1.0 s, hit 0.3 s, fades to ~1.9 s): three roaring bursts of bright blue fire. */
   blueflare: () => {
-    const s = new MoveSfx(1.45, 0xb1f1);
-    s.whoosh(0.0, 0.46, { from: 2000, to: 9000, gain: 0.35 });
-    s.chord(0.0, 0.45, [72, 79, 84], { rate: 0.025, gain: 0.18, voice: 'pulse' });
-    s.thud(0.43, 0.8, 0.9);
-    s.noise(0.43, 0.6, { clock: env.ramp(6000, 900), gain: env.attackDecay(0.5, 0.03) });
-    s.burn(1.0);
+    const s = new MoveSfx(2.05, 0xb1f1);
+    s.chord(0.0, 0.3, [72, 79, 84], { rate: 0.025, gain: 0.12, voice: 'pulse' });
+    for (const [i, at] of [0.3, 0.65, 1.0].entries()) {
+      s.thud(at, i ? 0.55 : 0.8, 0.8);
+      s.noise(at, 0.5, { clock: env.ramp(6000, 1200), gain: env.attackDecay(i === 1 ? 0.5 : 0.42, 0.03) });
+    }
+    s.noise(1.3, 0.55, { clock: () => 900, gain: env.decay(0.2, 1.5) });
+    s.sparkle(0.4, 1.1, 8, { lo: 6000, hi: 9500, gain: 0.1 });
     return s;
   },
 
@@ -116,14 +118,17 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a swirling, dancing flame with a rhythmic flicker. */
+  /** Custom (heat 0-0.3 s, dance with swirling embers 0.1-0.7 s, fire bursts at 0.7 / 1.05 s, hit 0.7 s, heat fades to ~1.95 s): a dancing tune over a swirling flame, two crackling bursts. */
   fierydance: () => {
-    const s = new MoveSfx(1.1, 0xf1ed);
-    s.noise(0.0, 0.45, { clock: (u) => 900 + 700 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.35 * Math.sin(Math.PI * u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 8 * u)) });
-    s.arpeggio(0.0, [67, 71, 74, 71, 74, 79], 0.07, { gain: 0.12, voice: 'wave', hold: 0.09 });
-    s.thud(0.43, 0.6, 0.6);
-    s.noise(0.44, 0.5, { clock: env.ramp(1800, 500), gain: env.attackDecay(0.4, 0.05) });
-    s.sparkle(0.5, 0.3, 4, { lo: 6000, hi: 9000, gain: 0.12 });
+    const s = new MoveSfx(2.05, 0xf1ed);
+    s.noise(0.05, 0.65, { clock: (u) => 900 + 700 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.3 * Math.sin(Math.PI * u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 8 * u)) });
+    s.arpeggio(0.1, [67, 71, 74, 71, 74, 79, 74, 79], 0.07, { gain: 0.12, voice: 'wave', hold: 0.09 });
+    for (const [i, at] of [0.7, 1.05].entries()) {
+      s.thud(at, i ? 0.45 : 0.6, 0.6);
+      s.noise(at, 0.4, { clock: env.ramp(2200, 600), gain: env.attackDecay(i ? 0.3 : 0.4, 0.04) });
+      for (let k = 0; k < 5; k++) s.noise(at + k * 0.04, 0.03, { clock: () => 9000, gain: env.decay(0.12, 1), short: true });
+    }
+    s.sparkle(1.1, 0.5, 4, { lo: 6000, hi: 9000, gain: 0.1 });
     return s;
   },
 
@@ -162,14 +167,14 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a pillar of fire erupts under the target. */
+  /** Custom (fire boils on the ground 0-0.3 s, three pillars shoot up 0.15-0.9 s, hit 0.3 s, dark smoke 0.8-1.6 s): a rumbling boil, a roaring eruption, a smoky hiss. */
   firepledge: () => {
-    const s = new MoveSfx(1.3, 0xf1e9);
-    s.whoosh(0.0, 0.45, { from: 600, to: 3000, gain: 0.3 });
-    s.thud(0.43, 0.65, 0.8);
-    s.noise(0.43, 0.75, { clock: env.ramp(500, 2500), gain: (u) => 0.45 * Math.min(1, u * 10) * Math.pow(1 - u, 1.2) });
-    s.pulse(0.43, 0.5, { freq: env.ramp(90, 260), gain: env.decay(0.2, 1), duty: 0.5 });
-    s.sparkle(0.55, 0.5, 6, { lo: 6000, hi: 9000, gain: 0.12 });
+    const s = new MoveSfx(1.7, 0xf1e9);
+    s.rumble(0.0, 0.3, { from: 150, to: 300, gain: 0.25 });
+    s.noise(0.15, 0.75, { clock: env.ramp(500, 2500), gain: (u) => 0.45 * Math.min(1, u * 8) * Math.pow(1 - u, 1.1) });
+    s.thud(0.3, 0.65, 0.8);
+    s.pulse(0.3, 0.5, { freq: env.ramp(90, 260), gain: env.decay(0.2, 1), duty: 0.5 });
+    s.noise(0.8, 0.8, { clock: () => 700, gain: env.swell(0.12) });
     return s;
   },
 
@@ -204,14 +209,14 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a fireball bursts, scattering embers around. */
+  /** Custom (fireball flies 0-0.4 s, bursts 0.4 s, embers fly out to ~1.3 s): a whoosh, a fiery pop, scattering embers. */
   flameburst: () => {
-    const s = new MoveSfx(1.15, 0xf1b0);
-    s.whoosh(0.0, 0.45, { from: 700, to: 3500, gain: 0.35 });
-    s.thud(0.43, 0.75, 0.7);
-    s.noise(0.43, 0.2, { clock: (u) => 11000 - 8000 * u, gain: env.attackDecay(0.5, 0.03) });
-    s.noise(0.5, 0.5, { clock: env.ramp(1500, 400), gain: env.decay(0.3, 1.2) });
-    s.sparkle(0.5, 0.4, 8, { lo: 5000, hi: 9000, gain: 0.15 });
+    const s = new MoveSfx(1.4, 0xf1b0);
+    s.whoosh(0.0, 0.4, { from: 700, to: 3500, gain: 0.32 });
+    s.thud(0.4, 0.75, 0.7);
+    s.noise(0.4, 0.2, { clock: (u) => 11000 - 8000 * u, gain: env.attackDecay(0.5, 0.03) });
+    s.noise(0.45, 0.6, { clock: env.ramp(1500, 400), gain: env.decay(0.3, 1.2) });
+    s.sparkle(0.5, 0.7, 9, { lo: 5000, hi: 9000, gain: 0.14 });
     return s;
   },
 

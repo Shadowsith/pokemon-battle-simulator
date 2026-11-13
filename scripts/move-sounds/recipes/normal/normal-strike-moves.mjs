@@ -34,12 +34,13 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee: a steady blow that chips bits off. */
+  /** Custom (slip 0-0.25 s, hit 0.25 s, sparks to 0.75 s, specks drift to ~1.05 s): a soft rush, a steady blow, chipped bits. */
   chipaway: () => {
-    const s = new MoveSfx(0.7, 0xc1a0);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 5000, gain: 0.3 });
-    s.thud(0.17, 0.55, 0.5);
-    for (let i = 0; i < 3; i++) s.noise(0.24 + i * 0.07, 0.03, { clock: () => 5000 + s.random() * 3000, gain: env.decay(0.25 - i * 0.05, 1) });
+    const s = new MoveSfx(1.15, 0xc1a0);
+    s.whoosh(0.0, 0.25, { from: 1500, to: 5000, gain: 0.28 });
+    s.thud(0.25, 0.55, 0.5);
+    s.sparkle(0.28, 0.4, 5, { lo: 4000, hi: 7000, gain: 0.14 });
+    for (let i = 0; i < 3; i++) s.noise(0.55 + i * 0.12, 0.03, { clock: () => 5000 + s.random() * 3000, gain: env.decay(0.15 - i * 0.03, 1) });
     return s;
   },
 

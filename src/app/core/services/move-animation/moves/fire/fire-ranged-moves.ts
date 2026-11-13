@@ -4,23 +4,31 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { DeliveryAnimations } from '../../delivery-animations';
 import { FxEffects } from '../../fx-effects';
+import { BlueFlare } from './blue-flare';
+import { FieryDance } from './fiery-dance';
 import { FireFlames } from './fire-flames';
+import { FirePledge } from './fire-pledge';
+import { FlameBurst } from './flame-burst';
 import { LavaPlume } from './lava-plume';
 import { MagmaStorm } from './magma-storm';
 import { MysticalFire } from './mystical-fire';
 
-/** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs (Lava Plume lives in `lava-plume.ts`). */
+/** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs (set pieces such as Lava Plume, Blue Flare, Fiery Dance, Fire Pledge and Flame Burst live in their own files). */
 export class FireRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     blastburn: (refs, launch, target) => FireRangedMoveAnimations.playBlastBurn(refs, launch, target),
+    blueflare: (refs, _launch, target) => BlueFlare.play(refs, target),
     ember: (refs, _launch, _target, v) => FireRangedMoveAnimations.playGroundFlame(refs, v),
     eruption: (refs, launch, target) => FireRangedMoveAnimations.playEruption(refs, launch, target),
+    fierydance: (refs, launch, target) => FieryDance.play(refs, launch, target),
     fireblast: (refs, launch, target, v) => FireRangedMoveAnimations.playFireBlast(refs, launch, target, v),
     firespin: async (refs, launch, target, v) => {
       await DeliveryAnimations.playDelivery(refs, launch, target, v);
       await FireRangedMoveAnimations.playVortex(refs, v);
     },
+    firepledge: (refs, _launch, target) => FirePledge.play(refs, target),
+    flameburst: (refs, launch, target) => FlameBurst.play(refs, launch, target),
     heatwave: (refs, _launch, _target, v) => FireRangedMoveAnimations.playHeatWave(refs, v),
     flamethrower: (refs, launch, target, v) => FireRangedMoveAnimations.playFlamethrower(refs, launch, target, v),
     lavaplume: (refs, launch, target) => LavaPlume.play(refs, launch, target),

@@ -2,15 +2,17 @@ import { Point, BattleStageRefs, MoveAnimRegistry } from '../animation.types';
 import { Fx } from '../fx';
 import { FxEffects } from '../fx-effects';
 import { FxGlyphs } from '../fx-glyphs';
+import { Coil } from './poison/coil';
 import { PoisonJab } from './poison/poison-jab';
 import { ToxicSpikes } from './poison/toxic-spikes';
 
-/** Hand-made animations for Poison-type moves (Poison Jab and Toxic Spikes live in `poison/`). */
+/** Hand-made animations for Poison-type moves (Coil, Poison Jab and Toxic Spikes live in `poison/`). */
 export class PoisonMoveAnimations {
   /** Hand-made Poison move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     acid: (refs, launch, target) => PoisonMoveAnimations.playAcidSpit(refs, launch, target),
     belch: (refs, launch, target) => PoisonMoveAnimations.playBelch(refs, launch, target),
+    coil: (refs, launch) => Coil.play(refs, launch),
     crosspoison: (refs, _launch, target) => PoisonMoveAnimations.playCrossPoison(refs, target),
     gunkshot: (refs, launch, target) => PoisonMoveAnimations.playGunkShot(refs, launch, target),
     poisonjab: (refs, _launch, target, v) => PoisonJab.play(refs, target, v),

@@ -14,6 +14,7 @@ export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     bind: (refs, _launch, target) => NormalStrikeMoveAnimations.playBind(refs, target),
+    chipaway: (refs, launch, target, v) => NormalStrikeMoveAnimations.playChipAway(refs, launch, target, v),
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
     gigaimpact: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playGigaImpact(refs, target, v),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
@@ -537,5 +538,73 @@ export class NormalStrikeMoveAnimations {
       }
     }
     await done;
+  }
+
+  /**
+   * Chip Away, after the Gen 5 animation:
+   * - Gen 5: https://www.pokewiki.de/images/b/bb/Zerm%C3%BCrben_Gen5.png
+   *
+   * The user goes pale and see-through as it slips forward toward the
+   * target (0-0.3 s). At the hit (0.25 s) a yellow-white spiky flash pops on
+   * the target while small yellow sparks fly off it (0.25-0.75 s), then a few
+   * tiny orange specks drift down (to ~1.05 s).
+   */
+  private static async playChipAway(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const original = launchEl.style.transform;
+    const dx = (target.x - launch.x) * 0.25;
+    const dy = (target.y - launch.y) * 0.25;
+    const slip = Fx.anim(launchEl, [
+      { transform: `${original} translate(0,0)`, opacity: 1, filter: 'brightness(1)' },
+      { transform: `${original} translate(${dx}px,${dy}px)`, opacity: 0.5, filter: 'brightness(1.8) saturate(.2)', offset: 0.45 },
+      { transform: `${original} translate(0,0)`, opacity: 1, filter: 'brightness(1)' }
+    ], { duration: 520, easing: 'ease-in-out', fill: 'none' });
+    await Fx.wait(250);
+
+    // The hit: a yellow-white flash and sparks.
+    const at: Point = { x: target.x - v.dir * tr.width * 0.1, y: target.y + tr.height * 0.1 };
+    const burst = FxGlyphs.spikyBurst(Math.max(tr.width * 0.6, 48), '#FFE84A', '#FFF8C0', '#FFFFFF');
+    Fx.place(burst, at);
+    fxEl.appendChild(burst);
+    Fx.flash(targetEl, '#ffffff', 0.6);
+    Fx.shake(targetEl, 5);
+    const effects: Promise<void>[] = [
+      slip,
+      Fx.anim(burst, [
+        { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+        { transform: 'scale(1) rotate(10deg)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(1.1) rotate(15deg)', opacity: 0 }
+      ], { duration: 380, easing: 'ease-out' }).then(() => burst.remove())
+    ];
+    for (let i = 0; i < 7; i++) {
+      const dot = document.createElement('div');
+      const s = 5 + Math.random() * 4;
+      dot.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:50%;pointer-events:none;background:radial-gradient(circle,#FFFFFF,#FFE84A 60%,#FFE84A00);box-shadow:0 0 5px #FFE84A`;
+      Fx.place(dot, at);
+      fxEl.appendChild(dot);
+      const ang = -Math.PI / 2 + (Math.random() * 2 - 1) * Math.PI * 0.7;
+      const d = Math.max(tr.width * 0.5, 36) * (0.6 + Math.random() * 0.5);
+      effects.push(
+        Fx.anim(dot, [
+          { transform: 'translate(0,0)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px)`, opacity: 0 }
+        ], { duration: 450 + Math.random() * 100, easing: 'ease-out' }).then(() => dot.remove())
+      );
+    }
+    for (let i = 0; i < 5; i++) {
+      const speck = document.createElement('div');
+      speck.style.cssText = 'position:absolute;width:3px;height:3px;border-radius:50%;pointer-events:none;background:#FF9A3A';
+      Fx.place(speck, { x: at.x + (Math.random() * 2 - 1) * tr.width * 0.35, y: at.y - tr.height * 0.2 });
+      fxEl.appendChild(speck);
+      effects.push(
+        Fx.anim(speck, [
+          { transform: 'translateY(0)', opacity: 0 },
+          { transform: 'translateY(8px)', opacity: 1, offset: 0.3 },
+          { transform: `translateY(${tr.height * 0.4}px)`, opacity: 0 }
+        ], { duration: 500, delay: 300 + Math.random() * 100, easing: 'ease-in' }).then(() => speck.remove())
+      );
+    }
+    await Promise.all(effects);
   }
 }

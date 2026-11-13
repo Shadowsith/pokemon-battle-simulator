@@ -70,15 +70,17 @@ export const ELECTRIC = {
     return t;
   },
 
-  /** Generic melee at high power + paralysis fleck: a charging, crackling body blow. */
+  /** Custom (black 0-0.25 s, crackling charge 0.25-0.75 s, flare 0.75-1.0 s, charge 1.0-1.2 s, hit 1.2 s, sparks to 1.95 s, clears ~2.2 s): a building crackle, a flash, a thunderous body blow. */
   boltstrike: () => {
-    const s = new MoveSfx(1.15, 0xb057);
-    s.noise(0.0, 0.18, { clock: env.ramp(3000, 9000), gain: env.ramp(0.1, 0.4), short: true });
-    s.thud(0.17, 0.6, 0.9);
-    s.noise(0.17, 0.25, { clock: (u) => 20000 - 14000 * u, gain: env.attackDecay(0.45, 0.02) });
-    s.pulse(0.17, 0.3, { freq: (u) => 1600 - 1300 * u, gain: env.decay(0.4, 2), duty: 0.25 });
-    s.noise(0.3, 0.4, { clock: () => 6000, gain: env.decay(0.2, 1.5), short: true });
-    s.paralyze(0.75);
+    const s = new MoveSfx(2.3, 0xb057);
+    s.noise(0.25, 0.5, { clock: env.ramp(3000, 9000), gain: env.ramp(0.08, 0.3), short: true });
+    s.pulse(0.25, 0.75, { freq: env.ramp(200, 900), gain: env.ramp(0.05, 0.2), duty: 0.25 });
+    s.chord(0.75, 0.25, [84, 88, 91], { rate: 0.02, gain: 0.16, voice: 'pulse' });
+    s.whoosh(1.0, 0.2, { from: 3000, to: 10000, gain: 0.35 });
+    s.thud(1.2, 0.85, 0.9);
+    s.noise(1.2, 0.3, { clock: (u) => 20000 - 14000 * u, gain: env.attackDecay(0.45, 0.02) });
+    s.pulse(1.2, 0.3, { freq: (u) => 1600 - 1300 * u, gain: env.decay(0.35, 2), duty: 0.25 });
+    for (const at of [1.25, 1.47, 1.69]) s.noise(at, 0.12, { clock: () => 7000 + s.random() * 4000, gain: env.decay(0.2, 1), short: true });
     return s;
   },
 

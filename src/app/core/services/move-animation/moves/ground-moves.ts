@@ -3,14 +3,16 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { DrillRun } from './ground/drill-run';
 
-/** Hand-made animations for Ground-type moves. */
+/** Hand-made animations for Ground-type moves (Drill Run lives in `ground/`). */
 export class GroundMoveAnimations {
   /** Hand-made Ground move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     boneclub: (refs, launch, target, v) => GroundMoveAnimations.playBoneClub(refs, launch, target, v),
     bonemerang: (refs, launch, target, v) => GroundMoveAnimations.playBonemerang(refs, launch, target, v),
     dig: (refs, _launch, target) => GroundMoveAnimations.playDigUp(refs, target),
+    drillrun: (refs, launch, target, v) => DrillRun.play(refs, launch, target, v),
     earthpower: (refs, _launch, target) => GroundMoveAnimations.playEarthPower(refs, target),
     earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs),
     landswrath: (refs, launch, target) => GroundMoveAnimations.playLandsWrath(refs, launch, target),

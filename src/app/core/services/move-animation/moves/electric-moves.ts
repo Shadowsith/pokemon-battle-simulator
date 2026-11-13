@@ -8,6 +8,7 @@ import { FxEffects } from '../fx-effects';
 export class ElectricMoveAnimations {
   /** Hand-made Electric move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    boltstrike: (refs, launch, target) => ElectricMoveAnimations.playBoltStrike(refs, launch, target),
     discharge: (refs, launch, target) => ElectricMoveAnimations.playDischarge(refs, launch, target),
     thunder: (refs, _launch, target) => ElectricMoveAnimations.playThunder(refs, target),
     thunderbolt: (refs, _launch, target) => ElectricMoveAnimations.playThunderbolt(refs, target),
@@ -492,6 +493,98 @@ export class ElectricMoveAnimations {
     Fx.flash(launchEl, '#FFE84A', 0.5);
     Fx.shake(launchEl, 4);
     await Fx.wait(300);
+  }
+
+  /**
+   * Bolt Strike, after the Gen 5 animation:
+   * - Gen 5: https://www.pokewiki.de/images/5/52/Blitzschlag_Gen5.png
+   *
+   * The scene goes black (0-0.25 s). The user turns olive-yellow while a
+   * crackling yellow spark ball forms at its front (0.25-0.75 s) and flares
+   * into a dazzling white-yellow glow (0.75-1.0 s). The user charges
+   * (1.0-1.2 s); at the hit (1.2 s) a yellow ray backdrop flares round the
+   * target, which glows yellow while blue-white sparks crackle over it
+   * (1.2-1.95 s); the scene clears (to ~2.2 s).
+   */
+  private static async playBoltStrike(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dir = target.x >= launch.x ? 1 : -1;
+    const dark = Fx.backdrop(fieldEl, 'background:#000');
+    await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    // 1. Charging: olive-yellow user, crackling ball at its front that flares white.
+    const charged = 'sepia(1) saturate(2.5) hue-rotate(15deg) brightness(1.1)';
+    const tint = Fx.anim(launchEl, [{ filter: 'none' }, { filter: charged, offset: 0.2 }, { filter: charged, offset: 0.85 }, { filter: 'none' }], {
+      duration: 1300,
+      easing: 'linear',
+      fill: 'none'
+    });
+    const size = Math.max(Math.max(lr.width, lr.height) * 0.7, 50);
+    const ball = document.createElement('div');
+    ball.style.cssText =
+      `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      'background:radial-gradient(circle,#FFFFFF 0 15%,#FFF68Aee 32%,#F2D83A88 52%,#F2D83A00 72%)';
+    Fx.place(ball, { x: launch.x + dir * lr.width * 0.2, y: launch.y });
+    fxEl.appendChild(ball);
+    const stopBall = ElectricMoveAnimations.crackle(ball, size, '#FFF68A');
+    await Fx.anim(ball, [
+      { transform: 'scale(.2)', opacity: 0 },
+      { transform: 'scale(.6)', opacity: 1, offset: 0.4 },
+      { transform: 'scale(.5)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(.65)', opacity: 1 }
+    ], { duration: 500, easing: 'ease-in-out' });
+    stopBall();
+    Fx.flash(launchEl, '#FFF68A', 0.9);
+    await Fx.anim(ball, [
+      { transform: 'scale(.65)', opacity: 1, filter: 'brightness(1)' },
+      { transform: 'scale(2.2)', opacity: 1, filter: 'brightness(1.6)', offset: 0.6 },
+      { transform: 'scale(2.6)', opacity: 0, filter: 'brightness(1.6)' }
+    ], { duration: 250, easing: 'ease-out' });
+    ball.remove();
+
+    // 2. The charge.
+    const original = launchEl.style.transform;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    await Fx.anim(launchEl, [
+      { transform: `${original} translate(0,0)` },
+      { transform: `${original} translate(${dx * 0.45}px,${dy * 0.45}px)` }
+    ], { duration: 200, easing: 'ease-in' });
+    const back = Fx.anim(launchEl, [
+      { transform: `${original} translate(${dx * 0.45}px,${dy * 0.45}px)` },
+      { transform: original }
+    ], { duration: 300, easing: 'ease-out' }).then(() => {
+      launchEl.getAnimations?.().forEach((a) => a.cancel());
+      launchEl.style.transform = original;
+    });
+
+    // 3. The hit: yellow rays, the target glows yellow under blue-white sparks.
+    // The ray backdrop opens below the black, which clears off it.
+    const raysReady = FxEffects.burstBackdrop(fieldEl, target, 'yellow');
+    Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' }).then(() => dark.remove());
+    const sparkSize = Math.max(Math.max(tr.width, tr.height) * 1.1, 60);
+    const sparks = document.createElement('div');
+    sparks.style.cssText = `width:${sparkSize}px;height:${sparkSize}px;pointer-events:none;filter:drop-shadow(0 0 3px #7FD8FF)`;
+    Fx.place(sparks, target);
+    fxEl.appendChild(sparks);
+    const stopSparks = ElectricMoveAnimations.crackle(sparks, sparkSize, '#D8F4FF');
+    const zapped = 'sepia(1) saturate(3) hue-rotate(10deg) brightness(1.3)';
+    const glow = Fx.anim(targetEl, [{ filter: 'none' }, { filter: zapped, offset: 0.15 }, { filter: zapped, offset: 0.8 }, { filter: 'none' }], {
+      duration: 750,
+      easing: 'linear',
+      fill: 'none'
+    });
+    Fx.shakeField(fieldEl, 0.6);
+    for (let i = 0; i < 3; i++) setTimeout(() => Fx.shake(targetEl, 5), i * 220);
+    const [rays] = await Promise.all([raysReady, tint, back, glow, Fx.wait(750)]);
+    stopSparks();
+    sparks.remove();
+
+    // 4. The scene clears.
+    await Fx.anim(rays, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' });
+    rays.remove();
   }
 
   /**

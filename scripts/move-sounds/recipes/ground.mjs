@@ -70,12 +70,14 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic melee: a spinning drill that grinds into the target. */
+  /** Custom (rush 0-0.25 s, hit 0.25 s, drill bores 0.25-0.9 s, sparks 0.6-1.05 s): a rush, then a whirring drill grinding in. */
   drillrun: () => {
-    const s = new MoveSfx(0.85, 0xd21a);
-    s.pulse(0.0, 0.45, { freq: (u) => 600 + 300 * u, gain: (u) => 0.18 * (0.6 + 0.4 * Math.sin(2 * Math.PI * 25 * u)), duty: 0.125 });
-    s.thud(0.17, 0.6, 0.6);
-    s.noise(0.17, 0.3, { clock: () => 5000, gain: env.decay(0.3, 1), short: true });
+    const s = new MoveSfx(1.15, 0xd21a);
+    s.whoosh(0.0, 0.25, { from: 1500, to: 6000, gain: 0.28 });
+    s.thud(0.25, 0.6, 0.6);
+    s.pulse(0.25, 0.65, { freq: (u) => 600 + 300 * u, gain: (u) => 0.2 * (1 - u * 0.6) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 25 * u)), duty: 0.125 });
+    s.noise(0.25, 0.65, { clock: () => 5000, gain: (u) => 0.22 * (1 - u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 12 * u)), short: true });
+    s.sparkle(0.6, 0.4, 6, { lo: 5000, hi: 8500, gain: 0.13 });
     return s;
   },
 

@@ -42,14 +42,16 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: fluffy cotton wraps around the body. */
+  /** Custom (cotton balls drift in and land 0.1-1.0 s, glow and puff away 1.0-1.4 s, orange stat-up sparkles 1.3-2.5 s): soft fluffy thumps, a puff, the stat-up jingle. */
   cottonguard: () => {
-    const s = new MoveSfx(1.5, 0xc07b);
-    for (const at of [0.03, 0.2, 0.37, 0.54]) {
-      s.noise(at, 0.18, { clock: () => 900, gain: env.swell(0.2) });
-      s.wave(at, 0.18, { freq: () => 523 + at * 400, gain: env.swell(0.12) });
+    const s = new MoveSfx(2.6, 0xc07b);
+    s.noise(0.05, 0.9, { clock: () => 1200, gain: env.swell(0.1) });
+    for (const at of [0.55, 0.67, 0.79, 0.91, 1.0]) {
+      s.noise(at, 0.1, { clock: () => 900, gain: env.decay(0.18, 1.5) });
+      s.wave(at, 0.1, { freq: () => 523 + at * 300, gain: env.decay(0.1, 1.5) });
     }
-    s.statUp(0.85);
+    s.whoosh(1.05, 0.35, { from: 3000, to: 1000, gain: 0.18 });
+    s.statUp(1.35);
     return s;
   },
 

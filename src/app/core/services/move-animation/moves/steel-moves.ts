@@ -3,6 +3,7 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { Autotomize } from './steel/autotomize';
 import { GyroBall } from './steel/gyro-ball';
 import { IronHead } from './steel/iron-head';
 
@@ -10,10 +11,11 @@ import { IronHead } from './steel/iron-head';
 const SILVER = '#DDE2EC';
 const DUST: [string, string] = ['#E4E8F0', '#A9B0BE'];
 
-/** Hand-made animations for Steel-type moves (Gyro Ball and Iron Head live in `steel/`). */
+/** Hand-made animations for Steel-type moves (Autotomize, Gyro Ball and Iron Head live in `steel/`). */
 export class SteelMoveAnimations {
   /** Hand-made Steel move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    autotomize: (refs, launch) => Autotomize.play(refs, launch),
     doomdesire: (refs) => SteelMoveAnimations.playDoomDesireHit(refs),
     flashcannon: (refs, launch, target) => SteelMoveAnimations.playFlashCannon(refs, launch, target),
     gyroball: (refs, launch, target, v) => GyroBall.play(refs, launch, target, v),
