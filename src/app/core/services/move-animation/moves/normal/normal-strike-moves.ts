@@ -3,13 +3,14 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { ClawStyle, FxEffects } from '../../fx-effects';
+import { HeadCharge } from './head-charge';
 import { LastResort } from './last-resort';
 import { RockClimb } from './rock-climb';
 
 /** Crush Claw's marks: black with a red glow. */
 const CRUSH_CLAW: ClawStyle = { glow: ['#FF2A2A', '#E01818'] };
 
-/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Last Resort lives in `last-resort.ts`). */
+/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Head Charge and Last Resort live in their own files). */
 export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -17,6 +18,7 @@ export class NormalStrikeMoveAnimations {
     chipaway: (refs, launch, target, v) => NormalStrikeMoveAnimations.playChipAway(refs, launch, target, v),
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
     gigaimpact: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playGigaImpact(refs, target, v),
+    headcharge: (refs, launch, target) => HeadCharge.play(refs, launch, target),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
     lastresort: (refs, _launch, target, v) => LastResort.play(refs, target, v),
     rockclimb: (refs, launch, target, v) => RockClimb.play(refs, launch, target, v),

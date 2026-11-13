@@ -129,14 +129,14 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a column of leafy energy surges at the foe. */
+  /** Custom (wind rings spin up 0-1.2 s, leaves whirl 0.15-1.3 s, hit 0.3 s): a whirling gust full of rustling leaves. */
   grasspledge: () => {
-    const s = new MoveSfx(0.95, 0x6a91);
-    s.whoosh(0.0, 0.45, { from: 1200, to: 5000, gain: 0.22 });
-    s.chord(0.0, 0.43, [67, 71, 74], { rate: 0.03, gain: 0.12 });
-    s.thud(0.43, 0.45, 0.35);
-    s.noise(0.43, 0.35, { clock: (u) => 5000 - 3000 * u, gain: env.attackDecay(0.22, 0.05) });
-    s.sparkle(0.45, 0.3, 4, { lo: 1800, hi: 3200, gain: 0.12 });
+    const s = new MoveSfx(1.5, 0x6a91);
+    s.whoosh(0.0, 1.2, { from: 1200, to: 4000, gain: 0.22 });
+    s.chord(0.0, 0.3, [67, 71, 74], { rate: 0.03, gain: 0.1 });
+    s.thud(0.3, 0.4, 0.35);
+    s.noise(0.15, 1.15, { clock: (u) => 5000 + 1500 * Math.sin(2 * Math.PI * 5 * u), gain: env.swell(0.14) });
+    s.sparkle(0.4, 0.8, 5, { lo: 1800, hi: 3200, gain: 0.1 });
     return s;
   },
 
@@ -162,13 +162,14 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + drain (~0.45 s): a horn stab, then life flows back to the user. */
+  /** Custom (ram 0-0.5 s, hit 0.25 s, drained HP sparkles round the user 0.6-1.5 s): a horn stab, then life flows back to the user. */
   hornleech: () => {
-    const s = new MoveSfx(1.0, 0x41ee);
-    s.whoosh(0.0, 0.17, { from: 2000, to: 6000, gain: 0.3 });
-    s.pulse(0.15, 0.08, { freq: (u) => 1600 - 800 * u, gain: env.decay(0.22, 1.5), duty: 0.125 });
-    s.thud(0.17, 0.6, 0.5);
-    s.drain(0.45, 0.22);
+    const s = new MoveSfx(1.6, 0x41ee);
+    s.whoosh(0.0, 0.25, { from: 2000, to: 6000, gain: 0.3 });
+    s.pulse(0.23, 0.08, { freq: (u) => 1600 - 800 * u, gain: env.decay(0.22, 1.5), duty: 0.125 });
+    s.thud(0.25, 0.6, 0.5);
+    s.drain(0.6, 0.22);
+    s.sparkle(0.7, 0.7, 6, { lo: 3000, hi: 5500, gain: 0.1 });
     return s;
   },
 

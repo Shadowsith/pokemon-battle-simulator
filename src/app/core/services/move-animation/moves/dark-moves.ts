@@ -2,18 +2,22 @@ import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../animati
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { FoulPlay } from './dark/foul-play';
+import { HoneClaws } from './dark/hone-claws';
 import { NastyPlot } from './dark/nasty-plot';
 import { NightSlash } from './dark/night-slash';
 import { SuckerPunch } from './dark/sucker-punch';
 import { Switcheroo } from './dark/switcheroo';
 
-/** Hand-made animations for Dark-type moves (Nasty Plot, Night Slash, Sucker Punch and Switcheroo live in `dark/`). */
+/** Hand-made animations for Dark-type moves (Foul Play, Hone Claws, Nasty Plot, Night Slash, Sucker Punch and Switcheroo live in `dark/`). */
 export class DarkMoveAnimations {
   /** Hand-made Dark move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     bite: (refs, _launch, target) => DarkMoveAnimations.playBite(refs, target),
     crunch: (refs, _launch, target) => DarkMoveAnimations.playCrunch(refs, target),
     darkpulse: (refs, launch, target) => DarkMoveAnimations.playDarkPulse(refs, launch, target),
+    foulplay: (refs, launch, target, v) => FoulPlay.play(refs, launch, target, v),
+    honeclaws: (refs, launch, target) => HoneClaws.play(refs, launch, target),
     hyperspacefury: (refs, launch, target) => DarkMoveAnimations.playHyperspaceFury(refs, launch, target),
     nastyplot: (refs, launch) => NastyPlot.play(refs, launch),
     nightslash: (refs, _launch, target, v) => NightSlash.play(refs, target, v),

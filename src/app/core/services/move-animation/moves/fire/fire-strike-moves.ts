@@ -3,14 +3,16 @@ import { HEAT_BACKDROP, DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FireFlames } from './fire-flames';
+import { HeatCrash } from './heat-crash';
 
-/** Hand-made animations for Fire-type contact moves: punches, kicks and charges. */
+/** Hand-made animations for Fire-type contact moves: punches, kicks and charges (Heat Crash lives in `heat-crash.ts`). */
 export class FireStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     blazekick: (refs, _launch, target) => FireStrikeMoveAnimations.playBlazeKick(refs, target),
     firepunch: (refs, _launch, target) => FireStrikeMoveAnimations.playFirePunch(refs, target),
-    flareblitz: (refs, launch, target, v) => FireStrikeMoveAnimations.playFlareBlitz(refs, launch, target, v)
+    flareblitz: (refs, launch, target, v) => FireStrikeMoveAnimations.playFlareBlitz(refs, launch, target, v),
+    heatcrash: (refs, launch, target) => HeatCrash.play(refs, launch, target)
   };
 
   /**

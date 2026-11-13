@@ -46,6 +46,9 @@ static readonly anims: MoveAnimRegistry = {
 | `clawMark(fxEl, at, len, angle, {glow:[c1,c2], tip?})` | Black claw stroke with glow (Crush Claw, Dragon Claw). |
 | `dropBackIn(el)` | User drops back in from above (Fly, Bounce). |
 | `dart(el, dir)` | Caster darts toward the target and back. |
+| `leapCrash(refs, launch, target, onLand)` | User leaps out of view and drops onto the target (landing 0.65 s, runs `onLand`), then slides home (~1.0 s) (Heat Crash, Heavy Slam). |
+| `crackle(el, size, color)` | Flickering jagged sparks off the edge of `el`; returns a stop function. |
+| `crackleRam(refs, launch, target, style)` | Black scene, tinted user behind a crackling ball that flares, charge, yellow ray backdrop on the crackling target (~2.2 s) (Bolt Strike, Freeze Shock). |
 | `orangeSparkles(refs, launch, top)` | Orange sparkles drift down over the caster (~1.2 s). |
 | `statUpAura(refs, launch)` | Stat-up: orange bands scroll up over the caster (~0.8 s). |
 | `statDownBubbles(refs, launch)` | Stat-down: blue bubbles drift down over the caster (~0.9 s). For a target drop pass `{ ...refs, launchEl: targetEl }, target`. |
@@ -54,7 +57,7 @@ static readonly anims: MoveAnimRegistry = {
 | `orbit(el, radius, laps, duration, spin)` | Sprite circles along a path (no turning). |
 | `speedLines(layer, W, H, flow, [c1, c2])` | Endless speed lines inside `layer` (stop when it is removed). |
 | `smokePuff(fxEl, at, size, [c1, c2]?)` | Puff cloud; white by default, also dust / spray. |
-| `burstBackdrop(fieldEl, at, 'red'\|'blue'\|'ember'\|'magenta'\|'orange'\|'green'\|'yellow')` | Backdrop with flickering burst rays; caller fades out + removes it. |
+| `burstBackdrop(fieldEl, at, 'red'\|'blue'\|'ember'\|'magenta'\|'orange'\|'green'\|'yellow'\|'flare'\|'amber')` | Backdrop with flickering burst rays; caller fades out + removes it. |
 | `cornerSun(fxEl, sun, size, total)` | Pulsing sun with sparkles. |
 | `healSparkles(refs, launch)` | Green heal stars round the caster (~0.9 s). |
 | `fireBlastCloud(fxEl, hit, size, count, sparkColor)` | Fiery explosion cloud with sparks. |
@@ -71,7 +74,7 @@ All return an absolutely positioned element; place it with `Fx.place`.
 `DIM_BACKDROP` (dark scene) · `HEAT_BACKDROP` (red-hot) · `PSYCHIC_WAVES`, `WATERFALL_WAVES` (tiling backgrounds) · `FIST_TONES` · `FLECK_COLOR` (statUp green, statDown red, poison purple, …) · `TYPE_STYLE` · `BUBBLE_DRIFT` / `BUBBLE_BEAM`.
 
 ## Reusable pieces inside type files (private, but worth knowing)
-- `ElectricMoveAnimations.crackle(el, size, color)` flickering sparks, `groundStreak(...)` (electric-moves.ts).
+- `ElectricMoveAnimations.groundStreak(...)` (electric-moves.ts).
 - `PoisonMoveAnimations.sludgeGlob(size)` (poison-moves.ts).
 - `BugMoveAnimations.webGlyph(...)`, `beeGlyph(w)` (bug-moves.ts).
 - `PsychicFx` dim / tremble effects (psychic/psychic-fx.ts), `FireFlames` (fire/fire-flames.ts), `WaterCrash` splash (water/water-crash.ts).

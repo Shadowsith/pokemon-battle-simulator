@@ -63,17 +63,23 @@ export const ICE = {
   },
 
   /**
-   * Two-turn move, plays on both turns: turn 1 FxEffects.chargeUp (glow
-   * gathers ~0.48 s), turn 2 generic beam at near-max power (grows 0.26 s,
-   * holds ~0.36 s, fades 0.2 s) + paralysis fleck. A crackling icy charge.
+   * Two-turn move, plays on both turns: turn 1 FreezeShock.charge (spark
+   * ball crackles 0-0.5 s, cold white light 0.5-1.3 s), turn 2
+   * FxEffects.crackleRam (black 0-0.25 s, icy ball crackles 0.25-0.75 s and
+   * flares 0.75-1.0 s, charge 1.0-1.2 s, hit 1.2 s with sparks to ~1.95 s,
+   * clears to ~2.2 s). A crackling icy charge, an icy swell, a zapping crash.
    */
   freezeshock: () => {
-    const s = new MoveSfx(1.25, 0xf25c);
-    s.wave(0.0, 0.3, { freq: (u) => 600 + 1200 * u, gain: env.ramp(0.08, 0.2) });
-    s.noise(0.0, 0.85, { clock: (u) => 9000 + 3000 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.2) });
-    s.noise(0.26, 0.55, { clock: () => 5000, gain: env.swell(0.12), short: true });
-    s.sparkle(0.26, 0.55, 8, { lo: 3500, hi: 6000, gain: 0.14 });
-    s.paralyze(0.85, 0.2);
+    const s = new MoveSfx(2.3, 0xf25c);
+    s.noise(0.2, 0.55, { clock: () => 5000, gain: env.swell(0.14), short: true });
+    s.sparkle(0.25, 0.5, 8, { lo: 3500, hi: 6000, gain: 0.14 });
+    s.wave(0.75, 0.25, { freq: (u) => 600 + 1400 * u, gain: env.ramp(0.1, 0.2) });
+    s.noise(0.75, 0.25, { clock: (u) => 6000 + 6000 * u, gain: env.ramp(0.08, 0.2) });
+    s.whoosh(1.0, 0.2, { from: 1500, to: 6000, gain: 0.3 });
+    s.thud(1.2, 0.7, 0.6);
+    s.noise(1.2, 0.75, { clock: (u) => 9000 + 3000 * Math.sin(2 * Math.PI * 6 * u), gain: env.attackDecay(0.25, 0.03), short: true });
+    for (const at of [1.3, 1.5, 1.72]) s.pulse(at, 0.06, { freq: () => 2400 + s.random() * 800, gain: env.decay(0.12, 1), duty: 0.25 });
+    s.sparkle(1.25, 0.6, 6, { lo: 5000, hi: 8000, gain: 0.1 });
     return s;
   },
 

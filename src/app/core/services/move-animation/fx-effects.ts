@@ -196,6 +196,155 @@ export class FxEffects {
     el.style.transform = '';
   }
 
+  /** Keeps short jagged sparks (`color`) flickering off the edge of `el` (a ball of `size` px); returns a stop function (Bolt Strike, Wild Charge, Freeze Shock). */
+  static crackle(el: HTMLElement, size: number, color = '#FFF6A0'): () => void {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('width', `${size}`);
+    svg.setAttribute('height', `${size}`);
+    svg.setAttribute('style', 'position:absolute;left:0;top:0;overflow:visible;pointer-events:none');
+    el.appendChild(svg);
+    const c = size / 2;
+    const draw = () => {
+      let html = '';
+      for (let k = 0; k < 3; k++) {
+        const ang = Math.random() * 360;
+        const len = size * (0.35 + Math.random() * 0.4);
+        const pts = Fx.zigzagPoints(0, c * 0.7, 0, c * 0.7 + len, 4);
+        html += `<polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.8" transform="translate(${c},${c}) rotate(${ang})"/>`;
+      }
+      svg.innerHTML = html;
+    };
+    draw();
+    const t = setInterval(draw, 60);
+    return () => clearInterval(t);
+  }
+
+  /**
+   * A crackling-ball charge (Bolt Strike, Freeze Shock): the scene goes black
+   * (0-0.25 s), the user takes on `userFilter` while a ball (`ball`
+   * background) crackling with `ballSpark` sparks forms at its front
+   * (0.25-0.75 s) and flares (0.75-1.0 s). The user charges (1.0-1.2 s); at
+   * the hit (1.2 s) a yellow ray backdrop flares round the target, which
+   * glows yellow while `hitSpark` sparks crackle over it (1.2-1.95 s); the
+   * scene clears (to ~2.2 s).
+   */
+  static async crackleRam(refs: BattleStageRefs, launch: Point, target: Point, c: CrackleRamStyle) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dir = target.x >= launch.x ? 1 : -1;
+    const dark = Fx.backdrop(fieldEl, 'background:#000');
+    await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    // 1. Charging: tinted user, crackling ball at its front that flares.
+    const charged = c.userFilter;
+    const tint = Fx.anim(launchEl, [{ filter: 'none' }, { filter: charged, offset: 0.2 }, { filter: charged, offset: 0.85 }, { filter: 'none' }], {
+      duration: 1300,
+      easing: 'linear',
+      fill: 'none'
+    });
+    const size = Math.max(Math.max(lr.width, lr.height) * 0.7, 50);
+    const ball = document.createElement('div');
+    ball.style.cssText =
+      `width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;` +
+      `background:${c.ball}`;
+    Fx.place(ball, { x: launch.x + dir * lr.width * 0.2, y: launch.y });
+    fxEl.appendChild(ball);
+    const stopBall = FxEffects.crackle(ball, size, c.ballSpark);
+    await Fx.anim(ball, [
+      { transform: 'scale(.2)', opacity: 0 },
+      { transform: 'scale(.6)', opacity: 1, offset: 0.4 },
+      { transform: 'scale(.5)', opacity: 1, offset: 0.7 },
+      { transform: 'scale(.65)', opacity: 1 }
+    ], { duration: 500, easing: 'ease-in-out' });
+    stopBall();
+    Fx.flash(launchEl, c.flare, 0.9);
+    await Fx.anim(ball, [
+      { transform: 'scale(.65)', opacity: 1, filter: 'brightness(1)' },
+      { transform: 'scale(2.2)', opacity: 1, filter: 'brightness(1.6)', offset: 0.6 },
+      { transform: 'scale(2.6)', opacity: 0, filter: 'brightness(1.6)' }
+    ], { duration: 250, easing: 'ease-out' });
+    ball.remove();
+
+    // 2. The charge.
+    const original = launchEl.style.transform;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    await Fx.anim(launchEl, [
+      { transform: `${original} translate(0,0)` },
+      { transform: `${original} translate(${dx * 0.45}px,${dy * 0.45}px)` }
+    ], { duration: 200, easing: 'ease-in' });
+    const back = Fx.anim(launchEl, [
+      { transform: `${original} translate(${dx * 0.45}px,${dy * 0.45}px)` },
+      { transform: original }
+    ], { duration: 300, easing: 'ease-out' }).then(() => {
+      launchEl.getAnimations?.().forEach((a) => a.cancel());
+      launchEl.style.transform = original;
+    });
+
+    // 3. The hit: yellow rays, the target glows yellow under crackling sparks.
+    // The ray backdrop opens below the black, which clears off it.
+    const raysReady = FxEffects.burstBackdrop(fieldEl, target, 'yellow');
+    Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' }).then(() => dark.remove());
+    const sparkSize = Math.max(Math.max(tr.width, tr.height) * 1.1, 60);
+    const sparks = document.createElement('div');
+    sparks.style.cssText = `width:${sparkSize}px;height:${sparkSize}px;pointer-events:none;filter:drop-shadow(0 0 3px ${c.hitGlow})`;
+    Fx.place(sparks, target);
+    fxEl.appendChild(sparks);
+    const stopSparks = FxEffects.crackle(sparks, sparkSize, c.hitSpark);
+    const zapped = 'sepia(1) saturate(3) hue-rotate(10deg) brightness(1.3)';
+    const glow = Fx.anim(targetEl, [{ filter: 'none' }, { filter: zapped, offset: 0.15 }, { filter: zapped, offset: 0.8 }, { filter: 'none' }], {
+      duration: 750,
+      easing: 'linear',
+      fill: 'none'
+    });
+    Fx.shakeField(fieldEl, 0.6);
+    for (let i = 0; i < 3; i++) setTimeout(() => Fx.shake(targetEl, 5), i * 220);
+    const [rays] = await Promise.all([raysReady, tint, back, glow, Fx.wait(750)]);
+    stopSparks();
+    sparks.remove();
+
+    // 4. The scene clears.
+    await Fx.anim(rays, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' });
+    rays.remove();
+  }
+
+  /**
+   * The user leaps up out of view (0-0.3 s), then drops from above onto the
+   * target and lands with a squash (0.45-0.65 s), before sliding back home
+   * (to ~1.0 s). `onLand` runs at the landing; the promise resolves once the
+   * user is home (Heat Crash, Heavy Slam). The sprite only moves, it never turns.
+   */
+  static async leapCrash(refs: BattleStageRefs, launch: Point, target: Point, onLand: () => Promise<void>) {
+    const { fieldEl, launchEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const original = launchEl.style.transform;
+    const at = (x: number, y: number, extra = '') => `${original} translate(${x}px,${y}px)${extra}`;
+    const lift = -fieldEl.clientHeight;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y - tr.height * 0.2;
+    await Fx.anim(launchEl, [
+      { transform: at(0, 0) },
+      { transform: at(0, 6, ' scale(1.05,.9)'), offset: 0.25 },
+      { transform: at(0, lift) }
+    ], { duration: 300, easing: 'ease-in' });
+    await Fx.wait(150);
+    await Fx.anim(launchEl, [{ transform: at(dx, dy + lift) }, { transform: at(dx, dy) }], { duration: 200, easing: 'ease-in' });
+    Fx.shakeField(fieldEl, 0.8);
+    const landed = onLand();
+    await Fx.anim(launchEl, [
+      { transform: at(dx, dy, ' scale(1.1,.85)') },
+      { transform: at(dx, dy - 10), offset: 0.3 },
+      { transform: at(dx, dy - 10), opacity: 1, offset: 0.55 },
+      { transform: at(0, 0), opacity: 0, offset: 0.56 },
+      { transform: at(0, 0), opacity: 1 }
+    ], { duration: 450, easing: 'ease-out' });
+    launchEl.getAnimations?.().forEach((a) => a.cancel());
+    launchEl.style.transform = original;
+    await landed;
+  }
+
   /** The caster darts quickly toward the target and straight back (Headbutt, High Jump Kick). */
   static dart(el: HTMLElement, dir: 1 | -1): Promise<void> {
     return Fx.anim(el, [
@@ -430,7 +579,7 @@ export class FxEffects {
   /**
    * A backdrop with flickering burst rays centred on `at`, behind the sprites:
    * red with yellow rays (Dynamic Punch, Megahorn), blue with white rays
-   * (Focus Punch), red-brown with peach rays (Psycho Boost), magenta with pink rays (Giga Impact), orange on deep blue (Head Smash), bright green with white rays (Power Whip) or yellow fading to black (Bolt Strike). Resolves once it has faded in; the caller fades it out and removes it.
+   * (Focus Punch), red-brown with peach rays (Psycho Boost), magenta with pink rays (Giga Impact), orange on deep blue (Head Smash), bright green with white rays (Power Whip), yellow fading to black (Bolt Strike) red-orange rays on black (Fusion Flare) or orange rays on a white-hot amber fading to black (Head Charge). Resolves once it has faded in; the caller fades it out and removes it.
    */
   static async burstBackdrop(fieldEl: HTMLElement, at: Point, tone: keyof typeof BURST_TONES = 'red'): Promise<HTMLElement> {
     const t = BURST_TONES[tone];
@@ -614,5 +763,20 @@ const BURST_TONES = {
   magenta: { bg: ['#FF6AA8', '#D0144E', '#5A0420'], core: '#FFFFFF', ray: '#FF9AC4', rayHi: '#FFE0EC' },
   orange: { bg: ['#FFF0C8', '#FF9A2A', '#1E4A78'], core: '#FFFFFF', ray: '#FF6A10', rayHi: '#FFD27A' },
   green: { bg: ['#F4FFD8', '#86E040', '#1E5A10'], core: '#FFFFFF', ray: '#E0FFC0', rayHi: '#FFFFFF' },
-  yellow: { bg: ['#FFFBD8', '#E8C81A', '#141000'], core: '#FFFFFF', ray: '#FFF07A', rayHi: '#FFFFFF' }
+  yellow: { bg: ['#FFFBD8', '#E8C81A', '#141000'], core: '#FFFFFF', ray: '#FFF07A', rayHi: '#FFFFFF' },
+  flare: { bg: ['#FF8A2A', '#6A1004', '#080000'], core: '#FFE08A', ray: '#FF4A1A', rayHi: '#FF9A5A' },
+  amber: { bg: ['#FFFFF0', '#FFB42A', '#1A0C00'], core: '#FFFFFF', ray: '#FF8A1A', rayHi: '#FFE07A' }
 };
+
+/** Colours of `FxEffects.crackleRam`. */
+export interface CrackleRamStyle {
+  /** CSS filter on the charging user. */
+  userFilter: string;
+  /** CSS background of the charge ball. */
+  ball: string;
+  ballSpark: string;
+  /** Flash on the user as the ball flares. */
+  flare: string;
+  hitSpark: string;
+  hitGlow: string;
+}

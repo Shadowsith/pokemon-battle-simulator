@@ -84,15 +84,16 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a massive iron body slams down with a ringing, heavy clang. */
+  /** Custom (leap 0-0.3 s, drop 0.45-0.65 s, landing 0.65 s with dust clouds to ~1.45 s): up and away, a falling rush, a ringing heavy clang. */
   heavyslam: () => {
-    const s = new MoveSfx(1.15, 0x4e5a);
-    s.whoosh(0.0, 0.18, { from: 800, to: 3000, gain: 0.3 });
-    s.thud(0.17, 0.9, 1);
-    s.noise(0.17, 0.1, { clock: () => 7000, gain: env.decay(0.45, 1), short: true });
-    s.pulse(0.17, 0.8, { freq: () => 1175, gain: env.decay(0.2, 1.5), duty: 0.5 });
-    s.pulse(0.17, 0.6, { freq: () => 1661, gain: env.decay(0.08, 2), duty: 0.5 });
-    s.rumble(0.2, 0.8, { from: 500, to: 150, gain: 0.4 });
+    const s = new MoveSfx(1.6, 0x4e5a);
+    s.whoosh(0.0, 0.3, { from: 800, to: 3000, gain: 0.3 });
+    s.whoosh(0.45, 0.2, { from: 4000, to: 900, gain: 0.3 });
+    s.thud(0.65, 0.9, 1);
+    s.noise(0.65, 0.1, { clock: () => 7000, gain: env.decay(0.45, 1), short: true });
+    s.pulse(0.65, 0.8, { freq: () => 1175, gain: env.decay(0.2, 1.5), duty: 0.5 });
+    s.pulse(0.65, 0.6, { freq: () => 1661, gain: env.decay(0.08, 2), duty: 0.5 });
+    s.rumble(0.68, 0.85, { from: 500, to: 150, gain: 0.4 });
     return s;
   },
 

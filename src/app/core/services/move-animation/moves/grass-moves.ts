@@ -6,6 +6,8 @@ import { FxEffects } from '../fx-effects';
 import { CottonGuard } from './grass/cotton-guard';
 import { EnergyBall } from './grass/energy-ball';
 import { GrassKnot } from './grass/grass-knot';
+import { GrassPledge } from './grass/grass-pledge';
+import { HornLeech } from './grass/horn-leech';
 import { LeafStorm } from './grass/leaf-storm';
 import { PetalBlizzard } from './grass/petal-blizzard';
 import { PowerWhip } from './grass/power-whip';
@@ -14,7 +16,7 @@ import { SeedFlare } from './grass/seed-flare';
 import { SpikyShield } from './grass/spiky-shield';
 import { WoodHammer } from './grass/wood-hammer';
 
-/** Hand-made animations for Grass-type moves (Cotton Guard, Energy Ball, Grass Knot, Leaf Storm, Petal Blizzard, Power Whip, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
+/** Hand-made animations for Grass-type moves (Cotton Guard, Energy Ball, Grass Knot, Grass Pledge, Horn Leech, Leaf Storm, Petal Blizzard, Power Whip, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -25,6 +27,8 @@ export class GrassMoveAnimations {
     frenzyplant: (refs, launch, target) => GrassMoveAnimations.playFrenzyPlant(refs, launch, target),
     gigadrain: (refs, launch, target) => GrassMoveAnimations.playGigaDrain(refs, launch, target),
     grassknot: (refs, _launch, target) => GrassKnot.play(refs, target),
+    grasspledge: (refs, _launch, target) => GrassPledge.play(refs, target),
+    hornleech: (refs, launch, target, v) => HornLeech.play(refs, launch, target, v),
     leafblade: (refs, _launch, target) => GrassMoveAnimations.playLeafBlade(refs, target),
     leafstorm: (refs, launch, target) => LeafStorm.play(refs, launch, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),

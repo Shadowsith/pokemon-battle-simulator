@@ -125,25 +125,27 @@ export const DARK = {
     return s;
   },
 
-  /** Generic melee (impact at 0.17 s): a sly feint, then the target's own power turned against it - a sneering low sting. */
+  /** Custom (sneak 0-0.3 s, hit 0.3 s with yellow ring to 0.8 s, specks drift 0.6-1.2 s): a sly creep, a sneering sting, falling glints. */
   foulplay: () => {
-    const s = new MoveSfx(0.85, 0xf0a1);
-    s.pulse(0.0, 0.15, { freq: (u) => 330 - 120 * u, gain: env.ramp(0.08, 0.2), duty: 0.125 });
-    s.whoosh(0.03, 0.15, { from: 2500, to: 8000, gain: 0.25 });
-    s.thud(0.17, 0.7, 0.7);
-    s.pulse(0.2, 0.4, { freq: (u) => 220 * (1 + 0.06 * Math.sin(2 * Math.PI * 7 * u)), gain: env.decay(0.18, 1.5), duty: 0.25 });
-    s.pulse(0.2, 0.4, { freq: (u) => 233 * (1 + 0.06 * Math.sin(2 * Math.PI * 7 * u)), gain: env.decay(0.12, 1.5), duty: 0.5 });
+    const s = new MoveSfx(1.35, 0xf0a1);
+    s.pulse(0.0, 0.3, { freq: (u) => 330 - 120 * u, gain: env.ramp(0.08, 0.2), duty: 0.125 });
+    s.whoosh(0.1, 0.2, { from: 2500, to: 8000, gain: 0.22 });
+    s.thud(0.3, 0.7, 0.7);
+    s.pulse(0.3, 0.45, { freq: (u) => 220 * (1 + 0.06 * Math.sin(2 * Math.PI * 7 * u)), gain: env.decay(0.18, 1.5), duty: 0.25 });
+    s.pulse(0.3, 0.45, { freq: (u) => 233 * (1 + 0.06 * Math.sin(2 * Math.PI * 7 * u)), gain: env.decay(0.12, 1.5), duty: 0.5 });
+    s.sparkle(0.6, 0.6, 5, { lo: 2400, hi: 4000, gain: 0.1 });
     return s;
   },
 
-  /** Generic self aura (~0.8 s): claws scrape against each other twice, then the stat-up jingle (0.85 s). */
+  /** Custom (scrapes with glints at 0.1 / 0.4 s, orange sparks + stat-up 0.6-1.8 s): two claw scrapes, then the stat-up jingle. */
   honeclaws: () => {
-    const s = new MoveSfx(1.45, 0x40c1);
-    for (const at of [0.05, 0.3, 0.55]) {
-      s.noise(at, 0.18, { clock: (u) => 9000 + 5000 * u, gain: env.swell(0.28), short: true });
-      s.pulse(at, 0.16, { freq: (u) => 2400 + 800 * u, gain: env.decay(0.12, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.9, 0x40c1);
+    for (const at of [0.1, 0.4]) {
+      s.noise(at, 0.2, { clock: (u) => 9000 + 5000 * u, gain: env.swell(0.28), short: true });
+      s.pulse(at, 0.18, { freq: (u) => 2400 + 800 * u, gain: env.decay(0.12, 1.5), duty: 0.125 });
     }
-    s.statUp(0.85);
+    s.statUp(0.65);
+    s.sparkle(0.7, 1.0, 6, { lo: 3000, hi: 5500, gain: 0.08 });
     return s;
   },
 

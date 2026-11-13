@@ -262,24 +262,28 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (impact at 0.43 s): a huge white-hot fireball - deep rising roar, then an explosive blast. */
+  /** Custom (embers 0-0.6 s, rays + fireball swells 0.6-1.3 s, drops 1.3-1.5 s, eruption 1.5 s to ~2.2 s, clears to ~2.45 s): a rising roar, a falling rush, an explosive blast. */
   fusionflare: () => {
-    const s = new MoveSfx(1.15, 0xf0f1);
-    s.noise(0.0, 0.43, { clock: (u) => 800 + 1500 * u, gain: env.ramp(0.1, 0.35) });
-    s.pulse(0.0, 0.43, { freq: (u) => 80 + 80 * u, gain: env.ramp(0.05, 0.15), duty: 0.5 });
-    s.thud(0.43, 0.8, 1);
-    s.noise(0.43, 0.6, { clock: (u) => 4000 - 3000 * u, gain: env.attackDecay(0.45, 0.03) });
-    s.rumble(0.45, 0.6, { from: 400, to: 120, gain: 0.3 });
+    const s = new MoveSfx(2.5, 0xf0f1);
+    s.noise(0.0, 0.6, { clock: (u) => 600 + 600 * u, gain: env.swell(0.12) });
+    s.noise(0.6, 0.7, { clock: (u) => 800 + 1800 * u, gain: env.ramp(0.1, 0.35) });
+    s.pulse(0.6, 0.7, { freq: (u) => 80 + 100 * u, gain: env.ramp(0.05, 0.15), duty: 0.5 });
+    s.whoosh(1.3, 0.2, { from: 4000, to: 1000, gain: 0.3 });
+    s.thud(1.5, 0.8, 1);
+    s.noise(1.5, 0.7, { clock: (u) => 4000 - 3000 * u, gain: env.attackDecay(0.45, 0.03) });
+    s.rumble(1.52, 0.7, { from: 400, to: 120, gain: 0.3 });
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a blazing body crashes down with a deep thud and a burst of flame. */
+  /** Custom (leap 0-0.3 s, sun glow 0.3-0.65 s, drop 0.45-0.65 s, landing 0.65 s, fire blast to ~1.45 s): up and away, a whistling fall, a fiery crash. */
   heatcrash: () => {
-    const s = new MoveSfx(1.0, 0x4ec5);
-    s.whoosh(0.0, 0.18, { from: 800, to: 2500, gain: 0.35 });
-    s.thud(0.17, 0.9, 1);
-    s.noise(0.17, 0.6, { clock: (u) => 1600 - 900 * u, gain: env.attackDecay(0.45, 0.05) });
-    s.sparkle(0.22, 0.4, 5, { lo: 5000, hi: 8000, gain: 0.12 });
+    const s = new MoveSfx(1.55, 0x4ec5);
+    s.whoosh(0.0, 0.3, { from: 1000, to: 4000, gain: 0.3 });
+    s.sparkle(0.3, 0.3, 3, { lo: 5000, hi: 7000, gain: 0.1 });
+    s.whoosh(0.45, 0.2, { from: 5000, to: 1200, gain: 0.35 });
+    s.thud(0.65, 0.9, 1);
+    s.noise(0.65, 0.7, { clock: (u) => 1600 - 900 * u, gain: env.attackDecay(0.45, 0.05) });
+    s.sparkle(0.7, 0.5, 5, { lo: 5000, hi: 8000, gain: 0.12 });
     return s;
   },
 

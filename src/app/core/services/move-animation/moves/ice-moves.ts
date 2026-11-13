@@ -3,18 +3,25 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { FreezeShock } from './ice/freeze-shock';
 
-/** Hand-made animations for Ice-type moves. */
+/** Hand-made animations for Ice-type moves (Freeze Shock lives in `ice/`). */
 export class IceMoveAnimations {
   /** Hand-made Ice move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     aurorabeam: (refs, launch, target) => IceMoveAnimations.playAuroraBeam(refs, launch, target),
     icepunch: (refs, _launch, target) => FxEffects.playElementalPunch(refs, target, 'ice', '#9CD6FF', () => FxGlyphs.iceChunk()),
     blizzard: (refs, launch, target) => IceMoveAnimations.playBlizzard(refs, launch, target),
+    freezeshock: (refs, launch, target) => FreezeShock.play(refs, launch, target),
     freezedry: (refs, _launch, target) => IceMoveAnimations.playFreezeDry(refs, target),
     icebeam: (refs, launch, target) => IceMoveAnimations.playIceBeam(refs, launch, target),
     hail: (refs) => IceMoveAnimations.playHail(refs),
     haze: (refs) => IceMoveAnimations.playHaze(refs)
+  };
+
+  /** Turn-1 animations of two-turn Ice moves, by @pkmn/sim move id. */
+  static readonly chargeAnims: MoveAnimRegistry = {
+    freezeshock: (refs, launch, target) => FreezeShock.charge(refs, launch, target)
   };
 
   /**

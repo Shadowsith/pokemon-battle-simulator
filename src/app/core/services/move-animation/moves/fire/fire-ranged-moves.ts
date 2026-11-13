@@ -9,11 +9,12 @@ import { FieryDance } from './fiery-dance';
 import { FireFlames } from './fire-flames';
 import { FirePledge } from './fire-pledge';
 import { FlameBurst } from './flame-burst';
+import { FusionFlare } from './fusion-flare';
 import { LavaPlume } from './lava-plume';
 import { MagmaStorm } from './magma-storm';
 import { MysticalFire } from './mystical-fire';
 
-/** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs (set pieces such as Lava Plume, Blue Flare, Fiery Dance, Fire Pledge and Flame Burst live in their own files). */
+/** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs (set pieces such as Lava Plume, Blue Flare, Fiery Dance, Fire Pledge, Flame Burst and Fusion Flare live in their own files). */
 export class FireRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -29,6 +30,7 @@ export class FireRangedMoveAnimations {
     },
     firepledge: (refs, _launch, target) => FirePledge.play(refs, target),
     flameburst: (refs, launch, target) => FlameBurst.play(refs, launch, target),
+    fusionflare: (refs, launch, target) => FusionFlare.play(refs, launch, target),
     heatwave: (refs, _launch, _target, v) => FireRangedMoveAnimations.playHeatWave(refs, v),
     flamethrower: (refs, launch, target, v) => FireRangedMoveAnimations.playFlamethrower(refs, launch, target, v),
     lavaplume: (refs, launch, target) => LavaPlume.play(refs, launch, target),

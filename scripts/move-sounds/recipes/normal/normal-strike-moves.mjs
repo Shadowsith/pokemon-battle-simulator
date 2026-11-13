@@ -306,14 +306,15 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + recoil (user flinches ~0.29 s): a reckless full-body ram with a heavy recoil jolt. */
+  /** Custom (pull back + charge 0-0.35 s, hit 0.3 s with amber rays and stars to ~1.1 s, rays fade to ~1.35 s, recoil ~1.4 s): a reckless ram, a heavy crash, a recoil jolt. */
   headcharge: () => {
-    const s = new MoveSfx(0.95, 0x4ec4);
-    s.whoosh(0.0, 0.18, { from: 1000, to: 4500, gain: 0.4 });
-    s.thud(0.17, 0.95, 0.9);
-    s.noise(0.17, 0.06, { clock: () => 6000, gain: env.decay(0.3, 1) });
-    s.thud(0.29, 0.4, 0.5);
-    s.rumble(0.2, 0.5, { from: 500, to: 150, gain: 0.2 });
+    const s = new MoveSfx(1.75, 0x4ec4);
+    s.whoosh(0.08, 0.22, { from: 1000, to: 4500, gain: 0.4 });
+    s.thud(0.3, 0.95, 0.9);
+    s.noise(0.3, 0.08, { clock: () => 6000, gain: env.decay(0.3, 1) });
+    s.rumble(0.33, 0.6, { from: 500, to: 150, gain: 0.2 });
+    s.sparkle(0.35, 0.6, 5, { lo: 3500, hi: 6500, gain: 0.1 });
+    s.thud(1.4, 0.4, 0.5);
     return s;
   },
 

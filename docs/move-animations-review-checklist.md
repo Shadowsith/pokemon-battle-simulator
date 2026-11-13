@@ -768,41 +768,41 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Funkenflug
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c2/Funkenflug_Gen5.png
 - [ ] **Flame Charge** / Nitroladung — `flamecharge` · Fire · Physical · `melee`
-- [ ] ⭐ **Foul Play** / Schmarotzer — `foulplay` · Dark · Physical · `melee`
+- [x] ⭐ **Foul Play** / Schmarotzer — `foulplay` · Dark · Physical · the user turns dark and see-through and sneaks forward, a soft yellow ring of light flares round the target, orange specks scatter off and drift down (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schmarotzer
   - Gen 5 APNG: https://www.pokewiki.de/images/4/4f/Schmarotzer_Gen5.png
-- [ ] ⭐ **Freeze Shock** / Frostvolt — `freezeshock` · Ice · Physical · `beam`
+- [x] ⭐ **Freeze Shock** / Frostvolt — `freezeshock` · Ice · Physical · turn 1: a yellow spark ball crackles, then a cold white light wraps the user; turn 2: black scene, the pale user charges behind an icy ball crackling with yellow-green sparks, yellow ray backdrop on the target while sparks crackle over it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Frostvolt
   - Gen 5 APNG: https://www.pokewiki.de/images/7/73/Frostvolt_Gen5.png
 - [ ] **Frost Breath** / Eisesodem — `frostbreath` · Ice · Special · `projectile`
-- [ ] ⭐ **Fusion Bolt** / Kreuzdonner — `fusionbolt` · Electric · Physical · `projectile`
+- [x] ⭐ **Fusion Bolt** / Kreuzdonner — `fusionbolt` · Electric · Physical · night-blue scene with blue motes, the user turns into a crackling blue silhouette and vanishes into an electric orb that flies at the target and bursts, the target glows blue under sparks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kreuzdonner
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b1/Kreuzdonner_Gen5.png
-- [ ] ⭐ **Fusion Flare** / Kreuzflamme — `fusionflare` · Fire · Special · `projectile`
+- [x] ⭐ **Fusion Flare** / Kreuzflamme — `fusionflare` · Fire · Special · the user glows red with rising embers, red-orange rays open on black above the target where a fireball swells inside fire rings, then drops and erupts into a fire dome (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kreuzflamme
   - Gen 5 APNG (boosted variant only): https://www.pokewiki.de/images/8/8a/Kreuzflamme_%28Verst%C3%A4rkt%29_Gen5.png
 - [ ] **Gear Grind** / Klikkdiskus — `geargrind` · Steel · Physical · `melee`
 - [ ] **Glaciate** / Eiszeit — `glaciate` · Ice · Special · `field`
-- [ ] ⭐ **Grass Pledge** / Pflanzensäulen — `grasspledge` · Grass · Special · `projectile`
+- [x] ⭐ **Grass Pledge** / Pflanzensäulen — `grasspledge` · Grass · Special · pale wind rings spin up round the target in three columns with green leaves whirling up inside them (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Pflanzens%C3%A4ulen
   - Gen 5 APNG: https://www.pokewiki.de/images/4/4d/Pflanzens%C3%A4ulen_Gen5.png
 - [ ] **Guard Split** / Schutzteiler — `guardsplit` · Psychic · Status · `targetAura`
-- [ ] ⭐ **Head Charge** / Steinschädel — `headcharge` · Normal · Physical · `melee`
+- [x] ⭐ **Head Charge** / Steinschädel — `headcharge` · Normal · Physical · the user charges head first, amber ray backdrop, an orange spiky burst with a rough dark core and red / pink / white stars fly off, recoil (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Steinsch%C3%A4del
   - Gen 5 APNG: https://www.pokewiki.de/images/3/38/Steinsch%C3%A4del_Gen5.png
 - [ ] **Heal Pulse** / Heilwoge — `healpulse` · Psychic · Status · `selfAura`
 - [ ] **Heart Stamp** / Herzstempel — `heartstamp` · Psychic · Physical · `melee`
-- [ ] ⭐ **Heat Crash** / Brandstempel — `heatcrash` · Fire · Physical · `melee`
+- [x] ⭐ **Heat Crash** / Brandstempel — `heatcrash` · Fire · Physical · the user leaps out of view, a yellow glow flares in the sky, it drops onto the target: fire blast, dark red smoke puffs, the target glows red (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Brandstempel
   - Gen 5 APNG: https://www.pokewiki.de/images/b/be/Brandstempel_Gen5.png
-- [ ] ⭐ **Heavy Slam** / Rammboss — `heavyslam` · Steel · Physical · `melee`
+- [x] ⭐ **Heavy Slam** / Rammboss — `heavyslam` · Steel · Physical · the user leaps out of view and drops onto the target: field shake, a big yellow-ochre dust cloud, brown dust puffs to both sides (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Rammboss
   - Gen 5 APNG: https://www.pokewiki.de/images/d/df/Rammboss_Gen5.png
 - [ ] **Hex** / Bürde — `hex` · Ghost · Special · `projectile`
-- [ ] ⭐ **Hone Claws** / Klauenwetzer — `honeclaws` · Dark · Status · `selfAura`
+- [x] ⭐ **Hone Claws** / Klauenwetzer — `honeclaws` · Dark · Status · the user shuffles back and forth scraping its claws with white glint streaks, then orange sparks and stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Klauenwetzer
   - Gen 5 APNG: https://www.pokewiki.de/images/5/5a/Klauenwetzer_Gen5.png
-- [ ] ⭐ **Horn Leech** / Holzgeweih — `hornleech` · Grass · Physical · `melee`
+- [x] ⭐ **Horn Leech** / Holzgeweih — `hornleech` · Grass · Physical · the user rams the target with a pale green spiky flash, then cyan-green sparkles and green orbs well up round the user (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Holzgeweih
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e2/Holzgeweih_Gen5.png
 - [ ] ⭐ **Hurricane** / Orkan — `hurricane` · Flying · Special · `projectile`

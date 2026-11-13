@@ -169,14 +169,16 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic projectile (impact at 0.43 s): the user turns into a crackling bolt and rams the target - buzz rush, big zap crash. */
+  /** Custom (night 0-0.3 s, crackling silhouette 0.3-0.8 s, orb swells 0.8-1.1 s, flies 1.1-1.45 s, hit 1.45 s, sparks to ~2.1 s, clears to ~2.4 s): crackle, swelling hum, rush, big zap crash. */
   fusionbolt: () => {
-    const s = new MoveSfx(1.05, 0xf0b0);
-    s.noise(0.0, 0.43, { clock: (u) => 3000 + 5000 * u, gain: env.ramp(0.08, 0.25), short: true });
-    s.pulse(0.0, 0.43, { freq: (u) => 200 + 600 * u, gain: env.ramp(0.06, 0.16), duty: 0.125 });
-    s.thud(0.43, 0.75, 0.8);
-    s.noise(0.43, 0.4, { clock: (u) => 9000 - 5000 * u, gain: env.attackDecay(0.35, 0.03), short: true });
-    for (const at of [0.55, 0.65, 0.74]) s.pulse(at, 0.06, { freq: () => 2400 + s.random() * 800, gain: env.decay(0.14, 1), duty: 0.25 });
+    const s = new MoveSfx(2.45, 0xf0b0);
+    s.noise(0.3, 0.5, { clock: () => 5000, gain: env.swell(0.14), short: true });
+    for (const at of [0.35, 0.5, 0.68]) s.pulse(at, 0.05, { freq: () => 2000 + s.random() * 800, gain: env.decay(0.1, 1), duty: 0.25 });
+    s.pulse(0.8, 0.3, { freq: (u) => 150 + 250 * u, gain: env.ramp(0.08, 0.18), duty: 0.125 });
+    s.noise(1.1, 0.35, { clock: (u) => 3000 + 5000 * u, gain: env.ramp(0.08, 0.25), short: true });
+    s.thud(1.45, 0.75, 0.8);
+    s.noise(1.45, 0.6, { clock: (u) => 9000 - 5000 * u, gain: env.attackDecay(0.35, 0.03), short: true });
+    for (const at of [1.6, 1.78, 1.95]) s.pulse(at, 0.06, { freq: () => 2400 + s.random() * 800, gain: env.decay(0.14, 1), duty: 0.25 });
     return s;
   },
 
