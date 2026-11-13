@@ -805,41 +805,41 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [x] ⭐ **Horn Leech** / Holzgeweih — `hornleech` · Grass · Physical · the user rams the target with a pale green spiky flash, then cyan-green sparkles and green orbs well up round the user (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Holzgeweih
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e2/Holzgeweih_Gen5.png
-- [ ] ⭐ **Hurricane** / Orkan — `hurricane` · Flying · Special · `projectile`
+- [x] ⭐ **Hurricane** / Orkan — `hurricane` · Flying · Special · the user beats its wings, a sky-blue backdrop with streaming wind lines, a white whirlwind of spinning rings full of olive-gold specks spins up round the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Orkan
   - Gen 5 APNG: https://www.pokewiki.de/images/4/4e/Orkan_Gen5.png
-- [ ] ⭐ **Ice Burn** / Frosthauch — `iceburn` · Ice · Special · `beam`
+- [x] ⭐ **Ice Burn** / Frosthauch — `iceburn` · Ice · Special · turn 1: freezing white mist and sparkles round the pale user; turn 2: dark scene, a wide icy ring sweeps to the target, blue ray backdrop, white frost puffs, the target pales then flushes red (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Frosthauch
   - Gen 5 APNG: https://www.pokewiki.de/images/8/8e/Frosthauch_Gen5.png
-- [ ] ⭐ **Icicle Crash** / Eiszapfhagel — `iciclecrash` · Ice · Physical · `projectile`
+- [x] ⭐ **Icicle Crash** / Eiszapfhagel — `iciclecrash` · Ice · Physical · three pale icicles drop onto the target one after another, each with a yellow spiky flash and white dust puffs to the sides (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Eiszapfhagel
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a1/Eiszapfhagel_Gen5.png
 - [ ] **Incinerate** / Einäschern — `incinerate` · Fire · Special · `field`
-- [ ] ⭐ **Inferno** / Inferno — `inferno` · Fire · Special · `projectile`
+- [x] ⭐ **Inferno** / Inferno — `inferno` · Fire · Special · flickering yellow-orange fire band backdrop, a dense column of fire puffs swirls up round the target which glows red, the fire dies to black and dark smoke rises (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Inferno
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a5/Inferno_Gen5.png
 - [ ] **Leaf Tornado** / Grasmixer — `leaftornado` · Grass · Special · `projectile`
 - [ ] **Low Sweep** / Fußtritt — `lowsweep` · Fighting · Physical · `melee`
 - [ ] **Magic Room** / Magieraum — `magicroom` · Psychic · Status · `targetAura`
-- [ ] ⭐ **Night Daze** / Nachtflut — `nightdaze` · Dark · Special · `projectile`
+- [x] ⭐ **Night Daze** / Nachtflut — `nightdaze` · Dark · Special · crimson-purple ripple rings spread over the ground from the user, dark purple orbs pop round the target, a murky dusk settles and the target darkens (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Nachtflut
   - Gen 5 APNG: https://www.pokewiki.de/images/e/ee/Nachtflut_Gen5.png
 - [ ] **Power Split** / Kraftteiler — `powersplit` · Psychic · Status · `targetAura`
-- [ ] ⭐ **Psyshock** / Psychoschock — `psyshock` · Psychic · Special · `projectile`
+- [x] ⭐ **Psyshock** / Psychoschock — `psyshock` · Psychic · Special · white, dark and purple orbs circle the target and close in, then glowing blue squares flicker up from its lower body (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Psychoschock
   - Gen 5 APNG: https://www.pokewiki.de/images/9/92/Psychoschock_Gen5.png
-- [ ] ⭐ **Psystrike** / Psychostoß — `psystrike` · Psychic · Special · `projectile`
+- [x] ⭐ **Psystrike** / Psychostoß — `psystrike` · Psychic · Special · crimson ripple rings from the user, black scene, magenta orbs gather round the target, magenta ray backdrop with bursting orange / white / pink stars, pink-red squares flicker over the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Psychosto%C3%9F
   - Gen 5 APNG: https://www.pokewiki.de/images/8/85/Psychosto%C3%9F_Gen5.png
 - [ ] **Quash** / Verzögerung — `quash` · Dark · Status · `targetAura`
 - [ ] **Quick Guard** / Rapidschutz — `quickguard` · Fighting · Status · `selfAura`
-- [ ] ⭐ **Quiver Dance** / Falterreigen — `quiverdance` · Bug · Status · `selfAura`
+- [x] ⭐ **Quiver Dance** / Falterreigen — `quiverdance` · Bug · Status · the user flutters its wings, dim scene with pale ripple rings under it and rising cyan sparkles, orange orbs float up, stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Falterreigen
   - Gen 5 APNG: https://www.pokewiki.de/images/8/80/Falterreigen_Gen5.png
-- [ ] ⭐ **Rage Powder** / Wutpulver — `ragepowder` · Bug · Status · `selfAura`
+- [x] ⭐ **Rage Powder** / Wutpulver — `ragepowder` · Bug · Status · four fuzzy pale yellow powder balls circle the user while a cloud of red powder puffs bursts out of it and drifts over the field (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Wutpulver
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b7/Wutpulver_Gen5.png
-- [ ] ⭐ **Razor Shell** / Kalkklinge — `razorshell` · Water · Physical · `melee`
+- [x] ⭐ **Razor Shell** / Kalkklinge — `razorshell` · Water · Physical · a big faint shell outline shrinks into a small shell above the target, it swoops down and a cyan blade arc slashes across the target with yellow sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kalkklinge
   - Gen 5 APNG: https://www.pokewiki.de/images/a/ad/Kalkklinge_Gen5.png
 - [ ] **Reflect Type** / Typenspiegel — `reflecttype` · Normal · Status · `targetAura`

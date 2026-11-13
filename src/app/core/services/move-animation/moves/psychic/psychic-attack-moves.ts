@@ -6,6 +6,8 @@ import { FxEffects } from '../../fx-effects';
 import { PsychicFx } from './psychic-fx';
 import { HyperspaceHole } from './hyperspace-hole';
 import { PsychoCut } from './psycho-cut';
+import { Psyshock } from './psyshock';
+import { Psystrike } from './psystrike';
 import { ZenHeadbutt } from './zen-headbutt';
 
 /** Hand-made animations for Psychic-type attacks (Hyperspace Hole, Psycho Cut and Zen Headbutt have their own files). */
@@ -20,6 +22,8 @@ export class PsychicAttackMoveAnimations {
     psychic: (refs) => PsychicAttackMoveAnimations.playPsychic(refs),
     psychoboost: (refs, launch, target) => PsychicAttackMoveAnimations.playPsychoBoost(refs, launch, target),
     psychocut: (refs, launch, target, v) => PsychoCut.play(refs, launch, target, v),
+    psyshock: (refs, _launch, target) => Psyshock.play(refs, target),
+    psystrike: (refs, launch, target) => Psystrike.play(refs, launch, target),
     zenheadbutt: (refs, launch, target, v) => ZenHeadbutt.play(refs, launch, target, v)
   };
 

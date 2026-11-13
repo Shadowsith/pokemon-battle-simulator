@@ -6,6 +6,7 @@ import { AirSlash } from './flying/air-slash';
 import { BraveBird } from './flying/brave-bird';
 import { Defog } from './flying/defog';
 import { DragonAscent } from './flying/dragon-ascent';
+import { Hurricane } from './flying/hurricane';
 import { Roost } from './flying/roost';
 import { Tailwind } from './flying/tailwind';
 
@@ -21,6 +22,7 @@ export class FlyingMoveAnimations {
     dragonascent: (refs, launch, target, v) => DragonAscent.play(refs, launch, target, v),
     drillpeck: (refs, _launch, target, v) => FlyingMoveAnimations.playDrillPeck(refs, target, v),
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target),
+    hurricane: (refs, launch, target) => Hurricane.play(refs, launch, target),
     oblivionwing: (refs, launch, target, v) => FlyingMoveAnimations.playOblivionWing(refs, launch, target, v),
     roost: (refs, launch) => Roost.play(refs, launch),
     skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target),

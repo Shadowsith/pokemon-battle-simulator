@@ -10,6 +10,7 @@ import { FireFlames } from './fire-flames';
 import { FirePledge } from './fire-pledge';
 import { FlameBurst } from './flame-burst';
 import { FusionFlare } from './fusion-flare';
+import { Inferno } from './inferno';
 import { LavaPlume } from './lava-plume';
 import { MagmaStorm } from './magma-storm';
 import { MysticalFire } from './mystical-fire';
@@ -33,6 +34,7 @@ export class FireRangedMoveAnimations {
     fusionflare: (refs, launch, target) => FusionFlare.play(refs, launch, target),
     heatwave: (refs, _launch, _target, v) => FireRangedMoveAnimations.playHeatWave(refs, v),
     flamethrower: (refs, launch, target, v) => FireRangedMoveAnimations.playFlamethrower(refs, launch, target, v),
+    inferno: (refs, _launch, target) => Inferno.play(refs, target),
     lavaplume: (refs, launch, target) => LavaPlume.play(refs, launch, target),
     magmastorm: (refs, _launch, target) => MagmaStorm.play(refs, target),
     mysticalfire: (refs, launch, target, v) => MysticalFire.play(refs, launch, target, v),

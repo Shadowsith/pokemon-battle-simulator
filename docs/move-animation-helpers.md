@@ -57,6 +57,7 @@ static readonly anims: MoveAnimRegistry = {
 | `orbit(el, radius, laps, duration, spin)` | Sprite circles along a path (no turning). |
 | `speedLines(layer, W, H, flow, [c1, c2])` | Endless speed lines inside `layer` (stop when it is removed). |
 | `smokePuff(fxEl, at, size, [c1, c2]?)` | Puff cloud; white by default, also dust / spray. |
+| `groundRipples(fxEl, foot, width, [edge, glow], count=4, gap=140, dur=700)` | Flat ripple rings spreading over the ground from `foot` (Night Daze, Psystrike, Quiver Dance). |
 | `burstBackdrop(fieldEl, at, 'red'\|'blue'\|'ember'\|'magenta'\|'orange'\|'green'\|'yellow'\|'flare'\|'amber')` | Backdrop with flickering burst rays; caller fades out + removes it. |
 | `cornerSun(fxEl, sun, size, total)` | Pulsing sun with sparkles. |
 | `healSparkles(refs, launch)` | Green heal stars round the caster (~0.9 s). |

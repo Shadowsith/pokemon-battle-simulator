@@ -158,17 +158,21 @@ export const ICE = {
   },
 
   /**
-   * Two-turn move, plays on both turns: turn 1 FxEffects.chargeUp (~0.5 s),
-   * turn 2 generic beam at near-max power (grows 0.26 s, holds ~0.36 s, fades
-   * to ~0.82 s) + burn fleck (0.85 s). A freezing roar with a searing edge.
+   * Two-turn move, plays on both turns: turn 1 IceBurn.charge (freezing
+   * mist and sparkles round the user 0-1.1 s), turn 2 IceBurn.play (dark
+   * 0-0.25 s, icy ring sweeps 0.25-0.75 s, hit 0.75 s with frost puffs, the
+   * target pales then flushes red ~1.3 s, clears to ~1.9 s). A freezing
+   * hiss, a sweeping icy whirr, a frosty burst with a searing edge.
    */
   iceburn: () => {
-    const s = new MoveSfx(1.3, 0x1cb0);
-    s.wave(0.0, 0.3, { freq: (u) => 500 + 1300 * u, gain: env.ramp(0.08, 0.2) });
-    s.noise(0.0, 0.82, { clock: (u) => 7000 + 3000 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.2) });
-    s.noise(0.26, 0.56, { clock: () => 900, gain: env.swell(0.2) });
-    s.sparkle(0.26, 0.5, 8, { lo: 3500, hi: 6500, gain: 0.13 });
-    s.burn(0.85, 0.25);
+    const s = new MoveSfx(2.0, 0x1cb0);
+    s.noise(0.0, 1.1, { clock: (u) => 7000 + 3000 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.18) });
+    s.wave(0.25, 0.5, { freq: (u) => 500 + 1300 * u, gain: env.ramp(0.06, 0.18) });
+    s.sparkle(0.15, 0.7, 7, { lo: 3500, hi: 6500, gain: 0.12 });
+    s.thud(0.75, 0.45, 0.5);
+    s.noise(0.75, 0.6, { clock: () => 900, gain: env.attackDecay(0.25, 0.1) });
+    s.sparkle(0.8, 0.5, 6, { lo: 3500, hi: 6500, gain: 0.1 });
+    s.burn(1.3, 0.25);
     return s;
   },
 
@@ -209,15 +213,16 @@ export const ICE = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + flinch fleck (0.55 s): heavy icicles crash down with a shattering thump. */
+  /** Custom (three icicles fall and land at 0.3 / 0.5 / 0.7 s with a yellow flash and dust puffs, to ~1.4 s): three falling whistles, each landing with a shattering thump. */
   iciclecrash: () => {
-    const s = new MoveSfx(1.05, 0x1c1c);
-    s.wave(0.0, 0.43, { freq: (u) => 1800 - 900 * u, gain: env.ramp(0.06, 0.16) });
-    s.whoosh(0.0, 0.43, { from: 2000, to: 6000, gain: 0.2 });
-    s.thud(0.43, 0.75, 0.9);
-    s.noise(0.43, 0.25, { clock: (u) => 13000 - 5000 * u, gain: env.attackDecay(0.3, 0.05) });
-    s.sparkle(0.45, 0.4, 8, { lo: 2500, hi: 5000, gain: 0.15 });
-    s.flinch(0.62);
+    const s = new MoveSfx(1.45, 0x1c1c);
+    for (const [i, at] of [0.3, 0.5, 0.7].entries()) {
+      s.wave(at - 0.25, 0.25, { freq: (u) => 2000 - 1000 * u, gain: env.ramp(0.04, 0.12) });
+      s.thud(at, 0.6 + i * 0.1, 0.8);
+      s.noise(at, 0.22, { clock: (u) => 13000 - 5000 * u, gain: env.attackDecay(0.28, 0.05) });
+    }
+    s.sparkle(0.35, 0.6, 8, { lo: 2500, hi: 5000, gain: 0.13 });
+    s.noise(0.75, 0.6, { clock: () => 1800, gain: env.decay(0.12, 1.5) });
     return s;
   },
 

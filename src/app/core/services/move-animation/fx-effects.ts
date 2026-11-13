@@ -747,6 +747,31 @@ export class FxEffects {
     ], { duration: 700, easing: 'ease-in' }).then(() => fist.remove());
     await Promise.all(bits);
   }
+
+  /**
+   * Flat ripple rings spreading over the ground from `foot`: `count` rings,
+   * one every `gap` ms, each widening to `width` px in `dur` ms and fading
+   * (Night Daze, Psystrike, Quiver Dance). `colors` = ring edge, inner glow.
+   */
+  static groundRipples(fxEl: HTMLElement, foot: Point, width: number, colors: [string, string], count = 4, gap = 140, dur = 700): Promise<void> {
+    const rings: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const ring = document.createElement('div');
+      ring.style.cssText =
+        `position:absolute;width:${width}px;height:${width * 0.3}px;border-radius:50%;pointer-events:none;` +
+        `border:3px solid ${colors[0]};box-shadow:0 0 6px ${colors[1]},inset 0 0 6px ${colors[1]}`;
+      Fx.place(ring, foot);
+      fxEl.appendChild(ring);
+      rings.push(
+        Fx.anim(ring, [
+          { transform: 'scale(.1)', opacity: 0 },
+          { transform: 'scale(.35)', opacity: 1, offset: 0.2 },
+          { transform: 'scale(1)', opacity: 0 }
+        ], { duration: dur, delay: i * gap, easing: 'ease-out' }).then(() => ring.remove())
+      );
+    }
+    return Promise.all(rings).then(() => void 0);
+  }
 }
 
 /** Colours of a {@link FxEffects.clawMark}: the two glow layers round the black stroke and an optional tip orb. */

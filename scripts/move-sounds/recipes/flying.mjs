@@ -191,14 +191,14 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + confusion fleck (0.55 s): a howling vortex of wind slams the target. */
+  /** Custom (wing beats 0-0.45 s, sky backdrop 0.35 s, whirlwind round the target 0.6-1.9 s, hit 0.75 s, fades to 2.2 s): two wing flaps, then a howling vortex that spins up and dies away. */
   hurricane: () => {
-    const s = new MoveSfx(1.15, 0x4cc4);
-    s.noise(0.0, 0.5, { clock: (u) => 2000 + 3000 * u + 1200 * Math.sin(2 * Math.PI * 6 * u), gain: env.ramp(0.12, 0.35) });
-    s.wave(0.0, 0.5, { freq: (u) => 500 + 400 * u + 120 * Math.sin(2 * Math.PI * 6 * u), gain: env.ramp(0.05, 0.16) });
-    s.noise(0.43, 0.35, { clock: env.ramp(7000, 1500), gain: env.attackDecay(0.35, 0.05) });
-    s.thud(0.43, 0.35, 0.4);
-    s.confusion(0.55);
+    const s = new MoveSfx(2.35, 0x4cc4);
+    for (const at of [0.05, 0.27]) s.whoosh(at, 0.16, { from: 800, to: 2500, gain: 0.22 });
+    s.noise(0.4, 1.6, { clock: (u) => 2000 + 2500 * Math.sin(Math.PI * u) + 1200 * Math.sin(2 * Math.PI * 9 * u), gain: env.swell(0.3) });
+    s.wave(0.55, 1.35, { freq: (u) => 450 + 350 * Math.sin(Math.PI * u) + 120 * Math.sin(2 * Math.PI * 9 * u), gain: env.swell(0.14) });
+    s.thud(0.75, 0.4, 0.4);
+    s.noise(0.75, 0.3, { clock: env.ramp(7000, 1500), gain: env.attackDecay(0.28, 0.05) });
     return s;
   },
 

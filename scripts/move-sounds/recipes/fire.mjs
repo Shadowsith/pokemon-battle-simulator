@@ -311,14 +311,15 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + burn fleck (0.55 s): a roaring fireball that engulfs the target. */
+  /** Custom (fire bands fade in 0-0.3 s, fire column swirls round the target 0.3-1.4 s, hit 0.4 s, target glows red, fire dies and smoke rises 1.4-2.15 s, clears to ~2.35 s): a rising roar that engulfs the target, then a smouldering sizzle. */
   inferno: () => {
-    const s = new MoveSfx(1.1, 0x1f30);
-    s.noise(0.0, 0.43, { clock: (u) => 500 + 900 * u, gain: env.ramp(0.12, 0.35) });
-    s.pulse(0.0, 0.43, { freq: (u) => 110 + 60 * u, gain: env.ramp(0.06, 0.15), duty: 0.5 });
-    s.thud(0.43, 0.7, 0.8);
-    s.noise(0.43, 0.6, { clock: () => 1000, gain: env.decay(0.35, 1.2) });
-    s.burn(0.55, 0.28);
+    const s = new MoveSfx(2.45, 0x1f30);
+    s.noise(0.0, 0.4, { clock: (u) => 500 + 900 * u, gain: env.ramp(0.12, 0.35) });
+    s.pulse(0.0, 0.4, { freq: (u) => 110 + 60 * u, gain: env.ramp(0.06, 0.15), duty: 0.5 });
+    s.thud(0.4, 0.7, 0.8);
+    s.noise(0.4, 1.0, { clock: (u) => 1000 + 400 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.3) });
+    s.burn(0.6, 0.28);
+    s.noise(1.4, 0.8, { clock: () => 600, gain: env.decay(0.14, 1.5) });
     return s;
   },
 

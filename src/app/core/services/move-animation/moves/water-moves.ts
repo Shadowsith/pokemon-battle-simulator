@@ -4,6 +4,7 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { AquaTail } from './water/aqua-tail';
 import { OriginPulse } from './water/origin-pulse';
+import { RazorShell } from './water/razor-shell';
 import { SteamEruption } from './water/steam-eruption';
 import { SurfWave } from './water/surf-wave';
 import { WaterCrash } from './water/water-crash';
@@ -20,6 +21,7 @@ export class WaterMoveAnimations {
     hydrocannon: (refs, launch, target) => WaterMoveAnimations.playHydroCannon(refs, launch, target),
     hydropump: (refs, launch, target) => WaterMoveAnimations.playHydroPump(refs, launch, target),
     originpulse: (refs, launch, target) => OriginPulse.play(refs, launch, target),
+    razorshell: (refs, _launch, target, v) => RazorShell.play(refs, target, v),
     raindance: (refs) => WaterMoveAnimations.playRainDance(refs),
     muddywater: (refs, launch, target, v) => SurfWave.play(refs, launch, target, v, SurfWave.MUD),
     steameruption: (refs, launch, target) => SteamEruption.play(refs, launch, target),

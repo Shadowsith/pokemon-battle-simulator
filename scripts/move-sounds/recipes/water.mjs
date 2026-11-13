@@ -214,13 +214,14 @@ export const WATER = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + defense-drop fleck (~0.6 s): a shell blade slashes wetly. */
+  /** Custom (shell outline shrinks 0-0.5 s, shell swoops 0.5-0.7 s, blade slash with sparkles 0.7-1.1 s): a shimmering shell, a swoop, a wet blade slash. */
   razorshell: () => {
-    const s = new MoveSfx(1.05, 0x7a5e);
-    s.whoosh(0.0, 0.18, { from: 2500, to: 9000, gain: 0.3 });
-    s.slash(0.17, 0.6);
-    s.splash(0.2, 0.3);
-    s.statDown(0.6, 0.22);
+    const s = new MoveSfx(1.25, 0x7a5e);
+    s.wave(0.0, 0.5, { freq: (u) => 1400 - 600 * u, gain: env.swell(0.1) });
+    s.whoosh(0.5, 0.2, { from: 2500, to: 9000, gain: 0.3 });
+    s.slash(0.7, 0.6);
+    s.splash(0.72, 0.3);
+    s.sparkle(0.75, 0.35, 5, { lo: 2800, hi: 5000, gain: 0.1 });
     return s;
   },
 

@@ -193,14 +193,15 @@ export const DARK = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + accuracy drop fleck (~0.55 s): a pitch-black shockwave hums over and booms dully. */
+  /** Custom (dark ripple rings 0-0.9 s, purple orbs pop round the target 0.2-0.8 s, hit 0.6 s, murky dusk to ~1.8 s): a humming dark ripple, popping orbs, a dull boom fading into gloom. */
   nightdaze: () => {
-    const s = new MoveSfx(1.05, 0x7da2);
-    s.pulse(0.0, 0.45, { freq: (u) => 70 + 50 * u, gain: env.ramp(0.08, 0.26), duty: 0.25 });
-    s.noise(0.0, 0.45, { clock: env.ramp(400, 1300), gain: env.swell(0.18) });
-    s.thud(0.43, 0.6, 0.8);
-    s.noise(0.43, 0.3, { clock: env.ramp(2500, 500), gain: env.attackDecay(0.3, 0.05) });
-    s.statDown(0.58);
+    const s = new MoveSfx(1.9, 0x7da2);
+    s.pulse(0.0, 0.6, { freq: (u) => 70 + 50 * u, gain: env.ramp(0.08, 0.24), duty: 0.25 });
+    s.noise(0.0, 0.6, { clock: env.ramp(400, 1300), gain: env.swell(0.16) });
+    for (const at of [0.25, 0.38, 0.5]) s.pulse(at, 0.07, { freq: (u) => 500 - 250 * u, gain: env.decay(0.14, 1.5), duty: 0.5 });
+    s.thud(0.6, 0.6, 0.8);
+    s.noise(0.6, 0.3, { clock: env.ramp(2500, 500), gain: env.attackDecay(0.28, 0.05) });
+    s.pulse(0.7, 0.9, { freq: (u) => 90 - 30 * u, gain: env.decay(0.12, 1.2), duty: 0.25 });
     return s;
   },
 

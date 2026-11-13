@@ -3,6 +3,8 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { GrassMoveAnimations } from './grass-moves';
+import { QuiverDance } from './bug/quiver-dance';
+import { RagePowder } from './bug/rage-powder';
 import { UTurn } from './bug/u-turn';
 import { XScissor } from './bug/x-scissor';
 
@@ -15,6 +17,8 @@ export class BugMoveAnimations {
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
     megahorn: (refs, launch, target) => BugMoveAnimations.playMegahorn(refs, launch, target),
+    quiverdance: (refs, launch) => QuiverDance.play(refs, launch),
+    ragepowder: (refs, launch) => RagePowder.play(refs, launch),
     signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target),
     stickyweb: (refs, launch, target) => BugMoveAnimations.playStickyWeb(refs, launch, target),
     uturn: (refs, launch, target) => UTurn.play(refs, launch, target),

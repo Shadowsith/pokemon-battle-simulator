@@ -5,6 +5,7 @@ import { FxEffects } from '../fx-effects';
 import { FoulPlay } from './dark/foul-play';
 import { HoneClaws } from './dark/hone-claws';
 import { NastyPlot } from './dark/nasty-plot';
+import { NightDaze } from './dark/night-daze';
 import { NightSlash } from './dark/night-slash';
 import { SuckerPunch } from './dark/sucker-punch';
 import { Switcheroo } from './dark/switcheroo';
@@ -20,6 +21,7 @@ export class DarkMoveAnimations {
     honeclaws: (refs, launch, target) => HoneClaws.play(refs, launch, target),
     hyperspacefury: (refs, launch, target) => DarkMoveAnimations.playHyperspaceFury(refs, launch, target),
     nastyplot: (refs, launch) => NastyPlot.play(refs, launch),
+    nightdaze: (refs, launch, target) => NightDaze.play(refs, launch, target),
     nightslash: (refs, _launch, target, v) => NightSlash.play(refs, target, v),
     partingshot: (refs, launch, target, v) => DarkMoveAnimations.playPartingShot(refs, launch, target, v),
     suckerpunch: (refs, launch, target, v) => SuckerPunch.play(refs, launch, target, v),

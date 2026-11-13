@@ -478,26 +478,28 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): crackling psychic blocks pelt the target. */
+  /** Custom (orbs circle the target and close in 0-0.9 s, hit 0.9 s, blue squares flicker up 0.9-1.5 s): a wavering psychic whirl, then crackling psychic blocks. */
   psyshock: () => {
-    const s = new MoveSfx(1.0, 0x95b0);
-    s.wave(0.0, 0.45, { freq: (u) => (500 + 600 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.25) });
-    for (const at of [0.43, 0.52, 0.61]) {
+    const s = new MoveSfx(1.6, 0x95b0);
+    s.wave(0.0, 0.9, { freq: (u) => (500 + 600 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.22) });
+    for (const at of [0.9, 1.0, 1.1]) {
       s.noise(at, 0.06, { clock: () => 6000, gain: env.decay(0.4, 1), short: true });
       s.pulse(at, 0.08, { freq: (u) => 900 * Math.pow(0.5, u), gain: env.decay(0.3, 1.5), duty: 0.5 });
     }
-    s.wave(0.6, 0.3, { freq: (u) => 660 * Math.pow(0.6, u), gain: env.decay(0.15, 1.5) });
+    s.wave(1.1, 0.35, { freq: (u) => 660 * Math.pow(0.6, u), gain: env.decay(0.15, 1.5) });
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a strong, deep psychic wave crashing into the foe. */
+  /** Custom (crimson ripples 0-0.7 s, black 0.5 s, magenta orbs gather 0.75-1.45 s, hit 1.45 s with bursting stars, squares flicker to 2.2 s, clears to ~2.5 s): a deep throbbing build-up that crashes into a strong psychic blast. */
   psystrike: () => {
-    const s = new MoveSfx(1.2, 0x9571);
-    s.wave(0.0, 0.45, { freq: (u) => (200 + 700 * u) * (1 + 0.1 * Math.sin(2 * Math.PI * 7 * u)), gain: env.ramp(0.1, 0.3) });
-    s.pulse(0.0, 0.45, { freq: (u) => (400 + 1000 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 11 * u)), gain: env.swell(0.14), duty: 0.125 });
-    s.thud(0.43, 0.45, 0.8);
-    s.noise(0.43, 0.25, { clock: (u) => 7000 - 4000 * u, gain: env.attackDecay(0.28, 0.04) });
-    s.wave(0.45, 0.6, { freq: (u) => 330 * (1 + 0.1 * Math.sin(2 * Math.PI * 6 * u)) * Math.pow(0.7, u), gain: env.decay(0.25, 1.2) });
+    const s = new MoveSfx(2.6, 0x9571);
+    s.wave(0.0, 0.7, { freq: (u) => 180 * (1 + 0.1 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.22) });
+    s.wave(0.75, 0.7, { freq: (u) => (200 + 700 * u) * (1 + 0.1 * Math.sin(2 * Math.PI * 7 * u)), gain: env.ramp(0.08, 0.28) });
+    s.pulse(0.75, 0.7, { freq: (u) => (400 + 1000 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 11 * u)), gain: env.swell(0.12), duty: 0.125 });
+    s.thud(1.45, 0.5, 0.8);
+    s.noise(1.45, 0.25, { clock: (u) => 7000 - 4000 * u, gain: env.attackDecay(0.28, 0.04) });
+    s.sparkle(1.5, 0.4, 5, { lo: 2500, hi: 5000, gain: 0.12 });
+    s.wave(1.5, 0.9, { freq: (u) => 330 * (1 + 0.1 * Math.sin(2 * Math.PI * 6 * u)) * Math.pow(0.7, u), gain: env.decay(0.22, 1.2) });
     return s;
   },
 

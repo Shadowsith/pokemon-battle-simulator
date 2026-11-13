@@ -153,23 +153,26 @@ export const BUG = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + stat-up fleck (0.85 s): a light, fluttering wing dance. */
+  /** Custom (wing flutter 0-0.5 s, dim + ripples + cyan sparkles 0.4-1.4 s, orange orbs 1.4-2.0 s, stat-up aura 2.0-2.8 s): a light fluttering dance with a twinkling tune, then the stat-up jingle. */
   quiverdance: () => {
-    const s = new MoveSfx(1.5, 0xb9d5);
-    s.pulse(0.02, 0.8, { freq: (u) => 1200 + 300 * Math.sin(2 * Math.PI * 3 * u), gain: (u) => 0.14 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 30 * u)), duty: 0.125 });
-    s.noise(0.02, 0.8, { clock: () => 7000, gain: (u) => 0.1 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 24 * u)) });
-    s.arpeggio(0.1, [81, 84, 88, 84, 81, 84], 0.11, { gain: 0.18, voice: 'wave', hold: 0.14 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.95, 0xb9d5);
+    s.pulse(0.02, 0.5, { freq: (u) => 1200 + 300 * Math.sin(2 * Math.PI * 3 * u), gain: (u) => 0.14 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 20 * u)), duty: 0.125 });
+    s.noise(0.02, 0.5, { clock: () => 7000, gain: (u) => 0.1 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 16 * u)) });
+    s.arpeggio(0.45, [81, 84, 88, 84, 81, 84, 88, 93], 0.12, { gain: 0.16, voice: 'wave', hold: 0.15 });
+    s.sparkle(0.5, 0.9, 8, { lo: 3500, hi: 6500, gain: 0.09 });
+    s.chord(1.45, 0.5, [76, 81, 84], { rate: 0.04, gain: 0.08 });
+    s.statUp(2.05);
     return s;
   },
 
-  /** Generic self aura (~0.8 s): a puff of irritating powder scattered around, with a buzz. */
+  /** Custom (yellow powder balls circle the user 0-1.9 s, red powder cloud bursts out 0.5-1.5 s): a soft fizzing hum, then a puff of irritating powder with a buzz. */
   ragepowder: () => {
-    const s = new MoveSfx(1.0, 0xb9a9);
-    s.noise(0.02, 0.15, { clock: (u) => 2000 + 3000 * u, gain: env.attackDecay(0.3, 0.2) });
-    s.noise(0.1, 0.75, { clock: () => 8000, gain: env.swell(0.14) });
-    s.pulse(0.1, 0.7, { freq: (u) => 200 * (1 + 0.05 * Math.sin(2 * Math.PI * 20 * u)), gain: env.swell(0.15), duty: 0.25 });
-    s.sparkle(0.15, 0.65, 9, { lo: 5000, hi: 8000, gain: 0.12 });
+    const s = new MoveSfx(2.0, 0xb9a9);
+    s.wave(0.0, 1.9, { freq: (u) => 600 + 40 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.07 * Math.min(1, u * 8) * Math.min(1, (1 - u) * 6) });
+    s.noise(0.5, 0.15, { clock: (u) => 2000 + 3000 * u, gain: env.attackDecay(0.3, 0.2) });
+    s.noise(0.55, 0.9, { clock: () => 8000, gain: env.swell(0.14) });
+    s.pulse(0.55, 0.9, { freq: (u) => 200 * (1 + 0.05 * Math.sin(2 * Math.PI * 20 * u)), gain: env.swell(0.15), duty: 0.25 });
+    s.sparkle(0.6, 0.8, 9, { lo: 5000, hi: 8000, gain: 0.11 });
     return s;
   },
 
