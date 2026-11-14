@@ -3,8 +3,9 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { Retaliate } from './retaliate';
 
-/** Hand-made animations for Normal-type punches, kicks and body blows. */
+/** Hand-made animations for Normal-type punches, kicks and body blows (Retaliate lives in `retaliate.ts`). */
 export class NormalBlowMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -15,6 +16,7 @@ export class NormalBlowMoveAnimations {
     headbutt: (refs, _launch, target, v) => NormalBlowMoveAnimations.playHeadbutt(refs, target, v),
     megakick: (refs, _launch, target) => NormalBlowMoveAnimations.playMegaKick(refs, target),
     megapunch: (refs, _launch, target) => NormalBlowMoveAnimations.playMegaPunch(refs, target),
+    retaliate: (refs, launch, target, v) => Retaliate.play(refs, launch, target, v),
     slam: (refs, _launch, target) => NormalBlowMoveAnimations.playSlam(refs, target),
     strength: (refs, _launch, target) => NormalBlowMoveAnimations.playStrength(refs, target),
     takedown: (refs, _launch, target, v) => NormalBlowMoveAnimations.playTakeDown(refs, target, v),

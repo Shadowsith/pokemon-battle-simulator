@@ -373,24 +373,27 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee slash (impact 0.17 s): a legendary blade – a ringing draw and a clean, gleaming cut. */
+  /** Custom (pause 0-0.2 s, white blade streak slashes 0.2-0.4 s, hit 0.3 s, blue orbs pop along the cut to ~0.9 s): a ringing draw, a clean gleaming cut, a shimmer of light. */
   sacredsword: () => {
-    const s = new MoveSfx(0.95, 0x5a5d);
-    s.pulse(0.0, 0.16, { freq: env.ramp(1500, 3200), gain: env.swell(0.14), duty: 0.125 });
-    s.whoosh(0.0, 0.17, { from: 3000, to: 11000, gain: 0.25 });
-    s.slash(0.17, 0.7);
-    s.wave(0.2, 0.6, { freq: () => 1568, gain: env.decay(0.16, 1.5) });
-    s.wave(0.2, 0.6, { freq: () => 2349, gain: env.decay(0.08, 1.5) });
+    const s = new MoveSfx(1.05, 0x5a5d);
+    s.pulse(0.05, 0.2, { freq: env.ramp(1500, 3200), gain: env.swell(0.12), duty: 0.125 });
+    s.whoosh(0.15, 0.15, { from: 3000, to: 11000, gain: 0.25 });
+    s.slash(0.3, 0.7);
+    s.wave(0.32, 0.6, { freq: () => 1568, gain: env.decay(0.16, 1.5) });
+    s.wave(0.32, 0.6, { freq: () => 2349, gain: env.decay(0.08, 1.5) });
+    s.sparkle(0.35, 0.45, 6, { lo: 3000, hi: 5500, gain: 0.08 });
     return s;
   },
 
-  /** Generic projectile (0.43 s), no fleck: a mystic blade-wave hums across and cuts deep with a ringing slash. */
+  /** Custom (dim 0-0.25 s, white streak 0.25-0.45 s, cyan blade drops 0.45-0.75 s, hit 0.75 s, three blade arcs slash 0.75-1.0 s with sparkles to ~1.3 s, clears to ~1.55 s): a faint swish, a descending mystic hum, a deep ringing triple slash. */
   secretsword: () => {
-    const s = new MoveSfx(0.85, 0x5ec5);
-    s.pulse(0.0, 0.43, { freq: (u) => 1100 + 900 * u, gain: env.ramp(0.08, 0.2), duty: 0.125 });
-    s.whoosh(0.0, 0.43, { from: 3000, to: 12000, gain: 0.25 });
-    s.slash(0.43, 0.55);
-    s.wave(0.45, 0.35, { freq: () => 1318, gain: env.decay(0.18, 1.5) });
+    const s = new MoveSfx(1.6, 0x5ec5);
+    s.whoosh(0.25, 0.2, { from: 4000, to: 10000, gain: 0.15 });
+    s.pulse(0.45, 0.3, { freq: (u) => 2000 - 900 * u, gain: env.ramp(0.08, 0.2), duty: 0.125 });
+    s.thud(0.75, 0.4, 0.4);
+    for (const at of [0.75, 0.82, 0.89]) s.slash(at, 0.45);
+    s.wave(0.77, 0.45, { freq: () => 1318, gain: env.decay(0.18, 1.5) });
+    s.sparkle(0.85, 0.4, 6, { lo: 3000, hi: 5500, gain: 0.1 });
     return s;
   },
 

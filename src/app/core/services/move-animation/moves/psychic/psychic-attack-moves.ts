@@ -8,9 +8,10 @@ import { HyperspaceHole } from './hyperspace-hole';
 import { PsychoCut } from './psycho-cut';
 import { Psyshock } from './psyshock';
 import { Psystrike } from './psystrike';
+import { Synchronoise } from './synchronoise';
 import { ZenHeadbutt } from './zen-headbutt';
 
-/** Hand-made animations for Psychic-type attacks (Hyperspace Hole, Psycho Cut and Zen Headbutt have their own files). */
+/** Hand-made animations for Psychic-type attacks (Hyperspace Hole, Psycho Cut, Psyshock, Psystrike, Synchronoise and Zen Headbutt have their own files). */
 export class PsychicAttackMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -24,6 +25,7 @@ export class PsychicAttackMoveAnimations {
     psychocut: (refs, launch, target, v) => PsychoCut.play(refs, launch, target, v),
     psyshock: (refs, _launch, target) => Psyshock.play(refs, target),
     psystrike: (refs, launch, target) => Psystrike.play(refs, launch, target),
+    synchronoise: (refs, launch, target) => Synchronoise.play(refs, launch, target),
     zenheadbutt: (refs, launch, target, v) => ZenHeadbutt.play(refs, launch, target, v)
   };
 

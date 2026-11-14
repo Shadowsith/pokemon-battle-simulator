@@ -14,8 +14,9 @@ import { Inferno } from './inferno';
 import { LavaPlume } from './lava-plume';
 import { MagmaStorm } from './magma-storm';
 import { MysticalFire } from './mystical-fire';
+import { SearingShot } from './searing-shot';
 
-/** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs (set pieces such as Lava Plume, Blue Flare, Fiery Dance, Fire Pledge, Flame Burst and Fusion Flare live in their own files). */
+/** Hand-made animations for Fire-type ranged attacks: flames, blasts and fire orbs (set pieces such as Lava Plume, Blue Flare, Fiery Dance, Fire Pledge, Flame Burst, Fusion Flare and Searing Shot live in their own files). */
 export class FireRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -39,7 +40,8 @@ export class FireRangedMoveAnimations {
     magmastorm: (refs, _launch, target) => MagmaStorm.play(refs, target),
     mysticalfire: (refs, launch, target, v) => MysticalFire.play(refs, launch, target, v),
     overheat: (refs, launch, target) => FireRangedMoveAnimations.playOverheat(refs, launch, target),
-    sacredfire: (refs, _launch, target) => FireRangedMoveAnimations.playSacredFire(refs, target)
+    sacredfire: (refs, _launch, target) => FireRangedMoveAnimations.playSacredFire(refs, target),
+    searingshot: (refs, launch, target) => SearingShot.play(refs, launch, target)
   };
 
   /**

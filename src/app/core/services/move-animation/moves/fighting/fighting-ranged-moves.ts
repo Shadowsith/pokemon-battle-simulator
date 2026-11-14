@@ -3,13 +3,15 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { SecretSword } from './secret-sword';
 
-/** Hand-made animations for ranged Fighting-type moves (energy shots). */
+/** Hand-made animations for ranged Fighting-type moves (energy shots; Secret Sword lives in `secret-sword.ts`). */
 export class FightingRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     aurasphere: (refs, launch, target) => FightingRangedMoveAnimations.playAuraSphere(refs, launch, target),
-    focusblast: (refs, launch, target) => FightingRangedMoveAnimations.playFocusBlast(refs, launch, target)
+    focusblast: (refs, launch, target) => FightingRangedMoveAnimations.playFocusBlast(refs, launch, target),
+    secretsword: (refs, _launch, target, v) => SecretSword.play(refs, target, v)
   };
 
   /**

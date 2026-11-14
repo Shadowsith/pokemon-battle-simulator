@@ -189,16 +189,17 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic sonic (rings 0.11 s apart, impact 0.43 s) + sleep fleck: an ancient, haunting melody. */
+  /** Custom (pale rings pulse round the user 0-0.6 s, music notes float to the target 0.5-1.2 s, hit 1.1 s, yellow rings and notes twinkle to ~1.7 s): a shimmering hum, an ancient, haunting melody drifting over, a soft chime on arrival. */
   relicsong: () => {
-    const s = new MoveSfx(1.15, 0x7e15);
-    [76, 79, 83, 81, 76].forEach((n, i) => {
+    const s = new MoveSfx(1.85, 0x7e15);
+    s.wave(0.0, 0.6, { freq: (u) => 660 * (1 + 0.02 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.12) });
+    [76, 79, 83, 81, 76, 79].forEach((n, i) => {
       const f = 440 * Math.pow(2, (n - 69) / 12);
-      s.wave(i * 0.11, 0.16, { freq: (u) => f * (1 + 0.015 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.3) });
-      s.pulse(i * 0.11, 0.12, { freq: () => f * 2, gain: env.decay(0.05, 1.5), duty: 0.25 });
+      s.wave(0.5 + i * 0.11, 0.18, { freq: (u) => f * (1 + 0.015 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.28) });
+      s.pulse(0.5 + i * 0.11, 0.12, { freq: () => f * 2, gain: env.decay(0.05, 1.5), duty: 0.25 });
     });
-    s.noise(0.43, 0.06, { clock: () => 5000, gain: env.decay(0.15, 1) });
-    s.sleep(0.58, 0.18);
+    s.noise(1.1, 0.06, { clock: () => 5000, gain: env.decay(0.15, 1) });
+    s.sparkle(1.12, 0.5, 6, { lo: 2600, hi: 4800, gain: 0.1 });
     return s;
   },
 

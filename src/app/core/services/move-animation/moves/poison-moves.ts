@@ -4,9 +4,10 @@ import { FxEffects } from '../fx-effects';
 import { FxGlyphs } from '../fx-glyphs';
 import { Coil } from './poison/coil';
 import { PoisonJab } from './poison/poison-jab';
+import { SludgeWave } from './poison/sludge-wave';
 import { ToxicSpikes } from './poison/toxic-spikes';
 
-/** Hand-made animations for Poison-type moves (Coil, Poison Jab and Toxic Spikes live in `poison/`). */
+/** Hand-made animations for Poison-type moves (Coil, Poison Jab, Sludge Wave and Toxic Spikes live in `poison/`). */
 export class PoisonMoveAnimations {
   /** Hand-made Poison move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -17,6 +18,7 @@ export class PoisonMoveAnimations {
     gunkshot: (refs, launch, target) => PoisonMoveAnimations.playGunkShot(refs, launch, target),
     poisonjab: (refs, _launch, target, v) => PoisonJab.play(refs, target, v),
     sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
+    sludgewave: (refs, launch, target) => SludgeWave.play(refs, launch, target),
     toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target),
     toxicspikes: (refs, launch, target) => ToxicSpikes.play(refs, launch, target)
   };

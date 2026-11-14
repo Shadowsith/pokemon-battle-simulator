@@ -214,17 +214,17 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + stat rise fleck (~0.85 s): interlocking gears grind round - metallic ratchet clicks speeding up. */
+  /** Custom (two gears mesh and turn faster and faster 0-1.1 s, orange sparkles drift down 1.1-2.3 s): metallic ratchet clicks speeding up, then the stat-up jingle. */
   shiftgear: () => {
-    const s = new MoveSfx(1.45, 0x5f6e);
-    let t = 0.03;
-    for (let i = 0; i < 9; i++) {
+    const s = new MoveSfx(2.4, 0x5f6e);
+    let t = 0.08;
+    for (let i = 0; i < 12; i++) {
       s.noise(t, 0.035, { clock: () => 9000, gain: env.decay(0.3, 1), short: true });
       s.pulse(t, 0.04, { freq: () => (i % 2 ? 1568 : 1175), gain: env.decay(0.14, 1.5), duty: 0.125 });
-      t += 0.11 - i * 0.007;
+      t += 0.12 - i * 0.007;
     }
-    s.pulse(0.03, 0.75, { freq: env.ramp(120, 200), gain: env.swell(0.1), duty: 0.25 });
-    s.statUp(0.85);
+    s.pulse(0.0, 1.1, { freq: env.ramp(120, 220), gain: env.swell(0.1), duty: 0.25 });
+    s.statUp(1.15);
     return s;
   },
 

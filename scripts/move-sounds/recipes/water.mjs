@@ -225,14 +225,15 @@ export const WATER = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + burn fleck (0.55 s): boiling water – a hissing, bubbling jet that splashes and sizzles. */
+  /** Custom (hot water jet 0-0.35 s, hit 0.35 s, gushes with mist to 0.75 s, fades to 0.95 s, target flushes red and steam rises 0.95-1.95 s): a hissing, bubbling jet that splashes, then a long scalding sizzle. */
   scald: () => {
-    const s = new MoveSfx(1.1, 0x5ca1);
-    s.noise(0.0, 0.43, { clock: env.ramp(4000, 8000), gain: env.swell(0.22) });
-    s.bubbles(0.0, 0.4, 8, { lo: 300, hi: 800, gain: 0.15 });
-    s.splash(0.43, 0.55);
-    s.noise(0.5, 0.45, { clock: () => 11000, gain: env.decay(0.18, 1) });
-    s.burn(0.55, 0.22);
+    const s = new MoveSfx(2.05, 0x5ca1);
+    s.noise(0.0, 0.35, { clock: env.ramp(4000, 8000), gain: env.ramp(0.12, 0.24) });
+    s.splash(0.35, 0.55);
+    s.noise(0.35, 0.6, { clock: () => 7000, gain: env.swell(0.2) });
+    s.bubbles(0.35, 0.55, 8, { lo: 300, hi: 800, gain: 0.14 });
+    s.burn(0.95, 0.2);
+    s.noise(0.95, 1.0, { clock: () => 11000, gain: env.decay(0.16, 1) });
     return s;
   },
 

@@ -7,12 +7,13 @@ import { Autotomize } from './steel/autotomize';
 import { GyroBall } from './steel/gyro-ball';
 import { HeavySlam } from './steel/heavy-slam';
 import { IronHead } from './steel/iron-head';
+import { ShiftGear } from './steel/shift-gear';
 
 /** Silver tones of Steel moves: sparkle, dust light, dust shade. */
 const SILVER = '#DDE2EC';
 const DUST: [string, string] = ['#E4E8F0', '#A9B0BE'];
 
-/** Hand-made animations for Steel-type moves (Autotomize, Gyro Ball, Heavy Slam and Iron Head live in `steel/`). */
+/** Hand-made animations for Steel-type moves (Autotomize, Gyro Ball, Heavy Slam, Iron Head and Shift Gear live in `steel/`). */
 export class SteelMoveAnimations {
   /** Hand-made Steel move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -26,6 +27,7 @@ export class SteelMoveAnimations {
     irontail: (refs, launch, target, v) => SteelMoveAnimations.playIronTail(refs, launch, target, v),
     kingsshield: (refs, launch, _target, v) => SteelMoveAnimations.playKingsShield(refs, launch, v),
     meteormash: (refs, _launch, target) => SteelMoveAnimations.playMeteorMash(refs, target),
+    shiftgear: (refs, launch) => ShiftGear.play(refs, launch),
     steelwing: (refs, launch, target, v) => SteelMoveAnimations.playSteelWing(refs, launch, target, v)
   };
 

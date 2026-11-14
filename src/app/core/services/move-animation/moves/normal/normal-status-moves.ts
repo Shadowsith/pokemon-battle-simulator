@@ -2,8 +2,9 @@ import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../../anim
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { ShellSmash } from './shell-smash';
 
-/** Hand-made animations for Normal-type status moves (setup, protection, support). */
+/** Hand-made animations for Normal-type status moves (setup, protection, support; Shell Smash lives in `shell-smash.ts`). */
 export class NormalStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -13,6 +14,7 @@ export class NormalStatusMoveAnimations {
     followme: (refs, launch) => NormalStatusMoveAnimations.playFollowMe(refs, launch),
     painsplit: (refs, launch, target) => NormalStatusMoveAnimations.playPainSplit(refs, launch, target),
     protect: (refs, launch) => NormalStatusMoveAnimations.playProtect(refs, launch),
+    shellsmash: (refs, launch) => ShellSmash.play(refs, launch),
     sleeptalk: (refs, launch, target, v) => NormalStatusMoveAnimations.playSleepTalk(refs, launch, target, v),
     swordsdance: (refs, launch) => NormalStatusMoveAnimations.playSwordsDance(refs, launch),
     whirlwind: (refs, _launch, target, v) => NormalStatusMoveAnimations.playWhirlwind(refs, target, v),

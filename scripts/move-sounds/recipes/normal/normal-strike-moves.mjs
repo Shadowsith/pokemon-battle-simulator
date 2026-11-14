@@ -448,14 +448,15 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a vengeful counterblow – a stern low strike with a hard echo. */
+  /** Custom (yellow glow and dust round the user 0-0.5 s, dart 0.5-0.76 s, hit 0.62 s, yellow spiky bursts pop to ~1.2 s): a stern swelling growl in a dust swirl, then a hard counterblow with crackling bursts. */
   retaliate: () => {
-    const s = new MoveSfx(0.85, 0x7e7a);
-    s.pulse(0.0, 0.16, { freq: env.ramp(110, 160), gain: env.swell(0.2), duty: 0.25 });
-    s.whoosh(0.0, 0.18, { from: 1200, to: 4500, gain: 0.3 });
-    s.thud(0.17, 0.8, 0.8);
-    s.thud(0.3, 0.4, 0.5);
-    s.rumble(0.2, 0.4, { from: 400, to: 150, gain: 0.2 });
+    const s = new MoveSfx(1.35, 0x7e7a);
+    s.pulse(0.0, 0.5, { freq: env.ramp(110, 160), gain: env.swell(0.16), duty: 0.25 });
+    s.noise(0.0, 0.5, { clock: () => 1500, gain: env.swell(0.12) });
+    s.whoosh(0.48, 0.15, { from: 1200, to: 4500, gain: 0.3 });
+    s.thud(0.62, 0.8, 0.8);
+    s.rumble(0.65, 0.4, { from: 400, to: 150, gain: 0.2 });
+    for (const at of [0.7, 0.77, 0.84, 0.91]) s.noise(at, 0.05, { clock: () => 6000, gain: env.decay(0.18, 1), short: true });
     return s;
   },
 

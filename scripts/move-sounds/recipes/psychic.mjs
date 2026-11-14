@@ -575,16 +575,19 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic field (shake + waves ~0.6 s, bp 120): eerie synchronised shockwaves pulse outward. */
+  /** Custom (dark 0-0.3 s, rainbow ground ripples with yellow sparks 0.3-1.35 s, hit 1.0 s, white rings pulse and small rings drift up 1.0-1.9 s, clears to ~2.15 s): eerie synchronised shockwaves pulse outward, then ring round the target. */
   synchronoise: () => {
-    const s = new MoveSfx(1.0, 0x5c40);
-    for (let i = 0; i < 4; i++) {
-      const at = 0.02 + i * 0.15;
-      s.wave(at, 0.2, { freq: (u) => 700 * (1 + 0.3 * u), gain: env.attackDecay(0.28, 0.15) });
-      s.wave(at, 0.2, { freq: (u) => 707 * (1 + 0.3 * u), gain: env.attackDecay(0.2, 0.15) });
+    const s = new MoveSfx(2.2, 0x5c40);
+    // One pulse per ripple ring: three colours 0.09 s apart, a second round 0.26 s later.
+    for (const at of [0.3, 0.39, 0.48, 0.56, 0.65, 0.74]) {
+      s.wave(at, 0.2, { freq: (u) => 700 * (1 + 0.3 * u), gain: env.attackDecay(0.24, 0.15) });
+      s.wave(at, 0.2, { freq: (u) => 707 * (1 + 0.3 * u), gain: env.attackDecay(0.17, 0.15) });
     }
-    s.noise(0.0, 0.7, { clock: (u) => 3000 + 2000 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.2) });
-    s.thud(0.6, 0.35, 0.4);
+    s.noise(0.3, 1.0, { clock: (u) => 3000 + 2000 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.18) });
+    s.sparkle(0.35, 0.6, 6, { lo: 3500, hi: 6000, gain: 0.08 });
+    s.thud(1.0, 0.35, 0.4);
+    for (const at of [1.0, 1.06, 1.12, 1.18]) s.wave(at, 0.25, { freq: () => 1046, gain: env.decay(0.1, 1.5) });
+    s.sparkle(1.2, 0.5, 5, { lo: 2500, hi: 4500, gain: 0.07 });
     return s;
   },
 

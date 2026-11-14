@@ -194,13 +194,14 @@ export const POISON = {
     return s;
   },
 
-  /** Generic field (waves 0-0.6 s) + poison fleck: a toxic tide floods the whole field. */
+  /** Custom (user heaves 0-0.3 s, sludge wave rolls along the ground 0.3-0.9 s, hit 0.9 s, purple bubbles pop round the target 0.9-1.8 s): a wet heave, a rolling toxic tide, a splat and bubbling. */
   sludgewave: () => {
-    const s = new MoveSfx(1.15, 0x5a7e);
-    s.rumble(0.0, 0.6, { from: 300, to: 500, gain: 0.3 });
-    s.noise(0.0, 0.6, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.25) });
-    s.bubbles(0.05, 0.55, 10, { lo: 180, hi: 420, gain: 0.2 });
-    s.poison(0.65);
+    const s = new MoveSfx(1.9, 0x5a7e);
+    s.pulse(0.0, 0.3, { freq: env.ramp(150, 260), gain: env.swell(0.12), duty: 0.5 });
+    s.rumble(0.3, 0.6, { from: 300, to: 500, gain: 0.3 });
+    s.noise(0.3, 0.6, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.25) });
+    s.splash(0.9, 0.45);
+    s.bubbles(0.95, 0.8, 10, { lo: 180, hi: 420, gain: 0.2 });
     return s;
   },
 

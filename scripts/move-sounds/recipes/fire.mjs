@@ -403,14 +403,15 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic lob (0.52 s) + burn fleck (~0.65 s): a scorching fireball hurled in an arc that bursts in roaring flames. */
+  /** Custom (black 0-0.25 s, fireball swells 0.25-0.55 s, explosions all over the field 0.55-1.25 s, hit 0.7 s, red rays 1.25-2.2 s while the target glows red 1.5-2.2 s, fades to ~2.45 s): a swelling roar, a chain of fiery blasts, a scorching flare. */
   searingshot: () => {
-    const s = new MoveSfx(1.15, 0x5ea5);
-    s.noise(0.0, 0.52, { clock: (u) => 900 + 700 * Math.sin(Math.PI * u), gain: env.ramp(0.15, 0.3) });
-    s.pulse(0.0, 0.52, { freq: (u) => 220 + 180 * Math.sin(Math.PI * u), gain: env.swell(0.12), duty: 0.25 });
-    s.thud(0.52, 0.6, 0.8);
-    s.noise(0.52, 0.45, { clock: env.ramp(2500, 600), gain: env.attackDecay(0.45, 0.05) });
-    s.burn(0.65, 0.25);
+    const s = new MoveSfx(2.55, 0x5ea5);
+    s.noise(0.25, 0.3, { clock: (u) => 600 + 900 * u, gain: env.ramp(0.08, 0.3) });
+    s.pulse(0.25, 0.3, { freq: (u) => 120 + 160 * u, gain: env.swell(0.12), duty: 0.25 });
+    s.thud(0.7, 0.7, 0.8);
+    for (const at of [0.6, 0.78, 0.92, 1.05, 1.15]) s.noise(at, 0.3, { clock: env.ramp(2500, 600), gain: env.attackDecay(0.32, 0.04) });
+    s.noise(1.25, 1.0, { clock: (u) => 1000 + 300 * Math.sin(2 * Math.PI * 8 * u), gain: env.swell(0.22) });
+    s.burn(1.55, 0.25);
     return s;
   },
 

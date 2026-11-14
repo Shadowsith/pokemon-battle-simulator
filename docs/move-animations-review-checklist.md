@@ -843,34 +843,34 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Kalkklinge
   - Gen 5 APNG: https://www.pokewiki.de/images/a/ad/Kalkklinge_Gen5.png
 - [ ] **Reflect Type** / Typenspiegel — `reflecttype` · Normal · Status · `targetAura`
-- [ ] ⭐ **Relic Song** / Urgesang — `relicsong` · Normal · Special · `sonic`
+- [x] ⭐ **Relic Song** / Urgesang — `relicsong` · Normal · Special · pale rings pulse round the singing user, orange and yellow music notes sway over to the target, yellow rings and notes twinkle round it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Urgesang
   - Gen 5 APNG: https://www.pokewiki.de/images/5/56/Urgesang_Gen5.png
-- [ ] ⭐ **Retaliate** / Heimzahlung — `retaliate` · Normal · Physical · `melee`
+- [x] ⭐ **Retaliate** / Heimzahlung — `retaliate` · Normal · Physical · the user glows yellow in a swirl of yellow dust, darts at the target and yellow spiky bursts pop round it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Heimzahlung
   - Gen 5 APNG: https://www.pokewiki.de/images/5/5f/Heimzahlung_Gen5.png
 - [ ] **Round** / Kanon — `round` · Normal · Special · `sonic`
-- [ ] ⭐ **Sacred Sword** / Sanctoklinge — `sacredsword` · Fighting · Physical · `melee`
+- [x] ⭐ **Sacred Sword** / Sanctoklinge — `sacredsword` · Fighting · Physical · a white blade streak slashes diagonally across the target, glowing blue orbs pop along the cut (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Sanctoklinge
   - Gen 5 APNG: https://www.pokewiki.de/images/3/3e/Sanctoklinge_Gen5.png
-- [ ] ⭐ **Scald** / Siedewasser — `scald` · Water · Special · `projectile`
+- [x] ⭐ **Scald** / Siedewasser — `scald` · Water · Special · a pale cyan hot-water jet gushes onto the target with white mist, then the target flushes red and white steam curls up (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Siedewasser
   - Gen 5 APNG: https://www.pokewiki.de/images/9/90/Siedewasser_Gen5.png
-- [ ] ⭐ **Searing Shot** / Flammenball — `searingshot` · Fire · Special · `lob`
+- [x] ⭐ **Searing Shot** / Flammenball — `searingshot` · Fire · Special · black scene, a fireball swells on the user and bursts into explosions all over the field, then a red ray backdrop round the user while the target glows red (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Flammenball
   - Gen 5 APNG: https://www.pokewiki.de/images/6/6c/Flammenball_Gen5.png
-- [ ] ⭐ **Secret Sword** / Mystoschwert — `secretsword` · Fighting · Special · `projectile`
+- [x] ⭐ **Secret Sword** / Mystoschwert — `secretsword` · Fighting · Special · dim scene, a white streak flashes past, a tall cyan blade drops onto the target, three cyan arcs slash across it with white sparkles and yellow orbs (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Mystoschwert
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e0/Mystoschwert_Gen5.png
-- [ ] ⭐ **Shell Smash** / Hausbruch — `shellsmash` · Normal · Status · `selfAura`
+- [x] ⭐ **Shell Smash** / Hausbruch — `shellsmash` · Normal · Status · the user squashes three times as white shell shards fly off, blue stat-down bubbles, then the orange stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Hausbruch
   - Gen 5 APNG: https://www.pokewiki.de/images/d/dc/Hausbruch_Gen5.png
-- [ ] ⭐ **Shift Gear** / Gangwechsel — `shiftgear` · Steel · Status · `selfAura`
+- [x] ⭐ **Shift Gear** / Gangwechsel — `shiftgear` · Steel · Status · two big pale gears mesh and turn faster and faster over the user, then orange sparkles drift down (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Gangwechsel
   - Gen 5 APNG: https://www.pokewiki.de/images/8/8f/Gangwechsel_Gen5.png
 - [ ] **Simple Beam** / Wankelstrahl — `simplebeam` · Normal · Status · `targetAura`
 - [ ] **Sky Drop** / Freier Fall — `skydrop` · Flying · Physical · `beam`
-- [ ] ⭐ **Sludge Wave** / Schlammwoge — `sludgewave` · Poison · Special · `field`
+- [x] ⭐ **Sludge Wave** / Schlammwoge — `sludgewave` · Poison · Special · the user heaves, a wave of purple sludge rolls along the ground onto the target, which glows purple as poison bubbles well up and pop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schlammwoge
   - Gen 5 APNG: https://www.pokewiki.de/images/4/42/Schlammwoge_Gen5.png
 - [ ] **Smack Down** / Katapult — `smackdown` · Rock · Physical · `projectile`
@@ -880,7 +880,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [ ] **Stored Power** / Kraftvorrat — `storedpower` · Psychic · Special · `projectile`
 - [ ] **Storm Throw** / Bergsturm — `stormthrow` · Fighting · Physical · `melee`
 - [ ] **Struggle Bug** / Käfertrutz — `strugglebug` · Bug · Special · `field`
-- [ ] ⭐ **Synchronoise** / Synchrolärm — `synchronoise` · Psychic · Special · `field`
+- [x] ⭐ **Synchronoise** / Synchrolärm — `synchronoise` · Psychic · Special · dark scene, magenta / green / yellow ripple rings spread from the user with yellow sparks, white rings pulse round the target and small rings drift up (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Synchrol%C3%A4rm
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e6/Synchrol%C3%A4rm_Gen5.png
 - [ ] **Tail Slap** / Kehrschelle — `tailslap` · Normal · Physical · `melee`

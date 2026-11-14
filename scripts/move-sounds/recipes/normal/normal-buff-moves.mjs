@@ -347,15 +347,16 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + stat rise fleck (~0.85 s): the shell cracks apart in a few crunches, then power surges. */
+  /** Custom (three squashes with flying shards at ~0.08 / 0.28 / 0.48 s, stat-down bubbles 0.6-1.5 s, stat-up aura 1.5-2.3 s): the shell cracks apart in three crunches, defences sink, then power surges. */
   shellsmash: () => {
-    const s = new MoveSfx(1.5, 0x5e11);
-    [0.08, 0.3, 0.5].forEach((at, i) => {
+    const s = new MoveSfx(2.45, 0x5e11);
+    [0.08, 0.28, 0.48].forEach((at, i) => {
       s.noise(at, 0.12, { clock: (u) => 7000 - 4000 * u, gain: env.attackDecay(0.4 + i * 0.05, 0.05) });
       s.pulse(at, 0.12, { freq: (u) => 300 * Math.pow(0.4, u), gain: env.decay(0.3, 2), duty: 0.5 });
     });
-    s.sparkle(0.55, 0.25, 4, { lo: 4000, hi: 7000, gain: 0.15 });
-    s.statUp(0.85);
+    s.sparkle(0.5, 0.25, 4, { lo: 4000, hi: 7000, gain: 0.12 });
+    s.statDown(0.62);
+    s.statUp(1.52);
     return s;
   },
 

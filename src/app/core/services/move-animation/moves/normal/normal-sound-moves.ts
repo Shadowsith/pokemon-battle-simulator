@@ -1,11 +1,13 @@
 import { Point, BattleStageRefs, MoveAnimRegistry } from '../../animation.types';
 import { Fx } from '../../fx';
+import { RelicSong } from './relic-song';
 
-/** Hand-made animations for Normal-type sound attacks. */
+/** Hand-made animations for Normal-type sound attacks (Relic Song lives in `relic-song.ts`). */
 export class NormalSoundMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
-    boomburst: (refs, launch, target) => NormalSoundMoveAnimations.playBoomburst(refs, launch, target)
+    boomburst: (refs, launch, target) => NormalSoundMoveAnimations.playBoomburst(refs, launch, target),
+    relicsong: (refs, launch, target) => RelicSong.play(refs, launch, target)
   };
 
   /**
