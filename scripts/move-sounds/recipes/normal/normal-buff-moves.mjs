@@ -488,15 +488,19 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck (0.85 s): the user psyches itself up - two pumped grunts, then the jingle. */
+  /**
+   * WorkUp: the user hunches down twice (0-0.5 s), flares orange in a reddish
+   * haze (0.5-1.15 s) and orange sparks burst out round it (0.9-1.65 s). Two
+   * pumped grunts, a swelling surge, then the stat-up jingle with the sparks.
+   */
   workup: () => {
-    const s = new MoveSfx(1.5, 0x3e0b);
-    for (const at of [0.08, 0.36]) {
+    const s = new MoveSfx(1.8, 0x3e0b);
+    for (const at of [0.12, 0.37]) {
       s.thud(at, 0.35, 0.4);
       s.pulse(at, 0.15, { freq: env.ramp(200, 330), gain: env.decay(0.2, 1), duty: 0.25 });
     }
-    s.pulse(0.55, 0.25, { freq: env.ramp(250, 600), gain: env.swell(0.15), duty: 0.25 });
-    s.statUp(0.85);
+    s.pulse(0.5, 0.4, { freq: env.ramp(250, 600), gain: env.swell(0.15), duty: 0.25 });
+    s.statUp(0.9);
     return s;
   },
 };

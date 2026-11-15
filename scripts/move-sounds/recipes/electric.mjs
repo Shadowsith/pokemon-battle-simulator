@@ -325,14 +325,20 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a crackling electric bolt zaps in, then the user whisks away. */
+  /**
+   * VoltSwitch: the scene dims (0-0.25 s), a crackling ball forms on the user
+   * (0.25-0.6 s), shoots over (0.6-0.85 s) and bursts into a big spark with
+   * bolts flying off (0.85-1.45 s); the scene clears (to ~1.65 s). A swelling
+   * crackle, a zip, a bright zap.
+   */
   voltswitch: () => {
-    const s = new MoveSfx(0.9, 0x7051);
-    s.noise(0.0, 0.43, { clock: () => 6000, gain: env.ramp(0.08, 0.22), short: true });
-    s.pulse(0.0, 0.43, { freq: (u) => 900 + 900 * u, gain: env.ramp(0.05, 0.15), duty: 0.25 });
-    s.noise(0.43, 0.15, { clock: (u) => 18000 - 12000 * u, gain: env.attackDecay(0.55, 0.03) });
-    s.pulse(0.43, 0.2, { freq: (u) => 1800 - 1400 * u, gain: env.decay(0.35, 2), duty: 0.25 });
-    s.whoosh(0.55, 0.28, { from: 7000, to: 2000, gain: 0.15 });
+    const s = new MoveSfx(1.75, 0x7051);
+    s.noise(0.25, 0.6, { clock: () => 6000, gain: env.ramp(0.08, 0.22), short: true });
+    s.pulse(0.25, 0.6, { freq: (u) => 900 + 900 * u, gain: env.ramp(0.05, 0.15), duty: 0.25 });
+    s.whoosh(0.6, 0.25, { from: 2500, to: 8000, gain: 0.15 });
+    s.noise(0.85, 0.2, { clock: (u) => 18000 - 12000 * u, gain: env.attackDecay(0.55, 0.03) });
+    s.pulse(0.85, 0.25, { freq: (u) => 1800 - 1400 * u, gain: env.decay(0.35, 2), duty: 0.25 });
+    s.noise(1.0, 0.45, { clock: () => 7000, gain: env.decay(0.15, 1.5), short: true });
     return s;
   },
 
@@ -357,15 +363,23 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + recoil (~0.29 s): a crackling charge slams in, the user takes a jolt back. */
+  /**
+   * WildCharge: sparks crackle round the user (0-0.45 s), a glowing ball swells
+   * (0.45-0.8 s), the charge (0.8-1.06 s, hit 0.92 s), lightning crackles over
+   * the target (0.92-1.4 s), it blinks dark (1.17-1.57 s), recoil at ~1.7 s.
+   * A building crackle, a slam with a zap, a crackling tail, a jolt back.
+   */
   wildcharge: () => {
-    const s = new MoveSfx(0.95, 0x3e61);
-    s.noise(0.0, 0.17, { clock: env.ramp(3000, 9000), gain: env.ramp(0.1, 0.35), short: true });
-    s.thud(0.17, 0.75, 0.8);
-    s.noise(0.17, 0.22, { clock: (u) => 20000 - 14000 * u, gain: env.attackDecay(0.45, 0.02) });
-    s.pulse(0.17, 0.25, { freq: (u) => 1600 - 1200 * u, gain: env.decay(0.3, 2), duty: 0.25 });
-    s.noise(0.3, 0.35, { clock: () => 6000, gain: env.decay(0.2, 1.5), short: true });
-    s.thud(0.29, 0.3, 0.3);
+    const s = new MoveSfx(2.0, 0x3e61);
+    s.noise(0.0, 0.8, { clock: env.ramp(3000, 9000), gain: env.ramp(0.08, 0.3), short: true });
+    s.pulse(0.45, 0.35, { freq: env.ramp(400, 1200), gain: env.ramp(0.04, 0.14), duty: 0.25 });
+    s.whoosh(0.8, 0.12, { from: 2000, to: 6000, gain: 0.2 });
+    s.thud(0.92, 0.75, 0.8);
+    s.noise(0.92, 0.22, { clock: (u) => 20000 - 14000 * u, gain: env.attackDecay(0.45, 0.02) });
+    s.pulse(0.92, 0.25, { freq: (u) => 1600 - 1200 * u, gain: env.decay(0.3, 2), duty: 0.25 });
+    s.noise(1.05, 0.4, { clock: () => 6000, gain: env.decay(0.2, 1.5), short: true });
+    s.thud(1.69, 0.3, 0.3);
+    s.noise(1.69, 0.2, { clock: () => 6000, gain: env.decay(0.15, 2), short: true });
     return s;
   },
 

@@ -4,8 +4,10 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { FusionBolt } from './electric/fusion-bolt';
+import { VoltSwitch } from './electric/volt-switch';
+import { WildCharge } from './electric/wild-charge';
 
-/** Hand-made animations for Electric-type moves (Fusion Bolt lives in `electric/`). */
+/** Hand-made animations for Electric-type moves (Fusion Bolt, Volt Switch and Wild Charge live in `electric/`). */
 export class ElectricMoveAnimations {
   /** Hand-made Electric move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -16,6 +18,8 @@ export class ElectricMoveAnimations {
     thunderbolt: (refs, _launch, target) => ElectricMoveAnimations.playThunderbolt(refs, target),
     thunderwave: (refs, _launch, target) => ElectricMoveAnimations.playThunderWave(refs, target),
     volttackle: (refs, launch, target) => ElectricMoveAnimations.playVoltTackle(refs, launch, target),
+    voltswitch: (refs, launch, target) => VoltSwitch.play(refs, launch, target),
+    wildcharge: (refs, launch, target, v) => WildCharge.play(refs, launch, target, v),
     zapcannon: (refs, launch, target, v) => ElectricMoveAnimations.playZapCannon(refs, launch, target, v),
     thunderpunch: (refs, _launch, target) =>
       FxEffects.playElementalPunch(refs, target, 'yellow', '#FFE04A', () => FxGlyphs.sparkBolt())

@@ -9,8 +9,9 @@ import { Scald } from './water/scald';
 import { SteamEruption } from './water/steam-eruption';
 import { SurfWave } from './water/surf-wave';
 import { WaterCrash } from './water/water-crash';
+import { WaterPledge } from './water/water-pledge';
 
-/** Hand-made animations for Water-type moves (the Surf wave, Steam Eruption, Origin Pulse, Aqua Tail, Razor Shell, Scald and the shared water crash live in `water/`). */
+/** Hand-made animations for Water-type moves (the Surf wave, Steam Eruption, Origin Pulse, Aqua Tail, Razor Shell, Scald, Water Pledge and the shared water crash live in `water/`). */
 export class WaterMoveAnimations {
   /** Hand-made Water move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -28,6 +29,7 @@ export class WaterMoveAnimations {
     muddywater: (refs, launch, target, v) => SurfWave.play(refs, launch, target, v, SurfWave.MUD),
     steameruption: (refs, launch, target) => SteamEruption.play(refs, launch, target),
     surf: (refs, launch, target, v) => SurfWave.play(refs, launch, target, v, SurfWave.SURF),
+    waterpledge: (refs, _launch, target) => WaterPledge.play(refs, target),
     waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target),
     waterspout: (refs, launch, target) => WaterMoveAnimations.playWaterSpout(refs, launch, target)
   };

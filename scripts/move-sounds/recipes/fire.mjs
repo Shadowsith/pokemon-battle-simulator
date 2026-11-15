@@ -425,14 +425,22 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic melee at max power (impact 0.17 s): a blazing V-shaped charge that explodes in flames. */
+  /**
+   * VCreate: the user rams in (hit 0.12 s), a burning "V" flares on the target
+   * (0.3-0.95 s), a red ray backdrop flares in and the V explodes (1.2 s, fire
+   * cloud to ~1.9 s), then the user's defences drop (bubbles 1.9-2.8 s). A
+   * thump, a roaring flame, a huge blast, then the stat-down jingle.
+   */
   vcreate: () => {
-    const s = new MoveSfx(1.15, 0x0c8e);
-    s.noise(0.0, 0.17, { clock: env.ramp(800, 2500), gain: env.ramp(0.15, 0.45) });
-    s.thud(0.17, 0.8, 1);
-    s.noise(0.17, 0.85, { clock: (u) => 2200 - 1700 * u, gain: env.attackDecay(0.55, 0.04) });
-    s.pulse(0.17, 0.6, { freq: (u) => 90 * Math.pow(0.45, u), gain: env.decay(0.35, 1.5), duty: 0.5 });
-    s.sparkle(0.25, 0.5, 6, { lo: 5000, hi: 8000, gain: 0.14 });
+    const s = new MoveSfx(2.9, 0x0c8e);
+    s.thud(0.12, 0.5, 0.6);
+    s.noise(0.3, 0.65, { clock: env.ramp(600, 2400), gain: env.ramp(0.12, 0.35) });
+    s.noise(0.95, 0.25, { clock: env.ramp(1500, 4000), gain: env.ramp(0.1, 0.3) });
+    s.thud(1.2, 0.9, 1);
+    s.noise(1.2, 0.7, { clock: (u) => 2200 - 1700 * u, gain: env.attackDecay(0.55, 0.04) });
+    s.pulse(1.2, 0.6, { freq: (u) => 90 * Math.pow(0.45, u), gain: env.decay(0.35, 1.5), duty: 0.5 });
+    s.sparkle(1.3, 0.5, 6, { lo: 5000, hi: 8000, gain: 0.14 });
+    s.statDown(1.95);
     return s;
   },
 

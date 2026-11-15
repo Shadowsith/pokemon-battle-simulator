@@ -193,16 +193,18 @@ export const ROCK = {
   },
 
   /**
-   * Support move, no aura: MoveAnimationService.playShield raises a brown
-   * bubble around every ally (0-0.62 s). A broad, stony guard: a heavy knock and a low ringing wall.
+   * WideGuard: five light bars rise in a row (0-0.6 s, one every 0.07 s), then
+   * merge into one wide wall (0.5-1.5 s). Five rising chimes, then a broad,
+   * low ringing wall.
    */
   wideguard: () => {
-    const s = new MoveSfx(0.85, 0x3f61);
-    s.whoosh(0.0, 0.12, { from: 1500, to: 5000, gain: 0.22 });
-    s.thud(0.08, 0.5, 0.7);
-    s.wave(0.1, 0.6, { freq: () => 196, gain: env.decay(0.28, 1.5) });
-    s.pulse(0.1, 0.55, { freq: () => 784, gain: env.decay(0.18, 2), duty: 0.25 });
-    s.pulse(0.1, 0.55, { freq: () => 1176, gain: env.decay(0.1, 2), duty: 0.25 });
+    const s = new MoveSfx(1.6, 0x3f61);
+    [523, 659, 784, 988, 1175].forEach((f, i) => s.pulse(i * 0.07, 0.18, { freq: () => f, gain: env.decay(0.14, 2), duty: 0.25 }));
+    s.whoosh(0.45, 0.12, { from: 1500, to: 5000, gain: 0.2 });
+    s.thud(0.5, 0.5, 0.7);
+    s.wave(0.5, 0.9, { freq: () => 196, gain: env.decay(0.28, 1.5) });
+    s.pulse(0.5, 0.8, { freq: () => 784, gain: env.decay(0.16, 2), duty: 0.25 });
+    s.pulse(0.5, 0.8, { freq: () => 1176, gain: env.decay(0.09, 2), duty: 0.25 });
     return s;
   },
 };

@@ -318,15 +318,22 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile at high power (impact 0.43 s): a futuristic charged blast - rising synth whine, hard energy burst with a falling laser tone. */
+  /**
+   * TechnoBlast: the user glows cyan while a white orb swells (0-0.7 s), the orb
+   * shoots over (0.7-0.95 s), hits (0.95 s) and bursts into twinkling sparkles
+   * (to ~1.6 s). A rising synth whine, a zip, a hard energy burst with a falling
+   * laser tone, then a glittery tail.
+   */
   technoblast: () => {
-    const s = new MoveSfx(1.05, 0x7ecb);
-    s.pulse(0.0, 0.43, { freq: (u) => 300 * Math.pow(5, u), gain: env.ramp(0.06, 0.2), duty: 0.125 });
-    s.pulse(0.0, 0.43, { freq: (u) => 302 * Math.pow(5, u), gain: env.ramp(0.04, 0.12), duty: 0.5 });
-    s.noise(0.0, 0.43, { clock: env.ramp(2000, 8000), gain: env.ramp(0.04, 0.16), short: true });
-    s.thud(0.43, 0.8, 0.8);
-    s.noise(0.43, 0.35, { clock: (u) => 18000 - 12000 * u, gain: env.attackDecay(0.4, 0.03) });
-    s.pulse(0.43, 0.45, { freq: (u) => 1600 * Math.pow(0.2, u), gain: env.decay(0.25, 1.5), duty: 0.25 });
+    const s = new MoveSfx(1.8, 0x7ecb);
+    s.pulse(0.0, 0.7, { freq: (u) => 300 * Math.pow(5, u), gain: env.ramp(0.05, 0.18), duty: 0.125 });
+    s.pulse(0.0, 0.7, { freq: (u) => 302 * Math.pow(5, u), gain: env.ramp(0.03, 0.1), duty: 0.5 });
+    s.noise(0.3, 0.4, { clock: env.ramp(2000, 8000), gain: env.ramp(0.04, 0.16), short: true });
+    s.whoosh(0.7, 0.25, { from: 3000, to: 9000, gain: 0.2 });
+    s.thud(0.95, 0.8, 0.8);
+    s.noise(0.95, 0.35, { clock: (u) => 18000 - 12000 * u, gain: env.attackDecay(0.4, 0.03) });
+    s.pulse(0.95, 0.45, { freq: (u) => 1600 * Math.pow(0.2, u), gain: env.decay(0.25, 1.5), duty: 0.25 });
+    s.sparkle(1.05, 0.55, 7, { lo: 4000, hi: 8000, gain: 0.14 });
     return s;
   },
 

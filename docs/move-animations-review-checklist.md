@@ -884,28 +884,28 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Synchrol%C3%A4rm
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e6/Synchrol%C3%A4rm_Gen5.png
 - [ ] **Tail Slap** / Kehrschelle — `tailslap` · Normal · Physical · `melee`
-- [ ] ⭐ **Techno Blast** / Techblaster — `technoblast` · Normal · Special · `projectile`
+- [x] ⭐ **Techno Blast** / Techblaster — `technoblast` · Normal · Special · the user glows cyan while a white orb swells in front of it, the orb shoots to the target and bursts into white sparkles with red glints (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Techblaster
   - Gen 5 APNG: https://www.pokewiki.de/images/0/00/Techblaster_Gen5.png
 - [ ] **Telekinesis** / Telekinese — `telekinesis` · Psychic · Status · `targetAura`
-- [ ] ⭐ **V-create** / V-Generator — `vcreate` · Fire · Physical · `melee`
+- [x] ⭐ **V-create** / V-Generator — `vcreate` · Fire · Physical · the user rams the target, a huge burning orange "V" with fireballs on its tips explodes on it under a red ray backdrop, then blue stat-down bubbles drift over the user (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/V-Generator
   - Gen 5 APNG (SW): https://www.pokewiki.de/images/b/b7/V-Generator_SW.png
 - [ ] **Venoshock** / Giftschock — `venoshock` · Poison · Special · `projectile`
-- [ ] ⭐ **Volt Switch** / Voltwechsel — `voltswitch` · Electric · Special · `projectile`
+- [x] ⭐ **Volt Switch** / Voltwechsel — `voltswitch` · Electric · Special · dim scene, a crackling yellow ball forms on the user, shoots to the target and bursts into a big yellow spark with bolts flying off (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Voltwechsel
   - Gen 5 APNG: https://www.pokewiki.de/images/5/50/Voltwechsel_Gen5.png
-- [ ] ⭐ **Water Pledge** / Wassersäulen — `waterpledge` · Water · Special · `projectile`
+- [x] ⭐ **Water Pledge** / Wassersäulen — `waterpledge` · Water · Special · three glowing water pillars topped by pale blue orbs shoot up round the target one after another, spray at their feet (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Wassers%C3%A4ulen
   - Gen 5 APNG: https://www.pokewiki.de/images/d/dc/Wassers%C3%A4ulen_Gen5.png
-- [ ] ⭐ **Wide Guard** / Rundumschutz — `wideguard` · Rock · Status · `selfAura`
+- [x] ⭐ **Wide Guard** / Rundumschutz — `wideguard` · Rock · Status · yellow, blue and green light bars rise in a row in front of the user and merge into a wide pale green wall (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Rundumschutz
   - Gen 5 APNG: https://www.pokewiki.de/images/b/be/Rundumschutz_Gen5.png
-- [ ] ⭐ **Wild Charge** / Stromstoß — `wildcharge` · Electric · Physical · `melee`
+- [x] ⭐ **Wild Charge** / Stromstoß — `wildcharge` · Electric · Physical · sparks crackle round the user, a glowing yellow ball swells over it, it charges, lightning crackles over the target, which blinks dark, then recoil (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Stromsto%C3%9F
   - Gen 5 APNG: https://www.pokewiki.de/images/f/f3/Stromsto%C3%9F_Gen5.png
 - [ ] **Wonder Room** / Wunderraum — `wonderroom` · Psychic · Status · `targetAura`
-- [ ] ⭐ **Work Up** / Kraftschub — `workup` · Normal · Status · `selfAura`
+- [x] ⭐ **Work Up** / Kraftschub — `workup` · Normal · Status · the user hunches down twice, flares orange in a reddish haze and orange sparks burst out round it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kraftschub
   - Gen 5 APNG: https://www.pokewiki.de/images/d/de/Kraftschub_Gen5.png
 

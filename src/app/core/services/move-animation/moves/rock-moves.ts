@@ -8,8 +8,9 @@ import { RockPolish } from './rock/rock-polish';
 import { RockWrecker } from './rock/rock-wrecker';
 import { StealthRock } from './rock/stealth-rock';
 import { StoneEdge } from './rock/stone-edge';
+import { WideGuard } from './rock/wide-guard';
 
-/** Hand-made animations for Rock-type moves (Head Smash, Power Gem, Rock Polish, Rock Wrecker, Stealth Rock and Stone Edge live in `rock/`). */
+/** Hand-made animations for Rock-type moves (Head Smash, Power Gem, Rock Polish, Rock Wrecker, Stealth Rock, Stone Edge and Wide Guard live in `rock/`). */
 export class RockMoveAnimations {
   /** Hand-made Rock move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -21,7 +22,8 @@ export class RockMoveAnimations {
     rockwrecker: (refs, launch, target, v) => RockWrecker.play(refs, launch, target, v),
     sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs),
     stealthrock: (refs, launch, target) => StealthRock.play(refs, launch, target),
-    stoneedge: (refs, _launch, target) => StoneEdge.play(refs, target)
+    stoneedge: (refs, _launch, target) => StoneEdge.play(refs, target),
+    wideguard: (refs, launch, _target, v) => WideGuard.play(refs, launch, v.dir)
   };
 
   /**

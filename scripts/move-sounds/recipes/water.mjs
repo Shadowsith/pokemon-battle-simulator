@@ -311,14 +311,20 @@ export const WATER = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a column of water rushes up from below and crashes onto the target. */
+  /**
+   * WaterPledge: three water pillars shoot up round the target at 0, 0.2 and
+   * 0.4 s (hit 0.5 s); their orbs float up and fade (to ~1.3 s). Three rushing
+   * gushes, a crash, then bubbling spray.
+   */
   waterpledge: () => {
-    const s = new MoveSfx(1.05, 0x3a62);
-    s.noise(0.0, 0.43, { clock: env.ramp(1500, 6000), gain: env.ramp(0.12, 0.38) });
-    s.pulse(0.0, 0.43, { freq: env.ramp(110, 260), gain: env.ramp(0.06, 0.18), duty: 0.5 });
-    s.splash(0.43, 0.65);
-    s.thud(0.43, 0.35, 0.6);
-    s.bubbles(0.5, 0.4, 7, { gain: 0.12 });
+    const s = new MoveSfx(1.5, 0x3a62);
+    for (const [at, g] of [[0.0, 0.22], [0.2, 0.26], [0.4, 0.38]]) {
+      s.noise(at, 0.3, { clock: env.ramp(1500, 6000), gain: env.attackDecay(g, 0.05) });
+      s.pulse(at, 0.25, { freq: env.ramp(130, 300), gain: env.decay(0.12, 1.5), duty: 0.5 });
+    }
+    s.splash(0.5, 0.65);
+    s.thud(0.5, 0.35, 0.6);
+    s.bubbles(0.6, 0.6, 8, { gain: 0.12 });
     return s;
   },
 

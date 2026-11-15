@@ -4,15 +4,17 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FireFlames } from './fire-flames';
 import { HeatCrash } from './heat-crash';
+import { VCreate } from './v-create';
 
-/** Hand-made animations for Fire-type contact moves: punches, kicks and charges (Heat Crash lives in `heat-crash.ts`). */
+/** Hand-made animations for Fire-type contact moves: punches, kicks and charges (Heat Crash lives in `heat-crash.ts`, V-create in `v-create.ts`). */
 export class FireStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     blazekick: (refs, _launch, target) => FireStrikeMoveAnimations.playBlazeKick(refs, target),
     firepunch: (refs, _launch, target) => FireStrikeMoveAnimations.playFirePunch(refs, target),
     flareblitz: (refs, launch, target, v) => FireStrikeMoveAnimations.playFlareBlitz(refs, launch, target, v),
-    heatcrash: (refs, launch, target) => HeatCrash.play(refs, launch, target)
+    heatcrash: (refs, launch, target) => HeatCrash.play(refs, launch, target),
+    vcreate: (refs, launch, target, v) => VCreate.play(refs, launch, target, v.dir)
   };
 
   /**

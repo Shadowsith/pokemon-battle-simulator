@@ -3,8 +3,9 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { ShellSmash } from './shell-smash';
+import { WorkUp } from './work-up';
 
-/** Hand-made animations for Normal-type status moves (setup, protection, support; Shell Smash lives in `shell-smash.ts`). */
+/** Hand-made animations for Normal-type status moves (setup, protection, support; Shell Smash lives in `shell-smash.ts`, Work Up in `work-up.ts`). */
 export class NormalStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -18,6 +19,7 @@ export class NormalStatusMoveAnimations {
     sleeptalk: (refs, launch, target, v) => NormalStatusMoveAnimations.playSleepTalk(refs, launch, target, v),
     swordsdance: (refs, launch) => NormalStatusMoveAnimations.playSwordsDance(refs, launch),
     whirlwind: (refs, _launch, target, v) => NormalStatusMoveAnimations.playWhirlwind(refs, target, v),
+    workup: (refs, launch) => WorkUp.play(refs, launch),
     yawn: (refs, launch, target) => NormalStatusMoveAnimations.playYawn(refs, launch, target)
   };
 
