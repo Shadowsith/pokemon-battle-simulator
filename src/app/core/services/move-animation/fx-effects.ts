@@ -569,6 +569,45 @@ export class FxEffects {
     await Promise.all(effects);
   }
 
+  /**
+   * Confused: three little yellow birds circle a head at `head` on an
+   * ellipse (`rx` × `ry`) while yellow stars twinkle above it (Dynamic Punch,
+   * Confuse Ray). Resolves when the birds are gone (`duration` ms).
+   */
+  static async dizzyBirds(fxEl: HTMLElement, head: Point, rx: number, ry: number, duration: number) {
+    const birds = [0, 1, 2].map((i) => {
+      const bird = FxGlyphs.birdGlyph(20);
+      Fx.place(bird, head);
+      fxEl.appendChild(bird);
+      const frames: Keyframe[] = [];
+      const steps = 24;
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const a = (Math.PI * 2 * i) / 3 + t * Math.PI * 3;
+        // Facing the way it flies: left along the front (lower) half of the loop, right along the back.
+        const face = Math.sin(a) >= 0 ? -1 : 1;
+        frames.push({
+          transform: `translate(${Math.cos(a) * rx}px,${Math.sin(a) * ry}px) scaleX(${face}) scale(${0.85 + 0.15 * Math.sin(a)})`,
+          opacity: k === 0 || k === steps ? 0 : 1
+        });
+      }
+      return Fx.anim(bird, frames, { duration, easing: 'linear' }).then(() => bird.remove());
+    });
+    for (let i = 0; i < 4; i++) {
+      const star = FxGlyphs.sparkStar(9, '#FFE04A');
+      Fx.place(star, { x: head.x + (i - 1.5) * rx * 0.6, y: head.y - ry - 10 - (i % 2) * 6 });
+      fxEl.appendChild(star);
+      Fx.anim(star, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.3 },
+        { transform: 'scale(.4) rotate(90deg)', opacity: 0.6, offset: 0.6 },
+        { transform: 'scale(1) rotate(135deg)', opacity: 1, offset: 0.8 },
+        { transform: 'scale(0) rotate(180deg)', opacity: 0 }
+      ], { duration: duration - 200, easing: 'ease-in-out', delay: 100 + i * 60 }).then(() => star.remove());
+    }
+    await Promise.all(birds);
+  }
+
   /** A burst of smoke puffs swelling out from `at` and fading: white by default (Substitute), grey dust (Extreme Speed). */
   static smokePuff(fxEl: HTMLElement, at: Point, size: number, tone: [string, string] = ['#ECEEF2', '#D4D8E0']): Promise<void> {
     const puffs: Promise<void>[] = [];

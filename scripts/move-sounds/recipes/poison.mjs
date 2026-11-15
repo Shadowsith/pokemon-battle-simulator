@@ -18,12 +18,17 @@ export const POISON = {
     return s;
   },
 
-  /** Generic self aura (0-0.8 s) + stat-up fleck: the body melts into liquid. */
+  /**
+   * PoisonMoveAnimations.playAcidArmor: the user melts into a puddle (0-0.5 s), acid drops
+   * bubble up (0.3-1.0 s), it re-forms (0.95-1.3 s), stat-up aura (1.3-2.1 s).
+   * A gloopy downward slide, bubbling, a slurp back up, then the stat-up jingle.
+   */
   acidarmor: () => {
-    const s = new MoveSfx(1.5, 0xac1a);
-    s.wave(0.02, 0.8, { freq: (u) => 150 - 50 * u + 45 * Math.sin(2 * Math.PI * 5 * u), gain: env.swell(0.4) });
-    s.bubbles(0.05, 0.7, 9, { lo: 160, hi: 400, gain: 0.25 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.4, 0xac1a);
+    s.wave(0.0, 0.5, { freq: (u) => 320 * Math.pow(0.4, u) * (1 + 0.08 * Math.sin(2 * Math.PI * 6 * u)), gain: env.attackDecay(0.32, 0.3) });
+    s.bubbles(0.3, 0.7, 9, { lo: 160, hi: 420, gain: 0.25 });
+    s.wave(0.95, 0.35, { freq: (u) => 140 * Math.pow(2.4, u), gain: env.swell(0.26) });
+    s.statUp(1.3);
     return s;
   },
 

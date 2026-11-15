@@ -1,5 +1,7 @@
 import { BattleStageRefs, MoveAnimRegistry, MoveVisual, Point } from '../animation.types';
+import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
+import { FxEffects } from '../fx-effects';
 import { FxGlyphs } from '../fx-glyphs';
 import { ShadowClaw } from './ghost/shadow-claw';
 import { ShadowForce } from './ghost/shadow-force';
@@ -8,6 +10,7 @@ import { ShadowForce } from './ghost/shadow-force';
 export class GhostMoveAnimations {
   /** Hand-made Ghost move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    confuseray: (refs, launch, target) => GhostMoveAnimations.playConfuseRay(refs, launch, target),
     curse: (refs, launch) => GhostMoveAnimations.playCurse(refs, launch),
     destinybond: (refs, launch, target) => GhostMoveAnimations.playDestinyBond(refs, launch, target),
     nightshade: (refs, launch) => GhostMoveAnimations.playNightShade(refs, launch),
@@ -17,6 +20,59 @@ export class GhostMoveAnimations {
     shadowforce: (refs, _launch, target, v) => ShadowForce.strike(refs, target, v),
     trickortreat: (refs, launch, target) => GhostMoveAnimations.playTrickOrTreat(refs, launch, target)
   };
+
+  /**
+   * Confuse Ray, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/4/40/Konfusstrahl_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/6/60/Konfusstrahl_Gen5.png
+   *
+   * The scene goes dark (0-0.28 s); a glowing yellow-green orb floats from the
+   * user to the target on a wavy path (0.3-1.1 s), circles it once and sinks
+   * into it with a flash (1.1-1.6 s). The scene clears and little birds circle
+   * the target's head (1.6-3.0 s).
+   */
+  private static async playConfuseRay(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 280, easing: 'ease-out' });
+
+    const size = Math.max(r.width * 0.28, 22);
+    const orb = Fx.box(size, size, 'border-radius:50%;background:radial-gradient(circle,#ffffff 0 18%,#F0FF9A 38%,#B8E040 60%,#90C02000 75%);box-shadow:0 0 14px #D8F060');
+    Fx.place(orb, launch);
+    fxEl.appendChild(orb);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const rx = Math.max(r.width * 0.45, 30);
+    const ry = Math.max(r.height * 0.2, 14);
+    const travelMs = 800;
+    const loopMs = 500;
+    const total = travelMs + loopMs;
+    const frames: Keyframe[] = [];
+    // Wavy flight to the target...
+    const travel = 16;
+    for (let k = 0; k <= travel; k++) {
+      const t = k / travel;
+      const wave = Math.sin(t * Math.PI * 3) * 18 * (1 - t * 0.5);
+      frames.push({ transform: `translate(${dx * t}px,${dy * t + wave}px) scale(${0.6 + t * 0.4})`, opacity: Math.min(1, t * 5), offset: (t * travelMs) / total });
+    }
+    // ...then one loop round it, shrinking into it.
+    const loop = 12;
+    for (let k = 1; k <= loop; k++) {
+      const t = k / loop;
+      const a = Math.PI + t * Math.PI * 2;
+      const shrink = 1 - t * 0.6;
+      frames.push({ transform: `translate(${dx + Math.cos(a) * rx * shrink}px,${dy + Math.sin(a) * ry * shrink}px) scale(${1 - t * 0.4})`, opacity: 1 - t * 0.3, offset: (travelMs + t * loopMs) / total });
+    }
+    await Fx.anim(orb, frames, { duration: total, easing: 'linear' });
+    orb.remove();
+    Fx.flash(targetEl, '#E8FF80', 0.6);
+
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' });
+    dim.remove();
+    const head: Point = { x: target.x, y: target.y - r.height * 0.45 };
+    await FxEffects.dizzyBirds(fxEl, head, rx, Math.max(r.height * 0.12, 10), 1400);
+  }
 
   /** Turn-1 animations of two-turn Ghost moves, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {

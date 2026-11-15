@@ -11,6 +11,7 @@ export class NormalStatusMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     batonpass: (refs, launch) => NormalStatusMoveAnimations.playBatonPass(refs, launch),
     bellydrum: (refs, launch) => NormalStatusMoveAnimations.playBellyDrum(refs, launch),
+    conversion: (refs, launch) => NormalStatusMoveAnimations.playConversion(refs, launch),
     encore: (refs, _launch, target) => NormalStatusMoveAnimations.playEncore(refs, target),
     followme: (refs, launch) => NormalStatusMoveAnimations.playFollowMe(refs, launch),
     painsplit: (refs, launch, target) => NormalStatusMoveAnimations.playPainSplit(refs, launch, target),
@@ -22,6 +23,50 @@ export class NormalStatusMoveAnimations {
     workup: (refs, launch) => WorkUp.play(refs, launch),
     yawn: (refs, launch, target) => NormalStatusMoveAnimations.playYawn(refs, launch, target)
   };
+
+  /**
+   * Conversion, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/c/c3/Umwandlung_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/e/eb/Umwandlung_Gen5.png
+   *
+   * Pastel squares (pink, lilac, sky blue, white) blink on and off all over
+   * the user like pixels being rewritten (0-1.1 s) while it flickers, then the
+   * last ones fade (to ~1.3 s).
+   */
+  private static async playConversion(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const colors = ['#F8C8D8', '#D8C8F8', '#C8E0F8', '#FFFFFF', '#F0B8C8'];
+    const base = Math.max(r.width * 0.16, 12);
+    const pixels: Promise<void>[] = [];
+    for (let i = 0; i < 26; i++) {
+      const s = base * (0.6 + Math.random() * 0.8);
+      const c = colors[i % colors.length];
+      const at: Point = {
+        x: launch.x + (Math.random() * 2 - 1) * r.width * 0.42,
+        y: launch.y + (Math.random() * 2 - 1) * r.height * 0.42
+      };
+      pixels.push(
+        Fx.spawn(fxEl, Fx.box(s, s, `background:${c};opacity:.9;box-shadow:0 0 3px ${c}`), at, [
+          { opacity: 0 },
+          { opacity: 0.9, offset: 0.15 },
+          { opacity: 0.2, offset: 0.45 },
+          { opacity: 0.9, offset: 0.65 },
+          { opacity: 0 }
+        ], { duration: 360 + Math.random() * 160, easing: 'steps(4, end)', delay: (i / 26) * 800 + Math.random() * 120 })
+      );
+    }
+    const flicker = Fx.anim(launchEl, [
+      { opacity: 1 },
+      { opacity: 0.6, offset: 0.2 },
+      { opacity: 1, offset: 0.35 },
+      { opacity: 0.55, offset: 0.55 },
+      { opacity: 1, offset: 0.7 },
+      { opacity: 0.7, offset: 0.85 },
+      { opacity: 1 }
+    ], { duration: 1100, easing: 'steps(6, end)', fill: 'none' });
+    await Promise.all([flicker, ...pixels]);
+  }
 
   /**
    * Yawn, after the DPPt animation: the user stretches up in a big yawn

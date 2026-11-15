@@ -14,6 +14,7 @@ export class FightingPunchMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     brickbreak: (refs, _launch, target) => FightingPunchMoveAnimations.playBrickBreak(refs, target),
     closecombat: (refs, launch, target) => FightingPunchMoveAnimations.playCloseCombat(refs, launch, target),
+    counter: (refs, _launch, target) => FightingPunchMoveAnimations.playCounter(refs, target),
     crosschop: (refs, _launch, target) => FightingPunchMoveAnimations.playCrossChop(refs, target),
     drainpunch: (refs, launch, target) => FightingPunchMoveAnimations.playDrainPunch(refs, launch, target),
     dynamicpunch: (refs, _launch, target) => FightingPunchMoveAnimations.playDynamicPunch(refs, target),
@@ -25,6 +26,49 @@ export class FightingPunchMoveAnimations {
     superpower: (refs, launch, target, v) => FightingPunchMoveAnimations.playSuperpower(refs, launch, target, v),
     wakeupslap: (refs, launch, target) => WakeUpSlap.play(refs, launch, target)
   };
+
+  /**
+   * Counter, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/a/ab/Konter_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/0/0a/Konter_Gen5.png
+   *
+   * A big red fist rams onto the target out of the screen (0-0.15 s, hit at
+   * 0.15 s); a ring of blue-white sparkles flares round it and twinkles
+   * outward while the target jolts, then the fist fades (to ~0.9 s).
+   */
+  private static async playCounter(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const fistW = Math.max(r.width * 0.6, 44);
+    const fist = FxGlyphs.fistGlyph(fistW, 'red');
+    const effects: Promise<void>[] = [
+      Fx.spawn(fxEl, fist, target, [
+        { transform: 'scale(2.4)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.17 },
+        { transform: 'scale(1.05)', opacity: 1, offset: 0.65 },
+        { transform: 'scale(.92)', opacity: 0 }
+      ], { duration: 900, easing: 'ease-out' })
+    ];
+    await Fx.wait(150);
+    Fx.flash(targetEl, '#FF5A4A', 0.7);
+    Fx.shake(targetEl, 6);
+
+    // Blue-white sparkles round the fist's edge, drifting out as they twinkle.
+    const count = 10;
+    for (let i = 0; i < count; i++) {
+      const a = (Math.PI * 2 * i) / count + Math.random() * 0.3;
+      const rad = fistW * 0.55;
+      const at: Point = { x: target.x + Math.cos(a) * rad, y: target.y + Math.sin(a) * rad * 0.85 };
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.sparkStar(8 + Math.random() * 5, '#9AD8FF'), at, [
+          { transform: 'translate(0,0) scale(0) rotate(0deg)', opacity: 0 },
+          { transform: `translate(${Math.cos(a) * 6}px,${Math.sin(a) * 6}px) scale(1.1) rotate(45deg)`, opacity: 1, offset: 0.35 },
+          { transform: `translate(${Math.cos(a) * 18}px,${Math.sin(a) * 18}px) scale(.3) rotate(90deg)`, opacity: 0 }
+        ], { duration: 550, easing: 'ease-out', delay: Math.random() * 120 })
+      );
+    }
+    await Promise.all(effects);
+  }
 
   /**
    * Drain Punch, after the Gen 4 / Gen 5 animation:
@@ -461,38 +505,7 @@ export class FightingPunchMoveAnimations {
     const head: Point = { x: target.x, y: r.top - f.top + r.height * 0.05 };
     const rx = Math.max(r.width * 0.45, 32);
     const ry = Math.max(r.height * 0.12, 10);
-    const circle = 1400;
-    const birds = [0, 1, 2].map((i) => {
-      const bird = FxGlyphs.birdGlyph(20);
-      Fx.place(bird, head);
-      fxEl.appendChild(bird);
-      const frames: Keyframe[] = [];
-      const steps = 24;
-      for (let k = 0; k <= steps; k++) {
-        const t = k / steps;
-        const a = (Math.PI * 2 * i) / 3 + t * Math.PI * 3;
-        // Facing the way it flies: left along the front (lower) half of the loop, right along the back.
-        const face = Math.sin(a) >= 0 ? -1 : 1;
-        frames.push({
-          transform: `translate(${Math.cos(a) * rx}px,${Math.sin(a) * ry}px) scaleX(${face}) scale(${0.85 + 0.15 * Math.sin(a)})`,
-          opacity: k === 0 || k === steps ? 0 : 1
-        });
-      }
-      return Fx.anim(bird, frames, { duration: circle, easing: 'linear' }).then(() => bird.remove());
-    });
-    for (let i = 0; i < 4; i++) {
-      const star = FxGlyphs.sparkStar(9, '#FFE04A');
-      Fx.place(star, { x: head.x + (i - 1.5) * rx * 0.6, y: head.y - ry - 10 - (i % 2) * 6 });
-      fxEl.appendChild(star);
-      Fx.anim(star, [
-        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
-        { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.3 },
-        { transform: 'scale(.4) rotate(90deg)', opacity: 0.6, offset: 0.6 },
-        { transform: 'scale(1) rotate(135deg)', opacity: 1, offset: 0.8 },
-        { transform: 'scale(0) rotate(180deg)', opacity: 0 }
-      ], { duration: circle - 200, easing: 'ease-in-out', delay: 100 + i * 60 }).then(() => star.remove());
-    }
-    await Promise.all(birds);
+    await FxEffects.dizzyBirds(fxEl, head, rx, ry, 1400);
   }
 
   /**

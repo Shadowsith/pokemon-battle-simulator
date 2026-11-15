@@ -55,7 +55,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
 
 - [x] **Absorb** / Absorber — `absorb` · Grass · Special · green energy stars drain to caster (custom, needs review)
 - [x] **Acid** / Säure — `acid` · Poison · Special · purple poison droplet spit (custom, needs review)
-- [ ] **Acid Armor** / Säurepanzer — `acidarmor` · Poison · Status · `selfAura`
+- [x] **Acid Armor** / Säurepanzer — `acidarmor` · Poison · Status · user turns purple and melts into a puddle, acid drops bubble up, re-forms, stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/S%C3%A4urepanzer
   - Gen 4 APNG: https://www.pokewiki.de/images/b/bf/S%C3%A4urepanzer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b5/S%C3%A4urepanzer_Gen5.png
@@ -71,7 +71,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [x] **Bind** / Klammergriff — `bind` · Normal · Physical · squeezing dark arcs around target (custom, needs review)
 - [x] **Bite** / Biss — `bite` · Dark · Physical · white jaw snaps on target (custom, needs review)
 - [x] ⭐ **Blizzard** / Blizzard — `blizzard` · Ice · Special · whiteout snowstorm + ice crystals (custom, needs review)
-- [ ] ⭐ **Body Slam** / Bodyslam — `bodyslam` · Normal · Physical · `melee`
+- [x] ⭐ **Body Slam** / Bodyslam — `bodyslam` · Normal · Physical · user hops onto the target, target flattened, yellow burst, dust puffs, specks scatter (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Bodyslam
   - Gen 4 APNG: https://www.pokewiki.de/images/c/c8/Bodyslam_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/9/9d/Bodyslam_Gen5.png
@@ -79,37 +79,37 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [x] **Bonemerang** / Knochmerang — `bonemerang` · Ground · Physical · spinning bone boomerang (custom, needs review)
 - [x] **Bubble** / Blubber — `bubble` · Water · Special · drifting bubbles pop around target (custom, needs review)
 - [x] **Bubble Beam** / Blubbstrahl — `bubblebeam` · Water · Special · fast bubble stream pops around target (custom, needs review)
-- [ ] **Clamp** / Schnapper — `clamp` · Water · Physical · `melee`
+- [x] **Clamp** / Schnapper — `clamp` · Water · Physical · two ridged blue-violet shell halves snap shut on the target, blue sparkles from the seam (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schnapper
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/4/4f/Schnapper_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/f/f8/Schnapper_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/00/Schnapper_Gen5.png
-- [ ] **Comet Punch** / Kometenhieb — `cometpunch` · Normal · Physical · `melee`
+- [x] **Comet Punch** / Kometenhieb — `cometpunch` · Normal · Physical · one small fist + yellow spiky burst per hit at different spots on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kometenhieb
   - Gen 4 APNG: https://www.pokewiki.de/images/9/9e/Kometenhieb_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/7/78/Kometenhieb_Gen5.png
-- [ ] **Confuse Ray** / Konfusstrahl — `confuseray` · Ghost · Status · `targetAura`
+- [x] **Confuse Ray** / Konfusstrahl — `confuseray` · Ghost · Status · dim scene, glowing yellow-green orb wavers to the target and loops round it, birds circle its head (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Konfusstrahl
   - Gen 4 APNG: https://www.pokewiki.de/images/4/40/Konfusstrahl_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/60/Konfusstrahl_Gen5.png
-- [ ] **Confusion** / Konfusion — `confusion` · Psychic · Special · `projectile`
+- [x] **Confusion** / Konfusion — `confusion` · Psychic · Special · dim scene, target glows pink and trembles, three purple rings close in (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Konfusion
   - Gen 4 APNG: https://www.pokewiki.de/images/9/95/Konfusion_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a0/Konfusion_Gen5.png
-- [ ] **Constrict** / Umklammerung — `constrict` · Normal · Physical · `melee`
+- [x] **Constrict** / Umklammerung — `constrict` · Normal · Physical · green coils wind round the target from the feet up and squeeze three times (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Umklammerung
   - Gen 4 APNG: https://www.pokewiki.de/images/3/32/Umklammerung_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/ba/Umklammerung_Gen5.png
-- [ ] **Conversion** / Umwandlung — `conversion` · Normal · Status · `selfAura`
+- [x] **Conversion** / Umwandlung — `conversion` · Normal · Status · pastel pixel squares blink on and off over the flickering user (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Umwandlung
   - Gen 4 APNG: https://www.pokewiki.de/images/c/c3/Umwandlung_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/eb/Umwandlung_Gen5.png
-- [ ] **Counter** / Konter — `counter` · Fighting · Physical · `melee`
+- [x] **Counter** / Konter — `counter` · Fighting · Physical · big red fist rams onto the target, ring of blue-white sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Konter
   - Gen 4 APNG: https://www.pokewiki.de/images/a/ab/Konter_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/0a/Konter_Gen5.png
 - [x] ⭐ **Crabhammer** / Krabbhammer — `crabhammer` · Water · Physical · big water drop from above + splash crown + bubbles (custom, needs review)
-- [ ] **Cut** / Zerschneider — `cut` · Normal · Physical · `melee`
+- [x] **Cut** / Zerschneider — `cut` · Normal · Physical · thin golden cut across the target, yellow-orange sparks drift out and sink (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Zerschneider
   - Gen 4 APNG: https://www.pokewiki.de/images/6/68/Zerschneider_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/86/Zerschneider_Gen5.png

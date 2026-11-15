@@ -15,6 +15,7 @@ import { ZenHeadbutt } from './zen-headbutt';
 export class PsychicAttackMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    confusion: (refs, _launch, target) => PsychicAttackMoveAnimations.playConfusion(refs, target),
     dreameater: (refs, launch, target, v) => PsychicAttackMoveAnimations.playDreamEater(refs, launch, target, v),
     extrasensory: (refs, launch) => PsychicAttackMoveAnimations.playExtrasensory(refs, launch),
     futuresight: (refs) => PsychicAttackMoveAnimations.playFutureSightHit(refs),
@@ -28,6 +29,40 @@ export class PsychicAttackMoveAnimations {
     synchronoise: (refs, launch, target) => Synchronoise.play(refs, launch, target),
     zenheadbutt: (refs, launch, target, v) => ZenHeadbutt.play(refs, launch, target, v)
   };
+
+  /**
+   * Confusion, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/9/95/Konfusion_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/a/a0/Konfusion_Gen5.png
+   *
+   * The scene goes dark (0-0.28 s); the target glows pink and trembles while
+   * three purple rings close in round it one after another (0.3-1.1 s, hit at
+   * 0.55 s), then the scene clears (1.1-1.4 s).
+   */
+  private static async playConfusion(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const dim = await PsychicFx.dimIn(fieldEl);
+    const effects: Promise<void>[] = [
+      PsychicFx.tremble(targetEl, 800, 3),
+      Fx.glow(targetEl, 'sepia(.6) saturate(3) hue-rotate(260deg) brightness(1.25) drop-shadow(0 0 8px #FF6AD8)', 800)
+    ];
+    const w = Math.max(r.width * 0.95, 60);
+    for (let i = 0; i < 3; i++) {
+      const ring = Fx.box(w, w * 0.9, 'border-radius:50%;border:3px solid #C860F0;box-shadow:0 0 8px #E070FF,inset 0 0 8px #E070FF');
+      effects.push(
+        Fx.spawn(fxEl, ring, target, [
+          { transform: 'scale(2)', opacity: 0 },
+          { transform: 'scale(1.4)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(.7)', opacity: 0 }
+        ], { duration: 480, easing: 'ease-in', delay: i * 160 })
+      );
+    }
+    await Fx.wait(250);
+    Fx.flash(targetEl, '#FF8AE0', 0.5);
+    await Promise.all(effects);
+    await PsychicFx.dimOut(dim);
+  }
 
   static readonly chargeAnims: MoveAnimRegistry = {
     futuresight: (refs) => PsychicAttackMoveAnimations.playFutureSightForesee(refs)

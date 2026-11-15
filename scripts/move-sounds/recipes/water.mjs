@@ -78,13 +78,19 @@ export const WATER = {
     return s;
   },
 
-  /** Generic melee: a shell snaps shut and squeezes. */
+  /**
+   * Clamp.play: the shell halves open beside the target (0-0.3 s), snap shut at 0.45 s,
+   * hold it (to 0.9 s) and part (0.9-1.2 s). A shell swish, a sharp snap, a squeezing creak.
+   */
   clamp: () => {
-    const s = new MoveSfx(0.8, 0xc1a3);
-    s.noise(0.17, 0.05, { clock: () => 10000, gain: env.decay(0.35, 1) });
-    s.pulse(0.17, 0.06, { freq: () => 900, gain: env.decay(0.35, 1), duty: 0.25 });
-    s.thud(0.17, 0.4, 0.4);
-    for (const at of [0.3, 0.45]) s.wave(at, 0.13, { freq: env.ramp(300, 210), gain: env.decay(0.4, 1) });
+    const s = new MoveSfx(1.35, 0xc1a3);
+    s.whoosh(0.0, 0.3, { from: 600, to: 1800, gain: 0.18 });
+    s.noise(0.45, 0.05, { clock: () => 10000, gain: env.decay(0.35, 1) });
+    s.pulse(0.45, 0.06, { freq: () => 900, gain: env.decay(0.35, 1), duty: 0.25 });
+    s.thud(0.45, 0.45, 0.4);
+    s.sparkle(0.47, 0.3, 4, { lo: 3500, hi: 6000, gain: 0.1 });
+    for (const at of [0.58, 0.75]) s.wave(at, 0.13, { freq: env.ramp(300, 210), gain: env.decay(0.35, 1) });
+    s.whoosh(0.9, 0.3, { from: 1800, to: 600, gain: 0.1 });
     return s;
   },
 

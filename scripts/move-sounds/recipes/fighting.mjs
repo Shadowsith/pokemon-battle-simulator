@@ -101,12 +101,16 @@ export const FIGHTING = {
   },
 
 
-  /** Generic melee: braces for the blow, then strikes back twice as hard. */
+  /**
+   * FightingPunchMoveAnimations.playCounter: the red fist rams in (0-0.15 s, hit at 0.15 s),
+   * blue-white sparkles twinkle out (to ~0.9 s). Braces, strikes back hard, glints.
+   */
   counter: () => {
-    const s = new MoveSfx(0.8, 0xc0c7);
-    s.pulse(0.0, 0.17, { freq: env.ramp(110, 160), gain: env.ramp(0.1, 0.25), duty: 0.5 });
-    s.thud(0.17, 0.8, 0.9);
-    s.pulse(0.18, 0.25, { freq: (u) => 2200 * Math.pow(0.6, u), gain: env.decay(0.16, 1.5), duty: 0.25 });
+    const s = new MoveSfx(1.05, 0xc0c7);
+    s.pulse(0.0, 0.15, { freq: env.ramp(110, 160), gain: env.ramp(0.1, 0.25), duty: 0.5 });
+    s.thud(0.15, 0.8, 0.9);
+    s.pulse(0.16, 0.25, { freq: (u) => 2200 * Math.pow(0.6, u), gain: env.decay(0.16, 1.5), duty: 0.25 });
+    s.sparkle(0.2, 0.55, 6, { lo: 3500, hi: 6500, gain: 0.12 });
     return s;
   },
 

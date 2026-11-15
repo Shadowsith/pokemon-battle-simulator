@@ -59,6 +59,7 @@ static readonly anims: MoveAnimRegistry = {
 | `statDropCloud(refs, target)` | XY-style stat drop: purple cloud rains on the target (~1.0 s). |
 | `sleepZs(fxEl, head, away, colors)` | Rising "Z"s. |
 | `orbit(el, radius, laps, duration, spin)` | Sprite circles along a path (no turning). |
+| `dizzyBirds(fxEl, head, rx, ry, duration)` | Confused: three little birds circle a head on an ellipse while stars twinkle (Dynamic Punch, Confuse Ray). |
 | `speedLines(layer, W, H, flow, [c1, c2])` | Endless speed lines inside `layer` (stop when it is removed). |
 | `smokePuff(fxEl, at, size, [c1, c2]?)` | Puff cloud; white by default, also dust / spray. |
 | `groundRipples(fxEl, foot, width, [edge, glow], count=4, gap=140, dur=700)` | Flat ripple rings spreading over the ground from `foot` (Night Daze, Psystrike, Quiver Dance). |

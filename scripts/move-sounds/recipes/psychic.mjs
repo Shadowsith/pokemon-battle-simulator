@@ -89,13 +89,16 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + confusion fleck: a warbling psychic wave. */
+  /**
+   * PsychicAttackMoveAnimations.playConfusion: dark (0-0.28 s), the target trembles and glows
+   * while three rings close in (0.28-1.1 s, hit at 0.53 s), the scene clears by 1.4 s.
+   * A warbling psychic wave with a chirp per ring.
+   */
   confusion: () => {
-    const s = new MoveSfx(1.2, 0xc0f5);
-    s.pulse(0.0, 0.45, { freq: (u) => (400 + 400 * u) * (1 + 0.1 * Math.sin(2 * Math.PI * 7 * u)), gain: env.ramp(0.08, 0.22), duty: 0.25 });
-    s.wave(0.43, 0.25, { freq: (u) => 900 * Math.pow(0.5, u), gain: env.decay(0.35, 1.5) });
-    s.thud(0.43, 0.35, 0.3);
-    s.confusion(0.6);
+    const s = new MoveSfx(1.55, 0xc0f5);
+    s.pulse(0.28, 0.8, { freq: (u) => (500 + 300 * u) * (1 + 0.1 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.18), duty: 0.25 });
+    for (let i = 0; i < 3; i++) s.wave(0.45 + i * 0.16, 0.18, { freq: (u) => (1100 + i * 150) * Math.pow(0.6, u), gain: env.decay(0.22, 1.5) });
+    s.thud(0.53, 0.35, 0.3);
     return s;
   },
 

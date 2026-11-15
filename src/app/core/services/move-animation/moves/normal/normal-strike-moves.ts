@@ -10,13 +10,30 @@ import { RockClimb } from './rock-climb';
 /** Crush Claw's marks: black with a red glow. */
 const CRUSH_CLAW: ClawStyle = { glow: ['#FF2A2A', '#E01818'] };
 
+/** Look of a single diagonal blade stroke with its spark spray (Slash, Cut). */
+interface BladeStyle {
+  blade: string;
+  glow: string;
+  width: number;
+  sparks: number;
+  /** Spark reach relative to Slash. */
+  reach: number;
+  /** How far the sparks sink at the end, px. */
+  sink: number;
+  sparkMs: number;
+}
+const SLASH: BladeStyle = { blade: '#fff', glow: '#FFF3A0', width: 7, sparks: 16, reach: 1, sink: 10, sparkMs: 520 };
+const CUT: BladeStyle = { blade: '#FFF0A0', glow: '#F8C030', width: 5, sparks: 22, reach: 1.5, sink: 30, sparkMs: 950 };
+
 /** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Head Charge and Last Resort live in their own files). */
 export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     bind: (refs, _launch, target) => NormalStrikeMoveAnimations.playBind(refs, target),
     chipaway: (refs, launch, target, v) => NormalStrikeMoveAnimations.playChipAway(refs, launch, target, v),
+    constrict: (refs, _launch, target) => NormalStrikeMoveAnimations.playConstrict(refs, target),
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
+    cut: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v, CUT),
     gigaimpact: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playGigaImpact(refs, target, v),
     headcharge: (refs, launch, target) => HeadCharge.play(refs, launch, target),
     holdback: (refs, launch, target) => NormalStrikeMoveAnimations.playHoldBack(refs, launch, target),
@@ -212,8 +229,15 @@ export class NormalStrikeMoveAnimations {
   /**
    * Slash: a bright white cut is drawn diagonally across the target with a
    * white flash where it lands, while yellow-orange sparks spray out of it.
+   *
+   * Cut uses the same stroke, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/6/68/Zerschneider_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/8/86/Zerschneider_Gen5.png
+   * A thin golden cut sweeps across the target (0-0.36 s, hit at 0.11 s),
+   * then a wider cloud of yellow-orange sparks drifts out and sinks slowly
+   * (to ~1.3 s).
    */
-  private static async playSlash(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+  private static async playSlash(refs: BattleStageRefs, target: Point, v: MoveVisual, style: BladeStyle = SLASH) {
     const { fxEl, targetEl } = refs;
     const r = Fx.rect(targetEl);
     const len = Math.max(r.width * 1.1, 80);
@@ -221,7 +245,7 @@ export class NormalStrikeMoveAnimations {
     const angle = v.dir > 0 ? 35 : 145;
 
     const blade = document.createElement('div');
-    blade.style.cssText = `position:absolute;width:${len}px;height:7px;pointer-events:none;clip-path:polygon(0 50%,50% 0,100% 50%,50% 100%);background:linear-gradient(90deg,#ffffff00,#fff 30%,#fff 70%,#ffffff00);filter:drop-shadow(0 0 5px #FFF6C0)`;
+    blade.style.cssText = `position:absolute;width:${len}px;height:${style.width}px;pointer-events:none;clip-path:polygon(0 50%,50% 0,100% 50%,50% 100%);background:linear-gradient(90deg,#ffffff00,${style.blade} 30%,${style.blade} 70%,#ffffff00);filter:drop-shadow(0 0 5px ${style.glow})`;
     // The blade turns round its left end; place that end so its middle crosses the target.
     const rad = (angle * Math.PI) / 180;
     Fx.place(blade, { x: target.x - (Math.cos(rad) * len) / 2 + len / 2, y: target.y - (Math.sin(rad) * len) / 2 });
@@ -233,7 +257,7 @@ export class NormalStrikeMoveAnimations {
     ], { duration: 360, easing: 'ease-out' }).then(() => blade.remove());
 
     await Fx.wait(110);
-    const star = FxGlyphs.sparkStar(Math.max(r.width * 0.4, 34), '#FFF3A0');
+    const star = FxGlyphs.sparkStar(Math.max(r.width * 0.4, 34), style.glow);
     Fx.place(star, target);
     fxEl.appendChild(star);
     const starDone = Fx.anim(star, [
@@ -247,7 +271,7 @@ export class NormalStrikeMoveAnimations {
     // Yellow-orange sparks spray out, mostly upward and toward the front.
     const sparks: Promise<void>[] = [];
     const reach = Math.max(r.width * 0.55, 40);
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < style.sparks; i++) {
       const s = 4 + Math.random() * 4;
       const spark = document.createElement('div');
       const c = i % 2 ? '#FFD040' : '#FF9A2A';
@@ -256,13 +280,13 @@ export class NormalStrikeMoveAnimations {
       Fx.place(spark, { x: target.x + Math.cos(rad) * len * along, y: target.y + Math.sin(rad) * len * along });
       fxEl.appendChild(spark);
       const ang = -Math.PI / 2 + v.dir * Math.random() * 1.4 + (Math.random() - 0.5) * 0.8;
-      const d = reach * (0.4 + Math.random() * 0.7);
+      const d = reach * style.reach * (0.4 + Math.random() * 0.7);
       sparks.push(
         Fx.anim(spark, [
           { transform: 'translate(0,0) scale(1)', opacity: 1 },
           { transform: `translate(${Math.cos(ang) * d * 0.7}px,${Math.sin(ang) * d * 0.7}px) scale(1)`, opacity: 1, offset: 0.6 },
-          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d + 10}px) scale(.4)`, opacity: 0 }
-        ], { duration: 520 + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 80 }).then(() => spark.remove())
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d + style.sink}px) scale(.4)`, opacity: 0 }
+        ], { duration: style.sparkMs + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 80 }).then(() => spark.remove())
       );
     }
     await Promise.all([bladeDone, starDone, ...sparks]);
@@ -488,6 +512,66 @@ export class NormalStrikeMoveAnimations {
     targetEl.getAnimations?.().forEach((a) => a.cancel());
     targetEl.style.transform = original;
     await Promise.all(done);
+  }
+
+  /**
+   * Constrict, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/3/32/Umklammerung_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/b/ba/Umklammerung_Gen5.png
+   *
+   * Green vine coils wind round the target one after another from its feet
+   * up (0-0.45 s), squeeze it three times with a dull flash each (0.55,
+   * 0.85, 1.15 s; the hit lands on the first), then loosen and fade
+   * (1.3-1.55 s).
+   */
+  private static async playConstrict(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const w = Math.max(r.width * 0.9, 56);
+    const h = Math.max(w * 0.28, 14);
+    const coils = 4;
+    const total = 1550;
+    const squeezes = [550, 850, 1150];
+
+    // Each coil: a flat tilted ring, dark-edged green, stacked from the feet up.
+    const done: Promise<void>[] = [];
+    for (let i = 0; i < coils; i++) {
+      const ring = Fx.box(w, h, 'border-radius:50%;border:4px solid #58C048;box-shadow:0 0 0 1px #1E5A1A,inset 0 0 0 1px #1E5A1A,0 0 6px #8AE070');
+      const y = target.y + r.height * (0.32 - i * 0.2);
+      Fx.place(ring, { x: target.x, y });
+      fxEl.appendChild(ring);
+      const tilt = i % 2 ? -10 : 10;
+      const appear = (i * 110) / total;
+      const frames: Keyframe[] = [
+        { transform: `rotate(${tilt}deg) scale(1.5,1.2)`, opacity: 0, offset: 0 },
+        { transform: `rotate(${tilt}deg) scale(1.5,1.2)`, opacity: 0, offset: appear },
+        { transform: `rotate(${tilt}deg) scale(1,1)`, opacity: 1, offset: appear + 150 / total }
+      ];
+      for (const at of squeezes) {
+        frames.push(
+          { transform: `rotate(${tilt}deg) scale(.86,.95)`, opacity: 1, offset: at / total },
+          { transform: `rotate(${tilt}deg) scale(1,1)`, opacity: 1, offset: (at + 160) / total }
+        );
+      }
+      frames.push(
+        { transform: `rotate(${tilt}deg) scale(1,1)`, opacity: 1, offset: 1300 / total },
+        { transform: `rotate(${tilt}deg) scale(1.25,1.1)`, opacity: 0, offset: 1 }
+      );
+      done.push(Fx.anim(ring, frames, { duration: total, easing: 'ease-in-out' }).then(() => ring.remove()));
+    }
+
+    // The target is squeezed in time with the coils.
+    const original = targetEl.style.transform;
+    const squash: Keyframe[] = [{ transform: original, offset: 0 }, { transform: original, offset: 450 / total }];
+    for (const at of squeezes) {
+      squash.push({ transform: `${original} scaleX(.9)`, offset: at / total }, { transform: original, offset: (at + 160) / total });
+      setTimeout(() => Fx.flash(targetEl, '#6A8A5A', 0.3), at);
+    }
+    squash.push({ transform: original, offset: 1 });
+    const squeezed = Fx.anim(targetEl, squash, { duration: total, easing: 'ease-in-out', fill: 'none' });
+    await Fx.wait(squeezes[0]);
+    Fx.shake(targetEl, 3);
+    await Promise.all([squeezed, ...done]);
   }
 
   /**

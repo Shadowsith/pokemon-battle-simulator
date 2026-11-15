@@ -14,12 +14,18 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic target aura + confusion fleck: an eerie, floating light. */
+  /**
+   * GhostMoveAnimations.playConfuseRay: dark (0-0.28 s), the orb wavers to the target and
+   * loops round it (0.28-1.58 s), flash, the scene clears, birds circle (1.83-3.23 s).
+   * An eerie warbling light, a soft flash, then the dizzy chime.
+   */
   confuseray: () => {
-    const s = new MoveSfx(1.2, 0xc0f2);
-    s.wave(0.02, 0.6, { freq: (u) => 600 * (1 + 0.15 * Math.sin(2 * Math.PI * 2 * u)), gain: env.swell(0.3) });
-    s.pulse(0.02, 0.6, { freq: (u) => 1200 * (1 + 0.15 * Math.sin(2 * Math.PI * 2 * u + 1)), gain: env.swell(0.07), duty: 0.125 });
-    s.confusion(0.6);
+    const s = new MoveSfx(3.4, 0xc0f2);
+    s.wave(0.28, 1.3, { freq: (u) => 600 * (1 + 0.15 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.28) });
+    s.pulse(0.28, 1.3, { freq: (u) => 1200 * (1 + 0.15 * Math.sin(2 * Math.PI * 4 * u + 1)), gain: env.swell(0.07), duty: 0.125 });
+    s.wave(1.58, 0.3, { freq: (u) => 1400 * Math.pow(0.5, u), gain: env.decay(0.22, 1.5) });
+    s.confusion(1.85);
+    s.confusion(2.5, 0.16);
     return s;
   },
 

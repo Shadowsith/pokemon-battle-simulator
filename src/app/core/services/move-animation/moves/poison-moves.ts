@@ -12,6 +12,7 @@ export class PoisonMoveAnimations {
   /** Hand-made Poison move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     acid: (refs, launch, target) => PoisonMoveAnimations.playAcidSpit(refs, launch, target),
+    acidarmor: (refs, launch) => PoisonMoveAnimations.playAcidArmor(refs, launch),
     belch: (refs, launch, target) => PoisonMoveAnimations.playBelch(refs, launch, target),
     coil: (refs, launch) => Coil.play(refs, launch),
     crosspoison: (refs, _launch, target) => PoisonMoveAnimations.playCrossPoison(refs, target),
@@ -23,6 +24,50 @@ export class PoisonMoveAnimations {
     toxicspikes: (refs, launch, target) => ToxicSpikes.play(refs, launch, target),
     venomdrench: (refs, _launch, target) => PoisonMoveAnimations.playVenomDrench(refs, target)
   };
+
+  /**
+   * Acid Armor, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/b/bf/S%C3%A4urepanzer_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/b/b5/S%C3%A4urepanzer_Gen5.png
+   *
+   * The user turns purple and melts into a flat puddle (0-0.5 s) while drops
+   * of acid bubble up off it and fall back (0.3-1.0 s), then it re-forms
+   * (0.95-1.3 s) and the stat-up aura plays (1.3-2.1 s).
+   */
+  private static async playAcidArmor(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const origin = launchEl.style.transformOrigin;
+    const base = launchEl.style.transform;
+    const tint = 'sepia(1) saturate(4) hue-rotate(230deg) brightness(.95)';
+    launchEl.style.transformOrigin = 'center bottom';
+    const melt = Fx.anim(launchEl, [
+      { transform: `${base} scale(1,1)`, filter: 'none' },
+      { transform: `${base} scale(1.08,.9)`, filter: tint, offset: 0.12 },
+      { transform: `${base} scale(1.3,.3)`, filter: tint, offset: 0.38 },
+      { transform: `${base} scale(1.34,.26)`, filter: tint, offset: 0.72 },
+      { transform: `${base} scale(.95,1.06)`, filter: tint, offset: 0.92 },
+      { transform: `${base} scale(1,1)`, filter: 'none' }
+    ], { duration: 1300, easing: 'ease-in-out', fill: 'none' }).then(() => (launchEl.style.transformOrigin = origin));
+
+    // Acid drops bubble up out of the puddle and fall back into it.
+    const floor = launch.y + r.height * 0.4;
+    const drops: Promise<void>[] = [];
+    for (let i = 0; i < 9; i++) {
+      const s = 7 + Math.random() * 6;
+      const x = (Math.random() * 2 - 1) * r.width * 0.45;
+      const up = 26 + Math.random() * 30;
+      drops.push(
+        Fx.spawn(fxEl, FxGlyphs.poisonBubble(s), { x: launch.x + x, y: floor }, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${x * 0.2}px,${-up}px) scale(1)`, opacity: 1, offset: 0.45 },
+          { transform: `translate(${x * 0.35}px,0) scale(.6)`, opacity: 0 }
+        ], { duration: 520, easing: 'ease-in-out', delay: 300 + i * 50 + Math.random() * 60 })
+      );
+    }
+    await Promise.all([melt, ...drops]);
+    await FxEffects.statUpAura(refs, launch);
+  }
 
   /**
    * Belch, after the XY animation: the user rears up and a pink gas puff with

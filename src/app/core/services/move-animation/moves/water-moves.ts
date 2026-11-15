@@ -3,6 +3,7 @@ import { BUBBLE_DRIFT, BUBBLE_BEAM, DIM_BACKDROP, WATERFALL_WAVES } from '../ani
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { AquaTail } from './water/aqua-tail';
+import { Clamp } from './water/clamp';
 import { OriginPulse } from './water/origin-pulse';
 import { RazorShell } from './water/razor-shell';
 import { Scald } from './water/scald';
@@ -12,13 +13,14 @@ import { WaterCrash } from './water/water-crash';
 import { WaterPledge } from './water/water-pledge';
 import { WaterShuriken } from './water/water-shuriken';
 
-/** Hand-made animations for Water-type moves (the Surf wave, Steam Eruption, Origin Pulse, Aqua Tail, Razor Shell, Scald, Water Pledge, Water Shuriken and the shared water crash live in `water/`). */
+/** Hand-made animations for Water-type moves (the Surf wave, Clamp, Steam Eruption, Origin Pulse, Aqua Tail, Razor Shell, Scald, Water Pledge, Water Shuriken and the shared water crash live in `water/`). */
 export class WaterMoveAnimations {
   /** Hand-made Water move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     aquatail: (refs, launch, target) => AquaTail.play(refs, launch, target),
     bubble: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_DRIFT),
     bubblebeam: (refs, launch, target) => WaterMoveAnimations.playBubbles(refs, launch, target, BUBBLE_BEAM),
+    clamp: (refs, _launch, target) => Clamp.play(refs, target),
     crabhammer: (refs, _launch, target) => WaterMoveAnimations.playCrabhammer(refs, target),
     dive: (refs, _launch, target) => WaterMoveAnimations.playDiveHit(refs, target),
     hydrocannon: (refs, launch, target) => WaterMoveAnimations.playHydroCannon(refs, launch, target),

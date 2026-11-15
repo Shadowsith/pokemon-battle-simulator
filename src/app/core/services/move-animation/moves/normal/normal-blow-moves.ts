@@ -9,6 +9,8 @@ import { Retaliate } from './retaliate';
 export class NormalBlowMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    bodyslam: (refs, launch, target, v) => NormalBlowMoveAnimations.playBodySlam(refs, launch, target, v),
+    cometpunch: (refs, _launch, target, v) => NormalBlowMoveAnimations.playCometPunch(refs, target, v),
     dizzypunch: (refs, _launch, target, v) => NormalBlowMoveAnimations.playDizzyPunch(refs, target, v),
     doubleedge: (refs, launch, target, v) => NormalBlowMoveAnimations.playDoubleEdge(refs, launch, target, v),
     facade: (refs, launch, target) => NormalBlowMoveAnimations.playFacade(refs, launch, target),
@@ -22,6 +24,124 @@ export class NormalBlowMoveAnimations {
     takedown: (refs, _launch, target, v) => NormalBlowMoveAnimations.playTakeDown(refs, target, v),
     thrash: (refs, _launch, target) => NormalBlowMoveAnimations.playThrash(refs, target)
   };
+
+  /**
+   * Body Slam, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/c/c8/Bodyslam_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/9/9d/Bodyslam_Gen5.png
+   *
+   * The user hops at the target in a short arc (0-0.32 s) and slams down on
+   * it (hit at 0.32 s): the target is flattened, a yellow-white burst flares,
+   * grey dust puffs out round its feet and yellow-orange specks scatter up and
+   * drift down (to ~1.2 s) while the user slides back home (0.32-0.62 s).
+   */
+  private static async playBodySlam(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const dx = (target.x - launch.x) * 0.35;
+    const dy = (target.y - launch.y) * 0.35;
+    const original = launchEl.style.transform;
+
+    // The hop and the slide home are one animation; the slam lands at 0.32 s.
+    const hop = Fx.anim(launchEl, [
+      { transform: `${original} translate(0,0)` },
+      { transform: `${original} translate(${dx * 0.6}px,${dy * 0.6 - 30}px)`, offset: 0.3 },
+      { transform: `${original} translate(${dx}px,${dy}px) scale(1.06,.94)`, offset: 0.52 },
+      { transform: `${original} translate(0,0)` }
+    ], { duration: 620, easing: 'ease-in-out', fill: 'none' });
+    await Fx.wait(320);
+
+    const size = Math.max(r.width * 0.7, 50);
+    const burst = FxGlyphs.spikyBurst(size, '#F8C820', '#FFF27A', '#ffffff');
+    const effects: Promise<void>[] = [
+      hop,
+      Fx.spawn(fxEl, burst, target, [
+        { transform: 'scale(.2) rotate(0deg)', opacity: 1 },
+        { transform: 'scale(1.1) rotate(15deg)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(1.2) rotate(25deg)', opacity: 0 }
+      ], { duration: 380, easing: 'ease-out' }),
+      FxEffects.smokePuff(fxEl, { x: target.x, y: target.y + r.height * 0.38 }, Math.max(r.width * 0.9, 60), ['#D8D8D8', '#A8A8A8'])
+    ];
+
+    // Flattened from the top, then springs back.
+    const origin = targetEl.style.transformOrigin;
+    const base = targetEl.style.transform;
+    targetEl.style.transformOrigin = 'center bottom';
+    effects.push(
+      Fx.anim(targetEl, [
+        { transform: `${base} scale(1,1)` },
+        { transform: `${base} scale(1.18,.72)`, offset: 0.3 },
+        { transform: `${base} scale(.95,1.05)`, offset: 0.7 },
+        { transform: `${base} scale(1,1)` }
+      ], { duration: 420, easing: 'ease-out', fill: 'none' }).then(() => { targetEl.style.transformOrigin = origin; })
+    );
+    Fx.flash(targetEl, '#FFF3A0', 0.7);
+    Fx.shakeField(fieldEl, 0.8 + v.power * 0.4);
+
+    // Yellow-orange specks pop up out of the hit and sink slowly.
+    const reach = Math.max(r.width * 0.7, 48);
+    for (let i = 0; i < 16; i++) {
+      const s = 4 + Math.random() * 4;
+      const c = i % 2 ? '#FFD040' : '#FF9A2A';
+      const ang = -Math.PI / 2 + (Math.random() * 2 - 1) * 1.5;
+      const d = reach * (0.4 + Math.random() * 0.6);
+      effects.push(
+        Fx.spawn(fxEl, Fx.box(s, s, `border-radius:50%;background:radial-gradient(circle,#FFF8D0,${c} 60%);box-shadow:0 0 5px ${c}`), target, [
+          { transform: 'translate(0,0) scale(.5)', opacity: 1 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d}px) scale(1)`, opacity: 1, offset: 0.45 },
+          { transform: `translate(${Math.cos(ang) * d}px,${Math.sin(ang) * d + 24}px) scale(.5)`, opacity: 0 }
+        ], { duration: 750 + Math.random() * 200, easing: 'ease-out', delay: Math.random() * 60 })
+      );
+    }
+    await Promise.all(effects);
+  }
+
+  /**
+   * Comet Punch, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/9/9e/Kometenhieb_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/7/78/Kometenhieb_Gen5.png
+   *
+   * One punch per hit (`v.hits`, 0.3 s each): a small fist jabs in at a
+   * different spot on the target, a yellow spiky burst flares behind it and
+   * the target flinches (hit 0.09 s into each punch).
+   */
+  private static async playCometPunch(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const fistW = Math.max(r.width * 0.36, 28);
+    const spots: Point[] = [
+      { x: -0.22, y: -0.12 },
+      { x: 0.2, y: 0.08 },
+      { x: -0.12, y: 0.2 },
+      { x: 0.16, y: -0.2 },
+      { x: 0, y: 0 }
+    ];
+    const effects: Promise<void>[] = [];
+    for (let hit = 0; hit < Math.max(v.hits, 1); hit++) {
+      const spot = spots[hit % spots.length];
+      const at: Point = { x: target.x + spot.x * r.width, y: target.y + spot.y * r.height };
+      const burst = FxGlyphs.spikyBurst(fistW * 1.8, '#F8C820', '#FFEA5A');
+      effects.push(
+        Fx.spawn(fxEl, burst, at, [
+          { transform: 'scale(.3) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(.3) rotate(0deg)', opacity: 0, offset: 0.3 },
+          { transform: 'scale(1) rotate(15deg)', opacity: 1, offset: 0.5 },
+          { transform: 'scale(1.1) rotate(25deg)', opacity: 0 }
+        ], { duration: 300, easing: 'ease-out' }),
+        Fx.spawn(fxEl, FxGlyphs.fistGlyph(fistW, 'yellow'), at, [
+          { transform: 'scale(1.8)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.3 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.75 },
+          { transform: 'scale(.9)', opacity: 0 }
+        ], { duration: 300, easing: 'ease-in' })
+      );
+      await Fx.wait(90);
+      Fx.flash(targetEl, '#FFE84A', 0.5);
+      Fx.shake(targetEl, 4);
+      await Fx.wait(210);
+    }
+    await Promise.all(effects);
+  }
 
   /**
    * Extreme Speed: the scene goes dark and turns into a green-cyan rush of

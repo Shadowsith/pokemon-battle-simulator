@@ -84,12 +84,15 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura: digital bleeps as the type changes. */
+  /**
+   * NormalStatusMoveAnimations.playConversion: pastel pixel squares blink on and off over the
+   * user (0-1.1 s), the last fade by ~1.3 s. Scattered digital bleeps as the type is rewritten.
+   */
   conversion: () => {
-    const s = new MoveSfx(1.0, 0xc0b1);
-    s.arpeggio(0.02, [72, 79, 76, 84, 81, 88, 86, 91], 0.045, { gain: 0.22, duty: 0.125, hold: 0.04 });
-    s.pulse(0.4, 0.4, { freq: (u) => 400 * Math.pow(4, u), gain: env.swell(0.16), duty: 0.5 });
-    s.sparkle(0.5, 0.35, 4, { gain: 0.12 });
+    const s = new MoveSfx(1.4, 0xc0b1);
+    s.arpeggio(0.02, [72, 79, 76, 84, 81, 88, 86, 91, 84, 89, 93, 88], 0.085, { gain: 0.2, duty: 0.125, hold: 0.05 });
+    s.pulse(0.6, 0.5, { freq: (u) => 400 * Math.pow(4, u), gain: env.swell(0.14), duty: 0.5 });
+    s.sparkle(0.1, 1.1, 8, { gain: 0.1 });
     return s;
   },
 

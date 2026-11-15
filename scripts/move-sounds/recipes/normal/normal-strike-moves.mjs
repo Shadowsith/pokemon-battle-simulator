@@ -24,13 +24,16 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee + paralysis fleck: a full-body slam. */
+  /**
+   * NormalBlowMoveAnimations.playBodySlam: hop (0-0.32 s), slam at 0.32 s, specks scatter
+   * and sink (to ~1.2 s). A rising hop, a heavy thud with a rumble, falling specks.
+   */
   bodyslam: () => {
-    const s = new MoveSfx(0.95, 0xb0d5);
-    s.whoosh(0.0, 0.18, { from: 800, to: 2500, gain: 0.35 });
-    s.thud(0.17, 0.85, 1);
-    s.rumble(0.2, 0.3, { from: 300, to: 120, gain: 0.25 });
-    s.paralyze(0.5, 0.2);
+    const s = new MoveSfx(1.3, 0xb0d5);
+    s.whoosh(0.0, 0.32, { from: 800, to: 2500, gain: 0.32 });
+    s.thud(0.32, 0.9, 1);
+    s.rumble(0.34, 0.35, { from: 300, to: 110, gain: 0.25 });
+    s.sparkle(0.4, 0.7, 6, { lo: 2500, hi: 4500, gain: 0.1 });
     return s;
   },
 
@@ -44,24 +47,29 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee punch, 3 hits (impacts at 0.17 / 0.59 / 1.01 s): punches like shooting stars. */
+  /** NormalBlowMoveAnimations.playCometPunch, 3 hits (impacts at 0.09 / 0.39 / 0.69 s): quick jabs like shooting stars. */
   cometpunch: () => {
-    const s = new MoveSfx(1.3, 0xc0e7);
+    const s = new MoveSfx(1.05, 0xc0e7);
     for (let hit = 0; hit < 3; hit++) {
-      const at = 0.17 + hit * 0.42;
-      s.whoosh(at - 0.12, 0.13, { from: 2500, to: 8000, gain: 0.22 });
+      const at = 0.09 + hit * 0.3;
+      s.whoosh(at - 0.08, 0.09, { from: 2500, to: 8000, gain: 0.2 });
       s.thud(at, 0.55, 0.35);
       s.pulse(at + 0.02, 0.12, { freq: () => 2637 + hit * 200, gain: env.decay(0.1, 2), duty: 0.125 });
     }
     return s;
   },
 
-  /** Generic melee + Speed drop fleck: the target gets squeezed tight. */
+  /**
+   * NormalStrikeMoveAnimations.playConstrict: four coils wind on (0 / 0.11 / 0.22 / 0.33 s),
+   * squeezes at 0.55 / 0.85 / 1.15 s (hit on the first), loosen by 1.55 s.
+   * Rustling vines winding up, then three tight creaking squeezes.
+   */
   constrict: () => {
-    const s = new MoveSfx(1.0, 0xc057);
-    s.thud(0.17, 0.4, 0.3);
-    for (const at of [0.2, 0.32]) s.wave(at, 0.12, { freq: env.ramp(320, 200), gain: env.decay(0.3, 1) });
-    s.statDown(0.5);
+    const s = new MoveSfx(1.7, 0xc057);
+    for (let i = 0; i < 4; i++) s.whoosh(i * 0.11, 0.12, { from: 900 + i * 300, to: 2400 + i * 400, gain: 0.16 });
+    s.thud(0.55, 0.4, 0.3);
+    for (const at of [0.55, 0.85, 1.15]) s.wave(at, 0.14, { freq: env.ramp(320, 200), gain: env.decay(0.3, 1) });
+    s.whoosh(1.3, 0.25, { from: 2400, to: 900, gain: 0.1 });
     return s;
   },
 
@@ -98,11 +106,15 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee slash: a clean cut. */
+  /**
+   * NormalStrikeMoveAnimations.playSlash (Cut style): a golden cut sweeps across (0-0.36 s,
+   * hit at 0.11 s), sparks drift out and sink (to ~1.3 s). A clean cut, then soft glints.
+   */
   cut: () => {
-    const s = new MoveSfx(0.55, 0xc07a);
-    s.whoosh(0.0, 0.18, { from: 2500, to: 10000, gain: 0.35 });
-    s.slash(0.17, 0.6);
+    const s = new MoveSfx(1.4, 0xc07a);
+    s.whoosh(0.0, 0.12, { from: 2500, to: 10000, gain: 0.35 });
+    s.slash(0.11, 0.6);
+    s.sparkle(0.2, 0.9, 7, { lo: 3000, hi: 5500, gain: 0.1 });
     return s;
   },
 
