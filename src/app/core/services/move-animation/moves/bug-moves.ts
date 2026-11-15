@@ -14,9 +14,12 @@ export class BugMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     attackorder: (refs, _launch, target) => BugMoveAnimations.playAttackOrder(refs, target),
     bugbuzz: (refs, launch, target) => BugMoveAnimations.playBugBuzz(refs, launch, target),
+    fellstinger: (refs, launch, target) => BugMoveAnimations.playFellStinger(refs, launch, target),
+    infestation: (refs, _launch, target) => BugMoveAnimations.playInfestation(refs, target),
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
     megahorn: (refs, launch, target) => BugMoveAnimations.playMegahorn(refs, launch, target),
+    powder: (refs, launch, target) => BugMoveAnimations.playPowder(refs, launch, target),
     quiverdance: (refs, launch) => QuiverDance.play(refs, launch),
     ragepowder: (refs, launch) => RagePowder.play(refs, launch),
     signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target),
@@ -470,6 +473,129 @@ export class BugMoveAnimations {
         Fx.shake(targetEl, 4);
       }, 400 + i * 250);
     }
+    await Promise.all(effects);
+  }
+
+  /**
+   * Fell Stinger, after the XY animation: the scene goes black (0-0.2 s),
+   * then turns magenta as the user darts in and the target becomes a black
+   * silhouette; a dark stinger orb strikes it with violet cracks of energy
+   * (0.3-0.9 s; hit at 0.4 s), then the scene clears (to 1.3 s).
+   * Reference: https://www.pokewiki.de/images/0/05/Stachelfinale_Gen6.png
+   */
+  private static async playFellStinger(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const tr = Fx.rect(targetEl);
+    const dark = Fx.backdrop(fieldEl, 'background:#000');
+    await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+    const magenta = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#1A0418,#C83AB8 55%,#F08AE8)');
+    dark.after(magenta);
+    await Fx.anim(magenta, [{ opacity: 0 }, { opacity: 1 }], { duration: 120, easing: 'ease-out' });
+
+    const dir = target.x >= launch.x ? 1 : -1;
+    const dart = FxEffects.dart(launchEl, dir);
+    const silhouette = Fx.anim(targetEl, [{ filter: 'brightness(0)' }, { filter: 'brightness(0)' }], { duration: 650, fill: 'none' });
+    await Fx.wait(100);
+    Fx.shake(targetEl, 5);
+    const orb = Math.max(tr.width * 0.3, 22);
+    const hit: Promise<unknown>[] = [
+      dart,
+      silhouette,
+      Fx.spawn(fxEl, Fx.box(orb, orb, 'border-radius:50%;background:radial-gradient(circle at 40% 35%,#8A8A9A,#1A1A22 60%);box-shadow:0 0 8px #E08AFF'), target, [
+        { transform: `translateX(${-dir * 30}px) scale(.5)`, opacity: 0 },
+        { transform: 'translateX(0) scale(1)', opacity: 1, offset: 0.2 },
+        { transform: 'translateX(0) scale(1)', opacity: 1, offset: 0.8 },
+        { transform: 'translateX(0) scale(.6)', opacity: 0 }
+      ], { duration: 550, easing: 'ease-out' })
+    ];
+    for (let i = 0; i < 4; i++) {
+      const a = (i / 4) * Math.PI * 2 + 0.4;
+      const len = Math.max(tr.height * 0.55, 40);
+      const crack = FxGlyphs.lightning(W, H, target, { x: target.x + Math.cos(a) * len, y: target.y + Math.sin(a) * len }, 6, '#F0C8FF', '#B04AFF', 1.6);
+      fxEl.appendChild(crack);
+      hit.push(Fx.anim(crack, [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0.4, offset: 0.6 }, { opacity: 0 }], { duration: 450, delay: 60 + i * 40, easing: 'linear' }).then(() => crack.remove()));
+    }
+    await Promise.all(hit);
+    await Promise.all([magenta, dark].map((bg) => Fx.anim(bg, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' }).then(() => bg.remove())));
+  }
+
+  /**
+   * Infestation, after the XY animation: a dark swarm of tiny bugs gathers
+   * round the target and crawls all over it, tinting it teal (0-1.2 s; hits
+   * at 0.35 s and 0.75 s), then scatters (to 1.6 s).
+   * Reference: https://www.pokewiki.de/images/c/c2/Plage_Gen6.png
+   */
+  private static async playInfestation(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+    const rx = Math.max(tr.width * 0.6, 40);
+    const ry = Math.max(tr.height * 0.45, 30);
+    const centre: Point = { x: target.x, y: (target.y + foot.y) / 2 };
+    const effects: Promise<unknown>[] = [Fx.glow(targetEl, 'brightness(.8) sepia(1) saturate(3) hue-rotate(130deg)', 1300, 150)];
+    for (let i = 0; i < 46; i++) {
+      const s = 2.5 + Math.random() * 2.5;
+      const bug = Fx.box(s, s, `border-radius:50%;background:${i % 4 ? '#2A1E14' : '#5A4A2A'}`);
+      const phase = Math.random() * Math.PI * 2;
+      const spin = Math.random() < 0.5 ? 1 : -1;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 10; k++) {
+        const t = k / 10;
+        const a = phase + spin * t * Math.PI * 3;
+        // Swarm in from far away, crawl round, scatter outward at the end.
+        const spread = k === 0 ? 3 : k === 10 ? 2.4 : 0.5 + Math.random() * 0.5;
+        frames.push({ transform: `translate(${Math.cos(a) * rx * spread}px,${Math.sin(a) * ry * spread}px)`, opacity: k === 0 || k === 10 ? 0 : 1 });
+      }
+      effects.push(Fx.spawn(fxEl, bug, centre, frames, { duration: 1400 + Math.random() * 200, delay: Math.random() * 150, easing: 'linear' }));
+    }
+    for (const t of [350, 750]) {
+      setTimeout(() => {
+        Fx.shake(targetEl, 3);
+        Fx.flash(targetEl, '#6AE0C0', 0.3);
+      }, t);
+    }
+    await Promise.all(effects);
+  }
+
+  /**
+   * Powder, after the XY animation: the user flaps and flings a cloud of
+   * grey-white powder that drifts over to the target in an arc (0-0.7 s) and
+   * settles on it in a dusty puff (0.6-1.3 s).
+   * Reference: https://www.pokewiki.de/images/8/84/Pulverschleuder_Gen6.png
+   */
+  private static async playPowder(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const original = launchEl.style.transform;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const effects: Promise<unknown>[] = [
+      Fx.anim(launchEl, [
+        { transform: `${original} scale(1,1)` },
+        { transform: `${original} scale(1.06,.95)`, offset: 0.25 },
+        { transform: `${original} scale(.97,1.03)`, offset: 0.5 },
+        { transform: `${original} scale(1,1)` }
+      ], { duration: 450, easing: 'ease-in-out', fill: 'none' })
+    ];
+    for (let i = 0; i < 26; i++) {
+      const s = 3 + Math.random() * 4;
+      const flake = Fx.box(s, s, `background:${i % 3 ? '#D8D8DC' : '#9A9AA4'};border-radius:1px`);
+      const jx = (Math.random() * 2 - 1) * tr.width * 0.4;
+      const jy = (Math.random() * 2 - 1) * tr.height * 0.35;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 6; k++) {
+        const t = k / 6;
+        frames.push({
+          transform: `translate(${dx * t + jx * t}px,${dy * t + jy * t - Math.sin(t * Math.PI) * 50}px) rotate(${t * 360}deg)`,
+          opacity: k === 0 ? 0 : k === 6 ? 0.2 : 1
+        });
+      }
+      effects.push(Fx.spawn(fxEl, flake, launch, frames, { duration: 650, delay: 100 + i * 15, easing: 'ease-out' }));
+    }
+    await Fx.wait(650);
+    effects.push(FxEffects.smokePuff(fxEl, target, Math.max(tr.width * 0.9, 60), ['#D8D8DCcc', '#A8A8B0aa']), Fx.glow(targetEl, 'brightness(1.1) grayscale(.6)', 600));
     await Promise.all(effects);
   }
 }

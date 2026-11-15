@@ -19,6 +19,7 @@ export class NormalStrikeMoveAnimations {
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
     gigaimpact: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playGigaImpact(refs, target, v),
     headcharge: (refs, launch, target) => HeadCharge.play(refs, launch, target),
+    holdback: (refs, launch, target) => NormalStrikeMoveAnimations.playHoldBack(refs, launch, target),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
     lastresort: (refs, _launch, target, v) => LastResort.play(refs, target, v),
     rockclimb: (refs, launch, target, v) => RockClimb.play(refs, launch, target, v),
@@ -605,6 +606,46 @@ export class NormalStrikeMoveAnimations {
           { transform: 'translateY(8px)', opacity: 1, offset: 0.3 },
           { transform: `translateY(${tr.height * 0.4}px)`, opacity: 0 }
         ], { duration: 500, delay: 300 + Math.random() * 100, easing: 'ease-in' }).then(() => speck.remove())
+      );
+    }
+    await Promise.all(effects);
+  }
+
+  /**
+   * Hold Back, after the XY animation: the user darts in (0-0.26 s) and a
+   * glowing yellow-white crescent sweeps across the target with a flash and
+   * a scatter of little stars (0.12-0.65 s) - a gentle, holding-back swipe.
+   * Reference: https://www.pokewiki.de/images/2/2c/Zur%C3%BCckhaltung_Gen6.png
+   */
+  private static async playHoldBack(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const dir = target.x >= launch.x ? 1 : -1;
+    const dart = FxEffects.dart(launchEl, dir);
+    await Fx.wait(120);
+    const w = Math.max(tr.width * 1.3, 80);
+    const arc = Fx.box(w, w * 0.5, `border-radius:50%;border-top:${w * 0.09}px solid #FFF6C0;filter:drop-shadow(0 0 6px #FFD83A) drop-shadow(0 0 2px #ffffff)`);
+    const effects: Promise<unknown>[] = [
+      dart,
+      Fx.spawn(fxEl, arc, { x: target.x, y: target.y - tr.height * 0.05 }, [
+        { transform: `rotate(${-dir * 50}deg) scale(.6)`, opacity: 0 },
+        { transform: `rotate(${-dir * 10}deg) scale(1)`, opacity: 1, offset: 0.4 },
+        { transform: `rotate(${dir * 20}deg) scale(1.05)`, opacity: 0 }
+      ], { duration: 380, easing: 'ease-out' })
+    ];
+    setTimeout(() => {
+      Fx.flash(targetEl, '#FFF2A0', 0.6);
+      Fx.shake(targetEl, 4);
+    }, 140);
+    for (let i = 0; i < 6; i++) {
+      const a = -Math.PI / 2 + (Math.random() * 2 - 1) * 1.4;
+      const d = w * (0.35 + Math.random() * 0.25);
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.fivePointStar(10, '#FFD83A', '#FFFBE0', '#FFE88A'), target, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `translate(${Math.cos(a) * d * 0.6}px,${Math.sin(a) * d * 0.6}px) scale(1)`, opacity: 1, offset: 0.4 },
+          { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px) scale(.5)`, opacity: 0 }
+        ], { duration: 450, delay: 140 + i * 25, easing: 'ease-out' })
       );
     }
     await Promise.all(effects);

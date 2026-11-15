@@ -318,12 +318,16 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a restrained, softened body blow. */
+  /**
+   * Custom (0.9 s): the user darts in with a swish (0-0.26 s), a soft knock
+   * as the crescent sweeps across at 0.26 s, and a twinkle of little stars
+   * (0.3-0.7 s).
+   */
   holdback: () => {
-    const s = new MoveSfx(0.7, 0x401d);
-    s.whoosh(0.0, 0.17, { from: 1500, to: 4000, gain: 0.25 });
-    s.thud(0.17, 0.5, 0.35);
-    s.wave(0.24, 0.25, { freq: (u) => 520 - 180 * u, gain: env.decay(0.12, 1.5) });
+    const s = new MoveSfx(0.9, 0x401d);
+    s.whoosh(0.05, 0.3, { from: 2000, to: 6000, gain: 0.22 });
+    s.thud(0.26, 0.35, 0.25);
+    s.sparkle(0.3, 0.4, 5, { lo: 3500, hi: 6000, gain: 0.12 });
     return s;
   },
 

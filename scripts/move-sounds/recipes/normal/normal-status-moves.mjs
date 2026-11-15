@@ -51,12 +51,17 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura + stat-down fleck: a secretive whisper. */
+  /**
+   * Custom (2.8 s): a soft pop as the speech bubble swells (0.15-0.5 s), a
+   * whoosh as it rushes to the target (0.5-0.85 s), a hushed murmur of three
+   * blips as the "..." bubble shows (1.05-1.6 s), then the stat-down run (1.6 s).
+   */
   confide: () => {
-    const s = new MoveSfx(1.5, 0xc0f1);
-    for (const at of [0.05, 0.25, 0.42]) s.noise(at, 0.14, { clock: () => 6000, gain: env.swell(0.22) });
-    s.wave(0.1, 0.5, { freq: () => 392, gain: env.swell(0.08) });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.8, 0xc0f1);
+    s.pulse(0.15, 0.2, { freq: env.ramp(400, 900), gain: env.swell(0.2), duty: 0.5 });
+    s.whoosh(0.5, 0.35, { from: 1500, to: 6000, gain: 0.22 });
+    s.arpeggio(1.1, [67, 67, 67], 0.14, { gain: 0.12, voice: 'wave', hold: 0.07 });
+    s.statDown(1.6);
     return s;
   },
 
@@ -241,13 +246,18 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Attack / Sp. Atk drop fleck (~0.85 s): a proud, rough roar, then a falling jingle. */
+  /**
+   * Custom (2.7 s): a big growling roar as the rays blast out (0-0.7 s), a
+   * fiery whoosh as the red ring spirals round the target (0.6-1.3 s), then the
+   * stat-down run (1.35 s).
+   */
   nobleroar: () => {
-    const s = new MoveSfx(1.45, 0x90b1);
-    s.pulse(0.02, 0.75, { freq: (u) => (180 + 80 * Math.sin(Math.PI * u)) * (1 + 0.04 * Math.sin(2 * Math.PI * 22 * u)), gain: (u) => 0.32 * Math.min(1, u * 8) * Math.pow(1 - u, 0.8), duty: 0.25 });
-    s.pulse(0.02, 0.75, { freq: (u) => 90 + 40 * Math.sin(Math.PI * u), gain: (u) => 0.2 * Math.min(1, u * 8) * Math.pow(1 - u, 0.8), duty: 0.5 });
-    s.noise(0.02, 0.75, { clock: () => 1800, gain: (u) => 0.2 * Math.min(1, u * 8) * Math.pow(1 - u, 0.8) });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.7, 0x90b1);
+    s.noise(0.0, 0.7, { clock: (u) => 1200 - 600 * u, gain: env.attackDecay(0.4, 0.1) });
+    s.pulse(0.0, 0.7, { freq: (u) => 140 - 40 * u + 10 * Math.sin(u * 60), gain: env.attackDecay(0.24, 0.1), duty: 0.25 });
+    s.whoosh(0.6, 0.6, { from: 800, to: 3000, gain: 0.2 });
+    s.burn(0.7, 0.18);
+    s.statDown(1.35);
     return s;
   },
 
@@ -278,12 +288,17 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura (0-0.8 s) + Attack-drop fleck: a friendly, cheerful little tune. */
+  /**
+   * Custom (2.7 s): a friendly boing as the user hops (0-0.45 s), sweet
+   * twinkling chimes round the target (0.45-1.25 s), then the stat-down run
+   * (1.3 s).
+   */
   playnice: () => {
-    const s = new MoveSfx(1.5, 0x91a1);
-    s.arpeggio(0.02, [72, 76, 79, 76, 84], 0.13, { gain: 0.26, duty: 0.25, hold: 0.14 });
-    s.sparkle(0.1, 0.55, 5, { lo: 3000, hi: 5000, gain: 0.12 });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.7, 0x91a1);
+    s.pulse(0.0, 0.3, { freq: env.ramp(300, 700), gain: env.swell(0.22), duty: 0.5 });
+    s.arpeggio(0.45, [84, 88, 91, 96], 0.1, { gain: 0.16, voice: 'wave', hold: 0.12 });
+    s.sparkle(0.45, 0.7, 8, { lo: 3500, hi: 6500, gain: 0.12 });
+    s.statDown(1.3);
     return s;
   },
 

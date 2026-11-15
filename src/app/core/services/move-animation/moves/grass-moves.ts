@@ -3,8 +3,10 @@ import { DIM_BACKDROP, FLECK_COLOR } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { TerrainFx } from '../terrain-fx';
 import { CottonGuard } from './grass/cotton-guard';
 import { EnergyBall } from './grass/energy-ball';
+import { ForestsCurse } from './grass/forests-curse';
 import { GrassKnot } from './grass/grass-knot';
 import { GrassPledge } from './grass/grass-pledge';
 import { HornLeech } from './grass/horn-leech';
@@ -16,7 +18,7 @@ import { SeedFlare } from './grass/seed-flare';
 import { SpikyShield } from './grass/spiky-shield';
 import { WoodHammer } from './grass/wood-hammer';
 
-/** Hand-made animations for Grass-type moves (Cotton Guard, Energy Ball, Grass Knot, Grass Pledge, Horn Leech, Leaf Storm, Petal Blizzard, Power Whip, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
+/** Hand-made animations for Grass-type moves (Cotton Guard, Energy Ball, Forest's Curse, Grass Knot, Grass Pledge, Horn Leech, Leaf Storm, Petal Blizzard, Power Whip, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -24,10 +26,12 @@ export class GrassMoveAnimations {
     aromatherapy: (refs, launch) => GrassMoveAnimations.playAromatherapy(refs, launch),
     cottonguard: (refs, launch) => CottonGuard.play(refs, launch),
     energyball: (refs, launch, target) => EnergyBall.play(refs, launch, target),
+    forestscurse: (refs, _launch, target) => ForestsCurse.play(refs, target),
     frenzyplant: (refs, launch, target) => GrassMoveAnimations.playFrenzyPlant(refs, launch, target),
     gigadrain: (refs, launch, target) => GrassMoveAnimations.playGigaDrain(refs, launch, target),
     grassknot: (refs, _launch, target) => GrassKnot.play(refs, target),
     grasspledge: (refs, _launch, target) => GrassPledge.play(refs, target),
+    grassyterrain: (refs, launch) => TerrainFx.play(refs, launch, TerrainFx.GRASSY),
     hornleech: (refs, launch, target, v) => HornLeech.play(refs, launch, target, v),
     leafblade: (refs, _launch, target) => GrassMoveAnimations.playLeafBlade(refs, target),
     leafstorm: (refs, launch, target) => LeafStorm.play(refs, launch, target),

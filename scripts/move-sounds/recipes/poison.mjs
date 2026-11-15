@@ -246,13 +246,18 @@ export const POISON = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) on all foes: a sticky flood of venom gushes over them and seeps in. */
+  /**
+   * Custom (2.6 s): a gloopy swell as the poison bubble grows above the
+   * target (0-0.55 s), a wet burst as it drops and pops at 0.55 s, the poison
+   * gurgle as bubbles fly (0.6-1.2 s), then the stat-down run (1.25 s).
+   */
   venomdrench: () => {
-    const s = new MoveSfx(1.25, 0x7ed1);
-    s.noise(0.0, 0.8, { clock: (u) => 2500 - 1500 * u, gain: env.swell(0.3) });
-    s.pulse(0.02, 0.85, { freq: (u) => (200 - 70 * u) * (1 + 0.07 * Math.sin(2 * Math.PI * 11 * u)), gain: env.swell(0.2), duty: 0.25 });
-    s.bubbles(0.15, 0.7, 9, { lo: 180, hi: 420, gain: 0.2 });
-    s.pulse(0.8, 0.35, { freq: (u) => 160 * Math.pow(0.6, u), gain: env.decay(0.15, 1.5), duty: 0.5 });
+    const s = new MoveSfx(2.6, 0x7ed1);
+    s.wave(0.0, 0.55, { freq: env.ramp(200, 500), gain: env.swell(0.16) });
+    s.splash(0.55, 0.4);
+    s.poison(0.6, 0.22);
+    s.bubbles(0.6, 0.6, 6, { lo: 200, hi: 600, gain: 0.16 });
+    s.statDown(1.25);
     return s;
   },
 

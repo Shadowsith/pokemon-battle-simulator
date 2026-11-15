@@ -346,14 +346,17 @@ export const DARK = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s, no fleck): everything flips - a pitch sweep that rises and turns over, with a low tumble. */
+  /**
+   * Custom (2.1 s): a rising slide whistle as the target floats up under the
+   * red grid (0.2-0.7 s), a falling one as everything flips and it drops onto
+   * the blue grid (0.9-1.14 s) with a dull thump at 1.14 s, then it settles.
+   */
   topsyturvy: () => {
-    const s = new MoveSfx(1.05, 0x7095);
-    s.pulse(0.02, 0.4, { freq: (u) => 200 * Math.pow(6, u), gain: env.swell(0.2), duty: 0.25 });
-    s.pulse(0.42, 0.4, { freq: (u) => 1200 * Math.pow(1 / 6, u), gain: env.swell(0.2), duty: 0.25 });
-    s.wave(0.02, 0.8, { freq: (u) => 110 * (1 + 0.1 * Math.sin(2 * Math.PI * 2 * u)), gain: env.swell(0.18) });
-    s.whoosh(0.3, 0.3, { from: 2000, to: 6000, gain: 0.15 });
-    s.thud(0.82, 0.3, 0.6);
+    const s = new MoveSfx(2.1, 0x7095);
+    s.wave(0.2, 0.5, { freq: env.ramp(300, 1200), gain: env.swell(0.2) });
+    s.wave(0.9, 0.24, { freq: env.ramp(1200, 250), gain: env.swell(0.2) });
+    s.thud(1.14, 0.35, 0.4);
+    s.pulse(1.5, 0.3, { freq: env.ramp(250, 400), gain: env.swell(0.1), duty: 0.5 });
     return s;
   },
 

@@ -3,22 +3,32 @@ import { env } from '../track.mjs';
 
 /** Fairy-type move sounds. */
 export const FAIRY = {
-  /** Generic self aura + stat-up fleck: a soft, sweet-smelling mist. */
+  /**
+   * Custom (2.2 s): a soft airy swell as the pink mist washes over the user
+   * (0-1.1 s) with a sweet shimmering chord, twinkles as the sparkles pop
+   * (0.7-1.2 s), then the stat-up run as the aura rises (1.15 s).
+   */
   aromaticmist: () => {
-    const s = new MoveSfx(1.5, 0xa3a5);
-    s.noise(0.02, 0.9, { clock: () => 9000, gain: env.swell(0.14) });
-    s.chord(0.1, 0.7, [76, 80, 83], { gain: 0.22, vibrato: 0.01 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.2, 0xa3a5);
+    s.noise(0.0, 1.1, { clock: () => 9000, gain: env.swell(0.12) });
+    s.chord(0.1, 0.9, [76, 80, 83], { gain: 0.2, vibrato: 0.01 });
+    s.sparkle(0.7, 0.5, 6, { lo: 3500, hi: 6000, gain: 0.12 });
+    s.statUp(1.15);
     return s;
   },
 
-  /** Generic self aura (priority) + stat-down fleck: big cute eyes twinkle. */
+  /**
+   * Custom (2.4 s): a bright two-note twinkle as the eyes catch the light,
+   * a ringing shimmer as the white ring flares (0.1-0.8 s), a glittery swish
+   * as the glints fly over (0.8-1.2 s), then the stat-down run (1.25 s).
+   */
   babydolleyes: () => {
-    const s = new MoveSfx(1.4, 0xbade);
-    s.arpeggio(0.02, [88, 93], 0.12, { gain: 0.25, voice: 'wave', hold: 0.2 });
-    s.pulse(0.3, 0.3, { freq: env.ramp(900, 1400), gain: env.swell(0.16), duty: 0.5 });
-    s.sparkle(0.1, 0.5, 6, { lo: 3500, hi: 6000, gain: 0.14 });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.4, 0xbade);
+    s.arpeggio(0.05, [88, 93], 0.12, { gain: 0.24, voice: 'wave', hold: 0.2 });
+    s.pulse(0.2, 0.55, { freq: env.ramp(1200, 1600), gain: env.swell(0.12), duty: 0.5 });
+    s.whoosh(0.8, 0.35, { from: 3000, to: 7000, gain: 0.1 });
+    s.sparkle(0.8, 0.4, 5, { lo: 3500, hi: 6500, gain: 0.12 });
+    s.statDown(1.25);
     return s;
   },
 
@@ -31,13 +41,17 @@ export const FAIRY = {
     return s;
   },
 
-  /** Generic self aura (priority): a magical shield rises over the team. */
+  /**
+   * Custom (1.6 s): a rising run of glassy blips as the hexagons pop up one
+   * after another (0-0.75 s), a ringing shield chord while the wall shines
+   * (0.3-1.1 s) and a soft glitter as it fades.
+   */
   craftyshield: () => {
-    const s = new MoveSfx(1.0, 0xc2af);
-    s.chord(0.02, 0.7, [76, 83, 88], { rate: 0.03, gain: 0.22 });
-    s.wave(0.02, 0.7, { freq: () => 164.8, gain: env.swell(0.18) });
-    s.pulse(0.35, 0.3, { freq: () => 2637, gain: env.decay(0.12, 2), duty: 0.5 });
-    s.sparkle(0.3, 0.5, 6, { gain: 0.12 });
+    const s = new MoveSfx(1.6, 0xc2af);
+    s.arpeggio(0.0, [76, 79, 83, 86, 88, 91, 95], 0.1, { gain: 0.16, voice: 'pulse', duty: 0.25, hold: 0.06 });
+    s.chord(0.3, 0.8, [76, 83, 88], { rate: 0.03, gain: 0.18 });
+    s.wave(0.3, 0.8, { freq: () => 164.8, gain: env.swell(0.14) });
+    s.sparkle(1.0, 0.5, 5, { gain: 0.1 });
     return s;
   },
 
@@ -59,58 +73,75 @@ export const FAIRY = {
     return s;
   },
 
-  /** Generic sonic (rings every 0.11 s, impact 0.43 s): a charming, sweet voice. */
+  /**
+   * Custom (1.9 s): a cute rising cry as the user rears up (0-0.35 s), a
+   * warbling run of notes as the sound rings roll out (0.35-1.0 s), then three
+   * bright pops as they burst on the target (0.97-1.25 s) with glitter.
+   */
   disarmingvoice: () => {
-    const s = new MoveSfx(0.95, 0xd15a);
-    [81, 84, 88, 84].forEach((n, i) => {
-      const f = 440 * Math.pow(2, (n - 69) / 12);
-      s.wave(i * 0.11, 0.16, { freq: (u) => f * (1 + 0.02 * Math.sin(2 * Math.PI * 3 * u)), gain: env.swell(0.3) });
-    });
-    s.thud(0.43, 0.3, 0.2);
-    s.sparkle(0.45, 0.3, 4, { gain: 0.12 });
+    const s = new MoveSfx(1.9, 0xd15a);
+    s.pulse(0.0, 0.35, { freq: env.ramp(700, 1400), gain: env.swell(0.26), duty: 0.5 });
+    s.arpeggio(0.35, [84, 88, 91, 88, 93], 0.12, { gain: 0.2, voice: 'wave', hold: 0.1 });
+    for (const t of [0.97, 1.09, 1.21]) s.noise(t, 0.1, { clock: () => 9000, gain: env.decay(0.22) });
+    s.sparkle(1.0, 0.4, 6, { lo: 3500, hi: 6500, gain: 0.12 });
     return s;
   },
 
-  /** Generic projectile (0.43 s) + drain: a blown kiss that steals energy. */
+  /**
+   * Custom (2.3 s): a little smack as the kiss lands at 0.2 s with a
+   * twinkle, a gentle rising tone as the white orb floats back (0.6-1.15 s),
+   * then the soft drain run as green light rises round the user (1.15 s).
+   */
   drainingkiss: () => {
-    const s = new MoveSfx(1.3, 0xd2a1);
-    s.pulse(0.02, 0.12, { freq: (u) => 600 + 900 * Math.sin(Math.PI * u), gain: env.swell(0.25), duty: 0.25 });
-    s.wave(0.1, 0.33, { freq: env.ramp(1000, 1400), gain: env.ramp(0.05, 0.15) });
-    s.arpeggio(0.43, [88], 0.2, { gain: 0.25, voice: 'wave', hold: 0.2 });
-    s.thud(0.43, 0.3, 0.2);
-    s.drain(0.55);
+    const s = new MoveSfx(2.3, 0xd2a1);
+    s.pulse(0.15, 0.06, { freq: env.ramp(1800, 900), gain: env.decay(0.3), duty: 0.25 });
+    s.noise(0.2, 0.06, { clock: () => 10000, gain: env.decay(0.18) });
+    s.sparkle(0.25, 0.35, 5, { lo: 3500, hi: 6000, gain: 0.12 });
+    s.wave(0.6, 0.55, { freq: env.ramp(520, 880), gain: env.swell(0.16) });
+    s.drain(1.15);
     return s;
   },
 
-  /** Generic target aura: chains of light snap shut around the field with a sweet, locking click. */
+  /**
+   * Custom (2.4 s): rattling chain clinks as the chains slide in (0-0.9 s)
+   * with glints (0.3-1.1 s), a swoop as the big padlock drops in (1.15 s) and
+   * a heavy click as its shackle snaps shut at 1.55 s.
+   */
   fairylock: () => {
-    const s = new MoveSfx(1.15, 0xfa10);
-    s.chord(0.02, 0.6, [84, 88, 91], { rate: 0.03, gain: 0.18 });
-    for (let i = 0; i < 4; i++) s.noise(0.1 + i * 0.12, 0.04, { clock: () => 9000, gain: env.decay(0.22, 1), short: true });
-    s.noise(0.6, 0.05, { clock: () => 7000, gain: env.decay(0.35, 1), short: true });
-    s.pulse(0.6, 0.25, { freq: () => 2093.0, gain: env.decay(0.22, 2), duty: 0.5 });
-    s.wave(0.6, 0.4, { freq: () => 1046.5, gain: env.decay(0.18, 1.5) });
+    const s = new MoveSfx(2.4, 0xfa10);
+    s.sparkle(0.0, 0.9, 14, { lo: 1800, hi: 3200, gain: 0.16 });
+    s.noise(0.0, 0.9, { clock: () => 7000, gain: env.swell(0.08), short: true });
+    s.sparkle(0.3, 0.8, 6, { lo: 4500, hi: 7500, gain: 0.1 });
+    s.pulse(1.15, 0.25, { freq: env.ramp(900, 400), gain: env.swell(0.14), duty: 0.5 });
+    s.noise(1.55, 0.06, { clock: () => 12000, gain: env.decay(0.4) });
+    s.thud(1.55, 0.35, 0.2);
+    s.chord(1.6, 0.4, [79, 83, 86], { rate: 0.03, gain: 0.12 });
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s), no original sound: a light, glittering breeze. */
+  /**
+   * Custom (1.5 s): three airy gusts sweep across (0, 0.15, 0.3 s), a
+   * glittery swirl round the target (0.55-1.3 s) with two soft buffets at
+   * 0.63 s and 0.83 s.
+   */
   fairywind: () => {
-    const s = new MoveSfx(0.9, 0xfa1d);
-    s.whoosh(0.0, 0.5, { from: 3000, to: 9000, gain: 0.3 });
-    s.chord(0.0, 0.45, [83, 88, 91], { rate: 0.04, gain: 0.16, vibrato: 0.01 });
-    s.sparkle(0.05, 0.4, 6, { lo: 3500, hi: 6000, gain: 0.14 });
-    s.noise(0.43, 0.2, { clock: (u) => 12000 - 6000 * u, gain: env.attackDecay(0.35, 0.05) });
-    s.arpeggio(0.43, [88, 91, 96], 0.05, { gain: 0.18, voice: 'wave', hold: 0.15 });
+    const s = new MoveSfx(1.5, 0xfa1d);
+    for (const t of [0.0, 0.15, 0.3]) s.whoosh(t, 0.8, { from: 1200, to: 5000, gain: 0.16 });
+    s.sparkle(0.55, 0.7, 7, { lo: 3500, hi: 6500, gain: 0.12 });
+    for (const t of [0.63, 0.83]) s.noise(t, 0.1, { clock: () => 3000, gain: env.decay(0.2) });
     return s;
   },
 
-  /** Generic target aura (~0.8 s, fleck at ~0.6 s): petals open into a flowery shield - a sweet blooming chime with a stat-up run. */
+  /**
+   * Custom (2.0 s): a swirling wind as the magenta whirl circles the field
+   * (0-1.5 s), rustling petal glitter (0.1-1.4 s) and a warm floral chord as
+   * the Pokémon glow pink (0.5-1.5 s).
+   */
   flowershield: () => {
-    const s = new MoveSfx(1.4, 0xf10d);
-    s.chord(0.0, 0.6, [84, 88, 91], { rate: 0.04, gain: 0.18, vibrato: 0.01 });
-    s.sparkle(0.05, 0.5, 6, { lo: 3000, hi: 5000, gain: 0.1 });
-    s.wave(0.0, 0.6, { freq: (u) => 523 + 260 * u, gain: env.swell(0.15) });
-    s.statUp(0.6);
+    const s = new MoveSfx(2.0, 0xf10d);
+    s.noise(0.0, 1.5, { clock: (u) => 2500 + 2000 * Math.sin(u * 9), gain: env.swell(0.16) });
+    s.sparkle(0.1, 1.3, 12, { lo: 2500, hi: 5000, gain: 0.1 });
+    s.chord(0.5, 1.0, [72, 76, 79, 84], { rate: 0.04, gain: 0.16, vibrato: 0.01 });
     return s;
   },
 
@@ -132,25 +163,36 @@ export const FAIRY = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + recoil (~0.55 s), bp 140: a beam of the eternal flower - a radiant chord swelling into a blinding blast, then a jolt back. */
+  /**
+   * Custom (2.6 s): a hush as the scene darkens, a rising shimmering hum as
+   * the pink light gathers (0.25-0.9 s), the beam fires with a bright roar at
+   * 0.9 s and explodes at 1.15 s in a big boom with chimes, then a dull thud
+   * as the user takes the recoil (1.85 s).
+   */
   lightofruin: () => {
-    const s = new MoveSfx(1.15, 0x11fe);
-    s.chord(0.0, 0.45, [84, 88, 91, 96], { rate: 0.03, gain: 0.24, voice: 'pulse' });
-    s.wave(0.0, 0.45, { freq: env.ramp(500, 1000), gain: env.ramp(0.08, 0.2) });
-    s.thud(0.43, 0.65, 0.8);
-    s.noise(0.43, 0.35, { clock: (u) => 14000 - 9000 * u, gain: env.attackDecay(0.4, 0.03) });
-    s.sparkle(0.45, 0.4, 8, { lo: 3000, hi: 6000, gain: 0.14 });
-    s.thud(0.58, 0.4, 0.4);
+    const s = new MoveSfx(2.6, 0x11fe);
+    s.wave(0.25, 0.65, { freq: env.ramp(300, 900), gain: env.ramp(0.05, 0.2) });
+    s.sparkle(0.25, 0.6, 8, { lo: 3500, hi: 6500, gain: 0.1 });
+    s.noise(0.9, 0.7, { clock: (u) => 12000 - 6000 * u, gain: env.attackDecay(0.3, 0.05) });
+    s.pulse(0.9, 0.7, { freq: env.ramp(1200, 600), gain: env.swell(0.14), duty: 0.25 });
+    s.thud(1.15, 0.55, 0.8);
+    s.rumble(1.15, 0.6, { from: 600, to: 150, gain: 0.3 });
+    s.chord(1.15, 0.5, [84, 88, 91], { rate: 0.03, gain: 0.12 });
+    s.thud(1.85, 0.3, 0.3);
     return s;
   },
 
-  /** Generic target aura (~0.8 s, whole field): a soft pink mist blankets the ground under a sweet chord. */
+  /**
+   * Custom (2.5 s, the terrain animation): big sparkles pop round the user (0-0.55 s), sparkles race over the ground as the scene takes its tint (0.4-1.3 s), then the fog bank rises and fades (1.1-2.4 s).
+   * Soft chimes as the sparkles pop, an airy glittering sweep over the ground
+   * and a dreamy, shimmering pad as the pink mist rises.
+   */
   mistyterrain: () => {
-    const s = new MoveSfx(1.15, 0x3157e);
-    s.noise(0.02, 0.85, { clock: (u) => 4000 + 3000 * Math.sin(Math.PI * u), gain: env.swell(0.26) });
-    s.chord(0.02, 0.8, [76, 80, 83, 88], { rate: 0.035, gain: 0.22, vibrato: 0.01 });
-    s.wave(0.02, 0.8, { freq: () => 164.8, gain: env.swell(0.14) });
-    s.sparkle(0.2, 0.6, 6, { lo: 3500, hi: 6500, gain: 0.1 });
+    const s = new MoveSfx(2.5, 0x3157e);
+    s.sparkle(0.0, 0.55, 6, { lo: 4000, hi: 7000, gain: 0.12 });
+    s.noise(0.4, 1.0, { clock: () => 9000, gain: env.swell(0.1) });
+    s.sparkle(0.4, 0.9, 10, { lo: 3500, hi: 6500, gain: 0.08 });
+    s.chord(1.1, 1.3, [76, 81, 84, 88], { rate: 0.05, gain: 0.14, vibrato: 0.012 });
     return s;
   },
 

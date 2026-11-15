@@ -3,14 +3,21 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { ElectricCheekMoveAnimations } from './electric/electric-cheek-moves';
+import { ElectricFieldMoveAnimations } from './electric/electric-field-moves';
 import { FusionBolt } from './electric/fusion-bolt';
 import { VoltSwitch } from './electric/volt-switch';
 import { WildCharge } from './electric/wild-charge';
 
-/** Hand-made animations for Electric-type moves (Fusion Bolt, Volt Switch and Wild Charge live in `electric/`). */
+/**
+ * Hand-made animations for Electric-type moves. Fusion Bolt, Volt Switch, Wild
+ * Charge and the Gen 6 field / cheek moves live in `electric/`.
+ */
 export class ElectricMoveAnimations {
   /** Hand-made Electric move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    ...ElectricFieldMoveAnimations.anims,
+    ...ElectricCheekMoveAnimations.anims,
     boltstrike: (refs, launch, target) => ElectricMoveAnimations.playBoltStrike(refs, launch, target),
     discharge: (refs, launch, target) => ElectricMoveAnimations.playDischarge(refs, launch, target),
     fusionbolt: (refs, launch, target) => FusionBolt.play(refs, launch, target),

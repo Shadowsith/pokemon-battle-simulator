@@ -32,6 +32,9 @@ static readonly anims: MoveAnimRegistry = {
 | `rect(el)` | Bounding box in field pixels (use instead of `getBoundingClientRect`). |
 | `centerOf(el, fieldEl)` / `footOf(el, fieldEl)` | Sprite centre / where it stands. |
 | `place(el, p)` | Absolutely positions `el` centred on `p` (needs `style.width/height` in px). |
+| `spawn(parent, el, at, frames, opts): Promise` | Places `el` centred on `at` in `parent`, plays `frames`, removes it — the one-liner for one-shot particles and props. |
+| `box(w, h, css): HTMLElement` | Plain absolutely positioned `div` of `w` × `h` px with extra inline css. |
+| `glow(el, filter, duration, delay=0)` | Fades a `filter` (tint / glow) in on a sprite and back out, leaving nothing behind. |
 | `clamp(n, lo, hi)` | Clamp. |
 | `zigzagPoints(x0, y0, x1, y1, jag)` | SVG polyline points for a lightning path. |
 
@@ -48,6 +51,7 @@ static readonly anims: MoveAnimRegistry = {
 | `dart(el, dir)` | Caster darts toward the target and back. |
 | `leapCrash(refs, launch, target, onLand)` | User leaps out of view and drops onto the target (landing 0.65 s, runs `onLand`), then slides home (~1.0 s) (Heat Crash, Heavy Slam). |
 | `crackle(el, size, color)` | Flickering jagged sparks off the edge of `el`; returns a stop function. |
+| `crackleOver(fxEl, at, size, color)` | `crackle` in its own box over a sprite (sprites are `<img>`, children don't render); the stop function removes it (Nuzzle, Electrify). |
 | `crackleRam(refs, launch, target, style)` | Black scene, tinted user behind a crackling ball that flares, charge, yellow ray backdrop on the crackling target (~2.2 s) (Bolt Strike, Freeze Shock). |
 | `orangeSparkles(refs, launch, top)` | Orange sparkles drift down over the caster (~1.2 s). |
 | `statUpAura(refs, launch)` | Stat-up: orange bands scroll up over the caster (~0.8 s). |
@@ -61,12 +65,13 @@ static readonly anims: MoveAnimRegistry = {
 | `burstBackdrop(fieldEl, at, 'red'\|'blue'\|'ember'\|'magenta'\|'orange'\|'green'\|'yellow'\|'flare'\|'amber')` | Backdrop with flickering burst rays; caller fades out + removes it. |
 | `cornerSun(fxEl, sun, size, total)` | Pulsing sun with sparkles. |
 | `healSparkles(refs, launch)` | Green heal stars round the caster (~0.9 s). |
+| `healStreaks(refs, launch, count=6)` | Green light streaks rise round the caster as it heals (~0.8 s; Draining Kiss, Parabolic Charge). |
 | `fireBlastCloud(fxEl, hit, size, count, sparkColor)` | Fiery explosion cloud with sparks. |
 | `playElementalPunch(refs, target, fistTone, flashColor, particle)` | Coloured fist + element particle burst (Ice/Thunder Punch). |
 
 ## `FxGlyphs` — particles and props (`fx-glyphs.ts`)
 All return an absolutely positioned element; place it with `Fx.place`.
-- **Energy:** `sparkStar(size, color)` 4-point star · `fivePointStar(size, glow)` · `ringSparkle(size, color, ring)` · `psySparkle(size)` · `spikyBurst(size, outer, inner, centre?)` comic impact burst · `glyph(v, size)` type particle · `boltGlyph(color, size)` · `sparkBolt()`.
+- **Energy:** `sparkStar(size, color)` 4-point star · `fivePointStar(size, glow)` · `ringSparkle(size, color, ring)` · `psySparkle(size)` · `spikyBurst(size, outer, inner, centre?)` comic impact burst · `glyph(v, size)` type particle · `boltGlyph(color, size)` · `sparkBolt()` · `lightning(W, H, from, to, jag, color?, glow?, width?)` field-sized jagged bolt SVG · `hexagon(s, fill, glow)` glowing hex tile.
 - **Elements:** `firePuff(size, 'hot'|'red'|'blue')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `pointedRock(w)` sharp stone, tip up · `poisonBubble(size)` glossy purple bubble · `petalGlyph(s, color)` · `leafGlyph(s)`.
 - **Body parts:** `fistGlyph(w, tone)` (tones in `FIST_TONES`: yellow, red, ice, blue, dark, brown) · `footGlyph(w, color?)` · `chopHandGlyph(w)` · `gloveGlyph(w)` · `pointingHandGlyph(w)` · `jawGlyph(w, h, lower)` · `incisorGlyph(h)` · `snakeEyeGlyph(w, side)`.
 - **Props:** `swordGlyph(h)` · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `itemBag(size)` cream item sack (Trick, Switcheroo) · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
@@ -75,6 +80,7 @@ All return an absolutely positioned element; place it with `Fx.place`.
 `DIM_BACKDROP` (dark scene) · `HEAT_BACKDROP` (red-hot) · `PSYCHIC_WAVES`, `WATERFALL_WAVES` (tiling backgrounds) · `FIST_TONES` · `FLECK_COLOR` (statUp green, statDown red, poison purple, …) · `TYPE_STYLE` · `BUBBLE_DRIFT` / `BUBBLE_BEAM`.
 
 ## Reusable pieces inside type files (private, but worth knowing)
+- `TerrainFx.play(refs, launch, TerrainFx.ELECTRIC | GRASSY | MISTY)` (terrain-fx.ts): the shared terrain animation; a new terrain is a new `TerrainStyle`.
 - `ElectricMoveAnimations.groundStreak(...)` (electric-moves.ts).
 - `PoisonMoveAnimations.sludgeGlob(size)` (poison-moves.ts).
 - `BugMoveAnimations.webGlyph(...)`, `beeGlyph(w)` (bug-moves.ts).
@@ -83,4 +89,4 @@ All return an absolutely positioned element; place it with `Fx.place`.
 If one of these is needed in another type file, move it to `FxEffects` / `FxGlyphs` instead of copying it.
 
 ## Reference frames
-`node scripts/apng-sheet.mjs <moveId ...>` downloads a move's Gen 4 and Gen 5 Pokewiki APNGs (URLs from the review checklist) and writes one small frame sheet per move. Read that image, not the raw APNGs.
+`node scripts/apng-sheet.mjs <moveId ...>` downloads a move's Gen 4–6 Pokewiki APNGs / MP4s (URLs from the review checklist) and writes one small frame sheet per move. Read that image, not the raw APNGs.

@@ -37,10 +37,10 @@ Search for `⭐` to jump between them. 284 moves are marked.
 - **Reviewed** = watched at least once, as attacker on both sides.
 
 ## Reference animations (Pokewiki)
-⭐ moves of Gen 4 and Gen 5 list the original in-game animations as APNG images from [Pokewiki](https://www.pokewiki.de), taken from the "Durchführung" gallery of the move's page. Open a URL in the browser to watch it.
-- Gen 4 moves have a Gen 4 and a Gen 5 image; Gen 5 moves only a Gen 5 image.
+⭐ moves of Gen 4 and Gen 5 and all Gen 6 moves list the original in-game animations as APNG images from [Pokewiki](https://www.pokewiki.de), taken from the "Durchführung" gallery of the move's page. Open a URL in the browser to watch it.
+- Gen 4 moves have a Gen 4 and a Gen 5 image; Gen 5 moves only a Gen 5 image; Gen 6 moves a Gen 6 (XY) image. Where Pokewiki only has a video, the Gen 6 MP4 is listed instead.
 - Where Pokewiki splits Gen 4 by game, both variants are listed (`DP` / `DPPt` / `Pt` / `PtHGSS` / `HGSS`). `SW` = Schwarz/Weiß.
-- Gen 1–3 and Gen 6 moves and non-⭐ moves have no references yet.
+- Gen 1–3 moves and non-⭐ Gen 4/5 moves have no references yet.
 
 ## When a new custom animation is added
 Every move has a self-made free sound (`public/assets/sounds/moves/free/<id>.mp3`). Its recipe in `scripts/move-sounds/recipes/<type>.mjs` (Normal: `recipes/normal/`) is timed to the animation the move had when the sound was made. **Only when a move gets a new hand-made animation** (an entry in a `moves/<type>-moves.ts` registry, including a custom charge turn), check that move's free sound again:
@@ -911,65 +911,189 @@ Changes to the generic delivery animations or to this review list alone don't ne
 
 ## Gen 6 (62)
 
-- [ ] **Aromatic Mist** / Duftwolke — `aromaticmist` · Fairy · Status · `selfAura`
-- [ ] **Baby-Doll Eyes** / Kulleraugen — `babydolleyes` · Fairy · Status · `selfAura`
+- [x] **Aromatic Mist** / Duftwolke — `aromaticmist` · Fairy · Status · pink mist washes over the user with pink puffs and sparkles, then a stat-up aura (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Duftwolke
+  - Gen 6 APNG: https://www.pokewiki.de/images/a/ae/Duftwolke_Gen6.png
+- [x] **Baby-Doll Eyes** / Kulleraugen — `babydolleyes` · Fairy · Status · white rays + glowing ring flash round the user's eyes, blue glints fly to the foe, XY stat-drop cloud (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Kulleraugen
+  - Gen 6 APNG: https://www.pokewiki.de/images/d/d3/Kulleraugen_Gen6.png
 - [x] ⭐ **Belch** / Rülpser — `belch` · Poison · Special · pink burp puff + sparks, dusky scene, sound rings travel to and close in on the target, pink gas bursts (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/R%C3%BClpser
+  - Gen 6 APNG: https://www.pokewiki.de/images/8/82/R%C3%BClpser_Gen6.png
 - [x] ⭐ **Boomburst** / Überschallknall — `boomburst` · Normal · Special · red-pink rays + mouth sparks, orange scene, shockwave rings roll through the target (custom, needs review)
-- [ ] **Celebrate** / Ehrentag — `celebrate` · Normal · Status · `selfAura`
-- [ ] **Confide** / Vertrauenssache — `confide` · Normal · Status · `selfAura`
-- [ ] **Crafty Shield** / Trickschutz — `craftyshield` · Fairy · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/%C3%9Cberschallknall
+  - Gen 6 APNG: https://www.pokewiki.de/images/9/9f/%C3%9Cberschallknall_Gen6.png
+- [x] **Celebrate** / Ehrentag — `celebrate` · Normal · Status · black scene + spotlight on a red star-pattern gift box, lid pops off, rainbow rays + confetti (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Ehrentag
+  - Gen 6 MP4: https://www.pokewiki.de/images/6/65/Ehrentag_Gen6.mp4
+- [x] **Confide** / Vertrauenssache — `confide` · Normal · Status · letterbox + speech bubble whooshes through speed lines to the foe, "…" bubble, XY stat-drop cloud (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Vertrauenssache
+  - Gen 6 APNG: https://www.pokewiki.de/images/d/d3/Vertrauenssache_Gen6.png
+- [x] **Crafty Shield** / Trickschutz — `craftyshield` · Fairy · Status · red-tinted scene, a curved wall of glowing pink hexagons rises in front of the user (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Trickschutz
+  - Gen 6 APNG: https://www.pokewiki.de/images/2/21/Trickschutz_Gen6.png
 - [x] ⭐ **Dazzling Gleam** / Zauberschein — `dazzlinggleam` · Fairy · Special · white wash, shadow halo + prismatic rainbow ring at the user, dark streaks, blinding prismatic flash on target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Zauberschein
+  - Gen 6 APNG: https://www.pokewiki.de/images/4/40/Zauberschein_Gen6.png
 - [x] ⭐ **Diamond Storm** / Diamantsturm — `diamondstorm` · Rock · Physical · white glow into a faceted diamond, magenta scene, storm of pink shards to the target, pink burst (custom, needs review)
-- [ ] **Disarming Voice** / Säuselstimme — `disarmingvoice` · Fairy · Special · `sonic`
+  - Pokewiki: https://www.pokewiki.de/Diamantsturm
+  - Gen 6 APNG: https://www.pokewiki.de/images/5/57/Diamantsturm_Gen6.png
+- [x] **Disarming Voice** / Säuselstimme — `disarmingvoice` · Fairy · Special · user rears up, rose-red scene, jagged pink sound rings + notes roll to the target and burst (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/S%C3%A4uselstimme
+  - Gen 6 APNG: https://www.pokewiki.de/images/0/0c/S%C3%A4uselstimme_Gen6.png
 - [x] ⭐ **Dragon Ascent** / Zenitstürmer — `dragonascent` · Flying · Physical · glows and shoots up, streak + star flash in a nebula, green comet dives onto target, user Def/SpD drop (custom, needs review)
-- [ ] **Draining Kiss** / Diebeskuss — `drainingkiss` · Fairy · Special · `projectile`
-- [ ] **Eerie Impulse** / Mystowellen — `eerieimpulse` · Electric · Status · `selfAura`
-- [ ] **Electric Terrain** / Elektrofeld — `electricterrain` · Electric · Status · `targetAura`
-- [ ] **Electrify** / Elektrifizierung — `electrify` · Electric · Status · `targetAura`
-- [ ] **Fairy Lock** / Feenschloss — `fairylock` · Fairy · Status · `targetAura`
-- [ ] **Fairy Wind** / Feenbrise — `fairywind` · Fairy · Special · `projectile`
-- [ ] **Fell Stinger** / Stachelfinale — `fellstinger` · Bug · Physical · `melee`
-- [ ] **Flower Shield** / Floraschutz — `flowershield` · Fairy · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Zenitst%C3%BCrmer
+  - Gen 6 APNG: https://www.pokewiki.de/images/d/d7/Zenitst%C3%BCrmer_Gen6.png
+- [x] **Draining Kiss** / Diebeskuss — `drainingkiss` · Fairy · Special · pink kiss + yellow-white glow on target, white orb floats back, green heal streaks (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Diebeskuss
+  - Gen 6 APNG: https://www.pokewiki.de/images/3/30/Diebeskuss_Gen6.png
+- [x] **Eerie Impulse** / Mystowellen — `eerieimpulse` · Electric · Status · cyan rings pulse to the target, crackles + yellow orbs circle it, XY stat-drop cloud (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Mystowellen
+  - Gen 6 APNG: https://www.pokewiki.de/images/5/5d/Mystowellen_Gen6.png
+- [x] **Electric Terrain** / Elektrofeld — `electricterrain` · Electric · Status · shared terrain animation: yellow sparkles, yellow tint, sparks race over the ground, fog with lightning (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Elektrofeld
+  - Gen 6 APNG: https://www.pokewiki.de/images/c/cf/Elektrofeld_Gen6.png
+- [x] **Electrify** / Elektrifizierung — `electrify` · Electric · Status · yellow-white streak to the target, orange ring flares at its feet, crackling yellow glow (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Elektrifizierung
+  - Gen 6 APNG: https://www.pokewiki.de/images/2/23/Elektrifizierung_Gen6.png
+- [x] **Fairy Lock** / Feenschloss — `fairylock` · Fairy · Status · golden chains with padlocks slide across the field, big padlock snaps shut (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Feenschloss
+  - Gen 6 APNG: https://www.pokewiki.de/images/e/e6/Feenschloss_Gen6.png
+- [x] **Fairy Wind** / Feenbrise — `fairywind` · Fairy · Special · pale pink-white gusts sweep across, white streaks + pink sparkles whirl round the target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Feenbrise
+  - Gen 6 APNG: https://www.pokewiki.de/images/a/a1/Feenbrise_Gen6.png
+- [x] **Fell Stinger** / Stachelfinale — `fellstinger` · Bug · Physical · black, then magenta scene, target as silhouette, dark stinger orb with violet cracks (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Stachelfinale
+  - Gen 6 APNG: https://www.pokewiki.de/images/0/05/Stachelfinale_Gen6.png
+- [x] **Flower Shield** / Floraschutz — `flowershield` · Fairy · Status · purple scene, magenta wind swirl carries petals round the field, Pokémon glow pink (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Floraschutz
+  - Gen 6 APNG: https://www.pokewiki.de/images/c/c0/Floraschutz_Gen6.png
 - [x] ⭐ **Flying Press** / Flying Press — `flyingpress` · Fighting · Physical · leaps out of sight, dives down through speed lines, body slam with dust cloud + rock chips (custom, needs review)
-- [ ] **Forest's Curse** / Waldesfluch — `forestscurse` · Grass · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Flying_Press
+  - Gen 6 APNG: https://www.pokewiki.de/images/c/cb/Flying_Press_Gen6.png
+- [x] **Forest's Curse** / Waldesfluch — `forestscurse` · Grass · Status · black, then dusk sky with twisted bare trees growing round the target, green glow + spores (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Waldesfluch
+  - Gen 6 APNG: https://www.pokewiki.de/images/2/2c/Waldesfluch_Gen6.png
 - [x] ⭐ **Freeze-Dry** / Gefriertrockner — `freezedry` · Ice · Special · warm glow, ice shards swirl in, target whitens inside an ice crystal that shatters into snowflakes (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Gefriertrockner
+  - Gen 6 APNG: https://www.pokewiki.de/images/2/26/Gefriertrockner_Gen6.png
 - [x] ⭐ **Geomancy** / Geokontrolle — `geomancy` · Fairy · Status · turn 1: light pillars + swirling rainbow gems; turn 2: rainbow light fan, white ground glow, stat-up aura (custom, needs review)
-- [ ] **Grassy Terrain** / Grasfeld — `grassyterrain` · Grass · Status · `targetAura`
-- [ ] **Happy Hour** / Goldene Zeiten — `happyhour` · Normal · Status · `selfAura`
-- [ ] **Hold Back** / Zurückhaltung — `holdback` · Normal · Physical · `melee`
-- [ ] **Hold Hands** / Händchenhalten — `holdhands` · Normal · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Geokontrolle
+  - Gen 6 APNG: https://www.pokewiki.de/images/f/f9/Geokontrolle_Gen6.png
+- [x] **Grassy Terrain** / Grasfeld — `grassyterrain` · Grass · Status · shared terrain animation: green sparkles, green tint, leaves blow across, pale green fog (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Grasfeld
+  - Gen 6 APNG: https://www.pokewiki.de/images/2/2f/Grasfeld_Gen6.png
+- [x] **Happy Hour** / Goldene Zeiten — `happyhour` · Normal · Status · dimmed scene, user hops twice, golden firefly sparkles rise round it (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Goldene_Zeiten
+  - Gen 6 APNG: https://www.pokewiki.de/images/6/66/Goldene_Zeiten_Gen6.png
+- [x] **Hold Back** / Zurückhaltung — `holdback` · Normal · Physical · user darts in, glowing yellow-white crescent sweeps across the target + little stars (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Zur%C3%BCckhaltung
+  - Gen 6 APNG: https://www.pokewiki.de/images/2/2c/Zur%C3%BCckhaltung_Gen6.png
+- [x] **Hold Hands** / Händchenhalten — `holdhands` · Normal · Status · magenta star scene, hearts, rainbow ribbons swirl, two gloves clasp in a rainbow ring, stars burst (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/H%C3%A4ndchenhalten
+  - Gen 6 APNG: https://www.pokewiki.de/images/5/54/H%C3%A4ndchenhalten_Gen6.png
 - [x] ⭐ **Hyperspace Fury** / Dimensionswahn — `hyperspacefury` · Dark · Physical · magenta scene + portal rings round the user, psychedelic swirl, gloves punch out of portals round the target, user Defense drop (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Dimensionswahn
+  - Gen 6 APNG: https://www.pokewiki.de/images/7/75/Dimensionswahn_Gen6.png
 - [x] ⭐ **Hyperspace Hole** / Dimensionsloch — `hyperspacehole` · Psychic · Special · white wash, user sinks into an ink hole and rises from one under the target, pink burst + white bolt + ink spikes (custom, needs review)
-- [ ] **Infestation** / Plage — `infestation` · Bug · Special · `projectile`
-- [ ] **Ion Deluge** / Plasmaschauer — `iondeluge` · Electric · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Dimensionsloch
+  - Gen 6 APNG: https://www.pokewiki.de/images/e/e0/Dimensionsloch_Gen6.png
+- [x] **Infestation** / Plage — `infestation` · Bug · Special · dark swarm of tiny bugs crawls round the target, which turns teal (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Plage
+  - Gen 6 APNG: https://www.pokewiki.de/images/c/c2/Plage_Gen6.png
+- [x] **Ion Deluge** / Plasmaschauer — `iondeluge` · Electric · Status · stormy blue sky, yellow lightning rains over the field, glowing user, spark spray (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Plasmaschauer
+  - Gen 6 APNG: https://www.pokewiki.de/images/a/af/Plasmaschauer_Gen6.png
 - [x] ⭐ **King's Shield** / Königsschild — `kingsshield` · Steel · Status · magenta sparks + grey orb, glowing lilac honeycomb shield in front of the user (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/K%C3%B6nigsschild
+  - Gen 6 APNG: https://www.pokewiki.de/images/6/6b/K%C3%B6nigsschild_Gen6.png
 - [x] ⭐ **Land's Wrath** / Bodengewalt — `landswrath` · Ground · Physical · black scene, golden ground rings + rising light round the user, golden light curtain over the target's side (custom, needs review)
-- [ ] ⭐ **Light of Ruin** / Lux Calamitatis — `lightofruin` · Fairy · Special · `projectile`
-- [ ] **Magnetic Flux** / Magnetregler — `magneticflux` · Electric · Status · `selfAura`
-- [ ] **Mat Block** / Tatami-Schild — `matblock` · Fighting · Status · `selfAura`
-- [ ] **Misty Terrain** / Nebelfeld — `mistyterrain` · Fairy · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Bodengewalt
+  - Gen 6 APNG: https://www.pokewiki.de/images/4/4a/Bodengewalt_Gen6.png
+- [x] ⭐ **Light of Ruin** / Lux Calamitatis — `lightofruin` · Fairy · Special · dark scene, pink light orb gathers, huge pink-white beam + explosion, recoil flinch (no Pokewiki reference) (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Lux_Calamitatis
+  - no Gen 6 animation on Pokewiki
+- [x] **Magnetic Flux** / Magnetregler — `magneticflux` · Electric · Status · golden scene with white lightning, orange magnetic rings circle the crackling user, stat-up aura (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Magnetregler
+  - Gen 6 APNG: https://www.pokewiki.de/images/8/8a/Magnetregler_Gen6.png
+- [x] **Mat Block** / Tatami-Schild — `matblock` · Fighting · Status · user ducks and flips a green tatami mat up in front of itself (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Tatami-Schild
+  - Gen 6 APNG: https://www.pokewiki.de/images/4/43/Tatami-Schild_Gen6.png
+- [x] **Misty Terrain** / Nebelfeld — `mistyterrain` · Fairy · Status · shared terrain animation: white sparkles, lilac tint, sparkles over the ground, pink fog (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Nebelfeld
+  - Gen 6 APNG: https://www.pokewiki.de/images/6/62/Nebelfeld_Gen6.png
 - [x] ⭐ **Moonblast** / Mondgewalt — `moonblast` · Fairy · Special · magenta sky, glowing full moon with pink rays, white orb to target, huge white flash + pink rings (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Mondgewalt
+  - Gen 6 APNG: https://www.pokewiki.de/images/9/98/Mondgewalt_Gen6.png
 - [x] ⭐ **Mystical Fire** / Magieflamme — `mysticalfire` · Fire · Special · flame tip draws a fire ring, ring flies to target and bursts into a fireball, purple stat-drop cloud (custom, needs review)
-- [ ] **Noble Roar** / Kampfgebrüll — `nobleroar` · Normal · Status · `selfAura`
-- [ ] **Nuzzle** / Wangenrubbler — `nuzzle` · Electric · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Magieflamme
+  - Gen 6 APNG: https://www.pokewiki.de/images/5/5d/Magieflamme_Gen6.png
+- [x] **Noble Roar** / Kampfgebrüll — `nobleroar` · Normal · Status · user roars, jagged red/orange/blue rays, fiery red ring spirals round the reddened target, XY stat-drop cloud (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Kampfgebr%C3%BCll
+  - Gen 6 APNG: https://www.pokewiki.de/images/d/d7/Kampfgebr%C3%BCll_Gen6.png
+- [x] **Nuzzle** / Wangenrubbler — `nuzzle` · Electric · Physical · yellow flash + crackling cheeks, user scoots over and rubs the target, red/violet paralysis sparks (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Wangenrubbler
+  - Gen 6 APNG: https://www.pokewiki.de/images/b/bd/Wangenrubbler_Gen6.png
 - [x] ⭐ **Oblivion Wing** / Unheilsschwingen — `oblivionwing` · Flying · Special · letterbox + crimson sphere, crimson sky beam onto target with rubble, magenta drain + heal sparkles (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Unheilsschwingen
+  - Gen 6 APNG: https://www.pokewiki.de/images/5/51/Unheilsschwingen_Gen6.png
 - [x] ⭐ **Origin Pulse** / Ursprungswoge — `originpulse` · Water · Special · cyan rings, deep-sea scene, blue orbs gather + beams, stream to target, blue-white crackling blast (custom, needs review)
-- [ ] **Parabolic Charge** / Parabolladung — `paraboliccharge` · Electric · Special · `field`
+  - Pokewiki: https://www.pokewiki.de/Ursprungswoge
+  - Gen 6 APNG: https://www.pokewiki.de/images/d/d0/Ursprungswoge_Gen6.png
+- [x] **Parabolic Charge** / Parabolladung — `paraboliccharge` · Electric · Special · red cheek sparks, orange scene, lightning bursts across the field onto the target, green flash + heal (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Parabolladung
+  - Gen 6 APNG: https://www.pokewiki.de/images/5/56/Parabolladung_Gen6.png
 - [x] ⭐ **Parting Shot** / Abgangstirade — `partingshot` · Dark · Status · letterbox + speed lines, white shout burst at foe, purple cloud rains on target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Abgangstirade
+  - Gen 6 APNG: https://www.pokewiki.de/images/2/25/Abgangstirade_Gen6.png
 - [x] ⭐ **Petal Blizzard** / Blütenwirbel — `petalblizzard` · Grass · Physical · dim green scene, multicoloured petal storm across the field, green sphere bursts on target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Bl%C3%BCtenwirbel
+  - Gen 6 APNG: https://www.pokewiki.de/images/4/4d/Bl%C3%BCtenwirbel_Gen6.png
 - [x] ⭐ **Phantom Force** / Phantomkraft — `phantomforce` · Ghost · Physical · turn 1: sinks into a purple portal; turn 2: drops out of a portal above the target, purple burst + flames (custom, needs review)
-- [ ] **Play Nice** / Kameradschaft — `playnice` · Normal · Status · `selfAura`
+  - Pokewiki: https://www.pokewiki.de/Phantomkraft
+  - Gen 6 APNG: https://www.pokewiki.de/images/2/26/Phantomkraft_Gen6.png
+- [x] **Play Nice** / Kameradschaft — `playnice` · Normal · Status · friendly hop, bright scene, golden stars + hearts round the target, XY stat-drop cloud (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Kameradschaft
+  - Gen 6 APNG: https://www.pokewiki.de/images/8/86/Kameradschaft_Gen6.png
 - [x] ⭐ **Play Rough** / Knuddler — `playrough` · Fairy · Physical · speed lines + dash, brawl cloud with stars and hearts (custom, needs review)
-- [ ] **Powder** / Pulverschleuder — `powder` · Bug · Status · `powder`
-- [ ] **Power-Up Punch** / Steigerungshieb — `poweruppunch` · Fighting · Physical · `melee`
+  - Pokewiki: https://www.pokewiki.de/Knuddler
+  - Gen 6 APNG: https://www.pokewiki.de/images/1/14/Knuddler_Gen6.png
+- [x] **Powder** / Pulverschleuder — `powder` · Bug · Status · user flaps, grey-white powder drifts over in an arc and settles in a dusty puff (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Pulverschleuder
+  - Gen 6 APNG: https://www.pokewiki.de/images/8/84/Pulverschleuder_Gen6.png
+- [x] **Power-Up Punch** / Steigerungshieb — `poweruppunch` · Fighting · Physical · red-white charge orb at the fist, white wash + red fist in a spiky burst, stat-up aura (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Steigerungshieb
+  - Gen 6 APNG: https://www.pokewiki.de/images/0/0a/Steigerungshieb_Gen6.png
 - [x] ⭐ **Precipice Blades** / Abgrundsklinge — `precipiceblades` · Ground · Physical · dark scene + lava floor, rock blades rise, fiery blast with red crystal spear, smoke (custom, needs review)
-- [ ] **Rototiller** / Pflüger — `rototiller` · Ground · Status · `targetAura`
+  - Pokewiki: https://www.pokewiki.de/Abgrundsklinge
+  - Gen 6 APNG: https://www.pokewiki.de/images/0/0d/Abgrundsklinge_Gen6.png
+- [x] **Rototiller** / Pflüger — `rototiller` · Ground · Status · brown earth scene with ploughed furrows rolling by, dust puffs, green sprout sparkles (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Pfl%C3%BCger
+  - Gen 6 APNG: https://www.pokewiki.de/images/f/f6/Pfl%C3%BCger_Gen6.png
 - [x] ⭐ **Spiky Shield** / Schutzstacheln — `spikyshield` · Grass · Status · green-tinted user + green ring, cone of green spikes bursts toward foe (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Schutzstacheln
+  - Gen 6 APNG: https://www.pokewiki.de/images/5/5e/Schutzstacheln_Gen6.png
 - [x] ⭐ **Steam Eruption** / Dampfschwall — `steameruption` · Water · Special · glowing user + steam jets, steam flood, hot orange blast on target, cools with rising steam (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Dampfschwall
+  - Gen 6 APNG: https://www.pokewiki.de/images/3/38/Dampfschwall_Gen6.png
 - [x] ⭐ **Sticky Web** / Klebenetz — `stickyweb` · Bug · Status · glowing orb + green web arcs over foe, drops flat, white ground web spreads (custom, needs review)
-- [ ] ⭐ **Thousand Arrows** / Tausend Pfeile — `thousandarrows` · Ground · Physical · `field`
-- [ ] ⭐ **Thousand Waves** / Tausend Wellen — `thousandwaves` · Ground · Physical · `field`
-- [ ] **Topsy-Turvy** / Invertigo — `topsyturvy` · Dark · Status · `targetAura`
-- [ ] **Trick-or-Treat** / Halloween — `trickortreat` · Ghost · Status · `targetAura`
-- [ ] **Venom Drench** / Giftfalle — `venomdrench` · Poison · Status · `targetAura`
-- [ ] **Water Shuriken** / Wasser-Shuriken — `watershuriken` · Water · Special · `projectile`
+  - Pokewiki: https://www.pokewiki.de/Klebenetz
+  - Gen 6 APNG: https://www.pokewiki.de/images/4/4c/Klebenetz_Gen6.png
+- [x] ⭐ **Thousand Arrows** / Tausend Pfeile — `thousandarrows` · Ground · Physical · night, green sphere at the user, light arrows fan into the sky and rain onto the target (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Tausend_Pfeile
+  - Gen 6 MP4: https://www.pokewiki.de/images/6/60/Tausend_Pfeile_Gen6.mp4
+- [x] ⭐ **Thousand Waves** / Tausend Wellen — `thousandwaves` · Ground · Physical · night, green hexagon cells spray up and roll over the ground, burst at the target's feet (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Tausend_Wellen
+  - Gen 6 MP4: https://www.pokewiki.de/images/0/04/Tausend_Wellen_Gen6.mp4
+- [x] **Topsy-Turvy** / Invertigo — `topsyturvy` · Dark · Status · grey scene, red grid on top, target floats up, blue grid below, it drops (moves only, no flip) (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Invertigo
+  - Gen 6 APNG: https://www.pokewiki.de/images/9/9a/Invertigo_Gen6.png
+- [x] **Trick-or-Treat** / Halloween — `trickortreat` · Ghost · Status · night, white puffs, cartoon ghosts float over and swirl round the target, big purple ghost rises (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Halloween
+  - Gen 6 APNG: https://www.pokewiki.de/images/3/34/Halloween_Gen6.png
+- [x] **Venom Drench** / Giftfalle — `venomdrench` · Poison · Status · purple bubble above the target drops and bursts into a poison cloud, violet flash, XY stat-drop cloud (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Giftfalle
+  - Gen 6 APNG: https://www.pokewiki.de/images/b/b3/Giftfalle_Gen6.png
+- [x] **Water Shuriken** / Wasser-Shuriken — `watershuriken` · Water · Special · per hit: user crouches, spinning blue water star flies to the target and splashes (custom, needs review)
+  - Pokewiki: https://www.pokewiki.de/Wasser-Shuriken
+  - Gen 6 APNG: https://www.pokewiki.de/images/7/77/Wasser-Shuriken_Gen6.png

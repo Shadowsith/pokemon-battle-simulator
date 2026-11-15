@@ -4,10 +4,11 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { HammerArm } from './hammer-arm';
+import { PowerUpPunch } from './power-up-punch';
 import { SacredSword } from './sacred-sword';
 import { WakeUpSlap } from './wake-up-slap';
 
-/** Hand-made animations for Fighting-type punches, chops and full-power blows (Hammer Arm, Sacred Sword and Wake-Up Slap live in `hammer-arm.ts` / `sacred-sword.ts` / `wake-up-slap.ts`). */
+/** Hand-made animations for Fighting-type punches, chops and full-power blows (Hammer Arm, Power-Up Punch, Sacred Sword and Wake-Up Slap live in `hammer-arm.ts` / `power-up-punch.ts` / `sacred-sword.ts` / `wake-up-slap.ts`). */
 export class FightingPunchMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -18,6 +19,7 @@ export class FightingPunchMoveAnimations {
     dynamicpunch: (refs, _launch, target) => FightingPunchMoveAnimations.playDynamicPunch(refs, target),
     focuspunch: (refs, launch, target) => FightingPunchMoveAnimations.playFocusPunch(refs, launch, target),
     hammerarm: (refs, launch, target, v) => HammerArm.play(refs, launch, target, v),
+    poweruppunch: (refs, launch, target) => PowerUpPunch.play(refs, launch, target),
     sacredsword: (refs, _launch, target, v) => SacredSword.play(refs, target, v),
     skyuppercut: (refs) => FightingPunchMoveAnimations.playSkyUppercut(refs),
     superpower: (refs, launch, target, v) => FightingPunchMoveAnimations.playSuperpower(refs, launch, target, v),

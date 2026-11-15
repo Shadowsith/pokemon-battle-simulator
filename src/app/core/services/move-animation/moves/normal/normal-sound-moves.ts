@@ -1,12 +1,16 @@
 import { Point, BattleStageRefs, MoveAnimRegistry } from '../../animation.types';
 import { Fx } from '../../fx';
+import { FxGlyphs } from '../../fx-glyphs';
+import { FxEffects } from '../../fx-effects';
 import { RelicSong } from './relic-song';
 
-/** Hand-made animations for Normal-type sound attacks (Relic Song lives in `relic-song.ts`). */
+/** Hand-made animations for Normal-type sound moves (Relic Song lives in `relic-song.ts`). */
 export class NormalSoundMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     boomburst: (refs, launch, target) => NormalSoundMoveAnimations.playBoomburst(refs, launch, target),
+    confide: (refs, launch, target) => NormalSoundMoveAnimations.playConfide(refs, launch, target),
+    nobleroar: (refs, launch, target) => NormalSoundMoveAnimations.playNobleRoar(refs, launch, target),
     relicsong: (refs, launch, target) => RelicSong.play(refs, launch, target)
   };
 
@@ -111,5 +115,110 @@ export class NormalSoundMoveAnimations {
         .then(() => flash.remove())
     );
     await Promise.all(effects);
+  }
+
+  /**
+   * Confide, after the XY animation: black letterbox bars close in and a
+   * white speech bubble swells at the user's mouth (0-0.5 s), whooshes to the
+   * target through speed lines (0.5-0.85 s) and leaves a small "…" bubble
+   * over its head (0.85-1.4 s), then its Sp. Atk falls (1.4-2.4 s).
+   * Reference: https://www.pokewiki.de/images/d/d3/Vertrauenssache_Gen6.png
+   */
+  private static async playConfide(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const bars = [0, 1].map((bottom) => {
+      const bar = Fx.box(W, H * 0.16, `left:0;${bottom ? 'bottom' : 'top'}:0;background:#000`);
+      fxEl.appendChild(bar);
+      Fx.anim(bar, [{ transform: `translateY(${bottom ? 100 : -100}%)` }, { transform: 'translateY(0)' }], { duration: 250, easing: 'ease-out' });
+      return bar;
+    });
+    const dir = target.x >= launch.x ? 1 : -1;
+    const mouth: Point = { x: launch.x + dir * lr.width * 0.35, y: launch.y - lr.height * 0.15 };
+    const bw = Math.max(lr.width * 0.55, 44);
+    const bubble = NormalSoundMoveAnimations.speechBubble(bw, '');
+    Fx.place(bubble, mouth);
+    fxEl.appendChild(bubble);
+    await Fx.anim(bubble, [{ transform: 'scale(.1)', opacity: 0 }, { transform: 'scale(1.1)', opacity: 1, offset: 0.7 }, { transform: 'scale(1)', opacity: 1 }], { duration: 350, delay: 150, easing: 'ease-out' });
+
+    const lines = Fx.box(W, H, 'left:0;top:0;overflow:hidden');
+    fxEl.insertBefore(lines, bars[0]);
+    FxEffects.speedLines(lines, W, H, dir, ['#ffffffcc', '#C8D0E0aa']);
+    const head: Point = { x: target.x, y: target.y - tr.height * 0.55 };
+    await Fx.anim(bubble, [
+      { transform: 'translate(0,0) scale(1)' },
+      { transform: `translate(${head.x - mouth.x}px,${head.y - mouth.y}px) scale(.35)` }
+    ], { duration: 350, easing: 'ease-in' });
+    bubble.remove();
+    lines.remove();
+    await Promise.all(bars.map((bar) => Fx.anim(bar, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in' }).then(() => bar.remove())));
+    await Fx.spawn(fxEl, NormalSoundMoveAnimations.speechBubble(26, '…'), head, [
+      { transform: 'scale(.3)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 1, offset: 0.25 },
+      { transform: 'translateY(-4px) scale(1)', opacity: 1, offset: 0.8 },
+      { transform: 'translateY(-8px) scale(.9)', opacity: 0 }
+    ], { duration: 550, easing: 'ease-out' });
+    await FxEffects.statDropCloud(refs, target);
+  }
+
+  /** A white speech bubble `w` px wide with a tail at the lower left, showing `text`. */
+  private static speechBubble(w: number, text: string): HTMLElement {
+    const el = Fx.box(w, w * 0.75, `text-align:center;font:bold ${w * 0.4}px/${w * 0.6}px sans-serif;color:#333;filter:drop-shadow(0 0 3px #00000066)`);
+    el.innerHTML =
+      `<svg width="100%" height="100%" viewBox="0 0 40 30" style="position:absolute;left:0;top:0"><path d="M20,2 C31,2 38,7 38,13 C38,19 31,24 20,24 C17,24 15,23.6 13,23 L5,28 L8,21 C4,19 2,16 2,13 C2,7 9,2 20,2 Z" fill="#ffffff" stroke="#C8C8D0" stroke-width="1"/></svg>` +
+      `<span style="position:relative">${text}</span>`;
+    return el;
+  }
+
+  /**
+   * Noble Roar, after the XY animation: the user rears up and roars - jagged
+   * red, orange and blue rays blast out from it across the scene (0-0.7 s);
+   * a fiery red ring spirals round the target, which glows red (0.6-1.3 s),
+   * then its Attack and Sp. Atk fall (1.3-2.3 s).
+   * Reference: https://www.pokewiki.de/images/d/d7/Kampfgebr%C3%BCll_Gen6.png
+   */
+  private static async playNobleRoar(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const c = `${launch.x}px ${launch.y}px`;
+    const rays = Fx.backdrop(fieldEl, `background:radial-gradient(circle at ${c},#FFE0A0 0 6%,#0000 30%),repeating-conic-gradient(from 0deg at ${c},#3A1418 0 4deg,#E83A2A 4deg 6deg,#FF9A3A 6deg 7deg,#3A1418 7deg 11deg,#4A6AE0 11deg 12deg,#3A1418 12deg 16deg)`);
+    const original = launchEl.style.transform;
+    const effects: Promise<unknown>[] = [
+      Fx.anim(rays, [{ opacity: 0 }, { opacity: 0.95, offset: 0.2 }, { opacity: 0.95, offset: 0.7 }, { opacity: 0 }], { duration: 750, easing: 'linear' }).then(() => rays.remove()),
+      Fx.anim(launchEl, [
+        { transform: `${original} translateY(0) scale(1,1)` },
+        { transform: `${original} translateY(-8px) scale(.96,1.06)`, offset: 0.3 },
+        { transform: `${original} translateY(0) scale(1,1)` }
+      ], { duration: 700, easing: 'ease-out', fill: 'none' })
+    ];
+    Fx.shakeField(fieldEl, 0.5);
+    await Fx.wait(600);
+
+    // A fiery red ring spirals round the glowing target.
+    const size = Math.max(tr.width * 1.4, 90);
+    const ring = Fx.box(size, size, 'border-radius:50%;background:repeating-conic-gradient(#FF3A1A 0 10deg,#FFB03A 10deg 14deg,#FF3A1A00 14deg 30deg);-webkit-mask-image:radial-gradient(circle,#0000 50%,#000 55% 68%,#0000 72%);mask-image:radial-gradient(circle,#0000 50%,#000 55% 68%,#0000 72%);filter:drop-shadow(0 0 6px #FF5A2A)');
+    effects.push(
+      Fx.spawn(fxEl, ring, target, [
+        { transform: 'scale(1.4) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1) rotate(160deg)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(.7) rotate(420deg)', opacity: 0 }
+      ], { duration: 700, easing: 'ease-out' }),
+      Fx.glow(targetEl, 'brightness(.9) sepia(1) saturate(4) hue-rotate(-30deg) drop-shadow(0 0 6px #FF3A1A)', 700)
+    );
+    for (let i = 0; i < 6; i++) {
+      const a = (i / 6) * Math.PI * 2;
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.boltGlyph('#FFB03A', 8), { x: target.x + Math.cos(a) * size * 0.45, y: target.y + Math.sin(a) * size * 0.35 }, [
+          { transform: 'scale(.3)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(.5)', opacity: 0 }
+        ], { duration: 400, delay: 100 + i * 50, easing: 'ease-out' })
+      );
+    }
+    await Promise.all(effects);
+    await FxEffects.statDropCloud(refs, target);
   }
 }

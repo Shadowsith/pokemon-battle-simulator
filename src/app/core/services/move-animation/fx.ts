@@ -28,7 +28,8 @@ export class Fx {
 
   static shake(el: HTMLElement, amp = 4): void {
     let i = 0;
-    const base = el.style.transform.replace(/translate\([^)]*\)/g, '');
+    // Also strip a translateX left by a shake still running, or overlapping shakes leave the sprite offset.
+    const base = el.style.transform.replace(/translateX?\([^)]*\)/g, '').trim();
     const t = setInterval(() => {
       el.style.transform = `${base} translateX(${i % 2 ? -amp : amp}px)`;
       if (++i > 5) {
@@ -108,6 +109,33 @@ export class Fx {
     el.style.position = 'absolute';
     el.style.left = `${p.x - w / 2}px`;
     el.style.top = `${p.y - h / 2}px`;
+  }
+
+  /**
+   * Appends `el` to `parent` centred on `at`, plays `frames` on it and removes
+   * it again; resolves when it is gone. For one-shot particles and props.
+   */
+  static spawn(parent: HTMLElement, el: HTMLElement, at: Point, frames: Keyframe[], opts: KeyframeAnimationOptions): Promise<void> {
+    Fx.place(el, at);
+    parent.appendChild(el);
+    return Fx.anim(el, frames, opts).then(() => el.remove());
+  }
+
+  /** Fades `filter` in on a sprite and back out over `duration` ms (a tint or glow that leaves no trace). */
+  static glow(el: HTMLElement, filter: string, duration: number, delay = 0): Promise<void> {
+    return Fx.anim(el, [{ filter: 'none' }, { filter, offset: 0.3 }, { filter, offset: 0.7 }, { filter: 'none' }], {
+      duration,
+      delay,
+      easing: 'ease-in-out',
+      fill: 'none'
+    });
+  }
+
+  /** A plain absolutely positioned `div` of `w` × `h` px with extra inline `css`. */
+  static box(w: number, h: number, css: string): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${w}px;height:${h}px;pointer-events:none;${css}`;
+    return el;
   }
 
   static clamp(n: number, lo: number, hi: number): number {

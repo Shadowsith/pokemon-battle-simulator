@@ -67,14 +67,20 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura: a cheerful little fanfare with confetti. */
+  /**
+   * Custom (3.9 s): a hush as the lights go out, twinkles round the gift box
+   * (0.5-1.4 s), a pop as the lid flies off at 1.55 s into a bright fanfare
+   * (1.55-2.4 s) while confetti glitters down (1.7-3.4 s).
+   */
   celebrate: () => {
-    const s = new MoveSfx(1.3, 0xce1e);
-    s.noise(0.02, 0.06, { clock: () => 7000, gain: env.decay(0.3, 1) });
-    s.arpeggio(0.05, [72, 76, 79], 0.09, { gain: 0.26, duty: 0.25, hold: 0.1 });
-    s.arpeggio(0.32, [84, 84], 0.12, { gain: 0.26, duty: 0.25, hold: 0.1 });
-    s.arpeggio(0.32, [76, 79], 0.12, { gain: 0.14, voice: 'wave', hold: 0.25 });
-    s.sparkle(0.1, 0.9, 12, { lo: 3000, hi: 6000, gain: 0.12 });
+    const s = new MoveSfx(3.9, 0xce1e);
+    s.noise(0.0, 0.3, { clock: () => 800, gain: env.decay(0.08) });
+    s.sparkle(0.5, 0.9, 8, { lo: 4000, hi: 7000, gain: 0.12 });
+    s.noise(1.55, 0.08, { clock: () => 6000, gain: env.decay(0.4) });
+    s.pulse(1.55, 0.08, { freq: env.ramp(500, 1500), gain: env.decay(0.3), duty: 0.25 });
+    s.arpeggio(1.6, [72, 76, 79, 84], 0.09, { gain: 0.26, voice: 'pulse', hold: 0.12 });
+    s.chord(1.98, 0.5, [84, 88, 91], { rate: 0.03, gain: 0.2 });
+    s.sparkle(1.7, 1.7, 16, { lo: 3500, hi: 7500, gain: 0.1 });
     return s;
   },
 
@@ -163,13 +169,15 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s glow + rings): a bouncy party jingle with confetti glitter. */
+  /**
+   * Custom (1.7 s): two bouncy hops (0.2 s and 0.65 s) to a cheerful little
+   * tune, while golden fireflies twinkle round the user (0.2-1.5 s).
+   */
   happyhour: () => {
-    const s = new MoveSfx(1.3, 0x4a99);
-    s.arpeggio(0.0, [72, 76, 79, 76, 79, 84], 0.1, { gain: 0.24, duty: 0.25, hold: 0.12 });
-    s.arpeggio(0.0, [60, 64, 67, 64, 67, 72], 0.1, { gain: 0.16, voice: 'wave', hold: 0.12 });
-    s.chord(0.6, 0.45, [84, 88, 91], { rate: 0.035, gain: 0.18 });
-    s.sparkle(0.1, 0.9, 12, { lo: 3000, hi: 6000, gain: 0.12 });
+    const s = new MoveSfx(1.7, 0x4a99);
+    for (const t of [0.05, 0.5]) s.pulse(t, 0.2, { freq: env.ramp(400, 900), gain: env.swell(0.2), duty: 0.5 });
+    s.arpeggio(0.2, [79, 84, 88, 91, 88, 91, 96], 0.12, { gain: 0.16, voice: 'wave', hold: 0.1 });
+    s.sparkle(0.2, 1.3, 10, { lo: 3500, hi: 6500, gain: 0.1 });
     return s;
   },
 
@@ -207,12 +215,20 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): two friendly hand claps, then a warm shared chime. */
+  /**
+   * Custom (2.6 s): a warm pad as the magenta scene and hearts appear
+   * (0.1-1.6 s) with soft chimes, a sweeping whoosh as the rainbow ribbons
+   * swirl (0.5-1.7 s), a little clap as the gloves clasp at 1.26 s into a
+   * bright chord, then a glittering burst of stars (1.5-2.1 s).
+   */
   holdhands: () => {
-    const s = new MoveSfx(1.05, 0x40d4);
-    for (const at of [0.03, 0.16]) s.noise(at, 0.05, { clock: () => 9000, gain: env.decay(0.3, 1.5) });
-    s.arpeggio(0.3, [72, 76, 79], 0.1, { gain: 0.22, voice: 'wave', hold: 0.3 });
-    s.chord(0.55, 0.4, [84, 88], { rate: 0.05, gain: 0.12 });
+    const s = new MoveSfx(2.6, 0x40d4);
+    s.chord(0.1, 1.2, [72, 76, 79], { rate: 0.05, gain: 0.12, vibrato: 0.01 });
+    s.arpeggio(0.2, [84, 88, 91, 88], 0.25, { gain: 0.1, voice: 'wave', hold: 0.15 });
+    s.whoosh(0.5, 1.1, { from: 1500, to: 4000, gain: 0.12 });
+    s.noise(1.26, 0.05, { clock: () => 8000, gain: env.decay(0.3) });
+    s.chord(1.3, 0.6, [84, 88, 91, 96], { rate: 0.03, gain: 0.18 });
+    s.sparkle(1.5, 0.6, 9, { lo: 3500, hi: 7000, gain: 0.12 });
     return s;
   },
 

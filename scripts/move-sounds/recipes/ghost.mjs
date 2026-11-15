@@ -208,16 +208,17 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a mischievous spook, a cackling vibrato giggle over a hollow drone. */
+  /**
+   * Custom (2.2 s): soft pops as the white puffs appear (0.1-0.6 s), a spooky
+   * warbling tune as the little ghosts float over and swirl (0.35-1.45 s),
+   * then a low "boo" as the big ghost rises behind the target (1.2-2.05 s).
+   */
   trickortreat: () => {
-    const s = new MoveSfx(1.2, 0x7071);
-    s.pulse(0.02, 0.9, { freq: () => 98, gain: env.swell(0.14), duty: 0.25 });
-    s.pulse(0.02, 0.9, { freq: () => 104, gain: env.swell(0.1), duty: 0.25 });
-    [0, 1, 2, 3, 4].forEach((i) => {
-      const f = [659, 784, 622, 740, 587][i];
-      s.wave(0.12 + i * 0.13, 0.11, { freq: (u) => f * (1 + 0.08 * Math.sin(2 * Math.PI * 4 * u)), gain: env.decay(0.28, 1) });
-    });
-    s.wave(0.8, 0.35, { freq: (u) => 523 * Math.pow(0.7, u) * (1 + 0.05 * Math.sin(2 * Math.PI * 3 * u)), gain: env.decay(0.18, 1.2) });
+    const s = new MoveSfx(2.2, 0x7071);
+    for (const t of [0.1, 0.17, 0.24, 0.31]) s.noise(t, 0.08, { clock: () => 3000, gain: env.decay(0.18) });
+    s.arpeggio(0.35, [69, 72, 75, 72, 70, 67], 0.18, { gain: 0.14, voice: 'wave', hold: 0.18 });
+    s.wave(0.35, 1.1, { freq: (u) => 700 + 80 * Math.sin(u * 30), gain: env.swell(0.08) });
+    s.wave(1.2, 0.85, { freq: env.ramp(330, 150), gain: env.swell(0.22) });
     return s;
   },
 };

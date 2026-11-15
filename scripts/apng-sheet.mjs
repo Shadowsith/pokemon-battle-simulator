@@ -4,11 +4,11 @@
  *
  *   node scripts/apng-sheet.mjs <moveId ...> [--out <dir>] [--frames 9] [--scale 0.75]
  *
- * Reads each move's Pokewiki APNG URLs (Gen 4 and Gen 5) from
+ * Reads each move's Pokewiki APNG / MP4 URLs (Gen 4, 5 and 6) from
  * docs/move-animations-review-checklist.md, downloads them and writes one
  * PNG per move: a 3x3 grid of evenly spaced frames per APNG, stacked top to
  * bottom in the order listed in the checklist (Gen 4 variants first, then
- * Gen 5). Small enough to read cheaply instead of the raw animations.
+ * Gen 5, then Gen 6). Small enough to read cheaply instead of the raw animations.
  * Needs ffmpeg / ffprobe on PATH. Output defaults to <tmp>/apng-sheets.
  */
 import { execFileSync } from 'node:child_process';
@@ -36,7 +36,7 @@ function parseArgs(argv) {
   return opts;
 }
 
-/** Move id -> [{ label, url }] from the "- Gen N APNG (label): url" lines under each checklist entry. */
+/** Move id -> [{ label, url }] from the "- Gen N APNG|MP4 (label): url" lines under each checklist entry. */
 function referenceUrls() {
   const refs = new Map();
   let current = null;
@@ -46,7 +46,7 @@ function referenceUrls() {
       current = entry[1];
       continue;
     }
-    const ref = line.match(/^\s+- Gen (\d) APNG(?: \(([^)]*)\))?: (\S+)/);
+    const ref = line.match(/^\s+- Gen (\d) (?:APNG|MP4)(?: \(([^)]*)\))?: (\S+)/);
     if (ref && current) {
       if (!refs.has(current)) refs.set(current, []);
       refs.get(current).push({ label: ref[2] ? `Gen${ref[1]} ${ref[2]}` : `Gen${ref[1]}`, url: ref[3] });
@@ -89,7 +89,7 @@ async function main() {
         console.warn(`${id}: ${label} download failed (${res.status})`);
         continue;
       }
-      const apng = path.join(dl, `${id}-${i}.png`);
+      const apng = path.join(dl, `${id}-${i}${path.extname(new URL(url).pathname) || '.png'}`);
       fs.writeFileSync(apng, Buffer.from(await res.arrayBuffer()));
       const grid = path.join(dl, `${id}-${i}-grid.png`);
       gridOf(apng, grid, opts.frames, opts.scale);

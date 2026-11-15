@@ -1,4 +1,4 @@
-import { MoveVisual } from './animation.types';
+import { MoveVisual, Point } from './animation.types';
 import { TYPE_STYLE, SHAPE_CSS, FIST_TONES } from './animation.constants';
 import { Fx } from './fx';
 
@@ -25,6 +25,31 @@ export class FxGlyphs {
     p.setAttribute('stroke', '#fff');
     p.setAttribute('stroke-width', '0.6');
     svg.appendChild(p);
+    return svg;
+  }
+
+  /**
+   * A jagged lightning stroke from `from` to `to` on a field-sized SVG
+   * (`W` × `H`, placed at the field's top left), `jag` px of kink, glowing in
+   * `glow` (Electric Terrain, Ion Deluge, Parabolic Charge).
+   */
+  static lightning(W: number, H: number, from: Point, to: Point, jag: number, color = '#FFFBE0', glow = '#FFF27A', width = 2.5): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('width', `${W}`);
+    svg.setAttribute('height', `${H}`);
+    svg.setAttribute('style', `position:absolute;left:0;top:0;overflow:visible;pointer-events:none;filter:drop-shadow(0 0 4px ${glow})`);
+    const line = document.createElementNS(ns, 'polyline');
+    // zigzagPoints steps along y; for flatter strokes step along a rotated copy.
+    const pts = Math.abs(to.y - from.y) >= Math.abs(to.x - from.x)
+      ? Fx.zigzagPoints(from.x, from.y, to.x, to.y, jag)
+      : Fx.zigzagPoints(from.y, from.x, to.y, to.x, jag).split(' ').map((p) => p.split(',').reverse().join(',')).join(' ');
+    line.setAttribute('points', pts);
+    line.setAttribute('fill', 'none');
+    line.setAttribute('stroke', color);
+    line.setAttribute('stroke-width', `${width}`);
+    line.setAttribute('stroke-linejoin', 'round');
+    svg.appendChild(line);
     return svg;
   }
 
@@ -443,6 +468,14 @@ export class FxGlyphs {
     const shape = document.createElement('div');
     shape.style.cssText = `width:100%;height:100%;clip-path:polygon(${pts.join(',')});background:radial-gradient(circle,${centre} 0 12%,${inner} 30%,${outer} 55%)`;
     el.appendChild(shape);
+    return el;
+  }
+
+  /** A flat-topped hexagon tile `s` px wide filled with `fill`, glowing in `glow` (Crafty Shield, Thousand Waves). */
+  static hexagon(s: number, fill: string, glow: string): HTMLElement {
+    // The glow sits on a wrapper: clip-path on the same element would cut the drop-shadow off.
+    const el = Fx.box(s, s, `filter:drop-shadow(0 0 4px ${glow})`);
+    el.appendChild(Fx.box(s, s, `left:0;top:0;clip-path:polygon(25% 3%,75% 3%,100% 50%,75% 97%,25% 97%,0 50%);background:${fill}`));
     return el;
   }
 

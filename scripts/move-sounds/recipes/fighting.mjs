@@ -298,23 +298,31 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic self aura (≈ 0.8 s): a tatami mat is flipped up with a woody slap and a sturdy guard tone. */
+  /**
+   * Custom (1.3 s): a quick swish as the user ducks and flips the mat up,
+   * a flat slap as it lands on its edge at 0.36 s.
+   */
   matblock: () => {
-    const s = new MoveSfx(1.0, 0x3a7b);
-    s.whoosh(0.0, 0.2, { from: 1000, to: 5000, gain: 0.3 });
-    s.thud(0.2, 0.7, 0.6);
-    s.noise(0.2, 0.06, { clock: () => 4000, gain: env.decay(0.35, 1) });
-    s.pulse(0.3, 0.55, { freq: () => 392, gain: env.decay(0.18, 1.2), duty: 0.25 });
-    s.pulse(0.3, 0.55, { freq: () => 587, gain: env.decay(0.12, 1.2), duty: 0.5 });
+    const s = new MoveSfx(1.3, 0x3a7b);
+    s.whoosh(0.05, 0.3, { from: 1000, to: 4000, gain: 0.22 });
+    s.noise(0.36, 0.08, { clock: () => 3000, gain: env.decay(0.35) });
+    s.thud(0.36, 0.4, 0.35);
     return s;
   },
 
-  /** Generic melee, punch style (0.17 s impact): a solid jab with a small rising power-up chime. */
+  /**
+   * Custom (2.1 s): a rising charge hum at the fist (0-0.55 s), the dart and
+   * a hard punch at 0.66 s with a bright crack as the scene flashes white,
+   * then the stat-up run (1.11 s).
+   */
   poweruppunch: () => {
-    const s = new MoveSfx(0.95, 0xf19c);
-    s.whoosh(0.0, 0.15, { from: 1500, to: 6000, gain: 0.25 });
-    s.thud(0.17, 0.65, 0.6);
-    s.arpeggio(0.45, [67, 71, 74, 79], 0.05, { gain: 0.18, duty: 0.25, hold: 0.08 });
+    const s = new MoveSfx(2.1, 0xf19c);
+    s.pulse(0.0, 0.55, { freq: env.ramp(200, 700), gain: env.ramp(0.05, 0.2), duty: 0.25 });
+    s.sparkle(0.1, 0.4, 5, { lo: 2000, hi: 4000, gain: 0.1 });
+    s.whoosh(0.55, 0.12, { from: 2000, to: 6000, gain: 0.18 });
+    s.thud(0.66, 0.6, 0.6);
+    s.noise(0.66, 0.15, { clock: () => 10000, gain: env.decay(0.3) });
+    s.statUp(1.11);
     return s;
   },
 

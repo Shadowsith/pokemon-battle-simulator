@@ -26,7 +26,8 @@ export class DarkMoveAnimations {
     partingshot: (refs, launch, target, v) => DarkMoveAnimations.playPartingShot(refs, launch, target, v),
     suckerpunch: (refs, launch, target, v) => SuckerPunch.play(refs, launch, target, v),
     switcheroo: (refs, launch, target, v) => Switcheroo.play(refs, launch, target, v),
-    taunt: (refs, launch, target, v) => DarkMoveAnimations.playTaunt(refs, launch, target, v)
+    taunt: (refs, launch, target, v) => DarkMoveAnimations.playTaunt(refs, launch, target, v),
+    topsyturvy: (refs, _launch, target) => DarkMoveAnimations.playTopsyTurvy(refs, target)
   };
 
   /**
@@ -502,5 +503,46 @@ export class DarkMoveAnimations {
     ground.remove();
     await Fx.anim(grey, [{ opacity: 1 }, { opacity: 0 }], { duration: 350, easing: 'ease-in' });
     grey.remove();
+  }
+
+  /**
+   * Topsy-Turvy, after the XY animation: the scene turns a flat grey with a
+   * red grid stretching over the top and the target floats up under it
+   * (0-0.7 s); the grid flips to blue at the bottom and the target drops down
+   * onto it - everything turned upside down (0.7-1.3 s), then it settles back
+   * and the field returns (to 1.7 s). The sprite only moves; it never flips.
+   * Reference: https://www.pokewiki.de/images/9/9a/Invertigo_Gen6.png
+   */
+  private static async playTopsyTurvy(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, targetEl } = refs;
+    const H = fieldEl.clientHeight;
+    const scene = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#5A5A5A,#E8E8E8 50%,#5A5A5A)');
+    const grid = (color: string, top: boolean) => {
+      const g = Fx.box(fieldEl.clientWidth, H * 0.3, `left:0;${top ? 'top' : 'bottom'}:0;background:repeating-linear-gradient(90deg,${color} 0 2px,#0000 2px 48px),repeating-linear-gradient(0deg,${color} 0 2px,#0000 2px 16px);transform-origin:50% ${top ? '0' : '100%'};transform:perspective(200px) rotateX(${top ? -50 : 50}deg);opacity:0`);
+      scene.appendChild(g);
+      return g;
+    };
+    const red = grid('#E83A3A', true);
+    const blue = grid('#3A4AE8', false);
+    await Fx.anim(scene, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+
+    const original = targetEl.style.transform;
+    const up = -Math.min(H * 0.25, target.y - H * 0.2);
+    const down = H * 0.18;
+    await Promise.all([
+      Fx.anim(red, [{ opacity: 0 }, { opacity: 1, offset: 0.4 }, { opacity: 1, offset: 0.9 }, { opacity: 0 }], { duration: 700, easing: 'linear' }),
+      Fx.anim(targetEl, [{ transform: `${original} translateY(0)` }, { transform: `${original} translateY(${up}px)` }], { duration: 500, easing: 'ease-out', fill: 'forwards' })
+    ]);
+    await Promise.all([
+      Fx.anim(blue, [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 1, offset: 0.8 }, { opacity: 0 }], { duration: 700, easing: 'linear' }),
+      Fx.anim(targetEl, [{ transform: `${original} translateY(${up}px)` }, { transform: `${original} translateY(${down}px)`, offset: 0.4 }, { transform: `${original} translateY(${down}px)` }], { duration: 600, easing: 'ease-in', fill: 'forwards' })
+    ]);
+    await Promise.all([
+      Fx.anim(targetEl, [{ transform: `${original} translateY(${down}px)` }, { transform: `${original} translateY(0)` }], { duration: 300, easing: 'ease-out', fill: 'none' }),
+      Fx.anim(scene, [{ opacity: 1 }, { opacity: 0 }], { duration: 400, easing: 'ease-in' })
+    ]);
+    targetEl.getAnimations?.().forEach((a) => a.cancel());
+    targetEl.style.transform = original;
+    scene.remove();
   }
 }

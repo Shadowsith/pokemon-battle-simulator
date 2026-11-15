@@ -213,14 +213,16 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): the soil is tilled – churning, chunky dirt turned over in rhythm. */
+  /**
+   * Custom (1.7 s): an earthy rumble while the furrows roll by (0-1.6 s),
+   * four scraping plough strokes (every 0.4 s) and fresh twinkles as the
+   * sprouts sparkle (0.5-1.3 s).
+   */
   rototiller: () => {
-    const s = new MoveSfx(1.1, 0x2071);
-    s.rumble(0.0, 0.9, { from: 300, to: 200, gain: 0.3 });
-    for (let i = 0; i < 6; i++) {
-      s.noise(i * 0.13, 0.1, { clock: () => 1200 + s.random() * 800, gain: env.attackDecay(0.28, 0.1) });
-      s.pulse(i * 0.13, 0.08, { freq: (u) => 140 * Math.pow(0.6, u), gain: env.decay(0.2, 1.5), duty: 0.5 });
-    }
+    const s = new MoveSfx(1.7, 0x2071);
+    s.rumble(0.0, 1.6, { from: 300, to: 200, gain: 0.2 });
+    for (const t of [0.1, 0.5, 0.9, 1.3]) s.noise(t, 0.25, { clock: (u) => 1500 + 1500 * u, gain: env.swell(0.16) });
+    s.sparkle(0.5, 0.8, 8, { lo: 3000, hi: 5500, gain: 0.1 });
     return s;
   },
 
@@ -257,25 +259,34 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic field (≈0.6 s): a hail of earthen arrows rains down - rapid little thuds over a rolling rumble. */
+  /**
+   * Custom (3.05 s): a deep swelling hum as the green sphere grows
+   * (0.25-0.7 s), rising whistles as the arrows shoot into the sky
+   * (0.85-1.6 s), falling whistles as they rain down (1.65-2.4 s) with a big
+   * earthy impact at 1.9 s.
+   */
   thousandarrows: () => {
-    const s = new MoveSfx(1.0, 0x1a44);
-    s.rumble(0.0, 0.85, { from: 500, to: 180, gain: 0.4 });
-    for (let i = 0; i < 9; i++) {
-      const at = 0.03 + i * 0.065 + s.random() * 0.02;
-      s.noise(at, 0.04, { clock: () => 7000, gain: env.decay(0.3, 1) });
-      s.pulse(at, 0.07, { freq: (u) => 260 * Math.pow(0.4, u), gain: env.decay(0.3, 2), duty: 0.5 });
-    }
+    const s = new MoveSfx(3.05, 0x1a44);
+    s.wave(0.25, 0.7, { freq: env.ramp(110, 220), gain: env.swell(0.2) });
+    for (let i = 0; i < 4; i++) s.pulse(0.85 + i * 0.12, 0.45, { freq: env.ramp(800, 2400), gain: env.swell(0.1), duty: 0.25 });
+    s.whoosh(0.85, 0.7, { from: 2000, to: 7000, gain: 0.14 });
+    for (let i = 0; i < 4; i++) s.pulse(1.65 + i * 0.1, 0.3, { freq: env.ramp(2400, 900), gain: env.swell(0.1), duty: 0.25 });
+    s.thud(1.9, 0.6, 0.8);
+    s.rumble(1.9, 0.7, { from: 500, to: 150, gain: 0.3 });
     return s;
   },
 
-  /** Generic field (≈0.6 s): the ground surges outward in a great wave - a deep swelling roll that crashes down. */
+  /**
+   * Custom (2.15 s): a rising rolling rumble as the green hexagons spray up
+   * and roll over the ground (0.2-1.35 s) with a sparkling shimmer, then a
+   * heavy impact as they burst round the target at 1.2 s.
+   */
   thousandwaves: () => {
-    const s = new MoveSfx(1.0, 0x1a4e);
-    s.noise(0.0, 0.85, { clock: (u) => 300 + 400 * Math.sin(Math.PI * u), gain: (u) => 0.45 * Math.min(1, u * 5) * Math.pow(1 - u, 1.1) });
-    s.pulse(0.0, 0.7, { freq: (u) => 70 + 30 * Math.sin(Math.PI * u), gain: env.swell(0.3), duty: 0.5 });
-    s.thud(0.35, 0.6, 1);
-    s.rumble(0.4, 0.5, { from: 400, to: 120, gain: 0.25 });
+    const s = new MoveSfx(2.15, 0x1a4e);
+    s.rumble(0.2, 1.1, { from: 200, to: 500, gain: 0.26 });
+    s.sparkle(0.2, 1.0, 12, { lo: 2500, hi: 5000, gain: 0.1 });
+    s.thud(1.2, 0.6, 0.8);
+    s.noise(1.2, 0.45, { clock: (u) => 6000 - 4000 * u, gain: env.decay(0.3) });
     return s;
   },
 };

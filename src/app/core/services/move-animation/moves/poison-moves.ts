@@ -20,7 +20,8 @@ export class PoisonMoveAnimations {
     sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
     sludgewave: (refs, launch, target) => SludgeWave.play(refs, launch, target),
     toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target),
-    toxicspikes: (refs, launch, target) => ToxicSpikes.play(refs, launch, target)
+    toxicspikes: (refs, launch, target) => ToxicSpikes.play(refs, launch, target),
+    venomdrench: (refs, _launch, target) => PoisonMoveAnimations.playVenomDrench(refs, target)
   };
 
   /**
@@ -559,5 +560,45 @@ export class PoisonMoveAnimations {
 
     await Fx.anim(bg, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     bg.remove();
+  }
+
+  /**
+   * Venom Drench, after the XY animation: a glossy purple bubble swells above
+   * the target (0-0.4 s), drops and bursts into a pink-purple cloud of poison
+   * over it as the scene flashes violet (0.4-1.0 s), then its stats fall
+   * (1.0-2.0 s).
+   * Reference: https://www.pokewiki.de/images/b/b3/Giftfalle_Gen6.png
+   */
+  private static async playVenomDrench(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const size = Math.max(tr.width * 0.45, 32);
+    const top: Point = { x: target.x, y: target.y - tr.height * 0.7 };
+    await Fx.spawn(fxEl, FxGlyphs.poisonBubble(size), top, [
+      { transform: 'translateY(0) scale(.2)', opacity: 0 },
+      { transform: 'translateY(0) scale(1)', opacity: 1, offset: 0.6 },
+      { transform: `translateY(${tr.height * 0.6}px) scale(1.1)`, opacity: 1 }
+    ], { duration: 550, easing: 'ease-in' });
+
+    const wash = Fx.backdrop(fieldEl, 'background:#B04AE0a0');
+    Fx.shake(targetEl, 4);
+    const effects: Promise<unknown>[] = [
+      Fx.anim(wash, [{ opacity: 0 }, { opacity: 1, offset: 0.3 }, { opacity: 0 }], { duration: 600, easing: 'ease-in-out' }).then(() => wash.remove()),
+      Fx.glow(targetEl, 'brightness(.9) sepia(1) saturate(3) hue-rotate(-120deg) drop-shadow(0 0 8px #D77CF0)', 700),
+      FxEffects.smokePuff(fxEl, target, Math.max(tr.width * 1.1, 70), ['#F08AF0cc', '#A04AD0aa'])
+    ];
+    for (let i = 0; i < 10; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = Math.max(tr.width * 0.5, 34) * (0.6 + Math.random() * 0.5);
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.poisonBubble(6 + Math.random() * 6), target, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${Math.cos(a) * d * 0.7}px,${Math.sin(a) * d * 0.7}px) scale(1)`, opacity: 1, offset: 0.4 },
+          { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 14}px) scale(.6)`, opacity: 0 }
+        ], { duration: 600, delay: i * 25, easing: 'ease-out' })
+      );
+    }
+    await Promise.all(effects);
+    await FxEffects.statDropCloud(refs, target);
   }
 }

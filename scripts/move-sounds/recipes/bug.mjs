@@ -57,14 +57,18 @@ export const BUG = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a sharp stinger jab, pointed and piercing. */
+  /**
+   * Custom (1.5 s): a dull drop as the scene goes black (0-0.2 s), a sharp
+   * stab as the stinger strikes the silhouette at 0.42 s, crackling violet
+   * zaps (0.45-0.95 s), then quiet as the scene clears.
+   */
   fellstinger: () => {
-    const s = new MoveSfx(0.8, 0xfe11);
-    s.pulse(0.0, 0.17, { freq: (u) => 900 + 600 * u + 80 * Math.sin(2 * Math.PI * 40 * u), gain: env.ramp(0.05, 0.18), duty: 0.125 });
-    s.noise(0.17, 0.04, { clock: () => 20000, gain: env.decay(0.3, 1) });
-    s.pulse(0.17, 0.1, { freq: (u) => 3200 - 1500 * u, gain: env.decay(0.25, 1.5), duty: 0.125 });
-    s.thud(0.18, 0.35, 0.3);
-    s.pulse(0.25, 0.4, { freq: env.ramp(600, 400), gain: env.decay(0.16, 1), duty: 0.25 });
+    const s = new MoveSfx(1.5, 0xfe11);
+    s.wave(0.0, 0.25, { freq: env.ramp(300, 120), gain: env.decay(0.16) });
+    s.slash(0.38, 0.4);
+    s.thud(0.42, 0.4, 0.3);
+    s.noise(0.45, 0.5, { clock: (u) => 7000 - 3000 * u, gain: env.decay(0.18), short: true });
+    s.sparkle(0.48, 0.4, 5, { lo: 2000, hi: 4000, gain: 0.12 });
     return s;
   },
 
@@ -88,13 +92,15 @@ export const BUG = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a swarm of tiny bugs buzzes in and keeps crawling over the target. */
+  /**
+   * Custom (1.8 s): a growing, swirling buzz as the swarm gathers and crawls
+   * over the target (0-1.6 s), with two small bites at 0.35 s and 0.75 s.
+   */
   infestation: () => {
-    const s = new MoveSfx(1.0, 0x1f57);
-    s.noise(0.0, 0.9, { clock: (u) => 2500 + 600 * Math.sin(2 * Math.PI * 14 * u), gain: env.swell(0.2), short: true });
-    s.pulse(0.0, 0.9, { freq: (u) => 180 * (1 + 0.08 * Math.sin(2 * Math.PI * 25 * u)), gain: env.swell(0.14), duty: 0.25 });
-    s.thud(0.43, 0.35, 0.2);
-    for (let i = 0; i < 6; i++) s.pulse(0.45 + i * 0.07, 0.03, { freq: () => 1200 + s.random() * 600, gain: env.decay(0.12, 1), duty: 0.25 });
+    const s = new MoveSfx(1.8, 0x1f57);
+    s.pulse(0.0, 1.6, { freq: (u) => 180 + 30 * Math.sin(u * 60), gain: env.swell(0.14), duty: 0.125 });
+    s.noise(0.0, 1.6, { clock: (u) => 2000 + 800 * Math.sin(u * 45), gain: env.swell(0.12), short: true });
+    for (const t of [0.35, 0.75]) s.thud(t, 0.22, 0.15);
     return s;
   },
 
@@ -143,13 +149,16 @@ export const BUG = {
     return s;
   },
 
-  /** Generic powder (stream 0.76 s, end ≈1.0 s): a cloud of fine, buzzy, explosive dust. */
+  /**
+   * Custom (1.4 s): a fluttering flap (0-0.45 s), a soft dusty hiss as the
+   * powder drifts over (0.1-0.75 s) and a muffled poof as it settles on the
+   * target at 0.65 s.
+   */
   powder: () => {
-    const s = new MoveSfx(1.15, 0x90d3);
-    s.noise(0.0, 0.85, { clock: (u) => 9000 - 3000 * u, gain: env.swell(0.25) });
-    s.noise(0.02, 0.8, { clock: () => 2500, gain: env.swell(0.12), short: true });
-    s.sparkle(0.05, 0.7, 8, { lo: 3000, hi: 6000, gain: 0.12 });
-    s.noise(0.76, 0.3, { clock: (u) => 2500 - 1500 * u, gain: env.attackDecay(0.28, 0.1) });
+    const s = new MoveSfx(1.4, 0x90d3);
+    for (const t of [0.0, 0.12, 0.24]) s.noise(t, 0.1, { clock: () => 2500, gain: env.swell(0.14) });
+    s.noise(0.1, 0.65, { clock: () => 11000, gain: env.swell(0.1) });
+    s.noise(0.65, 0.4, { clock: (u) => 2000 - 1200 * u, gain: env.attackDecay(0.22, 0.1) });
     return s;
   },
 

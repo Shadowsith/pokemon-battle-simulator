@@ -340,14 +340,16 @@ export const WATER = {
     return s;
   },
 
-  /** Generic projectile at priority, 3 hits (impacts 0.26 / 0.83 / 1.40 s): spinning water stars whiz in and splash. */
+  /**
+   * Custom (1.9 s, three throws 0.58 s apart): a spinning swish as each
+   * water star flies (0.08 s, 0.66 s, 1.24 s) and a splash as it bursts on
+   * the target (0.3 s, 0.88 s, 1.46 s).
+   */
   watershuriken: () => {
-    const s = new MoveSfx(1.75, 0x3a64);
-    for (const at of [0.26, 0.83, 1.4]) {
-      s.noise(at - 0.24, 0.24, { clock: (u) => 5000 + 3000 * Math.sin(2 * Math.PI * 4 * u), gain: env.ramp(0.08, 0.3) });
-      s.pulse(at - 0.24, 0.24, { freq: (u) => 1400 + 500 * Math.sin(2 * Math.PI * 4 * u), gain: env.ramp(0.03, 0.1), duty: 0.125 });
-      s.slash(at, 0.35);
-      s.splash(at, 0.4);
+    const s = new MoveSfx(1.9, 0x3a64);
+    for (const t of [0.0, 0.58, 1.16]) {
+      s.whoosh(t + 0.08, 0.22, { from: 3000, to: 7000, gain: 0.18 });
+      s.splash(t + 0.3, 0.4);
     }
     return s;
   },

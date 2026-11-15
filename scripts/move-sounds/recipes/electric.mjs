@@ -119,32 +119,47 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic self aura + stat-down fleck: strange electric waves pulse out of the user. */
+  /**
+   * Custom (2.5 s): three wobbling electric pulses as the cyan rings travel
+   * (0-0.75 s), crackling zaps while the orbs circle the target (0.56-1.2 s),
+   * then the stat-down run (1.25 s).
+   */
   eerieimpulse: () => {
-    const s = new MoveSfx(1.5, 0xee1e);
-    s.wave(0.02, 0.8, { freq: (u) => 600 * (1 + 0.08 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.25) });
-    s.noise(0.02, 0.8, { clock: () => 4500, gain: (u) => 0.18 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 6 * u)), short: true });
-    for (let i = 0; i < 4; i++) s.pulse(0.05 + i * 0.18, 0.1, { freq: env.ramp(1600, 900), gain: env.decay(0.2, 1.5), duty: 0.25 });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.5, 0xee1e);
+    for (const t of [0.0, 0.12, 0.24]) {
+      s.wave(t, 0.5, { freq: (u) => 600 + 160 * Math.sin(u * 30), gain: env.swell(0.14) });
+    }
+    s.noise(0.56, 0.6, { clock: (u) => 5000 + 3000 * Math.sin(u * 40), gain: env.swell(0.14), short: true });
+    s.paralyze(0.7, 0.18);
+    s.statDown(1.25);
     return s;
   },
 
-  /** Generic target aura (field terrain): the ground charges with a bright, steady electric hum. */
+  /**
+   * Custom (2.5 s, the terrain animation): big sparkles pop round the user (0-0.55 s), sparkles race over the ground as the scene takes its tint (0.4-1.3 s), then the fog bank rises and fades (1.1-2.4 s).
+   * Bright zaps as the sparkles pop, a buzzing electric sweep over the ground,
+   * a humming field and crackles as lightning flickers in the fog (1.4-1.85 s).
+   */
   electricterrain: () => {
-    const s = new MoveSfx(1.3, 0xe7e2);
-    s.noise(0.02, 1.0, { clock: () => 6500, gain: (u) => 0.22 * Math.sin(Math.PI * u) * (0.7 + 0.3 * Math.sin(2 * Math.PI * 12 * u)), short: true });
-    s.chord(0.05, 0.9, [76, 81, 88], { rate: 0.03, gain: 0.18, voice: 'pulse' });
-    s.sparkle(0.1, 0.8, 10, { lo: 3000, hi: 6000, gain: 0.16 });
-    s.paralyze(0.6, 0.18);
+    const s = new MoveSfx(2.5, 0xe7e2);
+    s.sparkle(0.0, 0.55, 6, { lo: 3000, hi: 6000, gain: 0.16 });
+    s.noise(0.4, 0.9, { clock: (u) => 3000 + 6000 * u, gain: env.swell(0.16), short: true });
+    s.pulse(1.1, 1.3, { freq: () => 120, gain: env.swell(0.12), duty: 0.125 });
+    for (const t of [1.4, 1.62, 1.84]) s.noise(t, 0.15, { clock: () => 9000, gain: env.decay(0.3) });
     return s;
   },
 
-  /** Generic target aura: the target is charged up, a rising crackling buzz. */
+  /**
+   * Custom (1.4 s): a rising zap as the streak shoots to the target
+   * (0-0.35 s), a crackle and a buzzing flare as the ring lights up round it
+   * (0.35-1.2 s).
+   */
   electrify: () => {
-    const s = new MoveSfx(1.15, 0xe1ef);
-    s.noise(0.02, 0.8, { clock: env.ramp(3000, 9000), gain: env.swell(0.25), short: true });
-    s.pulse(0.02, 0.75, { freq: (u) => 300 * Math.pow(4, u), gain: env.swell(0.18), duty: 0.25 });
-    s.paralyze(0.6, 0.25);
+    const s = new MoveSfx(1.4, 0xe1ef);
+    s.pulse(0.0, 0.35, { freq: env.ramp(600, 2400), gain: env.swell(0.2), duty: 0.25 });
+    s.noise(0.35, 0.12, { clock: () => 9000, gain: env.decay(0.3) });
+    s.noise(0.4, 0.8, { clock: (u) => 4000 + 2500 * Math.sin(u * 50), gain: env.swell(0.16), short: true });
+    s.paralyze(0.5, 0.2);
     return s;
   },
 
@@ -182,25 +197,35 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic target aura at priority (~0.8 s, no fleck): a crackling electric storm sweeps the field. */
+  /**
+   * Custom (2.1 s): a dark storm hum (0-1.9 s), a barrage of lightning cracks
+   * as bolts rain down all over the field (0.15-1.2 s), then a fizzing sweep
+   * as the sparks spray across (1.0-1.8 s).
+   */
   iondeluge: () => {
-    const s = new MoveSfx(1.05, 0x10de);
-    s.noise(0.0, 0.85, { clock: (u) => 6000 + 3000 * Math.sin(2 * Math.PI * 5 * u), gain: env.swell(0.25), short: true });
-    s.pulse(0.0, 0.85, { freq: (u) => 220 + 440 * u, gain: env.swell(0.12), duty: 0.25 });
-    for (let i = 0; i < 6; i++) {
-      const at = 0.08 + i * 0.12;
-      s.pulse(at, 0.05, { freq: (u) => 2000 - 1000 * u, gain: env.decay(0.18, 1), duty: 0.25 });
+    const s = new MoveSfx(2.1, 0x10de);
+    s.pulse(0.0, 1.9, { freq: () => 98, gain: env.swell(0.1), duty: 0.125 });
+    for (let i = 0; i < 12; i++) {
+      const crack = 8000 + 3000 * s.random();
+      s.noise(0.15 + i * 0.08, 0.1, { clock: () => crack, gain: env.decay(0.22) });
     }
+    s.rumble(0.3, 0.9, { from: 400, to: 200, gain: 0.14 });
+    s.noise(1.0, 0.8, { clock: (u) => 3000 + 5000 * u, gain: env.swell(0.14), short: true });
+    s.sparkle(1.0, 0.8, 8, { lo: 2500, hi: 5000, gain: 0.1 });
     return s;
   },
 
-  /** Generic self aura (≈ 0.8 s): magnetic field lines hum around the allies, pulsing in and out. */
+  /**
+   * Custom (2.2 s): a pulsing magnetic hum while the rings circle the user
+   * (0.1-1.1 s) with crackles as white lightning flickers (0.1-0.9 s), then
+   * the stat-up run (1.15 s).
+   */
   magneticflux: () => {
-    const s = new MoveSfx(1.1, 0xf1c5);
-    s.pulse(0.0, 0.9, { freq: (u) => 120 * (1 + 0.04 * Math.sin(2 * Math.PI * 50 * u)), gain: env.swell(0.22), duty: 0.5 });
-    s.noise(0.0, 0.9, { clock: () => 3000, gain: (u) => 0.12 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 5 * u)) * Math.sin(Math.PI * u), short: true });
-    s.chord(0.2, 0.7, [71, 78, 83], { rate: 0.03, gain: 0.12, voice: 'pulse' });
-    s.sparkle(0.4, 0.5, 5, { lo: 4000, hi: 7000, gain: 0.1 });
+    const s = new MoveSfx(2.2, 0xf1c5);
+    s.wave(0.1, 1.0, { freq: (u) => 220 + 30 * Math.sin(u * 40), gain: env.swell(0.16) });
+    s.pulse(0.1, 1.0, { freq: (u) => 110 + 15 * Math.sin(u * 40), gain: env.swell(0.08), duty: 0.125 });
+    for (let i = 0; i < 5; i++) s.noise(0.1 + i * 0.17, 0.08, { clock: () => 9000, gain: env.decay(0.18) });
+    s.statUp(1.15);
     return s;
   },
 
@@ -213,24 +238,35 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic melee hit (impact 0.17 s) + paralysis fleck (~0.45 s): a cute little nuzzle, a soft bump and crackling cheeks. */
+  /**
+   * Custom (1.9 s): crackling cheeks as the scene flashes yellow (0-0.45 s),
+   * squeaky rubbing as the user nuzzles the target (0.67-1.05 s, hit at
+   * 0.67 s), then the paralysis zaps as the sparks pop (1.07 s).
+   */
   nuzzle: () => {
-    const s = new MoveSfx(0.85, 0x9e22);
-    s.pulse(0.0, 0.17, { freq: env.ramp(900, 1500), gain: env.ramp(0.05, 0.16), duty: 0.25 });
-    s.thud(0.17, 0.4, 0.2);
-    s.noise(0.17, 0.12, { clock: () => 8000, gain: env.decay(0.3, 1), short: true });
-    s.sparkle(0.2, 0.2, 4, { lo: 3000, hi: 5000, gain: 0.12 });
-    s.paralyze(0.45);
+    const s = new MoveSfx(1.9, 0x9e22);
+    s.noise(0.0, 0.45, { clock: (u) => 5000 + 3000 * Math.sin(u * 50), gain: env.swell(0.14), short: true });
+    s.whoosh(0.45, 0.2, { from: 1500, to: 4000, gain: 0.14 });
+    s.thud(0.67, 0.25, 0.15);
+    for (const t of [0.72, 0.84, 0.96]) s.pulse(t, 0.08, { freq: env.ramp(1400, 1800), gain: env.swell(0.14), duty: 0.5 });
+    s.paralyze(1.07, 0.24);
     return s;
   },
 
-  /** Generic field (≈0.6 s) + drain: a crackling electric ring spreads out, then energy flows back. */
+  /**
+   * Custom (2.75 s): little pops as red sparks fly from the cheeks
+   * (0-0.58 s), a crackling burst of lightning across the field (0.58-1.2 s)
+   * that strikes the target with a fiery crack at 0.88 s, then a soft green
+   * chime and the drain run as the user heals (1.45 s).
+   */
   paraboliccharge: () => {
-    const s = new MoveSfx(1.4, 0xe1ac);
-    s.noise(0.02, 0.6, { clock: (u) => 6000 + 3000 * Math.sin(2 * Math.PI * 9 * u), gain: env.attackDecay(0.3, 0.1), short: true });
-    s.pulse(0.02, 0.5, { freq: (u) => 220 + 500 * u, gain: env.swell(0.2), duty: 0.25 });
-    for (let i = 0; i < 4; i++) s.paralyze(0.1 + i * 0.12, 0.12);
-    s.drain(0.85, 0.2);
+    const s = new MoveSfx(2.75, 0xe1ac);
+    for (const t of [0.05, 0.11, 0.17, 0.23]) s.pulse(t, 0.06, { freq: env.ramp(1800, 2600), gain: env.decay(0.16), duty: 0.25 });
+    s.noise(0.58, 0.6, { clock: (u) => 9000 - 3000 * u, gain: env.attackDecay(0.24, 0.05) });
+    s.noise(0.88, 0.25, { clock: () => 6000, gain: env.decay(0.35) });
+    s.thud(0.88, 0.4, 0.4);
+    s.chord(1.45, 0.5, [79, 83, 86], { rate: 0.04, gain: 0.14 });
+    s.drain(1.5);
     return s;
   },
 

@@ -221,6 +221,22 @@ export class FxEffects {
   }
 
   /**
+   * Sparks crackling over a sprite at `at` (sprites are images, so the sparks
+   * get their own box in `fxEl`); the returned stop function removes them
+   * (Nuzzle, Electrify, Magnetic Flux).
+   */
+  static crackleOver(fxEl: HTMLElement, at: Point, size: number, color = '#FFF6A0'): () => void {
+    const box = Fx.box(size, size, `filter:drop-shadow(0 0 3px ${color})`);
+    Fx.place(box, at);
+    fxEl.appendChild(box);
+    const stop = FxEffects.crackle(box, size, color);
+    return () => {
+      stop();
+      box.remove();
+    };
+  }
+
+  /**
    * A crackling-ball charge (Bolt Strike, Freeze Shock): the scene goes black
    * (0-0.25 s), the user takes on `userFilter` while a ball (`ball`
    * background) crackling with `ballSpark` sparks forms at its front
@@ -635,6 +651,24 @@ export class FxEffects {
       );
     }
     return Promise.all(effects).then(() => void 0);
+  }
+
+  /** Green light streaks rise round the caster as it heals (~0.8 s; Draining Kiss, Parabolic Charge). */
+  static healStreaks(refs: BattleStageRefs, launch: Point, count = 6): Promise<void> {
+    const r = Fx.rect(refs.launchEl);
+    const streaks: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const h = r.height * (0.5 + Math.random() * 0.4);
+      const at: Point = { x: launch.x + (Math.random() * 2 - 1) * r.width * 0.5, y: launch.y + r.height * 0.2 };
+      streaks.push(
+        Fx.spawn(refs.fxEl, Fx.box(4, h, 'border-radius:2px;background:linear-gradient(0deg,#7AF08A00,#7AF08A,#E8FFE8);box-shadow:0 0 6px #7AF08A'), at, [
+          { transform: 'translateY(0) scaleY(.2)', opacity: 0 },
+          { transform: `translateY(${-h * 0.3}px) scaleY(1)`, opacity: 1, offset: 0.4 },
+          { transform: `translateY(${-h * 0.7}px) scaleY(.6)`, opacity: 0 }
+        ], { duration: 550, delay: i * 55, easing: 'ease-out' })
+      );
+    }
+    return Promise.all(streaks).then(() => void 0);
   }
 
   /** HP gain: twinkling green stars and a soft green glow around the caster (drain moves). */

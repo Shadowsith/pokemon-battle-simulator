@@ -78,13 +78,18 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s, fleck at ~0.6 s): an eerie forest curse - rustling leaves and a creeping, wobbly minor tone. */
+  /**
+   * Custom (2.5 s): a low thrum as everything goes black (0-0.25 s), creaking
+   * groans as the twisted trees grow up (0.35-1.0 s), an eerie wavering tone as
+   * the target glows green (0.75-1.45 s), then the forest sinks away (to 2.4 s).
+   */
   forestscurse: () => {
-    const s = new MoveSfx(1.2, 0xf0c5);
-    s.noise(0.0, 0.7, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.18) });
-    s.wave(0.0, 0.75, { freq: (u) => 311 * (1 + 0.04 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.2) });
-    s.wave(0.05, 0.7, { freq: (u) => 370 * (1 + 0.04 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.15) });
-    s.arpeggio(0.6, [67, 66, 63, 62], 0.1, { gain: 0.2, voice: 'wave', hold: 0.14 });
+    const s = new MoveSfx(2.5, 0xf0c5);
+    s.wave(0.0, 0.4, { freq: () => 82, gain: env.swell(0.18) });
+    s.rumble(0.35, 0.7, { from: 300, to: 150, gain: 0.2 });
+    s.pulse(0.4, 0.6, { freq: (u) => 140 + 40 * Math.sin(u * 12), gain: env.swell(0.1), duty: 0.125 });
+    s.wave(0.75, 0.7, { freq: (u) => 440 + 60 * Math.sin(u * 25), gain: env.swell(0.14) });
+    s.wave(1.45, 0.8, { freq: env.ramp(200, 80), gain: env.decay(0.12) });
     return s;
   },
 
@@ -153,12 +158,17 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) on the whole field: grass sprouts everywhere with a fresh, rising chime. */
+  /**
+   * Custom (2.5 s, the terrain animation): big sparkles pop round the user (0-0.55 s), sparkles race over the ground as the scene takes its tint (0.4-1.3 s), then the fog bank rises and fades (1.1-2.4 s).
+   * Fresh twinkles as the sparkles pop, a glittery sweep over the ground,
+   * rustling leaves (0.7-1.6 s) and a soft breezy pad under the fog.
+   */
   grassyterrain: () => {
-    const s = new MoveSfx(1.35, 0x6a77);
-    s.noise(0.0, 0.9, { clock: env.ramp(1200, 3500), gain: env.swell(0.12) });
-    s.arpeggio(0.03, [67, 71, 74, 79, 83, 86], 0.1, { gain: 0.2, voice: 'wave', hold: 0.3 });
-    s.sparkle(0.35, 0.6, 7, { lo: 2000, hi: 3600, gain: 0.1 });
+    const s = new MoveSfx(2.5, 0x6a77);
+    s.sparkle(0.0, 0.55, 6, { lo: 3000, hi: 5500, gain: 0.14 });
+    s.sparkle(0.4, 0.9, 12, { lo: 2500, hi: 5000, gain: 0.1 });
+    s.noise(0.7, 0.9, { clock: () => 4000, gain: env.swell(0.14) });
+    s.chord(1.1, 1.3, [67, 71, 74], { rate: 0.05, gain: 0.14 });
     return s;
   },
 

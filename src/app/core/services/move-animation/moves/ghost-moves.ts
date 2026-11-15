@@ -14,7 +14,8 @@ export class GhostMoveAnimations {
     phantomforce: (refs, launch, target, v) => GhostMoveAnimations.playPhantomForceStrike(refs, launch, target, v),
     shadowball: (refs, launch, target, v) => GhostMoveAnimations.playShadowBall(refs, launch, target, v),
     shadowclaw: (refs, _launch, target, v) => ShadowClaw.play(refs, target, v),
-    shadowforce: (refs, _launch, target, v) => ShadowForce.strike(refs, target, v)
+    shadowforce: (refs, _launch, target, v) => ShadowForce.strike(refs, target, v),
+    trickortreat: (refs, launch, target) => GhostMoveAnimations.playTrickOrTreat(refs, launch, target)
   };
 
   /** Turn-1 animations of two-turn Ghost moves, by @pkmn/sim move id. */
@@ -459,5 +460,73 @@ export class GhostMoveAnimations {
 
     await Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     dark.remove();
+  }
+
+  /**
+   * Trick-or-Treat, after the XY animation: night falls and white puffs pop
+   * at the user (0-0.45 s), little cartoon ghosts float over to the target
+   * and swirl round it (0.35-1.4 s), then a big purple ghost rises behind it
+   * and fades as night lifts (1.2-2.1 s).
+   * Reference: https://www.pokewiki.de/images/3/34/Halloween_Gen6.png
+   */
+  private static async playTrickOrTreat(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const night = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#0A0A2A,#14143Acc 60%,#0A1A14cc)');
+    const effects: Promise<unknown>[] = [
+      Fx.anim(night, [{ opacity: 0 }, { opacity: 1, offset: 0.12 }, { opacity: 1, offset: 0.85 }, { opacity: 0 }], { duration: 2100, easing: 'ease-in-out' }).then(() => night.remove())
+    ];
+    for (let i = 0; i < 4; i++) {
+      const at: Point = { x: launch.x + (Math.random() * 2 - 1) * lr.width * 0.4, y: launch.y + (Math.random() * 2 - 1) * lr.height * 0.3 };
+      effects.push(
+        Fx.spawn(fxEl, Fx.box(22, 22, 'border-radius:50%;background:radial-gradient(circle,#ffffff,#ffffff00 70%)'), at, [
+          { transform: 'scale(.2)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(1.3)', opacity: 0 }
+        ], { duration: 350, delay: 100 + i * 70, easing: 'ease-out' })
+      );
+    }
+    // Little ghosts float over and swirl round the target.
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const rx = Math.max(tr.width * 0.6, 40);
+    for (let i = 0; i < 5; i++) {
+      const frames: Keyframe[] = [{ transform: 'translate(0,0) scale(.5)', opacity: 0 }];
+      for (let k = 1; k <= 4; k++) {
+        const t = k / 4;
+        frames.push({ transform: `translate(${dx * t}px,${dy * t - Math.sin(t * Math.PI) * 50 + (i - 2) * 8}px) scale(1)`, opacity: 1, offset: t * 0.45 });
+      }
+      for (let k = 1; k <= 6; k++) {
+        const a = (i / 5 + k / 6) * Math.PI * 2;
+        frames.push({ transform: `translate(${dx + Math.cos(a) * rx}px,${dy + Math.sin(a) * rx * 0.5}px) scale(1)`, opacity: k === 6 ? 0 : 1, offset: 0.45 + (k / 6) * 0.55 });
+      }
+      effects.push(Fx.spawn(fxEl, GhostMoveAnimations.cartoonGhost(24), launch, frames, { duration: 1050, delay: 350 + i * 50, easing: 'ease-in-out' }));
+    }
+    await Fx.wait(1200);
+    const big = GhostMoveAnimations.cartoonGhost(Math.max(tr.width * 1.2, 80), true);
+    effects.push(
+      Fx.spawn(fxEl, big, { x: target.x, y: target.y - tr.height * 0.35 }, [
+        { transform: 'translateY(30px) scale(.6)', opacity: 0 },
+        { transform: 'translateY(0) scale(1)', opacity: 0.85, offset: 0.4 },
+        { transform: 'translateY(-10px) scale(1.05)', opacity: 0 }
+      ], { duration: 850, easing: 'ease-out' }),
+      Fx.glow(targetEl, 'brightness(1.1) drop-shadow(0 0 8px #8A6AFF)', 800)
+    );
+    await Promise.all(effects);
+  }
+
+  /** A cartoon ghost `w` px wide - white with a blue-violet glow, or a see-through purple giant (`big`). */
+  private static cartoonGhost(w: number, big = false): HTMLElement {
+    const el = Fx.box(w, w * 1.15, `filter:drop-shadow(0 0 ${big ? 10 : 4}px ${big ? '#8A4AFF' : '#6A6AFF'})`);
+    const body = big ? '#7A5AE8cc' : '#F4F4FF';
+    const face = big ? '#2A1A6A' : '#2A2A4A';
+    el.innerHTML =
+      '<svg width="100%" height="100%" viewBox="0 0 20 23">' +
+      `<path d="M2,10 C2,4 6,1 10,1 C14,1 18,4 18,10 V21 L15.5,19 L13,21 L10,19 L7,21 L4.5,19 L2,21 Z" fill="${body}"/>` +
+      `<ellipse cx="7" cy="9" rx="1.6" ry="2.4" fill="${face}"/><ellipse cx="13" cy="9" rx="1.6" ry="2.4" fill="${face}"/>` +
+      `<path d="M7,14 Q10,16.5 13,14" stroke="${face}" stroke-width="1.2" fill="none" stroke-linecap="round"/>` +
+      '</svg>';
+    return el;
   }
 }

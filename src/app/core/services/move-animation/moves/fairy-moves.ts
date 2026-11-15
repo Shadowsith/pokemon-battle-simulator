@@ -3,12 +3,19 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { DazzlingGleam } from './fairy/dazzling-gleam';
+import { FairySpecialMoveAnimations } from './fairy/fairy-special-moves';
+import { FairySupportMoveAnimations } from './fairy/fairy-support-moves';
 import { Geomancy } from './fairy/geomancy';
 
-/** Hand-made animations for Fairy-type moves (Dazzling Gleam and Geomancy live in `fairy/`). */
+/**
+ * Hand-made animations for Fairy-type moves. Dazzling Gleam, Geomancy and the
+ * Gen 6 support moves / special attacks live in `fairy/`.
+ */
 export class FairyMoveAnimations {
   /** Hand-made Fairy move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    ...FairySupportMoveAnimations.anims,
+    ...FairySpecialMoveAnimations.anims,
     dazzlinggleam: (refs, launch, target) => DazzlingGleam.play(refs, launch, target),
     geomancy: (refs, launch) => Geomancy.release(refs, launch),
     moonblast: (refs, launch, target) => FairyMoveAnimations.playMoonblast(refs, launch, target),

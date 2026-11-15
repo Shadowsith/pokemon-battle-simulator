@@ -9,7 +9,8 @@ export class FightingStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     bulkup: (refs, launch) => FightingStatusMoveAnimations.playBulkUp(refs, launch),
-    detect: (refs, launch) => FightingStatusMoveAnimations.playDetect(refs, launch)
+    detect: (refs, launch) => FightingStatusMoveAnimations.playDetect(refs, launch),
+    matblock: (refs, launch, target) => FightingStatusMoveAnimations.playMatBlock(refs, launch, target)
   };
 
   /**
@@ -67,5 +68,36 @@ export class FightingStatusMoveAnimations {
     ], { duration: 800, easing: 'ease-in-out' });
     launchEl.style.transformOrigin = '';
     await FxEffects.orangeSparkles(refs, launch, launch.y - r.height / 2);
+  }
+
+  /**
+   * Mat Block, after the XY animation: the user ducks and flips a green
+   * tatami mat up on its edge in front of itself (0-0.4 s), the mat stands
+   * there (to 0.9 s) and fades (to 1.2 s).
+   * Reference: https://www.pokewiki.de/images/4/43/Tatami-Schild_Gen6.png
+   */
+  private static async playMatBlock(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const foot = Fx.footOf(launchEl, fieldEl);
+    const dir = target.x >= launch.x ? 1 : -1;
+    const w = Math.max(r.width * 0.35, 26);
+    const h = Math.max(r.height * 0.9, 60);
+    const mat = Fx.box(w, h, 'border-radius:2px;background:repeating-linear-gradient(90deg,#6AB83A 0 3px,#5AA830 3px 6px);border:3px solid #2A5A1A;box-shadow:0 0 6px #00000066;transform-origin:50% 100%');
+    const original = launchEl.style.transform;
+    await Promise.all([
+      Fx.anim(launchEl, [
+        { transform: `${original} translateY(0) scale(1,1)` },
+        { transform: `${original} translateY(4px) scale(1.04,.92)`, offset: 0.3 },
+        { transform: `${original} translateY(0) scale(1,1)` }
+      ], { duration: 400, easing: 'ease-out', fill: 'none' }),
+      Fx.spawn(fxEl, mat, { x: launch.x + dir * r.width * 0.75, y: foot.y - h / 2 - r.height * 0.08 }, [
+        { transform: 'scaleY(.05)', opacity: 0 },
+        { transform: 'scaleY(1.05)', opacity: 1, offset: 0.3 },
+        { transform: 'scaleY(1)', opacity: 1, offset: 0.4 },
+        { transform: 'scaleY(1)', opacity: 1, offset: 0.75 },
+        { transform: 'scaleY(1)', opacity: 0 }
+      ], { duration: 1200, easing: 'ease-out' })
+    ]);
   }
 }

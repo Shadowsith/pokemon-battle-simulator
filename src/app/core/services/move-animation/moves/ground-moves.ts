@@ -4,8 +4,9 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { DrillRun } from './ground/drill-run';
+import { ThousandMoves } from './ground/thousand-moves';
 
-/** Hand-made animations for Ground-type moves (Drill Run lives in `ground/`). */
+/** Hand-made animations for Ground-type moves (Drill Run, Thousand Arrows and Thousand Waves live in `ground/`). */
 export class GroundMoveAnimations {
   /** Hand-made Ground move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -17,7 +18,10 @@ export class GroundMoveAnimations {
     earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs),
     landswrath: (refs, launch, target) => GroundMoveAnimations.playLandsWrath(refs, launch, target),
     precipiceblades: (refs, _launch, target) => GroundMoveAnimations.playPrecipiceBlades(refs, target),
-    spikes: (refs, launch) => GroundMoveAnimations.playSpikes(refs, launch)
+    rototiller: (refs) => GroundMoveAnimations.playRototiller(refs),
+    spikes: (refs, launch) => GroundMoveAnimations.playSpikes(refs, launch),
+    thousandarrows: (refs, launch, target) => ThousandMoves.playArrows(refs, launch, target),
+    thousandwaves: (refs, launch, target) => ThousandMoves.playWaves(refs, launch, target)
   };
 
   /** Turn-1 animations of two-turn Ground moves, by @pkmn/sim move id. */
@@ -671,5 +675,39 @@ export class GroundMoveAnimations {
       }
       Fx.anim(clod, frames, { duration: 700 + Math.random() * 200, easing: 'linear', delay: Math.random() * dur * 0.5 }).then(() => clod.remove());
     }
+  }
+
+  /**
+   * Rototiller, after the XY animation: the scene turns to brown earth and
+   * ploughed furrows roll across the ground in a cloud of dust (0-1.1 s)
+   * while green sprouts sparkle along them (0.5-1.3 s), then the field
+   * returns (to 1.6 s).
+   * Reference: https://www.pokewiki.de/images/f/f6/Pfl%C3%BCger_Gen6.png
+   */
+  private static async playRototiller(refs: BattleStageRefs) {
+    const { fieldEl, fxEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const earth = Fx.backdrop(fieldEl, 'background:linear-gradient(180deg,#5A3A14,#6A4A1E)');
+    const furrows = Fx.box(W, H * 0.55, `left:0;top:${H * 0.45}px;background:repeating-linear-gradient(180deg,#8A6A3A 0 10px,#4A3010 10px 18px,#A8884A 18px 22px);-webkit-mask-image:linear-gradient(180deg,#0000,#000 30%);mask-image:linear-gradient(180deg,#0000,#000 30%)`);
+    earth.appendChild(furrows);
+    furrows.animate([{ backgroundPosition: '0 0' }, { backgroundPosition: '0 44px' }], { duration: 400, iterations: 4 });
+    const effects: Promise<unknown>[] = [
+      Fx.anim(earth, [{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 1, offset: 0.75 }, { opacity: 0 }], { duration: 1600, easing: 'ease-in-out' }).then(() => earth.remove())
+    ];
+    for (let i = 0; i < 6; i++) {
+      effects.push(FxEffects.smokePuff(fxEl, { x: W * (0.1 + i * 0.16), y: H * (0.6 + Math.random() * 0.3) }, 50, ['#C8A87Acc', '#8A6A3A99']));
+    }
+    for (let i = 0; i < 16; i++) {
+      const at: Point = { x: W * (0.05 + Math.random() * 0.9), y: H * (0.55 + Math.random() * 0.4) };
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.sparkStar(8 + Math.random() * 5, '#9AF07A'), at, [
+          { transform: 'translateY(0) scale(0)', opacity: 0 },
+          { transform: 'translateY(-6px) scale(1)', opacity: 1, offset: 0.4 },
+          { transform: 'translateY(-12px) scale(0)', opacity: 0 }
+        ], { duration: 450, delay: 500 + i * 40, easing: 'ease-out' })
+      );
+    }
+    await Promise.all(effects);
   }
 }
