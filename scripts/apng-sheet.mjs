@@ -36,7 +36,7 @@ function parseArgs(argv) {
   return opts;
 }
 
-/** Move id -> [{ label, url }] from the "- Gen N APNG|MP4 (label): url" lines under each checklist entry. */
+/** Move id -> [{ label, url }] from the "- Gen N APNG|GIF|MP4 (label): url" lines under each checklist entry. */
 function referenceUrls() {
   const refs = new Map();
   let current = null;
@@ -46,7 +46,7 @@ function referenceUrls() {
       current = entry[1];
       continue;
     }
-    const ref = line.match(/^\s+- Gen (\d) (?:APNG|MP4)(?: \(([^)]*)\))?: (\S+)/);
+    const ref = line.match(/^\s+- Gen (\d) (?:APNG|GIF|MP4)(?: \(([^)]*)\))?: (\S+)/);
     if (ref && current) {
       if (!refs.has(current)) refs.set(current, []);
       refs.get(current).push({ label: ref[2] ? `Gen${ref[1]} ${ref[2]}` : `Gen${ref[1]}`, url: ref[3] });
