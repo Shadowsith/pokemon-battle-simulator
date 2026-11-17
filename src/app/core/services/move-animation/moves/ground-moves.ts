@@ -16,6 +16,7 @@ export class GroundMoveAnimations {
     drillrun: (refs, launch, target, v) => DrillRun.play(refs, launch, target, v),
     earthpower: (refs, _launch, target) => GroundMoveAnimations.playEarthPower(refs, target),
     earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs),
+    fissure: (refs, _launch, target) => GroundMoveAnimations.playFissure(refs, target),
     landswrath: (refs, launch, target) => GroundMoveAnimations.playLandsWrath(refs, launch, target),
     precipiceblades: (refs, _launch, target) => GroundMoveAnimations.playPrecipiceBlades(refs, target),
     rototiller: (refs) => GroundMoveAnimations.playRototiller(refs),
@@ -519,6 +520,84 @@ export class GroundMoveAnimations {
 
     await Fx.anim(red, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
     red.remove();
+  }
+
+  /**
+   * Fissure, after the Gen 4 / Gen 5 animation:
+   * - Gen 4 (DPPt): https://www.pokewiki.de/images/d/d4/Geofissur_DPPt.png
+   * - Gen 4 (HGSS): https://www.pokewiki.de/images/c/c1/Geofissur_HGSS.png
+   * - Gen 5: https://www.pokewiki.de/images/3/34/Geofissur_Gen5.png
+   *
+   * The scene turns to brown earth (0-0.3 s). A black jagged crack runs down
+   * through the ground behind the target (0.3-0.55 s) and gapes open (0.55-
+   * 0.8 s): the field jolts and the target sinks into it (hit at 0.6 s) while
+   * clods tumble in and the ground keeps rumbling. The crack closes
+   * (1.25-1.55 s), the target rises back (to ~1.75 s) and the earth fades
+   * (to ~2.05 s).
+   */
+  private static async playFissure(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const H = fieldEl.clientHeight;
+    const r = Fx.rect(targetEl);
+    const earth = Fx.backdrop(fieldEl, 'background:radial-gradient(ellipse at 50% 40%,#9A6A3A,#6A4424 60%,#3E2614)');
+    await Fx.anim(earth, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out' });
+
+    // The crack: a jagged black band from the top of the field to the bottom, behind the target.
+    const w = Math.max(r.width * 0.55, 40);
+    const left: string[] = [];
+    const right: string[] = [];
+    const steps = 12;
+    for (let k = 0; k <= steps; k++) {
+      const y = (k / steps) * 100;
+      const mid = 10 + (k % 2 ? 2.5 : -2.5) + (Math.random() * 2 - 1);
+      const half = 2 + Math.random() * 3 + Math.sin((k / steps) * Math.PI) * 3;
+      left.push(`${(mid - half).toFixed(1)},${y.toFixed(1)}`);
+      right.unshift(`${(mid + half).toFixed(1)},${y.toFixed(1)}`);
+    }
+    const crack = document.createElement('div');
+    crack.style.cssText = `position:absolute;left:${target.x - w / 2}px;top:0;width:${w}px;height:${H}px;pointer-events:none`;
+    crack.innerHTML = `<svg viewBox="0 0 20 100" preserveAspectRatio="none" width="100%" height="100%"><polygon points="${left.join(' ')} ${right.join(' ')}" fill="#0A0604" stroke="#2A1A0E" stroke-width=".6" stroke-linejoin="round"/></svg>`;
+    earth.appendChild(crack);
+    await Fx.anim(crack, [
+      { clipPath: 'inset(0 0 100% 0)', transform: 'scaleX(.25)' },
+      { clipPath: 'inset(0 0 0 0)', transform: 'scaleX(.25)' }
+    ], { duration: 250, easing: 'ease-in' });
+    const gape = Fx.anim(crack, [
+      { clipPath: 'inset(0 0 0 0)', transform: 'scaleX(.25)' },
+      { clipPath: 'inset(0 0 0 0)', transform: 'scaleX(1)', offset: 0.25 },
+      { clipPath: 'inset(0 0 0 0)', transform: 'scaleX(1)', offset: 0.7 },
+      { clipPath: 'inset(0 0 0 0)', transform: 'scaleX(0)' }
+    ], { duration: 1000, easing: 'ease-in-out' });
+
+    // The hit: a jolt, the target sinks and shakes; clods tumble into the gap.
+    await Fx.wait(50);
+    Fx.shakeField(fieldEl, 1.4);
+    const base = targetEl.style.transform;
+    const sink = Fx.anim(targetEl, [
+      { transform: `${base} translate(0,0)` },
+      { transform: `${base} translate(3px,10px)`, offset: 0.15 },
+      { transform: `${base} translate(-3px,12px)`, offset: 0.3 },
+      { transform: `${base} translate(3px,12px)`, offset: 0.45 },
+      { transform: `${base} translate(-2px,12px)`, offset: 0.6 },
+      { transform: `${base} translate(0,10px)`, offset: 0.75 },
+      { transform: `${base} translate(0,0)` }
+    ], { duration: 1150, easing: 'linear', fill: 'none' });
+    const clods: Promise<void>[] = [];
+    for (let i = 0; i < 10; i++) {
+      const s = 5 + Math.random() * 6;
+      const from: Point = { x: target.x + (i % 2 ? 1 : -1) * (w * 0.4 + Math.random() * w * 0.4), y: target.y - r.height * 0.3 + Math.random() * r.height * 0.6 };
+      const clod = Fx.box(s, s * 0.85, 'clip-path:polygon(20% 0,75% 8%,100% 45%,85% 100%,15% 95%,0 40%);background:linear-gradient(135deg,#B08A5A,#6E5232 70%,#4A3622)');
+      clods.push(
+        Fx.spawn(fxEl, clod, from, [
+          { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+          { transform: `translate(${(target.x - from.x) * 0.8}px,${30 + Math.random() * 30}px) rotate(${(Math.random() * 2 - 1) * 200}deg)`, opacity: 0 }
+        ], { duration: 500, easing: 'ease-in', delay: i * 50 })
+      );
+    }
+    const rumble = Fx.wait(300).then(() => Fx.shakeField(fieldEl, 0.6));
+    await Promise.all([gape, sink, rumble, ...clods]);
+    await Fx.anim(earth, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    earth.remove();
   }
 
   /**

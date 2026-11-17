@@ -3,9 +3,10 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { DoubleSlap } from './double-slap';
 import { Retaliate } from './retaliate';
 
-/** Hand-made animations for Normal-type punches, kicks and body blows (Retaliate lives in `retaliate.ts`). */
+/** Hand-made animations for Normal-type punches, kicks and body blows (Double Slap lives in `double-slap.ts`, Retaliate in `retaliate.ts`). */
 export class NormalBlowMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -13,6 +14,7 @@ export class NormalBlowMoveAnimations {
     cometpunch: (refs, _launch, target, v) => NormalBlowMoveAnimations.playCometPunch(refs, target, v),
     dizzypunch: (refs, _launch, target, v) => NormalBlowMoveAnimations.playDizzyPunch(refs, target, v),
     doubleedge: (refs, launch, target, v) => NormalBlowMoveAnimations.playDoubleEdge(refs, launch, target, v),
+    doubleslap: (refs, _launch, target, v) => DoubleSlap.play(refs, target, v),
     facade: (refs, launch, target) => NormalBlowMoveAnimations.playFacade(refs, launch, target),
     extremespeed: (refs, launch, target, v) => NormalBlowMoveAnimations.playExtremeSpeed(refs, launch, target, v),
     headbutt: (refs, _launch, target, v) => NormalBlowMoveAnimations.playHeadbutt(refs, target, v),

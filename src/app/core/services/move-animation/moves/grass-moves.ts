@@ -36,6 +36,7 @@ export class GrassMoveAnimations {
     leafblade: (refs, _launch, target) => GrassMoveAnimations.playLeafBlade(refs, target),
     leafstorm: (refs, launch, target) => LeafStorm.play(refs, launch, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
+    megadrain: (refs, launch, target) => GrassMoveAnimations.playMegaDrain(refs, launch, target),
     petalblizzard: (refs, _launch, target, v) => PetalBlizzard.play(refs, target, v),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     powerwhip: (refs, _launch, target) => PowerWhip.play(refs, target),
@@ -48,6 +49,33 @@ export class GrassMoveAnimations {
     synthesis: (refs, launch) => GrassMoveAnimations.playSynthesis(refs, launch),
     woodhammer: (refs, launch, target, v) => WoodHammer.play(refs, launch, target, v)
   };
+
+  /**
+   * Mega Drain, after the Gen 4 / Gen 5 animation:
+   * - Gen 4 (DP): https://www.pokewiki.de/images/1/15/Megasauger_DP.png
+   * - Gen 4 (PtHGSS): https://www.pokewiki.de/images/c/c1/Megasauger_PtHGSS.png
+   * - Gen 5: https://www.pokewiki.de/images/a/a1/Megasauger_Gen5.png
+   *
+   * The whole screen takes on a yellow-green tint (0-1.6 s) while golden
+   * sparkles are pulled out of the target and drift to the user on wavy arcs
+   * (0.1-1.3 s); then the user sparkles with the HP it gained (to ~2.2 s).
+   */
+  private static async playMegaDrain(refs: BattleStageRefs, launch: Point, target: Point) {
+    Fx.screenWash(refs.screenFxEl, '#C8E04A88', 200, 1300, launch.x > target.x ? '70%' : '30%');
+    Fx.flash(refs.targetEl, '#F8E048', 0.5);
+    Fx.shake(refs.targetEl, 3);
+    await Fx.wait(100);
+    await GrassMoveAnimations.drainStream(refs, launch, target, {
+      count: 18,
+      travel: 850,
+      spread: 900,
+      bend: 55,
+      scatter: 24,
+      spin: 180,
+      make: (i) => FxGlyphs.sparkStar(7 + Math.random() * 7, i % 3 ? '#F8E048' : '#FFFBD0')
+    });
+    await FxEffects.healSparkles(refs, launch);
+  }
 
   /** Turn-1 animations of two-turn Grass moves, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {

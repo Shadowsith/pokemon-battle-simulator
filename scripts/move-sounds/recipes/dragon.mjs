@@ -70,13 +70,18 @@ export const DRAGON = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): a shock wave of draconic rage. */
+  /**
+   * DragonMoveAnimations.playDragonRage: flame stream pours onto the target (0-0.8 s,
+   * hit at 0.36 s), violet flames billow up over it (0.4-1.5 s). A rushing roar of
+   * fire, a heavy hit, then a seething flame rumble that dies away.
+   */
   dragonrage: () => {
-    const s = new MoveSfx(0.95, 0xd2a9);
-    s.noise(0.0, 0.45, { clock: env.ramp(300, 900), gain: env.ramp(0.15, 0.4) });
-    s.pulse(0.0, 0.45, { freq: (u) => 70 + 50 * u, gain: env.ramp(0.1, 0.3), duty: 0.25 });
-    s.thud(0.43, 0.75, 0.8);
-    s.rumble(0.45, 0.4, { from: 400, to: 150, gain: 0.25 });
+    const s = new MoveSfx(1.65, 0xd2a9);
+    s.noise(0.0, 0.8, { clock: env.ramp(300, 900), gain: env.ramp(0.15, 0.35) });
+    s.pulse(0.0, 0.36, { freq: (u) => 70 + 50 * u, gain: env.ramp(0.1, 0.3), duty: 0.25 });
+    s.thud(0.36, 0.75, 0.8);
+    s.noise(0.4, 1.1, { clock: (u) => 1200 - 700 * u, gain: env.decay(0.3, 1.2) });
+    s.rumble(0.4, 1.0, { from: 400, to: 120, gain: 0.25 });
     return s;
   },
 

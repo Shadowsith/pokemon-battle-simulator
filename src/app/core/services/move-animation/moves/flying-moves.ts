@@ -1,4 +1,5 @@
 import { Point, BattleStageRefs, MoveVisual, MoveAnimRegistry } from '../animation.types';
+import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
@@ -22,12 +23,54 @@ export class FlyingMoveAnimations {
     dragonascent: (refs, launch, target, v) => DragonAscent.play(refs, launch, target, v),
     drillpeck: (refs, _launch, target, v) => FlyingMoveAnimations.playDrillPeck(refs, target, v),
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target),
+    gust: (refs, _launch, target) => FlyingMoveAnimations.playGust(refs, target),
     hurricane: (refs, launch, target) => Hurricane.play(refs, launch, target),
+    mirrormove: (refs, _launch, target) => FlyingMoveAnimations.playMirrorMove(refs, target),
     oblivionwing: (refs, launch, target, v) => FlyingMoveAnimations.playOblivionWing(refs, launch, target, v),
     roost: (refs, launch) => Roost.play(refs, launch),
     skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target),
     tailwind: (refs, launch) => Tailwind.play(refs, launch)
   };
+
+  /**
+   * Mirror Move, after the Gen 5 animation (Gen 4 shows only the copied move):
+   * - Gen 4: https://www.pokewiki.de/images/6/65/Spiegeltrick_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/c/cf/Spiegeltrick_Gen5.png
+   *
+   * The scene goes dark (0-0.28 s); a ring of white glints wheels round the
+   * target, twinkling as it closes in (0.28-1.2 s), and vanishes into it with
+   * a white flash; the scene clears (1.2-1.5 s). The copied move plays after.
+   */
+  private static async playMirrorMove(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 280, easing: 'ease-out' });
+    const rx = Math.max(r.width * 0.75, 50);
+    const ry = Math.max(r.height * 0.45, 30);
+    const count = 12;
+    const steps = 16;
+    const glints = Array.from({ length: count }, (_, i) => {
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= steps; k++) {
+        const t = k / steps;
+        const a = (Math.PI * 2 * i) / count + t * Math.PI * 1.5;
+        const shrink = 1 - t * 0.85;
+        frames.push({
+          transform: `translate(${Math.cos(a) * rx * shrink}px,${Math.sin(a) * ry * shrink}px) scale(${0.6 + 0.4 * Math.abs(Math.sin(t * Math.PI * 3 + i))})`,
+          opacity: k === 0 ? 0 : 1
+        });
+      }
+      return Fx.spawn(fxEl, Fx.box(6, 6, 'border-radius:50%;background:#ffffff;box-shadow:0 0 6px #ffffff,0 0 10px #CFE8FF'), target, frames, {
+        duration: 920,
+        easing: 'ease-in'
+      });
+    });
+    await Promise.all(glints);
+    Fx.flash(targetEl, '#ffffff', 0.7);
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
+    dim.remove();
+  }
 
   /** Turn-1 animations of two-turn Flying moves, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {
@@ -35,6 +78,52 @@ export class FlyingMoveAnimations {
     fly: (refs, launch) => FlyingMoveAnimations.playFlyUp(refs, launch),
     skyattack: (refs, launch) => FlyingMoveAnimations.playSkyAttackCharge(refs, launch)
   };
+
+  /**
+   * Gust, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/e/e3/Windsto%C3%9F_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/2/26/Windsto%C3%9F_Gen5.png
+   *
+   * A whirl of grey-beige dust clouds springs up round the target's feet and
+   * sweeps round it twice, rising a little (0-1.1 s), with brown bits of
+   * debris flung round in it; the target shakes in the wind (hit at 0.3 s)
+   * and the clouds blow apart (to ~1.3 s).
+   */
+  private static async playGust(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const foot = Fx.footOf(targetEl, fieldEl);
+    const rx = Math.max(r.width * 0.6, 40);
+    const ry = Math.max(r.width * 0.16, 10);
+    const centre: Point = { x: target.x, y: foot.y - r.height * 0.15 };
+    const whirl = (a0: number, el: HTMLElement, rise: number, duration: number, delay: number) => {
+      const frames: Keyframe[] = [];
+      const steps = 16;
+      for (let k = 0; k <= steps; k++) {
+        const a = a0 + (k / steps) * Math.PI * 4;
+        const t = k / steps;
+        frames.push({
+          transform: `translate(${Math.cos(a) * rx * (0.6 + 0.4 * t)}px,${Math.sin(a) * ry - rise * t}px) scale(${0.6 + 0.6 * t})`,
+          opacity: k === 0 ? 0 : k === steps ? 0 : 0.85
+        });
+      }
+      return Fx.spawn(fxEl, el, centre, frames, { duration, easing: 'linear', delay });
+    };
+    const effects: Promise<void>[] = [];
+    for (let i = 0; i < 14; i++) {
+      const s = Math.max(r.width * 0.3, 24) * (0.7 + Math.random() * 0.5);
+      const cloud = Fx.box(s, s * 0.75, 'border-radius:50%;background:radial-gradient(circle at 45% 45%,#F4F0E8,#D8D0C0 45%,#B8B0A000 72%);filter:blur(1px)');
+      effects.push(whirl((i / 14) * Math.PI * 2, cloud, r.height * (0.2 + Math.random() * 0.3), 1100, i * 15));
+    }
+    for (let i = 0; i < 8; i++) {
+      const s = 3 + Math.random() * 3;
+      effects.push(whirl(Math.random() * Math.PI * 2, Fx.box(s, s, 'background:#6E5232'), r.height * (0.4 + Math.random() * 0.4), 1000, 100 + i * 40));
+    }
+    await Fx.wait(300);
+    Fx.flash(targetEl, '#ffffff', 0.5);
+    for (let t = 0; t < 700; t += 175) setTimeout(() => Fx.shake(targetEl, 4), t);
+    await Promise.all(effects);
+  }
 
   /**
    * Oblivion Wing, after the XY animation: letterbox bars slide in over a dark

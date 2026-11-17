@@ -129,12 +129,13 @@ export const FIGHTING = {
   },
 
 
-  /** Generic melee kick, 2 hits (impacts at 0.17 / 0.59 s). */
+  /** FightingKickThrowMoveAnimations.playDoubleKick, 2 hits (impacts at 0.12 / 0.54 s): a swish and a firm kick each, a spark tick. */
   doublekick: () => {
-    const s = new MoveSfx(0.85, 0xd0bc);
-    for (const at of [0.17, 0.59]) {
-      s.whoosh(at - 0.12, 0.13, { from: 2000, to: 7000, gain: 0.25 });
+    const s = new MoveSfx(1.0, 0xd0bc);
+    for (const at of [0.12, 0.54]) {
+      s.whoosh(at - 0.11, 0.12, { from: 2000, to: 7000, gain: 0.25 });
       s.thud(at, 0.6, 0.6);
+      s.pulse(at + 0.02, 0.1, { freq: () => 2349, gain: env.decay(0.08, 2), duty: 0.125 });
     }
     return s;
   },
@@ -506,12 +507,13 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a sharp karate chop. */
+  /** FightingPunchMoveAnimations.playKarateChop (hand rises 0-0.15 s, chops down, impact 0.3 s, fades by ~0.8 s): a sharp karate chop. */
   karatechop: () => {
-    const s = new MoveSfx(0.65, 0xca7c);
-    s.whoosh(0.0, 0.18, { from: 2500, to: 9000, gain: 0.35 });
-    s.thud(0.17, 0.6, 0.5);
-    s.noise(0.17, 0.05, { clock: () => 13000, gain: env.decay(0.35, 1) });
+    const s = new MoveSfx(0.85, 0xca7c);
+    s.whoosh(0.13, 0.17, { from: 2500, to: 9000, gain: 0.35 });
+    s.thud(0.3, 0.6, 0.5);
+    s.noise(0.3, 0.05, { clock: () => 13000, gain: env.decay(0.35, 1) });
+    s.sparkle(0.33, 0.35, 4, { lo: 2800, hi: 5000, gain: 0.08 });
     return s;
   },
 

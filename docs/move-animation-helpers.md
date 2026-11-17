@@ -56,6 +56,7 @@ static readonly anims: MoveAnimRegistry = {
 | `orangeSparkles(refs, launch, top)` | Orange sparkles drift down over the caster (~1.2 s). |
 | `statUpAura(refs, launch)` | Stat-up: orange bands scroll up over the caster (~0.8 s). |
 | `statDownBubbles(refs, launch)` | Stat-down: blue bubbles drift down over the caster (~0.9 s). For a target drop pass `{ ...refs, launchEl: targetEl }, target`. |
+| `blueStatDrop(refs, target)` | Classic target stat drop: the target turns blue under stat-down bubbles (~0.9 s; Flash, Leer, Kinesis). |
 | `statDropCloud(refs, target)` | XY-style stat drop: purple cloud rains on the target (~1.0 s). |
 | `sleepZs(fxEl, head, away, colors)` | Rising "Z"s. |
 | `orbit(el, radius, laps, duration, spin)` | Sprite circles along a path (no turning). |
@@ -75,7 +76,7 @@ All return an absolutely positioned element; place it with `Fx.place`.
 - **Energy:** `sparkStar(size, color)` 4-point star · `fivePointStar(size, glow)` · `ringSparkle(size, color, ring)` · `psySparkle(size)` · `spikyBurst(size, outer, inner, centre?)` comic impact burst · `glyph(v, size)` type particle · `boltGlyph(color, size)` · `sparkBolt()` · `lightning(W, H, from, to, jag, color?, glow?, width?)` field-sized jagged bolt SVG · `hexagon(s, fill, glow)` glowing hex tile.
 - **Elements:** `firePuff(size, 'hot'|'red'|'blue')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `pointedRock(w)` sharp stone, tip up · `poisonBubble(size)` glossy purple bubble · `petalGlyph(s, color)` · `leafGlyph(s)`.
 - **Body parts:** `fistGlyph(w, tone)` (tones in `FIST_TONES`: yellow, red, ice, blue, dark, brown) · `footGlyph(w, color?)` · `chopHandGlyph(w)` · `gloveGlyph(w)` · `pointingHandGlyph(w)` · `jawGlyph(w, h, lower)` · `incisorGlyph(h)` · `snakeEyeGlyph(w, side)`.
-- **Props:** `swordGlyph(h)` · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `itemBag(size)` cream item sack (Trick, Switcheroo) · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
+- **Props:** `swordGlyph(h)` · `hornGlyph(len)` black horn pointing right · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `itemBag(size)` cream item sack (Trick, Switcheroo) · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
 
 ## Constants (`animation.constants.ts`)
 `DIM_BACKDROP` (dark scene) · `HEAT_BACKDROP` (red-hot) · `PSYCHIC_WAVES`, `WATERFALL_WAVES` (tiling backgrounds) · `FIST_TONES` · `FLECK_COLOR` (statUp green, statDown red, poison purple, …) · `TYPE_STYLE` · `BUBBLE_DRIFT` / `BUBBLE_BEAM`.

@@ -19,12 +19,76 @@ export class DragonMoveAnimations {
     dracometeor: (refs, launch, target) => DragonMoveAnimations.playDracoMeteor(refs, launch, target),
     dragonclaw: (refs, launch, target) => DragonMoveAnimations.playDragonClaw(refs, launch, target),
     dragondance: (refs, launch) => DragonMoveAnimations.playDragonDance(refs, launch),
+    dragonrage: (refs, launch, target) => DragonMoveAnimations.playDragonRage(refs, launch, target),
     dragonpulse: (refs, launch, target) => DragonMoveAnimations.playDragonPulse(refs, launch, target),
     dragonrush: (refs, _launch, target) => DragonMoveAnimations.playDragonRush(refs, target),
     outrage: (refs, launch) => DragonMoveAnimations.playOutrage(refs, launch),
     roaroftime: (refs, launch, target) => RoarOfTime.play(refs, launch, target),
     spacialrend: (refs, launch, target) => SpacialRend.play(refs, launch, target)
   };
+
+  /**
+   * Dragon Rage, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/a/aa/Drachenwut_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/0/0a/Drachenwut_Gen5.png
+   *
+   * A swirling stream of dark violet and yellow flame puffs pours from the
+   * user onto the target (0-0.8 s, first puffs land at ~0.36 s = hit); the
+   * target turns violet and dark violet flames billow up over it and rise
+   * away (0.4-1.5 s).
+   */
+  private static async playDragonRage(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const travel = 400;
+    const effects: Promise<void>[] = [];
+
+    // The stream: violet and yellow puffs leave one after another, swirl and swell.
+    for (let i = 0; i < 30; i++) {
+      const size = 14 + Math.random() * 12;
+      const wav = Math.sin(i * 0.8) * 10;
+      const jx = (Math.random() * 2 - 1) * 10;
+      const jy = (Math.random() * 2 - 1) * 10;
+      effects.push(
+        Fx.spawn(fxEl, DragonMoveAnimations.ragePuff(size, i % 3 === 1), launch, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+          { transform: `translate(${dx * 0.15}px,${dy * 0.15 + wav * 0.3}px) scale(.7)`, opacity: 1, offset: 0.12 },
+          { transform: `translate(${dx * 0.6 + jx * 0.5}px,${dy * 0.6 + wav + jy * 0.5}px) scale(1.1)`, opacity: 1, offset: 0.6 },
+          { transform: `translate(${dx + jx}px,${dy + jy}px) scale(1.5)`, opacity: 0 }
+        ], { duration: travel, easing: 'linear', delay: i * 14 })
+      );
+    }
+    await Fx.wait(travel * 0.9);
+    effects.push(Fx.glow(targetEl, 'grayscale(1) brightness(.6) sepia(1) saturate(6) hue-rotate(220deg) drop-shadow(0 0 6px #8A3AF0)', 1100));
+    Fx.shake(targetEl, 5);
+
+    // Violet flames billow up over the target and rise away.
+    const foot = Fx.footOf(targetEl, fieldEl);
+    const spread = Math.max(r.width * 0.45, 30);
+    for (let i = 0; i < 22; i++) {
+      const size = Math.max(r.width * 0.35, 26) * (0.7 + Math.random() * 0.6);
+      const start: Point = { x: foot.x + (Math.random() * 2 - 1) * spread, y: foot.y - Math.random() * r.height * 0.6 };
+      const rise = r.height * (0.5 + Math.random() * 0.5);
+      effects.push(
+        Fx.spawn(fxEl, DragonMoveAnimations.ragePuff(size, false), start, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `translate(${(Math.random() * 2 - 1) * 6}px,${-rise * 0.35}px) scale(1)`, opacity: 0.95, offset: 0.35 },
+          { transform: `translate(${(Math.random() * 2 - 1) * 12}px,${-rise}px) scale(.6)`, opacity: 0 }
+        ], { duration: 650, easing: 'ease-out', delay: i * 22 })
+      );
+    }
+    await Promise.all(effects);
+  }
+
+  /** A soft flame puff for Dragon Rage: dark violet, or yellow when `yellow`. */
+  private static ragePuff(size: number, yellow: boolean): HTMLElement {
+    const fill = yellow
+      ? 'radial-gradient(circle at 45% 45%,#FFFBD0,#FFE040 35%,#E0A020 60%,#C0800000 78%)'
+      : 'radial-gradient(circle at 45% 45%,#D8B8FF,#8A3AF0 32%,#4A1A9A 60%,#2A0A6000 78%)';
+    return Fx.box(size, size, `border-radius:50% 50% 45% 55%;background:${fill}`);
+  }
 
   /**
    * Draco Meteor, after the Gen 4 / Gen 5 animation:

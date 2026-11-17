@@ -376,6 +376,17 @@ export class FxGlyphs {
     return svg;
   }
 
+  /** A black horn, `len` px long, pointing right (Megahorn, Fury Attack): wide base, curved flanks, sharp tip. */
+  static hornGlyph(len: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText = `position:absolute;width:${len}px;height:${len * 0.4}px;pointer-events:none`;
+    el.innerHTML =
+      '<svg viewBox="0 0 60 24" width="100%" height="100%"><defs><linearGradient id="bugHorn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6A6A74"/><stop offset=".45" stop-color="#2A2A30"/><stop offset="1" stop-color="#0A0A0C"/></linearGradient></defs>' +
+      '<path d="M1 2Q30 3 59 12Q30 23 1 22Q5 12 1 2Z" fill="url(#bugHorn)" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>' +
+      '<path d="M8 7Q30 8 50 11.5" stroke="#9A9AA6" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/></svg>';
+    return el;
+  }
+
   /** A simple cartoon bone (shaft with two round knobs at each end), outlined only on its outside. */
   static boneGlyph(w: number): HTMLElement {
     const h = w * 0.3;

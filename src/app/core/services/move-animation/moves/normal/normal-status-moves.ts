@@ -2,27 +2,249 @@ import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../../anim
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { DoubleTeam } from './double-team';
 import { ShellSmash } from './shell-smash';
 import { WorkUp } from './work-up';
 
-/** Hand-made animations for Normal-type status moves (setup, protection, support; Shell Smash lives in `shell-smash.ts`, Work Up in `work-up.ts`). */
+/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Double Team lives in `double-team.ts`, Shell Smash in `shell-smash.ts`, Work Up in `work-up.ts`). */
 export class NormalStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     batonpass: (refs, launch) => NormalStatusMoveAnimations.playBatonPass(refs, launch),
     bellydrum: (refs, launch) => NormalStatusMoveAnimations.playBellyDrum(refs, launch),
     conversion: (refs, launch) => NormalStatusMoveAnimations.playConversion(refs, launch),
-    encore: (refs, _launch, target) => NormalStatusMoveAnimations.playEncore(refs, target),
+    defensecurl: (refs, launch) => NormalStatusMoveAnimations.playDefenseCurl(refs, launch),
+    doubleteam: (refs, launch) => DoubleTeam.play(refs, launch),
+    focusenergy: (refs, launch) => NormalStatusMoveAnimations.playFocusEnergy(refs, launch),
     followme: (refs, launch) => NormalStatusMoveAnimations.playFollowMe(refs, launch),
+    growth: (refs, launch) => NormalStatusMoveAnimations.playGrowth(refs, launch),
+    harden: (refs, launch) => NormalStatusMoveAnimations.playHarden(refs, launch),
+    metronome: (refs, launch, _target, v) => NormalStatusMoveAnimations.playMetronome(refs, launch, v),
+    minimize: (refs, launch) => NormalStatusMoveAnimations.playMinimize(refs, launch),
     painsplit: (refs, launch, target) => NormalStatusMoveAnimations.playPainSplit(refs, launch, target),
     protect: (refs, launch) => NormalStatusMoveAnimations.playProtect(refs, launch),
     shellsmash: (refs, launch) => ShellSmash.play(refs, launch),
     sleeptalk: (refs, launch, target, v) => NormalStatusMoveAnimations.playSleepTalk(refs, launch, target, v),
     swordsdance: (refs, launch) => NormalStatusMoveAnimations.playSwordsDance(refs, launch),
-    whirlwind: (refs, _launch, target, v) => NormalStatusMoveAnimations.playWhirlwind(refs, target, v),
     workup: (refs, launch) => WorkUp.play(refs, launch),
-    yawn: (refs, launch, target) => NormalStatusMoveAnimations.playYawn(refs, launch, target)
   };
+
+  /**
+   * Metronome, after the Gen 4 animation:
+   * - Gen 4: https://www.pokewiki.de/images/7/79/Metronom_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/9/9d/Metronom_Gen5.png
+   *
+   * A white glove pops up beside the user's head (0-0.2 s) and wags its
+   * finger like a metronome, four ticks (0.2-1.4 s); a glint flashes on the
+   * fingertip and the glove fades (1.4-1.65 s). The called move plays after.
+   */
+  private static async playMetronome(refs: BattleStageRefs, launch: Point, v: MoveVisual) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const w = Math.max(r.width * 0.3, 24);
+    const at: Point = { x: launch.x + v.dir * r.width * 0.45, y: launch.y - r.height * 0.25 };
+    const hand = FxGlyphs.pointingHandGlyph(w);
+    hand.style.transformOrigin = '50% 100%';
+    Fx.place(hand, at);
+    fxEl.appendChild(hand);
+    const frames: Keyframe[] = [
+      { transform: 'rotate(0deg) scale(0)', opacity: 0, offset: 0 },
+      { transform: 'rotate(0deg) scale(1)', opacity: 1, offset: 0.12 }
+    ];
+    for (let k = 0; k < 4; k++) {
+      frames.push({ transform: `rotate(${k % 2 ? 28 : -28}deg) scale(1)`, opacity: 1, offset: 0.12 + ((k + 0.5) / 4) * 0.73 });
+    }
+    frames.push({ transform: 'rotate(0deg) scale(1)', opacity: 1, offset: 0.85 }, { transform: 'rotate(0deg) scale(.9)', opacity: 0, offset: 1 });
+    const wag = Fx.anim(hand, frames, { duration: 1650, easing: 'ease-in-out' }).then(() => hand.remove());
+    await Fx.wait(1400);
+    await Promise.all([
+      wag,
+      Fx.spawn(fxEl, FxGlyphs.sparkStar(16, '#ffffff'), { x: at.x, y: at.y - w * 0.75 }, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1.2) rotate(45deg)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+      ], { duration: 280, easing: 'ease-out' })
+    ]);
+  }
+
+  /**
+   * Minimize, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/c/ce/Komprimator_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/0/0a/Komprimator_Gen5.png
+   *
+   * The user shrinks to a speck where it stands (0-0.35 s), stays tiny
+   * (to 0.9 s), pops back to full size with a little bounce (0.9-1.15 s),
+   * then the stat-up aura plays (its evasion rises, 1.15-1.95 s).
+   */
+  private static async playMinimize(refs: BattleStageRefs, launch: Point) {
+    const { launchEl } = refs;
+    const origin = launchEl.style.transformOrigin;
+    const base = launchEl.style.transform;
+    launchEl.style.transformOrigin = 'center bottom';
+    await Fx.anim(launchEl, [
+      { transform: `${base} scale(1)` },
+      { transform: `${base} scale(.08)`, offset: 0.3 },
+      { transform: `${base} scale(.08)`, offset: 0.78 },
+      { transform: `${base} scale(1.12)`, offset: 0.92 },
+      { transform: `${base} scale(1)` }
+    ], { duration: 1150, easing: 'ease-in-out', fill: 'none' });
+    launchEl.style.transformOrigin = origin;
+    await FxEffects.statUpAura(refs, launch);
+  }
+
+  /**
+   * Defense Curl, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/a/ab/Einigler_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/6/6a/Einigler_Gen5.png
+   *
+   * The user curls up (squashes down, 0-0.25 s) and a see-through blue
+   * sphere swells round it (0.15-0.45 s); white sparkles twinkle on the
+   * sphere (0.45-0.9 s), then it fades and the user uncurls (0.9-1.1 s).
+   * Last, orange stat-up bands scroll up over the user (1.1-1.9 s).
+   */
+  private static async playDefenseCurl(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const base = launchEl.style.transform;
+    const origin = launchEl.style.transformOrigin;
+    launchEl.style.transformOrigin = 'center bottom';
+    const curl = Fx.anim(launchEl, [
+      { transform: `${base} scale(1,1)` },
+      { transform: `${base} scale(1.06,.86)`, offset: 0.23 },
+      { transform: `${base} scale(1.06,.86)`, offset: 0.82 },
+      { transform: `${base} scale(1,1)` }
+    ], { duration: 1100, easing: 'ease-in-out', fill: 'none' }).then(() => { launchEl.style.transformOrigin = origin; });
+
+    const size = Math.max(r.width, r.height) * 1.05;
+    const at: Point = { x: launch.x, y: launch.y + r.height * 0.06 };
+    const sphere = Fx.box(size, size, 'border-radius:50%;border:2px solid #E8F6FFcc;background:radial-gradient(circle at 32% 28%,#ffffffcc 0 10%,transparent 16%),radial-gradient(circle at 50% 50%,#6AB8FF22 45%,#3A88F088 85%,#2A68D0aa);box-shadow:0 0 10px #8FD0FF99,inset 0 0 12px #A8DCFF88');
+    const effects: Promise<void>[] = [
+      curl,
+      Fx.spawn(fxEl, sphere, at, [
+        { transform: 'scale(.3)', opacity: 0, offset: 0 },
+        { transform: 'scale(.3)', opacity: 0, offset: 0.16 },
+        { transform: 'scale(1)', opacity: 0.9, offset: 0.48 },
+        { transform: 'scale(1.03)', opacity: 0.9, offset: 0.85 },
+        { transform: 'scale(1.08)', opacity: 0 }
+      ], { duration: 1100, easing: 'ease-out' })
+    ];
+    for (let i = 0; i < 7; i++) {
+      const a = -Math.PI * (0.15 + Math.random() * 0.7);
+      const d = size * (0.3 + Math.random() * 0.2);
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.sparkStar(8 + Math.random() * 6, '#ffffff'), { x: at.x + Math.cos(a) * d, y: at.y + Math.sin(a) * d }, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.5 },
+          { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+        ], { duration: 320, easing: 'ease-in-out', delay: 450 + i * 60 })
+      );
+    }
+    await Promise.all(effects);
+    await FxEffects.statUpAura(refs, launch);
+  }
+
+  /**
+   * Focus Energy, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/3/32/Energiefokus_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/2/24/Energiefokus_Gen5.png
+   *
+   * Pillars of yellow light shoot up round the user one after another, one
+   * white in the middle (0-1.0 s), while glowing yellow dots pop up at its
+   * sides and float upward (0.15-1.15 s); the user glows faintly yellow.
+   */
+  private static async playFocusEnergy(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const foot = Fx.footOf(launchEl, fieldEl);
+    const h = Math.max(r.height * 1.3, 90);
+    const effects: Promise<void>[] = [Fx.glow(launchEl, 'brightness(1.2) drop-shadow(0 0 6px #FFE04A)', 1100)];
+    const pillars = 9;
+    for (let i = 0; i < pillars; i++) {
+      const centre = i === Math.floor(pillars / 2);
+      const pw = centre ? 10 : 5 + Math.random() * 5;
+      const x = centre ? launch.x : launch.x + (Math.random() * 2 - 1) * r.width * 0.45;
+      const tone = centre ? '#ffffff' : '#FFE84A';
+      const pillar = Fx.box(pw, h, `border-radius:${pw}px;background:linear-gradient(0deg,${tone}00,${tone}dd 25%,${tone} 55%,${tone}00);box-shadow:0 0 8px ${tone};transform-origin:50% 100%`);
+      effects.push(
+        Fx.spawn(fxEl, pillar, { x, y: foot.y - h / 2 }, [
+          { transform: 'translateY(0) scaleY(0)', opacity: 0 },
+          { transform: 'translateY(0) scaleY(1)', opacity: 1, offset: 0.4 },
+          { transform: `translateY(${-h * 0.3}px) scaleY(.6)`, opacity: 0 }
+        ], { duration: 420, easing: 'ease-out', delay: centre ? 300 : (i / pillars) * 600 + Math.random() * 80 })
+      );
+    }
+    for (let i = 0; i < 12; i++) {
+      const side = i % 2 ? 1 : -1;
+      const s = 6 + Math.random() * 5;
+      const at: Point = { x: launch.x + side * r.width * (0.3 + Math.random() * 0.25), y: foot.y - Math.random() * r.height * 0.5 };
+      effects.push(
+        Fx.spawn(fxEl, Fx.box(s, s, 'border-radius:50%;background:radial-gradient(circle,#FFFDE0,#FFE040 55%,#FFC80000);box-shadow:0 0 6px #FFE040'), at, [
+          { transform: 'translateY(0) scale(0)', opacity: 0 },
+          { transform: 'translateY(-6px) scale(1.2)', opacity: 1, offset: 0.3 },
+          { transform: `translateY(${-r.height * 0.4}px) scale(.6)`, opacity: 0 }
+        ], { duration: 550, easing: 'ease-out', delay: 150 + i * 40 })
+      );
+    }
+    await Promise.all(effects);
+  }
+
+  /**
+   * Growth, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/a/a5/Wachstum_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/b/bf/Wachstum_Gen5.png
+   *
+   * The user glows a soft green and stretches up taller from its feet
+   * (0-0.45 s), holds (to 0.6 s) and settles back (0.6-0.8 s); then orange
+   * stat-up bands scroll up over it (0.8-1.6 s).
+   */
+  private static async playGrowth(refs: BattleStageRefs, launch: Point) {
+    const { launchEl } = refs;
+    const base = launchEl.style.transform;
+    const origin = launchEl.style.transformOrigin;
+    launchEl.style.transformOrigin = 'center bottom';
+    await Promise.all([
+      Fx.anim(launchEl, [
+        { transform: `${base} scale(1,1)` },
+        { transform: `${base} scale(1.08,1.18)`, offset: 0.56 },
+        { transform: `${base} scale(1.08,1.18)`, offset: 0.75 },
+        { transform: `${base} scale(1,1)` }
+      ], { duration: 800, easing: 'ease-in-out', fill: 'none' }),
+      Fx.glow(launchEl, 'brightness(1.15) drop-shadow(0 0 7px #8AE85A)', 800)
+    ]);
+    launchEl.style.transformOrigin = origin;
+    await FxEffects.statUpAura(refs, launch);
+  }
+
+  /**
+   * Harden, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/0/06/H%C3%A4rtner_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/1/11/H%C3%A4rtner_Gen5.png
+   *
+   * The user turns hard, pale steel grey (0-0.8 s) while white glints flash
+   * on its edges one after another (0.15-0.7 s); then orange stat-up bands
+   * scroll up over it (0.8-1.6 s).
+   */
+  private static async playHarden(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const effects: Promise<void>[] = [Fx.glow(launchEl, 'grayscale(1) brightness(1.25) contrast(1.5) drop-shadow(0 0 3px #ffffff)', 800)];
+    const spots: Point[] = [
+      { x: -0.35, y: -0.3 },
+      { x: 0.35, y: -0.05 },
+      { x: -0.15, y: 0.3 }
+    ];
+    spots.forEach((p, i) => {
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.sparkStar(Math.max(r.width * 0.3, 20), '#ffffff'), { x: launch.x + p.x * r.width, y: launch.y + p.y * r.height }, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(45deg)', opacity: 1, offset: 0.5 },
+          { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+        ], { duration: 260, easing: 'ease-in-out', delay: 150 + i * 160 })
+      );
+    });
+    await Promise.all(effects);
+    await FxEffects.statUpAura(refs, launch);
+  }
 
   /**
    * Conversion, after the Gen 4 / Gen 5 animation:
@@ -66,98 +288,6 @@ export class NormalStatusMoveAnimations {
       { opacity: 1 }
     ], { duration: 1100, easing: 'steps(6, end)', fill: 'none' });
     await Promise.all([flicker, ...pixels]);
-  }
-
-  /**
-   * Yawn, after the DPPt animation: the user stretches up in a big yawn
-   * (0-0.4 s); a stream of grey-white breath puffs floats over to the target,
-   * wobbling and swelling, engulfs it and drifts on past (0.2-1.5 s); then a
-   * drowsy bubble swells and shrinks at its face like slow breathing while
-   * little rings rise off it and drift away, and it pops (1.4-2.6 s).
-   */
-  private static async playYawn(refs: BattleStageRefs, launch: Point, target: Point) {
-    const { fxEl, launchEl, targetEl } = refs;
-    const lr = Fx.rect(launchEl);
-    const tr = Fx.rect(targetEl);
-
-    // 1. The yawn: a stretch up and back down (no turning, the sprite keeps facing its foe).
-    const original = launchEl.style.transform;
-    const stretch = Fx.anim(launchEl, [
-      { transform: `${original} translateY(0) scale(1,1)` },
-      { transform: `${original} translateY(${-lr.height * 0.06}px) scale(.97,1.06)`, offset: 0.5 },
-      { transform: `${original} translateY(0) scale(1,1)` }
-    ], { duration: 400, easing: 'ease-in-out', fill: 'none' });
-
-    // 2. The breath: puffs leave the user's mouth one after another and float past the target.
-    const mouth: Point = { x: launch.x + (target.x - launch.x) * 0.1, y: launch.y - lr.height * 0.25 };
-    const dx = target.x - mouth.x;
-    const dy = target.y - mouth.y;
-    const len = Math.max(Math.hypot(dx, dy), 1);
-    const sx = -dy / len;
-    const sy = dx / len;
-    const breath: Promise<void>[] = [];
-    for (let i = 0; i < 14; i++) {
-      const s = Math.max(tr.width * (0.22 + Math.random() * 0.12), 18);
-      const puff = document.createElement('div');
-      puff.style.cssText = `position:absolute;width:${s}px;height:${s}px;border-radius:46% 54% 50% 50%;pointer-events:none;background:radial-gradient(circle at 40% 35%,#ffffff,#E4E6EE 50%,#C4C8D6cc 70%,#C4C8D600 74%)`;
-      Fx.place(puff, mouth);
-      fxEl.appendChild(puff);
-      const frames: Keyframe[] = [];
-      for (let k = 0; k <= 8; k++) {
-        const t = k / 8;
-        // On past the target by a third, wobbling sideways on the way.
-        const f = t * 1.35;
-        const wob = Math.sin(t * Math.PI * 2 + i * 0.9) * s * 0.5;
-        frames.push({
-          transform: `translate(${dx * f + sx * wob}px,${dy * f + sy * wob - t * 10}px) scale(${0.5 + t * 0.9})`,
-          opacity: t === 0 ? 0 : t < 0.7 ? 0.9 : (1 - t) * 3
-        });
-      }
-      breath.push(Fx.anim(puff, frames, { duration: 900, delay: 200 + i * 70, easing: 'linear', fill: 'backwards' }).then(() => puff.remove()));
-    }
-    setTimeout(() => Fx.flash(targetEl, '#E4E6EE', 0.3), 900);
-    await Promise.all([stretch, ...breath]);
-
-    // 3. The drowsy bubble breathes at the target's face; little rings drift up off it.
-    const face: Point = { x: target.x + (launch.x - target.x) * 0.08, y: target.y - tr.height * 0.12 };
-    const size = Math.max(tr.width * 0.3, 22);
-    const bubble = NormalStatusMoveAnimations.drowsyBubble(size);
-    Fx.place(bubble, face);
-    fxEl.appendChild(bubble);
-    const parts: Promise<void>[] = [
-      Fx.anim(bubble, [
-        { transform: 'scale(0)', opacity: 1 },
-        { transform: 'scale(1)', opacity: 1, offset: 0.2 },
-        { transform: 'scale(.78)', opacity: 1, offset: 0.42 },
-        { transform: 'scale(1.1)', opacity: 1, offset: 0.65 },
-        { transform: 'scale(.9)', opacity: 1, offset: 0.85 },
-        { transform: 'scale(1.3)', opacity: 0 }
-      ], { duration: 1200, easing: 'ease-in-out' }).then(() => bubble.remove())
-    ];
-    for (let i = 0; i < 5; i++) {
-      const ring = NormalStatusMoveAnimations.drowsyBubble(size * (0.4 + Math.random() * 0.25));
-      Fx.place(ring, face);
-      fxEl.appendChild(ring);
-      const drift = (Math.random() * 2 - 1) * size * 0.6;
-      parts.push(
-        Fx.anim(ring, [
-          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
-          { transform: `translate(${drift * 0.4}px,${-size * 0.6}px) scale(1)`, opacity: 0.9, offset: 0.3 },
-          { transform: `translate(${drift}px,${-size * 2}px) scale(1.1)`, opacity: 0 }
-        ], { duration: 800, delay: 150 + i * 180, easing: 'ease-out', fill: 'backwards' }).then(() => ring.remove())
-      );
-    }
-    await Promise.all(parts);
-  }
-
-  /** A see-through bubble, `size` px wide: white rim, pale blue inside and a highlight (Yawn). */
-  private static drowsyBubble(size: number): HTMLElement {
-    const el = document.createElement('div');
-    el.style.cssText =
-      `position:absolute;width:${size}px;height:${size}px;border-radius:50%;pointer-events:none;box-sizing:border-box;` +
-      'border:1.5px solid #ffffffdd;box-shadow:0 0 3px #ffffff88;' +
-      'background:radial-gradient(circle at 32% 30%,#ffffffcc 0 12%,#ffffff00 20%),radial-gradient(circle,#D8ECFF33,#B8D8FF66)';
-    return el;
   }
 
   /**
@@ -368,68 +498,6 @@ export class NormalStatusMoveAnimations {
   }
 
   /**
-   * Whirlwind: a gust sweeps over the target - white and grey flakes tumble
-   * past it in swirling streams with a few white wind streaks - while it
-   * leans against the wind. (Blowing it off the field is the move resolver's
-   * job, and only happens when there's a Pokémon to drag in.)
-   */
-  private static async playWhirlwind(refs: BattleStageRefs, target: Point, v: MoveVisual) {
-    const { fieldEl, fxEl, targetEl } = refs;
-    const W = fieldEl.clientWidth;
-    const r = Fx.rect(targetEl);
-    const span = Math.max(W * 0.35, r.width * 1.6);
-    const band = Math.max(r.height * 0.6, 40);
-    const gust = 1000;
-
-    const flakes: Promise<void>[] = [];
-    for (let i = 0; i < 34; i++) {
-      const s = 4 + Math.random() * 5;
-      const flake = document.createElement('div');
-      flake.style.cssText = `position:absolute;width:${s}px;height:${s * (0.6 + Math.random() * 0.6)}px;pointer-events:none;background:${i % 3 ? '#F4F4F4' : '#B8B8B8'};box-shadow:0 0 2px #00000055`;
-      const y0 = target.y + (Math.random() * 2 - 1) * band;
-      Fx.place(flake, { x: target.x - v.dir * span, y: y0 });
-      fxEl.appendChild(flake);
-      const frames: Keyframe[] = [];
-      const wob = 10 + Math.random() * 18;
-      const phase = Math.random() * Math.PI * 2;
-      const spin = (Math.random() < 0.5 ? -1 : 1) * (360 + Math.random() * 360);
-      for (let k = 0; k <= 8; k++) {
-        const t = k / 8;
-        frames.push({
-          transform: `translate(${v.dir * span * 2 * t}px,${Math.sin(phase + t * Math.PI * 2.5) * wob - t * 12}px) rotate(${spin * t}deg)`,
-          opacity: k === 0 || k === 8 ? 0 : 1
-        });
-      }
-      flakes.push(Fx.anim(flake, frames, { duration: 520 + Math.random() * 240, easing: 'linear', delay: Math.random() * (gust - 600) }).then(() => flake.remove()));
-    }
-    // Thin white wind streaks curl past.
-    for (let i = 0; i < 5; i++) {
-      const len = span * (0.5 + Math.random() * 0.4);
-      const streak = document.createElement('div');
-      streak.style.cssText = `position:absolute;width:${len}px;height:${8 + Math.random() * 8}px;pointer-events:none;border-top:2px solid #ffffffcc;border-radius:50%`;
-      Fx.place(streak, { x: target.x - v.dir * span * 0.6, y: target.y + (Math.random() * 2 - 1) * band * 0.8 });
-      fxEl.appendChild(streak);
-      flakes.push(
-        Fx.anim(streak, [
-          { transform: 'translateX(0) scaleX(.4)', opacity: 0 },
-          { transform: `translateX(${v.dir * span * 0.6}px) scaleX(1)`, opacity: 0.9, offset: 0.5 },
-          { transform: `translateX(${v.dir * span * 1.3}px) scaleX(.6)`, opacity: 0 }
-        ], { duration: 500, easing: 'ease-out', delay: 100 + Math.random() * (gust - 600) }).then(() => streak.remove())
-      );
-    }
-
-    // The target leans with the wind and wobbles (position only, it keeps facing its foe).
-    const base = targetEl.style.transform;
-    const lean: Keyframe[] = [];
-    for (let k = 0; k <= 10; k++) {
-      const push = k === 0 || k === 10 ? 0 : v.dir * (6 + (k % 2 ? 3 : -3));
-      lean.push({ transform: `${base} translateX(${push}px)` });
-    }
-    flakes.push(Fx.anim(targetEl, lean, { duration: gust, easing: 'ease-in-out', fill: 'none' }));
-    await Promise.all(flakes);
-  }
-
-  /**
    * Swords Dance: six teal swords appear and dance round the caster on a
    * ring while cyan sparkles twinkle, then fade; orange stat-up sparkles
    * drift down over the caster.
@@ -492,71 +560,6 @@ export class NormalStatusMoveAnimations {
 
     // 2. Attack up (1.7 s): orange stat sparkles.
     await FxEffects.orangeSparkles(refs, launch, r.top - f.top);
-  }
-
-  /**
-   * Encore: the stage goes dark, a pink-white spotlight shines down on the
-   * target from above with a pool of light at its feet, and colourful confetti
-   * flutters down around it.
-   */
-  private static async playEncore(refs: BattleStageRefs, target: Point) {
-    const { fieldEl, fxEl, targetEl } = refs;
-    const f = Fx.rect(fieldEl);
-    const r = Fx.rect(targetEl);
-    const foot = r.bottom - f.top - r.height * 0.06;
-
-    // 1. Dark stage (0-0.3 s).
-    const dark = Fx.backdrop(fieldEl, 'background:radial-gradient(circle at 50% 45%,#2A2230,#0C0A10)');
-    await Fx.anim(dark, [{ opacity: 0 }, { opacity: 1 }], { duration: 300, easing: 'ease-out', fill: 'forwards' });
-
-    // 2. The spotlight switches on (0.3-0.5 s): a cone from the top of the field and a pool of light.
-    const poolW = Math.max(r.width * 1.3, 90);
-    const cone = document.createElement('div');
-    const topW = poolW * 0.35;
-    cone.style.cssText = `position:absolute;left:${target.x - poolW / 2}px;top:0;width:${poolW}px;height:${foot}px;pointer-events:none;clip-path:polygon(${50 - (topW / poolW) * 50}% 0,${50 + (topW / poolW) * 50}% 0,100% 100%,0 100%);background:linear-gradient(180deg,#FFE8F4cc,#FFD0E888 60%,#FFC8E066)`;
-    const pool = document.createElement('div');
-    pool.style.cssText = `position:absolute;width:${poolW}px;height:${poolW * 0.32}px;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse,#FFF0F8ee,#FFD0E8aa 55%,#FFC8E000 72%)`;
-    Fx.place(pool, { x: target.x, y: foot });
-    dark.append(cone, pool);
-    const light = [cone, pool].map((el) =>
-      Fx.anim(el, [{ opacity: 0 }, { opacity: 1, offset: 0.15 }, { opacity: 0.9, offset: 0.85 }, { opacity: 0 }], { duration: 1500, easing: 'ease-out' })
-    );
-    Fx.anim(targetEl, [
-      { filter: 'brightness(1)' },
-      { filter: 'brightness(1.35) drop-shadow(0 0 6px #FFD0E8)', offset: 0.2 },
-      { filter: 'brightness(1.35) drop-shadow(0 0 6px #FFD0E8)', offset: 0.8 },
-      { filter: 'brightness(1)' }
-    ], { duration: 1500, easing: 'ease-out', fill: 'none' });
-
-    // 3. Confetti flutters down around the target (0.4-1.8 s).
-    const colors = ['#FF4A4A', '#FFC83A', '#4AC8FF', '#7AE05A', '#C86AFF', '#FF8AD0'];
-    const spread = poolW * 0.6;
-    const confetti: Promise<void>[] = [];
-    for (let i = 0; i < 26; i++) {
-      const w = 5 + Math.random() * 4;
-      const bit = document.createElement('div');
-      bit.style.cssText = `position:absolute;width:${w}px;height:${w * 0.55}px;pointer-events:none;background:${colors[i % colors.length]}`;
-      const x0 = target.x + (Math.random() * 2 - 1) * spread;
-      const y0 = r.top - f.top - 20 - Math.random() * r.height * 0.5;
-      Fx.place(bit, { x: x0, y: y0 });
-      fxEl.appendChild(bit);
-      const fall = r.height * (0.8 + Math.random() * 0.5);
-      const sway = 8 + Math.random() * 10;
-      const spin = (Math.random() < 0.5 ? -1 : 1) * (300 + Math.random() * 400);
-      const frames: Keyframe[] = [];
-      for (let k = 0; k <= 6; k++) {
-        const t = k / 6;
-        frames.push({
-          transform: `translate(${Math.sin(t * Math.PI * 3 + i) * sway}px,${t * fall}px) rotate(${spin * t}deg) scaleY(${Math.cos(t * Math.PI * 4)})`,
-          opacity: k === 0 ? 0 : k === 6 ? 0 : 1
-        });
-      }
-      confetti.push(Fx.anim(bit, frames, { duration: 1000 + Math.random() * 400, easing: 'linear', delay: 100 + Math.random() * 400 }).then(() => bit.remove()));
-    }
-    await Promise.all([...light, ...confetti]);
-
-    await Fx.anim(dark, [{ opacity: 1 }, { opacity: 0 }], { duration: 300, easing: 'ease-in' });
-    dark.remove();
   }
 
   /**

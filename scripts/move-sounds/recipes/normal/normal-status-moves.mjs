@@ -74,13 +74,19 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura: a flat "no" buzzer, then a lock clicks. */
+  /**
+   * NormalStatusMoveAnimations.playDisable: white glint on the target (0-0.35 s), scene and
+   * target grey over (0.3-0.6 s, held to 1.0 s), come back (1.0-1.3 s). A glint ping, a
+   * power-down "no" buzzer sinking low, a lock click, then a faint hum back.
+   */
   disable: () => {
-    const s = new MoveSfx(0.85, 0xd15b);
-    s.pulse(0.02, 0.18, { freq: () => 196, gain: env.decay(0.3, 0.5), duty: 0.5 });
-    s.pulse(0.22, 0.25, { freq: () => 147, gain: env.decay(0.3, 0.5), duty: 0.5 });
-    s.noise(0.5, 0.03, { clock: () => 9000, gain: env.decay(0.3, 1) });
-    s.pulse(0.5, 0.04, { freq: () => 1200, gain: env.decay(0.2, 1), duty: 0.25 });
+    const s = new MoveSfx(1.45, 0xd15b);
+    s.pulse(0.05, 0.15, { freq: () => 2637, gain: env.decay(0.14, 2), duty: 0.125 });
+    s.pulse(0.3, 0.18, { freq: () => 196, gain: env.decay(0.3, 0.5), duty: 0.5 });
+    s.pulse(0.5, 0.3, { freq: (u) => 147 - 40 * u, gain: env.decay(0.3, 0.5), duty: 0.5 });
+    s.noise(0.62, 0.03, { clock: () => 9000, gain: env.decay(0.3, 1) });
+    s.pulse(0.62, 0.04, { freq: () => 1200, gain: env.decay(0.2, 1), duty: 0.25 });
+    s.pulse(1.0, 0.3, { freq: env.ramp(110, 220), gain: env.swell(0.1), duty: 0.25 });
     return s;
   },
 
@@ -112,14 +118,18 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + accuracy drop fleck (0.85 s): a blinding white flash. */
+  /**
+   * NormalStatusMoveAnimations.playFlash: white flash with the user as a silhouette
+   * (0-0.55 s), then the target turns blue under stat-down bubbles (0.55-1.45 s).
+   * A blinding bright burst, then the accuracy-drop jingle.
+   */
   flash: () => {
     const s = new MoveSfx(1.5, 0xf1a5);
-    s.chord(0.02, 0.35, [84, 88, 91, 96], { rate: 0.02, gain: 0.22, voice: 'pulse' });
-    s.noise(0.05, 0.4, { clock: (u) => 18000 - 10000 * u, gain: env.attackDecay(0.3, 0.05) });
-    s.wave(0.3, 0.5, { freq: env.ramp(2100, 1400), gain: env.decay(0.2, 1.5) });
-    s.sparkle(0.15, 0.6, 8, { lo: 4000, hi: 7000, gain: 0.14 });
-    s.statDown(0.85);
+    s.chord(0.0, 0.35, [84, 88, 91, 96], { rate: 0.02, gain: 0.22, voice: 'pulse' });
+    s.noise(0.02, 0.4, { clock: (u) => 18000 - 10000 * u, gain: env.attackDecay(0.3, 0.05) });
+    s.wave(0.25, 0.4, { freq: env.ramp(2100, 1400), gain: env.decay(0.2, 1.5) });
+    s.sparkle(0.1, 0.45, 8, { lo: 4000, hi: 7000, gain: 0.14 });
+    s.statDown(0.6);
     return s;
   },
 
@@ -154,25 +164,32 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Attack-drop fleck (0.85 s): a cute but menacing growl. */
+  /**
+   * NormalSoundMoveAnimations.playGrowl: two growls with red glow pulses (0 / 0.375 s, to 0.75 s),
+   * then stat-down bubbles on the target (0.75-1.65 s). A cute but menacing growl, then the drop jingle.
+   */
   growl: () => {
-    const s = new MoveSfx(1.5, 0x6201);
-    for (const [at, f] of [[0.03, 230], [0.38, 200]]) {
+    const s = new MoveSfx(1.7, 0x6201);
+    for (const [at, f] of [[0.02, 230], [0.39, 200]]) {
       s.pulse(at, 0.32, { freq: (u) => f * (1 + 0.1 * Math.sin(2 * Math.PI * 9 * u)) * (1 - 0.2 * u), gain: env.attackDecay(0.3, 0.2), duty: 0.25 });
       s.noise(at, 0.3, { clock: () => 900, gain: env.attackDecay(0.12, 0.2) });
     }
-    s.statDown(0.85);
+    s.statDown(0.75);
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Defense-down fleck (~0.85 s): a cold, menacing stare - a piercing glint over a low drone. */
+  /**
+   * NormalFoeStatusMoveAnimations.playLeer: dark (0-0.28 s), glint in the eyes (0.3-0.65 s),
+   * the scene clears (0.65-0.95 s), the target's blue stat drop (0.95-1.85 s).
+   * A low menacing drone, a sharp glint, the stat-down jingle.
+   */
   leer: () => {
-    const s = new MoveSfx(1.5, 0x1ee7);
-    s.pulse(0.0, 0.7, { freq: (u) => 110 + 10 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.15), duty: 0.25 });
-    s.pulse(0.15, 0.12, { freq: () => 3136, gain: env.decay(0.2, 1), duty: 0.125 });
-    s.pulse(0.3, 0.3, { freq: (u) => 2637 * (1 + 0.01 * Math.sin(2 * Math.PI * 20 * u)), gain: env.decay(0.18, 1.2), duty: 0.125 });
-    s.noise(0.15, 0.4, { clock: () => 11000, gain: env.decay(0.08, 1.5) });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.05, 0x1ee7);
+    s.pulse(0.0, 0.9, { freq: (u) => 110 + 10 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.15), duty: 0.25 });
+    s.pulse(0.32, 0.12, { freq: () => 3136, gain: env.decay(0.2, 1), duty: 0.125 });
+    s.pulse(0.44, 0.3, { freq: (u) => 2637 * (1 + 0.01 * Math.sin(2 * Math.PI * 20 * u)), gain: env.decay(0.18, 1.2), duty: 0.125 });
+    s.noise(0.32, 0.4, { clock: () => 11000, gain: env.decay(0.08, 1.5) });
+    s.statDown(0.95);
     return s;
   },
 
@@ -187,14 +204,21 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) + sleep fleck (~0.6 s): a smooch - a little pop, a swooning heart melody and a lullaby. */
+  /**
+   * NormalFoeStatusMoveAnimations.playLovelyKiss: the heart pops up (0-0.2 s), beats at
+   * ~0.31 / 0.43 s, bursts into small hearts at 0.78 s, "Z"s rise from 1.18 s (to ~3.0 s).
+   * A kiss smack, two heartbeats, a sparkly burst, then the sleepy lullaby.
+   */
   lovelykiss: () => {
-    const s = new MoveSfx(1.3, 0x10e1);
+    const s = new MoveSfx(3.1, 0x10e1);
     s.pulse(0.02, 0.05, { freq: (u) => 900 + 900 * u, gain: env.decay(0.28, 1), duty: 0.5 });
     s.noise(0.02, 0.04, { clock: () => 6000, gain: env.decay(0.2, 1) });
-    s.wave(0.1, 0.45, { freq: (u) => 784 * (1 + 0.03 * Math.sin(2 * Math.PI * 7 * u)) * (1 - 0.15 * u), gain: env.swell(0.22) });
-    s.arpeggio(0.12, [79, 84, 83], 0.12, { gain: 0.12, duty: 0.25, hold: 0.14 });
-    s.sleep(0.6);
+    for (const at of [0.31, 0.43]) s.wave(at, 0.1, { freq: env.ramp(180, 120), gain: env.decay(0.3, 1) });
+    s.wave(0.1, 0.65, { freq: (u) => 784 * (1 + 0.03 * Math.sin(2 * Math.PI * 7 * u)) * (1 - 0.15 * u), gain: env.swell(0.18) });
+    s.sparkle(0.78, 0.4, 6, { lo: 3000, hi: 6000, gain: 0.12 });
+    s.arpeggio(0.8, [79, 84, 83], 0.12, { gain: 0.12, duty: 0.25, hold: 0.14 });
+    s.sleep(1.18);
+    s.sleep(1.9, 0.14);
     return s;
   },
 
@@ -218,12 +242,16 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a quick phrase is echoed back, copied a beat later. */
+  /**
+   * NormalFoeStatusMoveAnimations.playMimic: a light rises out of the target (0-0.3 s), floats to
+   * the user (0.3-0.9 s) and swells into a glow (0.9-1.55 s). A phrase, then the same echoed back.
+   */
   mimic: () => {
-    const s = new MoveSfx(1.1, 0x313c);
-    s.arpeggio(0.02, [76, 79, 74], 0.09, { gain: 0.28, duty: 0.25, hold: 0.09 });
-    s.arpeggio(0.4, [76, 79, 74], 0.09, { gain: 0.24, voice: 'wave', hold: 0.12 });
-    s.pulse(0.7, 0.2, { freq: () => 1175, gain: env.decay(0.12, 2), duty: 0.5 });
+    const s = new MoveSfx(1.75, 0x313c);
+    s.arpeggio(0.02, [76, 79, 74], 0.09, { gain: 0.26, duty: 0.25, hold: 0.09 });
+    s.pulse(0.3, 0.6, { freq: (u) => 900 + 500 * Math.sin(Math.PI * u), gain: env.swell(0.08), duty: 0.125 });
+    s.arpeggio(0.9, [76, 79, 74], 0.09, { gain: 0.24, voice: 'wave', hold: 0.12 });
+    s.pulse(1.2, 0.3, { freq: () => 1175, gain: env.decay(0.12, 2), duty: 0.5 });
     return s;
   },
 

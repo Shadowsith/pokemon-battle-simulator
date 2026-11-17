@@ -108,14 +108,21 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s), OHKO: the ground splits open and swallows the foe. */
+  /**
+   * GroundMoveAnimations.playFissure: earth scene (0-0.3 s), crack runs down (0.3-0.55 s)
+   * and gapes open (hit 0.6 s), rumbling clods to ~1.25 s, closes (1.25-1.55 s), scene back
+   * by ~2.05 s. A low rumble, a splitting crack and heavy jolt, tumbling clods, a grinding close.
+   */
   fissure: () => {
-    const s = new MoveSfx(1.6, 0xf155);
-    s.rumble(0.0, 0.5, { from: 300, to: 600, gain: 0.35 });
-    s.noise(0.43, 0.08, { clock: () => 9000, gain: env.decay(0.5, 1) });
-    s.thud(0.43, 0.8, 1);
-    s.rumble(0.45, 1.05, { from: 700, to: 120, gain: 0.55 });
-    for (const at of [0.6, 0.78, 0.95]) s.thud(at, 0.35, 0.9);
+    const s = new MoveSfx(2.2, 0xf155);
+    s.rumble(0.0, 0.6, { from: 300, to: 600, gain: 0.35 });
+    s.noise(0.3, 0.25, { clock: env.ramp(4000, 12000), gain: env.ramp(0.15, 0.4) });
+    s.noise(0.6, 0.08, { clock: () => 9000, gain: env.decay(0.5, 1) });
+    s.thud(0.6, 0.8, 1);
+    s.rumble(0.6, 1.0, { from: 700, to: 150, gain: 0.55 });
+    for (const at of [0.75, 0.9, 1.05]) s.thud(at, 0.35, 0.9);
+    s.rumble(1.25, 0.35, { from: 200, to: 90, gain: 0.4 });
+    s.thud(1.55, 0.45, 1);
     return s;
   },
 

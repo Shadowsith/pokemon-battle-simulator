@@ -392,6 +392,18 @@ export class FxEffects {
   }
 
   /**
+   * Classic target stat drop (~0.9 s): the target turns blue while blue
+   * stat-down bubbles drift down over it (Flash, Leer, Kinesis).
+   */
+  static async blueStatDrop(refs: BattleStageRefs, target: Point) {
+    const { targetEl } = refs;
+    await Promise.all([
+      Fx.glow(targetEl, 'grayscale(1) brightness(.85) sepia(1) saturate(5) hue-rotate(180deg) drop-shadow(0 0 5px #5AA8FF)', 900),
+      FxEffects.statDownBubbles({ ...refs, launchEl: targetEl }, target)
+    ]);
+  }
+
+  /**
    * Classic stat-up aura (~800 ms): bands of orange-red light scroll up
    * through an oval over the caster while it glows orange (Iron Defense).
    */

@@ -82,14 +82,17 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + paralysis fleck (~0.55 s): a big slobbery tongue - a wet, warbly slurp and tingling zaps. */
+  /**
+   * GhostMoveAnimations.playLick: the tongue licks up the target (0-0.3 s, hit at 0.2 s) and
+   * fades (to 0.65 s), a white glint streaks up (0.45-0.8 s). A wet slurp, then a shiny ping.
+   */
   lick: () => {
     const s = new MoveSfx(1.0, 0x11c4);
     s.wave(0.0, 0.3, { freq: (u) => (300 + 500 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 18 * u)), gain: env.swell(0.28) });
     s.noise(0.12, 0.18, { clock: (u) => 4000 - 2500 * u, gain: env.attackDecay(0.3, 0.1) });
-    s.thud(0.17, 0.35, 0.2);
-    s.pulse(0.2, 0.2, { freq: (u) => 500 - 250 * u, gain: env.decay(0.15, 1.5), duty: 0.25 });
-    s.paralyze(0.55);
+    s.thud(0.2, 0.35, 0.2);
+    s.pulse(0.22, 0.2, { freq: (u) => 500 - 250 * u, gain: env.decay(0.15, 1.5), duty: 0.25 });
+    s.pulse(0.5, 0.2, { freq: (u) => 2637 * (1 + 0.2 * u), gain: env.decay(0.12, 1.5), duty: 0.125 });
     return s;
   },
 

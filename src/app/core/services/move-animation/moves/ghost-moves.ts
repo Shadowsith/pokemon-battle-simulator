@@ -13,6 +13,7 @@ export class GhostMoveAnimations {
     confuseray: (refs, launch, target) => GhostMoveAnimations.playConfuseRay(refs, launch, target),
     curse: (refs, launch) => GhostMoveAnimations.playCurse(refs, launch),
     destinybond: (refs, launch, target) => GhostMoveAnimations.playDestinyBond(refs, launch, target),
+    lick: (refs, _launch, target) => GhostMoveAnimations.playLick(refs, target),
     nightshade: (refs, launch) => GhostMoveAnimations.playNightShade(refs, launch),
     phantomforce: (refs, launch, target, v) => GhostMoveAnimations.playPhantomForceStrike(refs, launch, target, v),
     shadowball: (refs, launch, target, v) => GhostMoveAnimations.playShadowBall(refs, launch, target, v),
@@ -20,6 +21,39 @@ export class GhostMoveAnimations {
     shadowforce: (refs, _launch, target, v) => ShadowForce.strike(refs, target, v),
     trickortreat: (refs, launch, target) => GhostMoveAnimations.playTrickOrTreat(refs, launch, target)
   };
+
+  /**
+   * Lick, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/e/ee/Schlecker_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/4/46/Schlecker_Gen5.png
+   *
+   * A peach-orange tongue licks up the target from bottom to top (0-0.3 s,
+   * hit at 0.2 s), slides on up and fades (0.3-0.65 s), and a white glint
+   * streaks up after it (0.45-0.8 s).
+   */
+  private static async playLick(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const w = Math.max(r.width * 0.3, 22);
+    const h = Math.max(r.height * 0.85, 50);
+    const tongue = Fx.box(w, h, 'border-radius:50% 50% 45% 45% / 22% 22% 14% 14%;background:linear-gradient(0deg,#F07A40cc,#FFB078dd 45%,#FFD8B8aa 80%,#FFE8D000);box-shadow:0 0 8px #FF9A6A88');
+    tongue.style.transformOrigin = '50% 100%';
+    const lick = Fx.spawn(fxEl, tongue, target, [
+      { transform: 'translateY(0) scaleY(0)', opacity: 0.9 },
+      { transform: 'translateY(0) scaleY(1)', opacity: 1, offset: 0.45 },
+      { transform: `translateY(${-h * 0.35}px) scaleY(.55)`, opacity: 0 }
+    ], { duration: 650, easing: 'ease-out' });
+    await Fx.wait(200);
+    Fx.flash(targetEl, '#FFB078', 0.4);
+    Fx.shake(targetEl, 3);
+    await Fx.wait(250);
+    const glint = Fx.spawn(fxEl, Fx.box(3, h * 0.5, 'border-radius:2px;background:linear-gradient(0deg,#ffffff00,#ffffff,#ffffff00);box-shadow:0 0 6px #fff'), target, [
+      { transform: `translateY(${h * 0.3}px)`, opacity: 0 },
+      { transform: 'translateY(0)', opacity: 1, offset: 0.5 },
+      { transform: `translateY(${-h * 0.45}px)`, opacity: 0 }
+    ], { duration: 350, easing: 'ease-out' });
+    await Promise.all([lick, glint]);
+  }
 
   /**
    * Confuse Ray, after the Gen 4 / Gen 5 animation:

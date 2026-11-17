@@ -8,6 +8,7 @@ import { FxEffects } from '../../fx-effects';
 export class FightingKickThrowMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    doublekick: (refs, _launch, target, v) => FightingKickThrowMoveAnimations.playDoubleKick(refs, target, v),
     flyingpress: (refs, launch, target) => FightingKickThrowMoveAnimations.playFlyingPress(refs, launch, target),
     highjumpkick: (refs, _launch, target, v) => FightingKickThrowMoveAnimations.playHighJumpKick(refs, target, v),
     jumpkick: (refs, launch, target) => FightingKickThrowMoveAnimations.playJumpKick(refs, launch, target),
@@ -16,6 +17,71 @@ export class FightingKickThrowMoveAnimations {
     submission: (refs, _launch, target) => FightingKickThrowMoveAnimations.playSubmission(refs, target),
     vitalthrow: (refs, _launch, target) => FightingKickThrowMoveAnimations.playVitalThrow(refs, target)
   };
+
+  /**
+   * Double Kick, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/f/f0/Doppelkick_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/6/6f/Doppelkick_Gen5.png
+   *
+   * One kick per hit (`v.hits`, 0.42 s each) at a different spot: a black foot
+   * stamps onto the target from large (hit 0.12 s into each kick), a yellow
+   * spiky burst with yellow sparkles flares behind it, orange specks scatter
+   * and the foot fades.
+   */
+  private static async playDoubleKick(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const w = Math.max(r.width * 0.4, 32);
+    const spots: Point[] = [
+      { x: -0.12 * v.dir, y: -0.1 },
+      { x: 0.14 * v.dir, y: 0.12 }
+    ];
+    const effects: Promise<void>[] = [];
+    for (let hit = 0; hit < Math.max(v.hits, 1); hit++) {
+      const spot = spots[hit % spots.length];
+      const at: Point = { x: target.x + spot.x * r.width, y: target.y + spot.y * r.height };
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.footGlyph(w), at, [
+          { transform: 'scale(2.2)', opacity: 0 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.29 },
+          { transform: 'scale(1)', opacity: 1, offset: 0.7 },
+          { transform: 'scale(1.05)', opacity: 0 }
+        ], { duration: 420, easing: 'ease-in' })
+      );
+      await Fx.wait(120);
+      Fx.flash(targetEl, '#FFE84A', 0.6);
+      Fx.shake(targetEl, 5);
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.spikyBurst(w * 1.7, '#F8C820', '#FFF27A', '#ffffff'), at, [
+          { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+          { transform: 'scale(1) rotate(15deg)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(1.15) rotate(25deg)', opacity: 0 }
+        ], { duration: 300, easing: 'ease-out' })
+      );
+      for (let i = 0; i < 6; i++) {
+        const a = (i / 6) * Math.PI * 2 + Math.random() * 0.5;
+        const d = w * (0.6 + Math.random() * 0.5);
+        effects.push(
+          Fx.spawn(fxEl, FxGlyphs.sparkStar(7 + Math.random() * 5, '#FFE04A'), at, [
+            { transform: 'translate(0,0) scale(.4)', opacity: 1 },
+            { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px) scale(1)`, opacity: 0 }
+          ], { duration: 320, easing: 'ease-out' })
+        );
+      }
+      for (let i = 0; i < 5; i++) {
+        const a = Math.random() * Math.PI * 2;
+        const d = w * (0.9 + Math.random() * 0.6);
+        effects.push(
+          Fx.spawn(fxEl, Fx.box(5, 5, 'border-radius:50%;background:radial-gradient(circle,#FFD8A8,#F07838 65%);box-shadow:0 0 4px #F07838'), at, [
+            { transform: 'translate(0,0)', opacity: 1 },
+            { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px)`, opacity: 0 }
+          ], { duration: 480, easing: 'ease-out' })
+        );
+      }
+      await Fx.wait(300);
+    }
+    await Promise.all(effects);
+  }
 
   /**
    * Flying Press, after the XY animation: the user leaps up out of sight in a

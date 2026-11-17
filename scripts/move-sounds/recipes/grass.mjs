@@ -265,15 +265,18 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + drain (energy flows back ≈ 0.75 s): a green seed hits, then a rising sap-like run returns. */
+  /**
+   * GrassMoveAnimations.playMegaDrain: yellow-green tint (0-1.6 s), golden sparkles drain from the
+   * target to the user (0.1-1.3 s), heal sparkles (1.3-2.2 s). A drawing hum, the drain, a warm chord.
+   */
   megadrain: () => {
-    const s = new MoveSfx(1.4, 0x3e6d);
-    s.whoosh(0.0, 0.43, { from: 2000, to: 6000, gain: 0.25 });
-    s.pulse(0.0, 0.43, { freq: (u) => 700 + 400 * u, gain: env.swell(0.1), duty: 0.25 });
-    s.thud(0.43, 0.4, 0.3);
-    s.noise(0.43, 0.3, { clock: () => 3500, gain: env.decay(0.15, 1) });
-    s.drain(0.72, 0.24);
-    s.chord(0.72, 0.5, [72, 79], { rate: 0.05, gain: 0.1 });
+    const s = new MoveSfx(2.3, 0x3e6d);
+    s.pulse(0.0, 1.3, { freq: (u) => 700 + 400 * u, gain: env.swell(0.1), duty: 0.25 });
+    s.thud(0.02, 0.3, 0.2);
+    s.sparkle(0.1, 1.1, 10, { lo: 3000, hi: 5500, gain: 0.1 });
+    s.drain(0.4, 0.24);
+    s.chord(1.3, 0.6, [72, 79, 84], { rate: 0.05, gain: 0.12 });
+    s.sparkle(1.35, 0.7, 6, { lo: 4000, hi: 7000, gain: 0.1 });
     return s;
   },
 

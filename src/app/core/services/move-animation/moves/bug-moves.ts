@@ -232,17 +232,6 @@ export class BugMoveAnimations {
     await BugMoveAnimations.hornImpact(refs, target);
   }
 
-  /** A black horn, `len` px long, pointing right: wide base, curved flanks, sharp tip. */
-  private static hornGlyph(len: number): HTMLElement {
-    const el = document.createElement('div');
-    el.style.cssText = `position:absolute;width:${len}px;height:${len * 0.4}px;pointer-events:none`;
-    el.innerHTML =
-      '<svg viewBox="0 0 60 24" width="100%" height="100%"><defs><linearGradient id="bugHorn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6A6A74"/><stop offset=".45" stop-color="#2A2A30"/><stop offset="1" stop-color="#0A0A0C"/></linearGradient></defs>' +
-      '<path d="M1 2Q30 3 59 12Q30 23 1 22Q5 12 1 2Z" fill="url(#bugHorn)" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>' +
-      '<path d="M8 7Q30 8 50 11.5" stroke="#9A9AA6" stroke-width="1.6" fill="none" stroke-linecap="round" opacity=".8"/></svg>';
-    return el;
-  }
-
   /** The horn flies point-first from the caster to the target with red-orange streaks behind it. */
   private static async hornShot(refs: BattleStageRefs, launch: Point, target: Point) {
     const { fxEl, targetEl } = refs;
@@ -260,7 +249,7 @@ export class BugMoveAnimations {
       streak.style.cssText = `position:absolute;left:${-len * w + len * 0.4}px;top:${len * 0.2 + off * len * 0.4 - 2.5}px;width:${len * w}px;height:5px;border-radius:3px;background:linear-gradient(90deg,${c}00,${c} 80%,${c}00)`;
       shot.appendChild(streak);
     }
-    shot.appendChild(BugMoveAnimations.hornGlyph(len));
+    shot.appendChild(FxGlyphs.hornGlyph(len));
     Fx.place(shot, launch);
     fxEl.appendChild(shot);
     await Fx.anim(shot, [

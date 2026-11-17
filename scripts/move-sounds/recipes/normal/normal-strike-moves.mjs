@@ -158,11 +158,12 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee, 3 hits (impacts at 0.17 / 0.59 / 1.01 s): snappy slaps. */
+  /** DoubleSlap.play, 3 hits (impacts at 0.14 / 0.50 / 0.86 s): a swish in, then a snappy slap. */
   doubleslap: () => {
-    const s = new MoveSfx(1.25, 0xd05a);
+    const s = new MoveSfx(1.15, 0xd05a);
     for (let hit = 0; hit < 3; hit++) {
-      const at = 0.17 + hit * 0.42;
+      const at = 0.14 + hit * 0.36;
+      s.whoosh(at - 0.12, 0.12, { from: 2500, to: 7000, gain: 0.15 });
       s.noise(at, 0.06, { clock: () => 15000, gain: env.decay(0.5, 1) });
       s.thud(at, 0.35, 0.2);
     }
@@ -255,24 +256,24 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee, 3 hits (impacts at 0.17 / 0.59 / 1.01 s): rapid horn jabs - sharp pecking stabs. */
+  /** NormalStrikeMoveAnimations.playFuryAttack, 3 hits (impacts at 0.1 / 0.42 / 0.74 s): rapid horn jabs - sharp pecking stabs. */
   furyattack: () => {
-    const s = new MoveSfx(1.3, 0xf0a7);
+    const s = new MoveSfx(1.05, 0xf0a7);
     for (let hit = 0; hit < 3; hit++) {
-      const at = 0.17 + hit * 0.42;
-      s.whoosh(at - 0.1, 0.1, { from: 3000, to: 9000, gain: 0.2 });
+      const at = 0.1 + hit * 0.32;
+      s.whoosh(at - 0.09, 0.09, { from: 3000, to: 9000, gain: 0.2 });
       s.thud(at, 0.5, 0.25);
       s.pulse(at, 0.06, { freq: () => 1760 + hit * 120, gain: env.decay(0.18, 1), duty: 0.25 });
     }
     return s;
   },
 
-  /** Generic melee, 3 hits (impacts at 0.17 / 0.59 / 1.01 s): quick claw swipes. */
+  /** NormalStrikeMoveAnimations.playFurySwipes, 3 hits (impacts at 0.1 / 0.46 / 0.82 s): quick three-claw rakes. */
   furyswipes: () => {
-    const s = new MoveSfx(1.3, 0xf05a);
+    const s = new MoveSfx(1.15, 0xf05a);
     for (let hit = 0; hit < 3; hit++) {
-      const at = 0.17 + hit * 0.42;
-      s.whoosh(at - 0.1, 0.11, { from: 2500, to: 8000, gain: 0.2 });
+      const at = 0.1 + hit * 0.36;
+      s.whoosh(at - 0.09, 0.1, { from: 2500, to: 8000, gain: 0.2 });
       s.slash(at, 0.45);
       s.thud(at, 0.3, 0.2);
     }
@@ -292,14 +293,21 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): giant pincers snap shut on the foe with a sharp, final clack. */
+  /**
+   * Guillotine.play: scene darkens (0-0.25 s), blades open (0.25-0.45 s), snap shut at
+   * 0.6 s, sparkles drift down (to 1.2 s), scene back by ~1.45 s. A low ominous swell,
+   * a steely "shing" as the blades open, then a sharp, final clack and falling twinkles.
+   */
   guillotine: () => {
-    const s = new MoveSfx(0.7, 0x6011);
-    s.pulse(0.0, 0.17, { freq: env.ramp(1200, 2600), gain: env.swell(0.24), duty: 0.125 });
-    s.slash(0.15, 0.4);
-    s.noise(0.17, 0.06, { clock: () => 14000, gain: env.decay(0.25, 1), short: true });
-    s.thud(0.18, 0.25, 0.5);
-    s.pulse(0.18, 0.45, { freq: () => 1975, gain: env.decay(0.18, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.5, 0x6011);
+    s.pulse(0.0, 0.3, { freq: () => 98, gain: env.swell(0.2), duty: 0.25 });
+    s.noise(0.25, 0.2, { clock: env.ramp(6000, 14000), gain: env.attackDecay(0.18, 0.1), short: true });
+    s.pulse(0.3, 0.3, { freq: env.ramp(1200, 2600), gain: env.swell(0.2), duty: 0.125 });
+    s.slash(0.58, 0.4);
+    s.noise(0.6, 0.06, { clock: () => 14000, gain: env.decay(0.25, 1), short: true });
+    s.thud(0.6, 0.35, 0.5);
+    s.pulse(0.61, 0.45, { freq: () => 1975, gain: env.decay(0.18, 1.5), duty: 0.125 });
+    s.sparkle(0.65, 0.55, 6, { lo: 3000, hi: 5500, gain: 0.1 });
     return s;
   },
 
@@ -343,22 +351,28 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a horn rams the target with a sharp stab. */
+  /** NormalStrikeMoveAnimations.playHornAttack (impact 0.1 s, dots spring out to ~0.5 s): a horn rams the target with a sharp stab. */
   hornattack: () => {
-    const s = new MoveSfx(0.62, 0x4a77);
-    s.whoosh(0.0, 0.17, { from: 2000, to: 7000, gain: 0.3 });
-    s.pulse(0.15, 0.08, { freq: (u) => 1800 - 900 * u, gain: env.decay(0.25, 1.5), duty: 0.125 });
-    s.thud(0.17, 0.6, 0.5);
+    const s = new MoveSfx(0.6, 0x4a77);
+    s.whoosh(0.0, 0.1, { from: 2000, to: 7000, gain: 0.3 });
+    s.pulse(0.08, 0.08, { freq: (u) => 1800 - 900 * u, gain: env.decay(0.25, 1.5), duty: 0.125 });
+    s.thud(0.1, 0.6, 0.5);
+    s.sparkle(0.15, 0.3, 4, { lo: 2500, hi: 4500, gain: 0.08 });
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): the horn spins like a drill and grinds into the target (OHKO). */
+  /**
+   * HornDrill.play: horn flies in (0-0.25 s), bores in from 0.3 s (hit) juddering to 0.85 s,
+   * final flare at 0.85 s, gone by ~1.15 s. A rising whir, a stab, a grinding drill, a last crunch.
+   */
   horndrill: () => {
-    const s = new MoveSfx(1.0, 0x4d71);
-    s.noise(0.0, 0.17, { clock: env.ramp(2000, 6000), gain: env.ramp(0.1, 0.25), short: true });
-    s.thud(0.17, 0.5, 0.5);
-    s.noise(0.17, 0.6, { clock: (u) => 5000 + 1500 * Math.sin(2 * Math.PI * 14 * u), gain: (u) => 0.3 * Math.pow(1 - u, 0.8), short: true });
-    s.pulse(0.17, 0.6, { freq: (u) => 180 + 60 * Math.sin(2 * Math.PI * 14 * u), gain: env.decay(0.18, 1), duty: 0.25 });
+    const s = new MoveSfx(1.3, 0x4d71);
+    s.noise(0.0, 0.3, { clock: env.ramp(2000, 6000), gain: env.ramp(0.1, 0.25), short: true });
+    s.thud(0.3, 0.5, 0.5);
+    s.noise(0.3, 0.55, { clock: (u) => 5000 + 1500 * Math.sin(2 * Math.PI * 14 * u), gain: (u) => 0.3 * Math.pow(1 - u * 0.5, 0.8), short: true });
+    s.pulse(0.3, 0.55, { freq: (u) => 180 + 60 * Math.sin(2 * Math.PI * 14 * u), gain: env.decay(0.18, 0.6), duty: 0.25 });
+    s.thud(0.85, 0.65, 0.8);
+    s.noise(0.85, 0.25, { clock: (u) => 6000 - 4000 * u, gain: env.decay(0.3, 1.2) });
     return s;
   },
 

@@ -2,7 +2,7 @@
 
 **Status:** concept; not implemented yet · **Scope:** native apps only (Android / iOS via Capacitor) · **Connection:** Wi-Fi / hotspot / Bluetooth, no server
 
-This document describes how local multiplayer between nearby devices can be built: PvP (1 vs 1, 2 vs 2) and coop (multi battles against the NPC, coop Top-Vier / Arenaleiter runs). The implementation happens in the phases described below, each one separately.
+This document describes how local multiplayer between nearby devices can be built: PvP (1 vs 1, 2 vs 2) and coop (multi battles against the NPC, coop Top-Vier / Arenaleiter runs). The implementation happens in the phases described below, each one separately. Online play through a dedicated server is described in [multiplayer-server-concept.md](multiplayer-server-concept.md).
 
 ## Context
 All battles today are single-player against the NPC. The goal is local multiplayer between nearby devices, without a server and without internet:
@@ -12,14 +12,21 @@ All battles today are single-player against the NPC. The goal is local multiplay
 It only exists in the native Capacitor apps (Android and iOS, mixed pairs included); the web build hides it.
 
 **Constraints from the current code:**
-- The whole battle (state, turn order, damage, items, AI) lives in [battle.page.ts](../src/app/pages/battle/battle.page.ts), about 1,786 lines, mixed with about 26 `await animation / audio` calls.
-- Randomness (`Math.random`) is spread over about 10 engine files: damage-calc, status, stat-change, npc-ai, battle-format, item-effects …
+- The battle loop has already moved out of [battle.page.ts](../src/app/pages/battle/battle.page.ts) (now ~580 lines: view bindings, menus, debug panel) into page-scoped services in [pages/battle/services/](../src/app/pages/battle/services/):
+  - `battle-state.service.ts`: teams, active slots and all per-battle volatiles (protect streaks, encores, curses, future attacks, Destiny Bond, Baton Pass, side guards, Helping Hand, redirection, substitutes …);
+  - `battle-flow.service.ts`: command phase, NPC actions, `executeTurn`, `finishRound`, residuals, faints, replacements, send-in;
+  - `move-resolver.service.ts`: `performMove`, `performSupportMove`, `performSelfMove`, hit resolution, protection, berries and the special moves (Future Sight, Curse, Belly Drum, Baton Pass, Substitute, Destiny Bond);
+  - `battle-setup.service.ts`: format, background, opponent team, run carry-over;
+  - `battle-stage.service.ts`: log lines and waits for the UI.
+- Rule modules for single mechanics already sit Angular-free in [core/battle/](../src/app/core/battle/) (`substitute`, `encore`, `curse`, `future-sight`, `pain-split`, `belly-drum`, `heal-bell`, …).
+- But rules and presentation are still interleaved: `battle-flow` and `move-resolver` contain about 170 `await` calls on `MoveAnimationService`, `AudioService` and `BattleStageService`. `BattleStateService` reads `ActivatedRoute`, and the rule services (`damage-calc`, `status`, `stat-change`) are Angular `@Injectable`s.
+- Randomness (`Math.random`) is spread over the rule code: damage-calc, status, stat-change, item-effects, npc-ai, npc-items, battle-format, plus move-resolver, battle-flow and battle-setup. Only `orderActions` and the random target pick in battle-format take an `rng` parameter so far.
 - So two devices can't run the battle side by side and stay in sync (no lockstep). One device has to be authoritative.
 - `android/` and `ios/` don't exist yet (`npx cap add` is still to be run).
 
 ## Core decisions
 1. **Host-authoritative.** One device (the host) runs the only battle engine. The others send **commands** and get back an ordered **event stream**, which they only render. No device-to-device desyncs, and clients never calculate damage.
-2. **Prerequisite: pull the engine out of the page.** A headless `BattleEngine` produces events; `BattlePage` only plays them back. Single player then runs through exactly the same path (a local controller), and gets testable, without the DOM.
+2. **Prerequisite: separate the engine from the presentation.** A headless `BattleEngine` produces events; `BattlePage` only plays them back. The engine is plain TypeScript without Angular imports, so the same code can also run on a dedicated server ([multiplayer-server-concept.md](multiplayer-server-concept.md)). Single player then runs through exactly the same path (a local controller), and gets testable, without the DOM.
 3. **One transport interface, several native back ends:**
    - LAN (same Wi-Fi or a phone hotspot) is the **cross-platform** path, including iOS ↔ Android.
    - Bluetooth / Wi-Fi Direct come from the OS frameworks: Google Nearby (Android ↔ Android) and MultipeerConnectivity (iOS ↔ iOS).
@@ -41,7 +48,7 @@ It only exists in the native Capacitor apps (Android and iOS, mixed pairs includ
 - **State:**
   - sides → **parties per owner** (multi battles: two parties per side);
   - active slots with their owner;
-  - per-turn volatiles, charge, choice locks, PP and items, all already modelled in the page today;
+  - per-turn volatiles, charge, choice locks, PP and items, all already modelled in `BattleStateService` today (the engine takes that state over; the service stays as the page's view state, or goes away);
   - `rng: () => number` injected (seedable for tests and replays).
 - **API:**
   - `start(config)`;
@@ -53,8 +60,8 @@ It only exists in the native Capacitor apps (Android and iOS, mixed pairs includ
   - `log`, `moveUsed`, `hit` (slot, damage, effectiveness), `miss`, `hp`, `status`, `boosts`;
   - `itemUsed` / `itemReveal`, `protect`, `faint`, `sendOut`, `recall`;
   - `turnEnd`, `battleEnd`.
-- **Moved out of the page (not rewritten):** performMove / performSupportMove / performSelfMove, executeTurn, finishRound, residuals and replacements. The `await animation` / `wait` calls become `emit(event)`. The building blocks in [battle-format.ts](../src/app/core/battle/battle-format.ts), [npc-ai.ts](../src/app/core/battle/npc-ai.ts), [item-effects.ts](../src/app/core/battle/item-effects.ts), the damage, status and stat-change services, and the trainer-run carry-over all stay as they are.
-- **Randomness:** `Math.random` in damage-calc, status, stat-change, item-effects and battle-format is replaced by the injected `rng` (a parameter with `Math.random` as default; `orderActions` already works this way).
+- **Moved out of the page services (not rewritten):** `performMove` / `performSupportMove` / `performSelfMove` and the special moves from `move-resolver`; `executeTurn`, `finishRound`, residuals, faints and replacements from `battle-flow`; the state from `battle-state`. The `await animation` / `audio` / `stage` calls become `emit(event)`, and `inject()` becomes constructor parameters (plain classes; the Angular services become thin wrappers). The building blocks in [battle-format.ts](../src/app/core/battle/battle-format.ts), [npc-ai.ts](../src/app/core/battle/npc-ai.ts), [item-effects.ts](../src/app/core/battle/item-effects.ts), the mechanic modules in `core/battle/`, the damage, status and stat-change logic, and the trainer-run carry-over all stay as they are.
+- **Randomness:** `Math.random` in the rule code (damage-calc, status, stat-change, item-effects, npc-ai, npc-items, battle-format and the moved resolver / flow code) is replaced by the injected `rng` (a parameter with `Math.random` as default; `orderActions` already works this way). Animation code keeps `Math.random`; it never affects the battle.
 
 ### B. `EventPlayer` + slimmer `BattlePage`
 - The `EventPlayer` plays events one after another and maps each to the existing [move-animation.service.ts](../src/app/core/services/move-animation.service.ts) / [audio.service.ts](../src/app/core/services/audio.service.ts) calls, waits and log lines. That reuses what's there today, including the "last line stays readable" pauses.
@@ -133,7 +140,7 @@ interface MultiplayerTransport {
 ## Implementation phases (each one ships separately and is tested)
 1. **Engine extraction** (no network):
    - `BattleEngine`, `EventPlayer`, controllers, injected `rng`.
-   - Single player has to play exactly as before: all existing specs plus the Playwright flows (singles, doubles, items, Top-Vier, Arenaleiter).
+   - Single player has to play exactly as before: all existing specs pass, and the flows singles, doubles, items, Top-Vier, Arenaleiter and tournament are played through. There is no Playwright suite in the repo yet; adding one for these flows is part of this phase, so it can guard the later phases too.
    - New engine specs with a seeded `rng`, run headless.
 2. **Session + protocol + dev transports:** `SessionService`, codec and validation, `LoopbackTransport`, `BroadcastChannelTransport`. PvP 1 vs 1 works between two browser tabs (dev only).
 3. **`LocalMultiplayer` plugin, LAN back end** (Android + iOS): `npx cap add android` / `ios`, permissions, DNS-SD and TCP. First real-device PvP, including Android ↔ iOS.
@@ -142,7 +149,7 @@ interface MultiplayerTransport {
 6. **PvP 2 vs 2** with four devices (Nearby `P2P_STAR`, Multipeer, LAN with 3 clients).
 
 ## Risks / open points
-- **The engine extraction is the biggest piece of work.** That's why it comes first, behind the existing test and Playwright safety net.
+- **The engine extraction is the biggest piece of work.** Splitting the page into services already did part of it; what is left is separating rules from the ~170 animation / audio awaits. That's why it comes first, behind the existing specs and the new Playwright flows.
 - **Mixed Android ↔ iOS without a router** only works over a hotspot. That's documented, and the UI explains it ("Ein Gerät startet einen Hotspot …").
 - **iOS local network permission:** the system prompts on first discovery. If the user denies it, LAN discovery stops working. The UI detects this and links to Settings.
 - **Cheating:** the host is trusted, which is fine for local play between friends. Clients are validated (teams, commands).
@@ -161,4 +168,4 @@ interface MultiplayerTransport {
   - Android ↔ iOS: WLAN and hotspot;
   - 4 devices, 2 vs 2;
   - Wi-Fi drop mid-battle (grace period and reconnect).
-- **Regression:** after phase 1, all 83+ existing specs and the existing Playwright flows still pass.
+- **Regression:** after phase 1, all existing specs (currently 147 cases in 24 files) and the new Playwright flows still pass.

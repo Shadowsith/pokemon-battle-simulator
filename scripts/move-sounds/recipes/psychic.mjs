@@ -249,12 +249,16 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) + sleep fleck (0.6 s): hypnotic, swaying waves lull the target. */
+  /**
+   * PsychicStatusMoveAnimations.playHypnosis: yellow rings float over (0-0.85 s), pink rings
+   * close in (0.55-1.1 s), Zs rise (0.9-2.85 s). Hypnotic swaying waves, then a sleepy lull.
+   */
   hypnosis: () => {
-    const s = new MoveSfx(1.45, 0x4e9b);
-    s.wave(0.0, 0.8, { freq: (u) => 440 + 110 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.22) });
-    s.wave(0.05, 0.75, { freq: (u) => 660 - 110 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.12) });
-    s.sleep(0.6, 0.22);
+    const s = new MoveSfx(2.9, 0x4e9b);
+    s.wave(0.0, 1.0, { freq: (u) => 440 + 110 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.22) });
+    s.wave(0.05, 0.95, { freq: (u) => 660 - 110 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.12) });
+    s.sleep(0.9, 0.22);
+    s.sleep(1.6, 0.14);
     return s;
   },
 
@@ -337,13 +341,17 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic self aura (≈ 0.8 s) + Attack-up fleck (0.85 s): a calm, slow breathing hum focuses the mind. */
+  /**
+   * PsychicStatusMoveAnimations.playMeditate: dark (0-0.28 s), the user sinks into a silhouette
+   * (0.28-0.7 s) and flares orange (0.7-1.25 s), the scene clears (1.25-1.57 s), stat-up aura
+   * (1.57-2.37 s). A calm drone, a rising glow chord, the stat-up jingle.
+   */
   meditate: () => {
-    const s = new MoveSfx(1.55, 0x3ed1);
-    s.wave(0.0, 0.85, { freq: (u) => 220 * (1 + 0.02 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.24) });
-    s.wave(0.1, 0.75, { freq: () => 330, gain: env.swell(0.14) });
-    s.chord(0.3, 0.5, [76, 83], { rate: 0.08, gain: 0.08 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.6, 0x3ed1);
+    s.wave(0.0, 1.25, { freq: (u) => 220 * (1 + 0.02 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.24) });
+    s.wave(0.28, 0.45, { freq: () => 330, gain: env.swell(0.12) });
+    s.chord(0.7, 0.55, [76, 83, 88], { rate: 0.06, gain: 0.12 });
+    s.statUp(1.57);
     return s;
   },
 
@@ -594,13 +602,17 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic self aura + accuracy-drop fleck (0.85 s): a spoon bends with a wobbly, twanging tone. */
+  /**
+   * PsychicStatusMoveAnimations.playKinesis: the spoon appears (0-0.25 s) and wobbles while a ring
+   * pulses (0.25-0.85 s), its bowl bends (0.8-1.05 s), fades by 1.25 s, then the target's blue
+   * stat drop (1.25-2.15 s). A wavering hum, a bending creak, the stat-down jingle.
+   */
   kinesis: () => {
-    const s = new MoveSfx(1.5, 0x4135);
-    s.wave(0.02, 0.4, { freq: (u) => 600 * (1 - 0.35 * Math.sin(Math.PI * u)), gain: env.swell(0.28) });
-    s.wave(0.38, 0.4, { freq: (u) => 640 * (1 - 0.4 * Math.sin(Math.PI * u)), gain: env.swell(0.28) });
-    s.pulse(0.72, 0.15, { freq: () => 1760, gain: env.decay(0.15, 1.5), duty: 0.25 });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.4, 0x4135);
+    s.wave(0.05, 0.75, { freq: (u) => 600 * (1 - 0.3 * Math.sin(2 * Math.PI * 2 * u)), gain: env.swell(0.26) });
+    s.wave(0.8, 0.25, { freq: (u) => 640 * (1 - 0.45 * u), gain: env.attackDecay(0.26, 0.2) });
+    s.pulse(1.02, 0.15, { freq: () => 1760, gain: env.decay(0.15, 1.5), duty: 0.25 });
+    s.statDown(1.25);
     return s;
   },
 

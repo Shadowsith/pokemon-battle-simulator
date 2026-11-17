@@ -1,6 +1,7 @@
 import { MoveAnimRegistry } from '../animation.types';
 import { NormalBlowMoveAnimations } from './normal/normal-blow-moves';
 import { NormalCheerMoveAnimations } from './normal/normal-cheer-moves';
+import { NormalFoeStatusMoveAnimations } from './normal/normal-foe-status-moves';
 import { NormalHealMoveAnimations } from './normal/normal-heal-moves';
 import { NormalRangedMoveAnimations } from './normal/normal-ranged-moves';
 import { NormalSoundMoveAnimations } from './normal/normal-sound-moves';
@@ -19,6 +20,7 @@ export class NormalMoveAnimations {
     ...NormalRangedMoveAnimations.anims,
     ...NormalSoundMoveAnimations.anims,
     ...NormalStatusMoveAnimations.anims,
+    ...NormalFoeStatusMoveAnimations.anims,
     ...NormalHealMoveAnimations.anims,
     ...NormalCheerMoveAnimations.anims
   };

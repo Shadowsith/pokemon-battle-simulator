@@ -20,6 +20,7 @@ export class FightingPunchMoveAnimations {
     dynamicpunch: (refs, _launch, target) => FightingPunchMoveAnimations.playDynamicPunch(refs, target),
     focuspunch: (refs, launch, target) => FightingPunchMoveAnimations.playFocusPunch(refs, launch, target),
     hammerarm: (refs, launch, target, v) => HammerArm.play(refs, launch, target, v),
+    karatechop: (refs, _launch, target, v) => FightingPunchMoveAnimations.playKarateChop(refs, target, v),
     poweruppunch: (refs, launch, target) => PowerUpPunch.play(refs, launch, target),
     sacredsword: (refs, _launch, target, v) => SacredSword.play(refs, target, v),
     skyuppercut: (refs) => FightingPunchMoveAnimations.playSkyUppercut(refs),
@@ -506,6 +507,60 @@ export class FightingPunchMoveAnimations {
     const rx = Math.max(r.width * 0.45, 32);
     const ry = Math.max(r.height * 0.12, 10);
     await FxEffects.dizzyBirds(fxEl, head, rx, ry, 1400);
+  }
+
+  /**
+   * Karate Chop, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/c/c0/Karateschlag_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/4/4c/Karateschlag_Gen5.png
+   *
+   * A black, white-outlined flat hand appears above the target (0-0.15 s) and
+   * chops down onto its head (hit at 0.3 s): a yellow star burst flares,
+   * yellow sparkles and orange specks scatter, the target shakes, and the hand
+   * rests a moment before it fades (to ~0.8 s).
+   */
+  private static async playKarateChop(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const hw = Math.max(r.width * 0.55, 46);
+    const at: Point = { x: target.x, y: target.y - r.height * 0.22 };
+    // Hand points toward the caster's side with its edge down, tilted a little.
+    const tilt = v.dir > 0 ? 8 : -8;
+    const flip = v.dir > 0 ? -1 : 1;
+    const pose = (y: number) => `translate(0,${y}px) scaleX(${flip}) rotate(${tilt}deg)`;
+    const effects: Promise<void>[] = [
+      Fx.spawn(fxEl, FxGlyphs.chopHandGlyph(hw), at, [
+        { transform: pose(-hw * 0.9), opacity: 0 },
+        { transform: pose(-hw * 0.7), opacity: 1, offset: 0.19 },
+        { transform: pose(0), opacity: 1, offset: 0.38 },
+        { transform: pose(2), opacity: 1, offset: 0.75 },
+        { transform: pose(4), opacity: 0 }
+      ], { duration: 800, easing: 'ease-in' })
+    ];
+    await Fx.wait(300);
+    Fx.flash(targetEl, '#FFE84A', 0.6);
+    Fx.shake(targetEl, 6);
+    effects.push(
+      Fx.spawn(fxEl, FxGlyphs.spikyBurst(hw * 1.2, '#F8C820', '#FFF27A', '#ffffff'), { x: at.x, y: at.y + hw * 0.1 }, [
+        { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+        { transform: 'scale(1) rotate(15deg)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(1.1) rotate(25deg)', opacity: 0 }
+      ], { duration: 320, easing: 'ease-out' })
+    );
+    for (let i = 0; i < 10; i++) {
+      const a = Math.random() * Math.PI * 2;
+      const d = hw * (0.6 + Math.random() * 0.6);
+      const sparkle = i % 2
+        ? FxGlyphs.sparkStar(7 + Math.random() * 5, '#FFE04A')
+        : Fx.box(5, 5, 'border-radius:50%;background:radial-gradient(circle,#FFD8A8,#F07838 65%);box-shadow:0 0 4px #F07838');
+      effects.push(
+        Fx.spawn(fxEl, sparkle, at, [
+          { transform: 'translate(0,0) scale(.5)', opacity: 1 },
+          { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d + 10}px) scale(1)`, opacity: 0 }
+        ], { duration: 450 + Math.random() * 100, easing: 'ease-out' })
+      );
+    }
+    await Promise.all(effects);
   }
 
   /**

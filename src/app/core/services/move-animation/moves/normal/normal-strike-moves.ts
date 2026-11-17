@@ -3,7 +3,9 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { ClawStyle, FxEffects } from '../../fx-effects';
+import { Guillotine } from './guillotine';
 import { HeadCharge } from './head-charge';
+import { HornDrill } from './horn-drill';
 import { LastResort } from './last-resort';
 import { RockClimb } from './rock-climb';
 
@@ -25,7 +27,7 @@ interface BladeStyle {
 const SLASH: BladeStyle = { blade: '#fff', glow: '#FFF3A0', width: 7, sparks: 16, reach: 1, sink: 10, sparkMs: 520 };
 const CUT: BladeStyle = { blade: '#FFF0A0', glow: '#F8C030', width: 5, sparks: 22, reach: 1.5, sink: 30, sparkMs: 950 };
 
-/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Head Charge and Last Resort live in their own files). */
+/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Guillotine, Head Charge, Horn Drill, Last Resort and Rock Climb live in their own files). */
 export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -34,9 +36,14 @@ export class NormalStrikeMoveAnimations {
     constrict: (refs, _launch, target) => NormalStrikeMoveAnimations.playConstrict(refs, target),
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
     cut: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v, CUT),
+    furyattack: (refs, launch, target, v) => NormalStrikeMoveAnimations.playFuryAttack(refs, launch, target, v),
+    furyswipes: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playFurySwipes(refs, target, v),
     gigaimpact: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playGigaImpact(refs, target, v),
+    guillotine: (refs, _launch, target) => Guillotine.play(refs, target),
     headcharge: (refs, launch, target) => HeadCharge.play(refs, launch, target),
     holdback: (refs, launch, target) => NormalStrikeMoveAnimations.playHoldBack(refs, launch, target),
+    hornattack: (refs, launch, target) => NormalStrikeMoveAnimations.playHornAttack(refs, launch, target),
+    horndrill: (refs, launch, target) => HornDrill.play(refs, launch, target),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
     lastresort: (refs, _launch, target, v) => LastResort.play(refs, target, v),
     rockclimb: (refs, launch, target, v) => RockClimb.play(refs, launch, target, v),
@@ -45,6 +52,170 @@ export class NormalStrikeMoveAnimations {
     smellingsalts: (refs, _launch, target) => NormalStrikeMoveAnimations.playSmellingSalts(refs, target),
     superfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSuperFang(refs, target, v)
   };
+
+  /**
+   * Fury Attack, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/c/cb/Furienschlag_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/d/dc/Furienschlag_Gen5.png
+   *
+   * One jab per hit (`v.hits`, 0.32 s each, see `hornJab`): a black horn
+   * stabs point-first into a different spot on the target (hit 0.1 s into
+   * each jab), a small yellow burst flares, a ring of orange dots springs out
+   * of it and red specks drift off, and the horn pulls back.
+   */
+  private static async playFuryAttack(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const r = Fx.rect(refs.targetEl);
+    const len = Math.max(r.width * 0.5, 40);
+    const spots: Point[] = [
+      { x: -0.12, y: -0.15 },
+      { x: 0.1, y: 0.1 },
+      { x: -0.05, y: 0.18 },
+      { x: 0.14, y: -0.08 },
+      { x: 0, y: 0 }
+    ];
+    const jabs: Promise<void>[] = [];
+    for (let hit = 0; hit < Math.max(v.hits, 1); hit++) {
+      const spot = spots[hit % spots.length];
+      jabs.push(NormalStrikeMoveAnimations.hornJab(refs, launch, { x: target.x + spot.x * r.width, y: target.y + spot.y * r.height }, len, 8));
+      await Fx.wait(320);
+    }
+    await Promise.all(jabs);
+  }
+
+  /**
+   * Horn Attack, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/3/38/Hornattacke_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/e/ea/Hornattacke_Gen5.png
+   *
+   * One big jab (see `hornJab`): a large black horn drives point-first into
+   * the target's middle (hit 0.1 s), a yellow burst flares, a wide ring of
+   * orange dots springs out and red specks drift off (to ~0.5 s).
+   */
+  private static async playHornAttack(refs: BattleStageRefs, launch: Point, target: Point) {
+    const r = Fx.rect(refs.targetEl);
+    await NormalStrikeMoveAnimations.hornJab(refs, launch, target, Math.max(r.width * 0.7, 54), 12);
+  }
+
+  /**
+   * One horn jab at `at` (0.32 s): the horn, `len` px long and pointing from
+   * the caster toward the target, stabs in tip-first (hit at 0.1 s: flash,
+   * shake, yellow burst, a ring of `dots` orange dots and three red specks)
+   * and pulls back. Resolves when every piece is gone (~0.5 s).
+   */
+  private static async hornJab(refs: BattleStageRefs, launch: Point, at: Point, len: number, dots: number) {
+    const { fxEl, targetEl } = refs;
+    const angle = Math.atan2(at.y - launch.y, at.x - launch.x);
+    const deg = (angle * 180) / Math.PI;
+    const back = { x: -Math.cos(angle) * len * 0.8, y: -Math.sin(angle) * len * 0.8 };
+    // The horn's tip lands on the spot: its box centre sits half a length behind it.
+    const hornAt: Point = { x: at.x - Math.cos(angle) * len * 0.45, y: at.y - Math.sin(angle) * len * 0.45 };
+    const effects: Promise<void>[] = [
+      Fx.spawn(fxEl, FxGlyphs.hornGlyph(len), hornAt, [
+        { transform: `translate(${back.x}px,${back.y}px) rotate(${deg}deg)`, opacity: 0 },
+        { transform: `translate(0,0) rotate(${deg}deg)`, opacity: 1, offset: 0.32 },
+        { transform: `translate(0,0) rotate(${deg}deg)`, opacity: 1, offset: 0.55 },
+        { transform: `translate(${back.x * 0.6}px,${back.y * 0.6}px) rotate(${deg}deg)`, opacity: 0 }
+      ], { duration: 320, easing: 'ease-out' })
+    ];
+    await Fx.wait(100);
+    Fx.flash(targetEl, '#FFE84A', 0.5);
+    Fx.shake(targetEl, 4);
+    effects.push(
+      Fx.spawn(fxEl, FxGlyphs.spikyBurst(len * 0.7, '#F8C820', '#FFF27A', '#ffffff'), at, [
+        { transform: 'scale(.3)', opacity: 1 },
+        { transform: 'scale(1) rotate(15deg)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(1.1) rotate(25deg)', opacity: 0 }
+      ], { duration: 260, easing: 'ease-out' })
+    );
+    // Ring of orange dots springs outward; a few red specks drift up and off.
+    const ring = len * 0.6;
+    for (let i = 0; i < dots; i++) {
+      const a = (i / dots) * Math.PI * 2;
+      effects.push(
+        Fx.spawn(fxEl, Fx.box(6, 6, 'border-radius:50%;background:radial-gradient(circle,#FFE0A0,#FF8A1A 65%);box-shadow:0 0 4px #FF8A1A'), at, [
+          { transform: `translate(${Math.cos(a) * ring * 0.3}px,${Math.sin(a) * ring * 0.3}px)`, opacity: 1 },
+          { transform: `translate(${Math.cos(a) * ring}px,${Math.sin(a) * ring}px)`, opacity: 0 }
+        ], { duration: 300, easing: 'ease-out' })
+      );
+    }
+    for (let i = 0; i < 3; i++) {
+      const dx = (Math.random() * 2 - 1) * len * 0.6;
+      effects.push(
+        Fx.spawn(fxEl, Fx.box(4, 4, 'border-radius:50%;background:#D82818;box-shadow:0 0 3px #FF4A2A'), at, [
+          { transform: 'translate(0,0)', opacity: 1 },
+          { transform: `translate(${dx}px,${-len * 0.5 - Math.random() * len * 0.3}px)`, opacity: 0 }
+        ], { duration: 450, easing: 'ease-out', delay: 40 })
+      );
+    }
+    await Promise.all(effects);
+  }
+
+  /**
+   * Fury Swipes, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/d/d3/Kratzfurie_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/9/9f/Kratzfurie_Gen5.png
+   *
+   * One swipe per hit (`v.hits`, 0.36 s each) at a different spot: three
+   * parallel yellow claw streaks rake down across the target from the top
+   * back corner (hit 0.1 s into each swipe), a white glint flares and orange
+   * specks pop out and sink.
+   */
+  private static async playFurySwipes(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const len = Math.max(r.width * 0.6, 46);
+    // Down and toward the caster's side, like a paw swiping from top-back.
+    const deg = v.dir > 0 ? 115 : 65;
+    const rad = (deg * Math.PI) / 180;
+    const spots: Point[] = [
+      { x: 0.1, y: -0.12 },
+      { x: -0.1, y: 0.08 },
+      { x: 0.05, y: 0.15 },
+      { x: -0.12, y: -0.1 },
+      { x: 0, y: 0 }
+    ];
+    const effects: Promise<void>[] = [];
+    for (let hit = 0; hit < Math.max(v.hits, 1); hit++) {
+      const spot = spots[hit % spots.length];
+      const at: Point = { x: target.x + spot.x * r.width, y: target.y + spot.y * r.height };
+      for (let k = -1; k <= 1; k++) {
+        // Streaks side by side, square to the swipe direction.
+        const off = k * len * 0.16;
+        const c: Point = { x: at.x - Math.sin(rad) * off, y: at.y + Math.cos(rad) * off };
+        const streak = Fx.box(len, 4, 'border-radius:2px;background:linear-gradient(90deg,#FFF6B000,#FFF6B0 30%,#FFE040 70%,#FFE04000);box-shadow:0 0 6px #F8C030');
+        effects.push(
+          Fx.spawn(fxEl, streak, c, [
+            { transform: `rotate(${deg}deg) scaleX(0)`, opacity: 1 },
+            { transform: `rotate(${deg}deg) scaleX(1)`, opacity: 1, offset: 0.4 },
+            { transform: `rotate(${deg}deg) scaleX(1) scaleY(.4)`, opacity: 0 }
+          ], { duration: 300, easing: 'ease-out', delay: (k + 1) * 20 })
+        );
+      }
+      await Fx.wait(100);
+      Fx.flash(targetEl, '#ffffff', 0.5);
+      Fx.shake(targetEl, 4);
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.sparkStar(len * 0.45, '#FFE04A'), at, [
+          { transform: 'scale(.2) rotate(0deg)', opacity: 1 },
+          { transform: 'scale(1) rotate(30deg)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(.5) rotate(45deg)', opacity: 0 }
+        ], { duration: 260, easing: 'ease-out' })
+      );
+      for (let i = 0; i < 5; i++) {
+        const a = -Math.PI / 2 + (Math.random() * 2 - 1) * 1.3;
+        const d = len * (0.4 + Math.random() * 0.4);
+        effects.push(
+          Fx.spawn(fxEl, Fx.box(5, 5, 'border-radius:50%;background:radial-gradient(circle,#FFF0C0,#FF9A2A 60%);box-shadow:0 0 4px #FF9A2A'), at, [
+            { transform: 'translate(0,0)', opacity: 1 },
+            { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px)`, opacity: 1, offset: 0.5 },
+            { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d + 16}px)`, opacity: 0 }
+          ], { duration: 500, easing: 'ease-out' })
+        );
+      }
+      await Fx.wait(260);
+    }
+    await Promise.all(effects);
+  }
 
   /**
    * Smelling Salts, after the DPPt animation: two white open hands appear on

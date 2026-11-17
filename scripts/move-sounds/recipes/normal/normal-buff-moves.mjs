@@ -105,24 +105,33 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: the body curls up into a ball. */
+  /**
+   * NormalStatusMoveAnimations.playDefenseCurl: curls up (0-0.25 s), blue sphere swells
+   * (0.15-0.45 s), white sparkles (0.45-0.9 s), sphere fades (0.9-1.1 s), stat-up bands
+   * (1.1-1.9 s). A falling curl blip, a glassy shimmer, twinkles, then the stat-up jingle.
+   */
   defensecurl: () => {
-    const s = new MoveSfx(1.5, 0xdefc);
-    s.pulse(0.02, 0.35, { freq: (u) => 900 * Math.pow(0.3, u), gain: env.swell(0.22), duty: 0.25 });
-    s.thud(0.4, 0.4, 0.5);
-    s.statUp(0.85);
+    const s = new MoveSfx(2.05, 0xdefc);
+    s.pulse(0.0, 0.25, { freq: (u) => 900 * Math.pow(0.3, u), gain: env.swell(0.22), duty: 0.25 });
+    s.thud(0.24, 0.3, 0.4);
+    s.chord(0.15, 0.6, [79, 84, 88], { rate: 0.03, gain: 0.12, vibrato: 0.01 });
+    s.sparkle(0.45, 0.45, 7, { lo: 3500, hi: 6500, gain: 0.14 });
+    s.statUp(1.1);
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: afterimages flicker on both sides. */
+  /**
+   * DoubleTeam.play: two copies swap sides six times (0-1.0 s, every ~0.17 s), then the
+   * stat-up bands (1.0-1.8 s). A flicking whoosh and blip per swap, then the stat-up jingle.
+   */
   doubleteam: () => {
-    const s = new MoveSfx(1.5, 0xd07e);
+    const s = new MoveSfx(1.95, 0xd07e);
     for (let i = 0; i < 6; i++) {
-      const at = 0.02 + i * 0.11;
-      s.whoosh(at, 0.1, { from: 3000, to: 8000, gain: 0.22 - i * 0.02 });
+      const at = 0.02 + i * 0.167;
+      s.whoosh(at, 0.12, { from: 3000, to: 8000, gain: 0.22 - i * 0.02 });
       s.pulse(at, 0.06, { freq: () => (i % 2 ? 1320 : 1100), gain: env.decay(0.14, 1), duty: 0.125 });
     }
-    s.statUp(0.85);
+    s.statUp(1.0);
     return s;
   },
 
@@ -136,13 +145,18 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s, no stat fleck): deep breath, the user's focus sharpens - a rising, pumping energy. */
+  /**
+   * NormalStatusMoveAnimations.playFocusEnergy: light pillars shoot up one after another
+   * (0-1.0 s, white centre pillar at 0.3 s), yellow dots float up (0.15-1.15 s). A rising,
+   * pumping energy that peaks in a bright ping.
+   */
   focusenergy: () => {
-    const s = new MoveSfx(1.2, 0xf0e9);
-    s.noise(0.0, 0.8, { clock: (u) => 1500 + 3000 * u, gain: env.swell(0.15) });
+    const s = new MoveSfx(1.3, 0xf0e9);
+    s.noise(0.0, 0.9, { clock: (u) => 1500 + 3000 * u, gain: env.swell(0.15) });
     for (const [at, f] of [[0.05, 196], [0.25, 247], [0.45, 294], [0.65, 392]]) {
       s.pulse(at, 0.18, { freq: (u) => f * (1 + 0.15 * u), gain: env.attackDecay(0.22, 0.1), duty: 0.25 });
     }
+    s.pulse(0.3, 0.12, { freq: () => 1568, gain: env.decay(0.1, 2), duty: 0.125 });
     s.pulse(0.85, 0.25, { freq: () => 784, gain: env.decay(0.16, 1.5), duty: 0.125 });
     return s;
   },
@@ -163,12 +177,13 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + stat-up fleck (0.85 s): the body swells with a rising, leafy hum. */
+  /** NormalStatusMoveAnimations.playGrowth: stretches up (0-0.45 s), settles (0.6-0.8 s), stat-up bands (0.8-1.6 s). A rising, leafy hum. */
   growth: () => {
-    const s = new MoveSfx(1.5, 0x6207);
-    s.wave(0.02, 0.75, { freq: env.ramp(196, 523), gain: env.swell(0.2) });
-    s.noise(0.02, 0.75, { clock: env.ramp(800, 3000), gain: env.swell(0.08) });
-    s.statUp(0.85);
+    const s = new MoveSfx(1.65, 0x6207);
+    s.wave(0.0, 0.5, { freq: env.ramp(196, 523), gain: env.swell(0.2) });
+    s.noise(0.0, 0.6, { clock: env.ramp(800, 3000), gain: env.swell(0.08) });
+    s.wave(0.6, 0.2, { freq: env.ramp(523, 392), gain: env.decay(0.12, 1) });
+    s.statUp(0.8);
     return s;
   },
 
@@ -184,14 +199,19 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck (0.85 s): the body stiffens with a hard, grinding shell creak. */
+  /**
+   * NormalStatusMoveAnimations.playHarden: turns steel grey (0-0.8 s), glints at 0.28 / 0.44 /
+   * 0.6 s, stat-up bands (0.8-1.6 s). A hard grinding creak, metal pings, the stat-up jingle.
+   */
   harden: () => {
-    const s = new MoveSfx(1.5, 0x4a2d);
-    s.pulse(0.05, 0.6, { freq: (u) => 300 + 200 * u, gain: env.swell(0.18), duty: 0.125 });
-    s.noise(0.05, 0.6, { clock: (u) => 2500 + 2500 * u, gain: env.swell(0.14), short: true });
-    s.noise(0.62, 0.05, { clock: () => 8000, gain: env.decay(0.3, 1), short: true });
-    s.pulse(0.62, 0.2, { freq: () => 1400, gain: env.decay(0.12, 2), duty: 0.5 });
-    s.statUp(0.85);
+    const s = new MoveSfx(1.65, 0x4a2d);
+    s.pulse(0.0, 0.6, { freq: (u) => 300 + 200 * u, gain: env.swell(0.18), duty: 0.125 });
+    s.noise(0.0, 0.6, { clock: (u) => 2500 + 2500 * u, gain: env.swell(0.14), short: true });
+    for (const [i, at] of [0.28, 0.44, 0.6].entries()) {
+      s.noise(at, 0.04, { clock: () => 8000, gain: env.decay(0.2, 1), short: true });
+      s.pulse(at, 0.15, { freq: () => 1400 + i * 180, gain: env.decay(0.1, 2), duty: 0.5 });
+    }
+    s.statUp(0.8);
     return s;
   },
 
@@ -253,14 +273,18 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): a finger wags like a metronome, tick-tock, then a bright "pick" chime. */
+  /**
+   * NormalStatusMoveAnimations.playMetronome: the glove pops up (0-0.2 s), finger wags with ticks
+   * at 0.35 / 0.65 / 0.95 / 1.25 s, a glint flashes on the fingertip (1.4 s), fades by 1.65 s.
+   * Clock ticks, then a bright "ding" as the move is picked.
+   */
   metronome: () => {
-    const s = new MoveSfx(1.1, 0x3e70);
-    [0.02, 0.2, 0.38, 0.56].forEach((at, i) => {
+    const s = new MoveSfx(1.8, 0x3e70);
+    [0.35, 0.65, 0.95, 1.25].forEach((at, i) => {
       s.pulse(at, 0.04, { freq: () => (i % 2 ? 1400 : 1870), gain: env.decay(0.3, 1), duty: 0.25 });
       s.noise(at, 0.02, { clock: () => 14000, gain: env.decay(0.18, 1) });
     });
-    s.arpeggio(0.74, [79, 84, 91], 0.05, { gain: 0.24, voice: 'wave', hold: 0.18 });
+    s.arpeggio(1.4, [79, 84, 91], 0.05, { gain: 0.24, voice: 'wave', hold: 0.18 });
     return s;
   },
 
@@ -274,13 +298,19 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck (0.85 s): the user shrinks with a falling squeeze, then evasion rises. */
+  /**
+   * NormalStatusMoveAnimations.playMinimize: the user shrinks to a speck (0-0.35 s), stays tiny
+   * (to 0.9 s), pops back (0.9-1.15 s), stat-up aura (1.15-1.95 s).
+   * A falling squeak, a pop, the stat-up jingle.
+   */
   minimize: () => {
-    const s = new MoveSfx(1.5, 0x3191);
-    s.pulse(0.02, 0.7, { freq: (u) => 1500 * Math.pow(0.3, u), gain: env.swell(0.24), duty: 0.25 });
-    s.wave(0.02, 0.7, { freq: (u) => 750 * Math.pow(0.3, u), gain: env.swell(0.16) });
-    s.noise(0.6, 0.06, { clock: () => 9000, gain: env.decay(0.2, 1), short: true });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.2, 0x3191);
+    s.pulse(0.02, 0.35, { freq: (u) => 1500 * Math.pow(0.3, u), gain: env.attackDecay(0.24, 0.3), duty: 0.25 });
+    s.wave(0.02, 0.35, { freq: (u) => 750 * Math.pow(0.3, u), gain: env.attackDecay(0.16, 0.3) });
+    s.pulse(0.4, 0.5, { freq: () => 2200, gain: env.swell(0.05), duty: 0.125 });
+    s.noise(0.95, 0.06, { clock: () => 9000, gain: env.decay(0.2, 1), short: true });
+    s.pulse(0.95, 0.1, { freq: (u) => 600 + 1200 * u, gain: env.decay(0.2, 1), duty: 0.5 });
+    s.statUp(1.15);
     return s;
   },
 

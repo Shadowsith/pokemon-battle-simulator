@@ -181,13 +181,14 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a gust of wind is whipped up and buffets the foe. */
+  /** FlyingMoveAnimations.playGust: dust whirl sweeps round the target (0-1.1 s, hit 0.3 s), blows apart by ~1.3 s. A swirling, buffeting wind. */
   gust: () => {
-    const s = new MoveSfx(0.85, 0x6057);
-    s.whoosh(0.0, 0.45, { from: 900, to: 3800, gain: 0.32 });
-    s.whoosh(0.15, 0.3, { from: 1500, to: 5000, gain: 0.18 });
-    s.noise(0.43, 0.3, { clock: (u) => 4000 - 2500 * u, gain: env.attackDecay(0.3, 0.05) });
-    s.thud(0.44, 0.3, 0.2);
+    const s = new MoveSfx(1.35, 0x6057);
+    s.whoosh(0.0, 0.5, { from: 900, to: 3800, gain: 0.3 });
+    s.whoosh(0.4, 0.45, { from: 3800, to: 1500, gain: 0.22 });
+    s.whoosh(0.75, 0.45, { from: 1200, to: 3500, gain: 0.16 });
+    s.noise(0.3, 0.3, { clock: (u) => 4000 - 2500 * u, gain: env.attackDecay(0.28, 0.05) });
+    s.thud(0.3, 0.3, 0.2);
     return s;
   },
 
@@ -203,16 +204,18 @@ export const FLYING = {
   },
 
   /**
-   * Generic target aura (~0.8 s); no original sound exists (silent in game), designed from the
-   * animation: the move's echo is caught and reflected back - a fluttering airy sweep and a mirrored phrase.
+   * FlyingMoveAnimations.playMirrorMove: dark (0-0.28 s), a ring of glints wheels in round the
+   * target (0.28-1.2 s), white flash at 1.2 s, the scene clears by 1.5 s.
+   * A shimmering phrase mirrored back, then a bright chime.
    */
   mirrormove: () => {
-    const s = new MoveSfx(1.1, 0x3133);
-    s.whoosh(0.02, 0.4, { from: 2000, to: 6000, gain: 0.2 });
-    s.arpeggio(0.05, [79, 83, 86], 0.08, { gain: 0.24, duty: 0.25, hold: 0.1 });
-    s.whoosh(0.42, 0.4, { from: 6000, to: 2000, gain: 0.18 });
-    s.arpeggio(0.45, [86, 83, 79], 0.08, { gain: 0.22, voice: 'wave', hold: 0.15 });
-    s.pulse(0.7, 0.25, { freq: () => 1976, gain: env.decay(0.12, 2), duty: 0.5 });
+    const s = new MoveSfx(1.65, 0x3133);
+    s.whoosh(0.28, 0.45, { from: 2000, to: 6000, gain: 0.18 });
+    s.arpeggio(0.3, [79, 83, 86], 0.1, { gain: 0.22, duty: 0.25, hold: 0.12 });
+    s.whoosh(0.75, 0.45, { from: 6000, to: 2000, gain: 0.16 });
+    s.arpeggio(0.75, [86, 83, 79], 0.1, { gain: 0.2, voice: 'wave', hold: 0.15 });
+    s.sparkle(0.3, 0.9, 8, { lo: 4000, hi: 7000, gain: 0.08 });
+    s.pulse(1.2, 0.3, { freq: () => 1976, gain: env.decay(0.14, 2), duty: 0.5 });
     return s;
   },
 

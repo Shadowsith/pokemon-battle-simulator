@@ -10,9 +10,56 @@ export class NormalSoundMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     boomburst: (refs, launch, target) => NormalSoundMoveAnimations.playBoomburst(refs, launch, target),
     confide: (refs, launch, target) => NormalSoundMoveAnimations.playConfide(refs, launch, target),
+    growl: (refs, launch, target) => NormalSoundMoveAnimations.playGrowl(refs, launch, target),
     nobleroar: (refs, launch, target) => NormalSoundMoveAnimations.playNobleRoar(refs, launch, target),
     relicsong: (refs, launch, target) => RelicSong.play(refs, launch, target)
   };
+
+  /**
+   * Growl, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/a/aa/Heuler_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/4/43/Heuler_Gen5.png
+   *
+   * The user growls: it hunches forward a little while a soft red glow pulses
+   * round it twice and little yellow zigzag bolts pop out at its sides
+   * (0-0.75 s). Then blue stat-down bubbles drift down over the target (its
+   * Attack falls, 0.75-1.65 s).
+   */
+  private static async playGrowl(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const r = Fx.rect(launchEl);
+    const size = Math.max(r.width, r.height) * 1.5;
+    const original = launchEl.style.transform;
+    const effects: Promise<void>[] = [
+      Fx.anim(launchEl, [
+        { transform: `${original} translate(0,0)` },
+        { transform: `${original} translate(${(target.x > launch.x ? 1 : -1) * 4}px,3px)`, offset: 0.25 },
+        { transform: `${original} translate(0,0)`, offset: 0.5 },
+        { transform: `${original} translate(${(target.x > launch.x ? 1 : -1) * 4}px,3px)`, offset: 0.75 },
+        { transform: `${original} translate(0,0)` }
+      ], { duration: 750, easing: 'ease-in-out', fill: 'none' }),
+      Fx.spawn(fxEl, Fx.box(size, size, 'border-radius:50%;background:radial-gradient(circle,#FF3A2A00 25%,#FF4A2A88 50%,#FF6A3A44 62%,#FF3A2A00 72%)'), launch, [
+        { transform: 'scale(.6)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 1, offset: 0.25 },
+        { transform: 'scale(.8)', opacity: 0.4, offset: 0.5 },
+        { transform: 'scale(1.1)', opacity: 1, offset: 0.75 },
+        { transform: 'scale(1.2)', opacity: 0 }
+      ], { duration: 750, easing: 'ease-in-out' })
+    ];
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2 + 0.3;
+      const d = size * 0.38;
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.boltGlyph('#FFE040', 9), { x: launch.x + Math.cos(a) * d, y: launch.y + Math.sin(a) * d * 0.8 }, [
+          { transform: 'scale(0)', opacity: 0 },
+          { transform: 'scale(1.1)', opacity: 1, offset: 0.35 },
+          { transform: `translate(${Math.cos(a) * 10}px,${Math.sin(a) * 10}px) scale(.8)`, opacity: 0 }
+        ], { duration: 320, easing: 'ease-out', delay: (i % 4) * 90 + (i < 4 ? 0 : 360) })
+      );
+    }
+    await Promise.all(effects);
+    await FxEffects.statDownBubbles({ ...refs, launchEl: targetEl }, target);
+  }
 
   /**
    * Boomburst, after the XY animation: the user rears up while red-pink rays

@@ -17,13 +17,132 @@ export class PsychicStatusMoveAnimations {
     calmmind: (refs, launch) => PsychicStatusMoveAnimations.playCalmMind(refs, launch),
     cosmicpower: (refs, launch) => PsychicStatusMoveAnimations.playCosmicPower(refs, launch),
     healingwish: (refs, launch) => HealingWish.play(refs, launch),
+    hypnosis: (refs, launch, target) => PsychicStatusMoveAnimations.playHypnosis(refs, launch, target),
+    kinesis: (refs, launch, target, v) => PsychicStatusMoveAnimations.playKinesis(refs, launch, target, v),
     lightscreen: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.LIGHT_SCREEN),
     magiccoat: (refs, launch) => PsychicStatusMoveAnimations.playMagicCoat(refs, launch),
+    meditate: (refs, launch) => PsychicStatusMoveAnimations.playMeditate(refs, launch),
     reflect: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.REFLECT),
     rest: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playRest(refs, launch, v),
     trick: (refs, launch, target) => PsychicStatusMoveAnimations.playTrick(refs, launch, target),
     trickroom: (refs) => TrickRoom.play(refs)
   };
+
+  /**
+   * Kinesis, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/0/02/Psykraft_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/c/ce/Psykraft_Gen5.png
+   *
+   * A pink-glowing spoon appears beside the user (0-0.25 s) and wobbles while
+   * a pink ring pulses out round the user (0.25-0.8 s); its bowl bends over
+   * (0.8-1.05 s) and it fades (to 1.25 s). Then the target turns blue under
+   * stat-down bubbles (its accuracy falls, 1.25-2.15 s).
+   */
+  private static async playKinesis(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const h = Math.max(r.height * 0.55, 40);
+    const w = h * 0.32;
+    const spoon = Fx.box(w, h, 'filter:drop-shadow(0 0 5px #FF6AD8)');
+    spoon.style.transformOrigin = '50% 100%';
+    const handle = Fx.box(w * 0.2, h * 0.62, 'left:40%;bottom:0;border-radius:3px;background:linear-gradient(90deg,#A8A8B8,#F4F4FA,#9A9AAA)');
+    const bowl = Fx.box(w, h * 0.42, 'left:0;top:0;border-radius:50%;background:radial-gradient(ellipse at 40% 35%,#ffffff,#D8D8E4 45%,#8A8A9C)');
+    bowl.style.transformOrigin = '50% 100%';
+    spoon.append(handle, bowl);
+    Fx.place(spoon, { x: launch.x + v.dir * r.width * 0.5, y: launch.y - r.height * 0.1 });
+    fxEl.appendChild(spoon);
+
+    const ringW = Math.max(r.width * 1.1, 70);
+    const ring = Fx.spawn(fxEl, Fx.box(ringW, ringW * 0.9, 'border-radius:50%;border:3px solid #F07AD8;box-shadow:0 0 10px #FF8AE8,inset 0 0 10px #FF8AE8'), launch, [
+      { transform: 'scale(.5)', opacity: 0 },
+      { transform: 'scale(1)', opacity: 0.9, offset: 0.5 },
+      { transform: 'scale(1.3)', opacity: 0 }
+    ], { duration: 600, delay: 250, easing: 'ease-out' });
+    const spoonDone = Fx.anim(spoon, [
+      { transform: 'rotate(0deg) scale(0)', opacity: 0, offset: 0 },
+      { transform: 'rotate(0deg) scale(1)', opacity: 1, offset: 0.2 },
+      { transform: 'rotate(-8deg) scale(1)', opacity: 1, offset: 0.33 },
+      { transform: 'rotate(8deg) scale(1)', opacity: 1, offset: 0.46 },
+      { transform: 'rotate(-6deg) scale(1)', opacity: 1, offset: 0.58 },
+      { transform: 'rotate(0deg) scale(1)', opacity: 1, offset: 0.66 },
+      { transform: 'rotate(0deg) scale(1)', opacity: 1, offset: 0.85 },
+      { transform: 'rotate(0deg) scale(.9)', opacity: 0 }
+    ], { duration: 1250, easing: 'ease-in-out' }).then(() => spoon.remove());
+    const bend = Fx.anim(bowl, [
+      { transform: 'rotate(0deg)' },
+      { transform: `rotate(${v.dir * 70}deg)` }
+    ], { duration: 250, delay: 800, easing: 'ease-in', fill: 'forwards' });
+    await Promise.all([ring, spoonDone, bend]);
+    await FxEffects.blueStatDrop(refs, target);
+  }
+
+  /**
+   * Meditate, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/5/56/Meditation_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/c/c3/Meditation_Gen5.png
+   *
+   * The scene goes dark (0-0.28 s) and the user sinks into a dark silhouette
+   * (0.28-0.7 s), then flares up orange-gold (0.7-1.25 s); the scene clears
+   * (1.25-1.57 s) and the stat-up aura plays (its Attack rises, 1.57-2.37 s).
+   */
+  private static async playMeditate(refs: BattleStageRefs, launch: Point) {
+    const { fieldEl, launchEl } = refs;
+    const dim = await PsychicFx.dimIn(fieldEl);
+    await Fx.anim(launchEl, [
+      { filter: 'none' },
+      { filter: 'brightness(.15)', offset: 0.43 },
+      { filter: 'sepia(1) saturate(4) hue-rotate(-15deg) brightness(1.3) drop-shadow(0 0 10px #FFA62B)', offset: 0.75 },
+      { filter: 'none' }
+    ], { duration: 970, easing: 'ease-in-out', fill: 'none' });
+    await PsychicFx.dimOut(dim);
+    await FxEffects.statUpAura(refs, launch);
+  }
+
+  /**
+   * Hypnosis, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/7/77/Hypnose_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/8/8a/Hypnose_Gen5.png
+   *
+   * Yellow rings ripple out of the user one after another and float to the
+   * target, growing as they go (0-0.85 s, 0.09 s apart); round the target they
+   * turn into pink rings that close in on it while it glows pink (0.55-1.1 s).
+   * Then pink "Z"s rise from its head (0.9-2.85 s).
+   */
+  private static async playHypnosis(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const size = Math.max(r.width * 0.55, 40);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const effects: Promise<void>[] = [];
+    for (let i = 0; i < 6; i++) {
+      const ring = Fx.box(size, size, 'border-radius:50%;border:3px solid #FFD83A;box-shadow:0 0 6px #FFC020,inset 0 0 4px #FFC020');
+      effects.push(
+        Fx.spawn(fxEl, ring, launch, [
+          { transform: 'translate(0,0) scale(.2)', opacity: 0 },
+          { transform: `translate(${dx * 0.15}px,${dy * 0.15}px) scale(.45)`, opacity: 1, offset: 0.15 },
+          { transform: `translate(${dx}px,${dy}px) scale(1)`, opacity: 0.9, offset: 0.9 },
+          { transform: `translate(${dx}px,${dy}px) scale(1.1)`, opacity: 0 }
+        ], { duration: 400, easing: 'ease-in', delay: i * 90 })
+      );
+    }
+    await Fx.wait(550);
+    effects.push(Fx.glow(targetEl, 'brightness(1.05) sepia(.6) saturate(3) hue-rotate(280deg) drop-shadow(0 0 6px #F06CC8)', 600));
+    for (let i = 0; i < 3; i++) {
+      const ring = Fx.box(size * 1.8, size * 1.8, 'border-radius:50%;border:3px solid #F07CC8;box-shadow:0 0 8px #F04CA8,inset 0 0 6px #F04CA8');
+      effects.push(
+        Fx.spawn(fxEl, ring, target, [
+          { transform: 'scale(1)', opacity: 0 },
+          { transform: 'scale(.8)', opacity: 0.9, offset: 0.3 },
+          { transform: 'scale(.2)', opacity: 0 }
+        ], { duration: 360, easing: 'ease-in', delay: i * 100 })
+      );
+    }
+    await Fx.wait(350);
+    const away = target.x > launch.x ? 1 : -1;
+    effects.push(FxEffects.sleepZs(fxEl, { x: target.x, y: target.y - r.height * 0.35 }, away, ['#F08CD8', '#D79BF0']));
+    await Promise.all(effects);
+  }
 
   /**
    * Trick, after the DPPt animation: the scene dims to a dark grey (0-0.3 s);
