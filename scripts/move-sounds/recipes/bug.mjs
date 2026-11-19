@@ -136,15 +136,15 @@ export const BUG = {
     return s;
   },
 
-  /** Generic lob, 3 hits (impacts 0.52 / 1.26 / 2.00 s): each pin whistles up and stabs in. */
+  /** BugMoveAnimations.playPinMissile, 3 hits (needles fly 0.26 s each, impacts 0.26 / 0.68 / 1.10 s): each pin whistles in and stabs with a crackle of sparks. */
   pinmissile: () => {
-    const s = new MoveSfx(2.3, 0x914d);
+    const s = new MoveSfx(1.6, 0x914d);
     for (let i = 0; i < 3; i++) {
-      const at = 0.02 + i * 0.74;
-      s.pulse(at, 0.5, { freq: (u) => 1800 + 900 * Math.sin(Math.PI * u), gain: (u) => 0.16 * (1 - 0.4 * u), duty: 0.125 });
-      s.pulse(at + 0.5, 0.05, { freq: (u) => 2400 - 1200 * u, gain: env.decay(0.3, 1.5), duty: 0.25 });
-      s.thud(at + 0.5, 0.4, 0.25);
-      s.noise(at + 0.52, 0.15, { clock: () => 7000, gain: env.decay(0.12, 1.5), short: true });
+      const at = i * 0.42;
+      s.pulse(at, 0.26, { freq: (u) => 1800 + 1200 * u, gain: (u) => 0.14 * (0.6 + 0.4 * u), duty: 0.125 });
+      s.pulse(at + 0.26, 0.05, { freq: (u) => 2400 - 1200 * u, gain: env.decay(0.3, 1.5), duty: 0.25 });
+      s.thud(at + 0.26, 0.4, 0.25);
+      s.noise(at + 0.27, 0.18, { clock: () => 7000, gain: env.decay(0.12, 1.5), short: true });
     }
     return s;
   },
@@ -255,15 +255,22 @@ export const BUG = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + stat-down fleck (~0.85 s): silk shoots out in buzzy spurts. */
+  /**
+   * BugMoveAnimations.playStringShot: dark (0-0.2 s), three threads shoot out (0.2-0.5 s),
+   * seven silk rings wind round the target (0.45-0.85 s), stat drop (1.6-2.5 s).
+   * Buzzy spurts of silk, a rising run of soft swishes, then the drop.
+   */
   stringshot: () => {
-    const s = new MoveSfx(1.4, 0x5751);
-    for (let i = 0; i < 6; i++) {
-      const at = 0.02 + i * 0.12;
-      s.noise(at, 0.09, { clock: env.ramp(4000, 7000), gain: env.attackDecay(0.22, 0.2), short: true });
-      s.pulse(at, 0.08, { freq: (u) => 900 + 500 * u, gain: env.decay(0.12, 1), duty: 0.125 });
+    const s = new MoveSfx(2.6, 0x5751);
+    for (let i = 0; i < 3; i++) {
+      s.noise(0.2 + i * 0.05, 0.25, { clock: env.ramp(4000, 7000), gain: env.attackDecay(0.2, 0.2), short: true });
     }
-    s.statDown(0.85, 0.24);
+    for (let i = 0; i < 7; i++) {
+      const at = 0.45 + i * 0.055;
+      s.noise(at, 0.07, { clock: () => 6000 + i * 400, gain: env.attackDecay(0.12, 0.3), short: true });
+      s.pulse(at, 0.06, { freq: (u) => 700 + 300 * u + i * 60, gain: env.decay(0.08, 1), duty: 0.125 });
+    }
+    s.statDown(1.65, 0.24);
     return s;
   },
 
@@ -288,16 +295,15 @@ export const BUG = {
     return s;
   },
 
-  /** Generic projectile, 2 hits (impacts 0.43 / 1.0 s) + poison fleck (~1.12 s): two stingers whine in and prick. */
+  /** BugMoveAnimations.playPinMissile with the Twineedle style: two needles, hits at 0.26 / 0.68 s, sparks to ~1.1 s. Two whistling needles, each with a sharp prick. */
   twineedle: () => {
-    const s = new MoveSfx(1.6, 0x2e7d);
-    for (const at of [0.43, 1.0]) {
-      s.pulse(at - 0.36, 0.36, { freq: (u) => 1800 + 1600 * u, gain: (u) => 0.1 * (0.5 + 0.5 * u), duty: 0.125 });
-      s.noise(at - 0.3, 0.3, { clock: () => 6500, gain: env.ramp(0.03, 0.1), short: true });
+    const s = new MoveSfx(1.15, 0x2e7d);
+    for (const at of [0.26, 0.68]) {
+      s.pulse(at - 0.26, 0.26, { freq: (u) => 1800 + 1600 * u, gain: (u) => 0.1 * (0.5 + 0.5 * u), duty: 0.125 });
+      s.noise(at - 0.22, 0.22, { clock: () => 6500, gain: env.ramp(0.03, 0.1), short: true });
       s.pulse(at, 0.04, { freq: () => 3200, gain: env.decay(0.3, 1.5), duty: 0.25 });
       s.thud(at, 0.35, 0.15);
     }
-    s.poison(1.12);
     return s;
   },
 

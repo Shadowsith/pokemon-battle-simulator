@@ -4,9 +4,10 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { DrillRun } from './ground/drill-run';
+import { SandAttack } from './ground/sand-attack';
 import { ThousandMoves } from './ground/thousand-moves';
 
-/** Hand-made animations for Ground-type moves (Drill Run, Thousand Arrows and Thousand Waves live in `ground/`). */
+/** Hand-made animations for Ground-type moves (Drill Run, Sand Attack, Thousand Arrows and Thousand Waves live in `ground/`). */
 export class GroundMoveAnimations {
   /** Hand-made Ground move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -20,6 +21,7 @@ export class GroundMoveAnimations {
     landswrath: (refs, launch, target) => GroundMoveAnimations.playLandsWrath(refs, launch, target),
     precipiceblades: (refs, _launch, target) => GroundMoveAnimations.playPrecipiceBlades(refs, target),
     rototiller: (refs) => GroundMoveAnimations.playRototiller(refs),
+    sandattack: (refs, launch, target) => SandAttack.play(refs, launch, target),
     spikes: (refs, launch) => GroundMoveAnimations.playSpikes(refs, launch),
     thousandarrows: (refs, launch, target) => ThousandMoves.playArrows(refs, launch, target),
     thousandwaves: (refs, launch, target) => ThousandMoves.playWaves(refs, launch, target)

@@ -233,13 +233,13 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + accuracy drop fleck (~0.85 s): sand is kicked up and flung into the eyes. */
+  /** SandAttack.play (sand sprays 0-0.5 s, cloud 0.45-1.0 s, blue accuracy drop 1.0-1.9 s): sand is kicked up and flung into the eyes. */
   sandattack: () => {
-    const s = new MoveSfx(1.4, 0x5a7a);
+    const s = new MoveSfx(2.0, 0x5a7a);
     s.noise(0.0, 0.25, { clock: env.ramp(1500, 6000), gain: env.attackDecay(0.3, 0.2) });
-    s.noise(0.2, 0.55, { clock: (u) => 5000 + 2000 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.2) });
-    for (let i = 0; i < 8; i++) s.noise(0.25 + s.random() * 0.5, 0.02, { clock: () => 10000, gain: env.decay(0.15, 1), short: true });
-    s.statDown(0.85, 0.24);
+    s.noise(0.2, 0.75, { clock: (u) => 5000 + 2000 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.2) });
+    for (let i = 0; i < 8; i++) s.noise(0.45 + s.random() * 0.5, 0.02, { clock: () => 10000, gain: env.decay(0.15, 1), short: true });
+    s.statDown(1.0, 0.24);
     return s;
   },
 

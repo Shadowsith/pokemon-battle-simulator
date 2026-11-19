@@ -1,4 +1,5 @@
-import { BattleStageRefs, MoveAnimRegistry, Point } from '../animation.types';
+import { BattleStageRefs, MoveAnimRegistry, MoveVisual, Point } from '../animation.types';
+import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
@@ -19,14 +20,151 @@ export class BugMoveAnimations {
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
     megahorn: (refs, launch, target) => BugMoveAnimations.playMegahorn(refs, launch, target),
+    pinmissile: (refs, launch, target, v) => BugMoveAnimations.playPinMissile(refs, launch, target, v),
     powder: (refs, launch, target) => BugMoveAnimations.playPowder(refs, launch, target),
     quiverdance: (refs, launch) => QuiverDance.play(refs, launch),
     ragepowder: (refs, launch) => RagePowder.play(refs, launch),
     signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target),
     stickyweb: (refs, launch, target) => BugMoveAnimations.playStickyWeb(refs, launch, target),
+    stringshot: (refs, launch, target) => BugMoveAnimations.playStringShot(refs, launch, target),
+    twineedle: (refs, launch, target, v) => BugMoveAnimations.playPinMissile(refs, launch, target, v, BugMoveAnimations.TWINEEDLE),
     uturn: (refs, launch, target) => UTurn.play(refs, launch, target),
     xscissor: (refs, _launch, target, v) => XScissor.play(refs, target, v)
   };
+
+  /**
+   * String Shot, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/d/d7/Fadenschuss_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/7/78/Fadenschuss_Gen5.png
+   *
+   * The scene darkens (0-0.2 s) and three fine white threads shoot from the
+   * user to the target (0.2-0.5 s). Silk rings wind round the target from
+   * its feet up, one after another (0.45-0.85 s), and hold while it squirms
+   * (to 1.25 s). The silk fades (1.25-1.4 s) and the dark lifts (1.4-1.6 s),
+   * then the target turns blue under stat-down bubbles (1.6-2.5 s).
+   */
+  private static async playStringShot(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dir = target.x >= launch.x ? 1 : -1;
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+
+    const mouth: Point = { x: launch.x + dir * lr.width * 0.2, y: launch.y - lr.height * 0.1 };
+    const threads: Promise<void>[] = [];
+    for (let i = 0; i < 3; i++) {
+      const end: Point = { x: target.x, y: target.y + (i - 1) * tr.height * 0.15 };
+      const dx = end.x - mouth.x;
+      const dy = end.y - mouth.y;
+      const len = Math.hypot(dx, dy);
+      const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+      const thread = Fx.box(len, 2, 'background:linear-gradient(90deg,#ffffff00,#ffffffee 30%,#fff);box-shadow:0 0 3px #fff;transform-origin:0 50%');
+      thread.style.left = `${mouth.x}px`;
+      thread.style.top = `${mouth.y - 1}px`;
+      fxEl.appendChild(thread);
+      threads.push(
+        Fx.anim(thread, [
+          { transform: `rotate(${deg}deg) scaleX(0)`, opacity: 1 },
+          { transform: `rotate(${deg}deg) scaleX(1)`, opacity: 1, offset: 0.6 },
+          { transform: `rotate(${deg}deg) scaleX(1)`, opacity: 0 }
+        ], { duration: 450, delay: i * 50, easing: 'ease-out' }).then(() => thread.remove())
+      );
+    }
+    await Fx.wait(250);
+
+    // 0.45 s: the silk winds round the target from the feet up.
+    const rings: Promise<void>[] = [];
+    const count = 7;
+    const w = Math.max(tr.width * 0.95, 56);
+    for (let i = 0; i < count; i++) {
+      const y = target.y + tr.height * 0.4 - (i / (count - 1)) * tr.height * 0.8;
+      const ring = Fx.box(w, 10, 'border-radius:50%;border:2px solid #F4F4FF;box-shadow:0 0 3px #fff,inset 0 0 2px #fff');
+      rings.push(
+        Fx.spawn(fxEl, ring, { x: target.x, y }, [
+          { transform: 'scaleX(1.4)', opacity: 0 },
+          { transform: 'scaleX(1)', opacity: 1, offset: 0.15 },
+          { transform: 'scaleX(.95)', opacity: 1, offset: 0.85 },
+          { transform: 'scaleX(.95)', opacity: 0 }
+        ], { duration: 950 - i * 55, delay: i * 55, easing: 'ease-out' })
+      );
+    }
+    setTimeout(() => Fx.shake(targetEl, 2), 450);
+    await Promise.all([...threads, ...rings]);
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in' });
+    dim.remove();
+    await FxEffects.blueStatDrop(refs, target);
+  }
+
+  /** Pin Missile's needles: white, with yellow bursts and orange sparks. */
+  private static readonly PIN_MISSILE: NeedleStyle = { needle: 'linear-gradient(90deg,#9A9AA8,#F4F4F8 60%,#FFFFFF)', burst: ['#F8A020', '#FFE04A'], spark: '#FF9A20' };
+  /** Twineedle's needles: pink-tipped, with magenta bursts; the target turns purple on each hit. */
+  private static readonly TWINEEDLE: NeedleStyle = {
+    needle: 'linear-gradient(90deg,#B07AB8,#F4E4F4 55%,#FF7AD8)',
+    burst: ['#C030C0', '#FF7AE8'],
+    spark: '#E050D0',
+    tint: 'sepia(1) saturate(4) hue-rotate(250deg) brightness(1.05)'
+  };
+
+  /**
+   * Pin Missile, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/e/e4/Nadelrakete_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/1/10/Nadelrakete_Gen5.png
+   *
+   * One white needle per hit (`v.hits`, one every 0.42 s): it shoots straight
+   * from the user into a spot on the target (0.26 s), where a yellow spiky
+   * burst flares and orange sparks scatter (hits at 0.26 / 0.68 / 1.10 /
+   * 1.52 / 1.94 s).
+   *
+   * Twineedle uses the same timeline with `TWINEEDLE`, after
+   * - Gen 4: https://www.pokewiki.de/images/d/d8/Duonadel_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/c/c7/Duonadel_Gen5.png
+   * pink-tipped needles, a magenta burst and the target turning purple for a
+   * moment on each of its two hits (0.26 / 0.68 s).
+   */
+  private static async playPinMissile(refs: BattleStageRefs, launch: Point, target: Point, v: MoveVisual, style: NeedleStyle = BugMoveAnimations.PIN_MISSILE) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const len = Math.max(r.width * 0.45, 30);
+    const effects: Promise<void>[] = [];
+    for (let hit = 0; hit < Math.max(v.hits, 1); hit++) {
+      const end: Point = { x: target.x + (Math.random() * 2 - 1) * r.width * 0.22, y: target.y + (Math.random() * 2 - 1) * r.height * 0.22 };
+      const dx = end.x - launch.x;
+      const dy = end.y - launch.y;
+      const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+      const needle = Fx.box(len, 6, `clip-path:polygon(0 35%,72% 25%,100% 50%,72% 75%,0 65%);background:${style.needle}`);
+      const wrap = Fx.box(len, 6, 'filter:drop-shadow(0 0 3px #ffffff)');
+      wrap.appendChild(needle);
+      needle.style.left = needle.style.top = '0';
+      await Fx.spawn(fxEl, wrap, launch, [
+        { transform: `translate(0,0) rotate(${deg}deg)`, opacity: 0 },
+        { transform: `translate(${dx * 0.15}px,${dy * 0.15}px) rotate(${deg}deg)`, opacity: 1, offset: 0.15 },
+        { transform: `translate(${dx}px,${dy}px) rotate(${deg}deg)`, opacity: 1 }
+      ], { duration: 260, easing: 'linear' });
+      if (style.tint) Fx.glow(targetEl, style.tint, 260);
+      else Fx.flash(targetEl, '#FFE84A', 0.45);
+      Fx.shake(targetEl, 3);
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.spikyBurst(len * 1.1, style.burst[0], style.burst[1], '#ffffff'), end, [
+          { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+          { transform: 'scale(1) rotate(15deg)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(1.1) rotate(25deg)', opacity: 0 }
+        ], { duration: 280, easing: 'ease-out' })
+      );
+      for (let i = 0; i < 6; i++) {
+        const a = (Math.PI * 2 * i) / 6 + Math.random() * 0.5;
+        const d = len * (0.7 + Math.random() * 0.5);
+        effects.push(
+          Fx.spawn(fxEl, Fx.box(6, 6, `border-radius:50%;background:radial-gradient(circle,#FFF4C0,${style.spark} 60%);box-shadow:0 0 4px ${style.spark}`), end, [
+            { transform: 'translate(0,0) scale(1)', opacity: 1 },
+            { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d}px) scale(.5)`, opacity: 0 }
+          ], { duration: 420, easing: 'ease-out' })
+        );
+      }
+      await Fx.wait(160);
+    }
+    await Promise.all(effects);
+  }
 
   /**
    * Sticky Web, after the XY animation: a glowing white orb wrapped in a small
@@ -587,4 +725,12 @@ export class BugMoveAnimations {
     effects.push(FxEffects.smokePuff(fxEl, target, Math.max(tr.width * 0.9, 60), ['#D8D8DCcc', '#A8A8B0aa']), Fx.glow(targetEl, 'brightness(1.1) grayscale(.6)', 600));
     await Promise.all(effects);
   }
+}
+
+/** Look of Pin Missile-style needle hits: needle gradient, burst [outer, inner], spark colour, optional target tint filter. */
+interface NeedleStyle {
+  needle: string;
+  burst: [string, string];
+  spark: string;
+  tint?: string;
 }

@@ -376,13 +376,13 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee kick (impact 0.17 s) + flinch fleck (~0.6 s): a spinning kick – a whirling whoosh and a solid smack. */
+  /** FightingKickThrowMoveAnimations.playRollingKick (whirl + foot sweep 0-0.55 s, kick lands at 0.55 s, specks to ~1.0 s): a whirling whoosh, then a solid smack. */
   rollingkick: () => {
-    const s = new MoveSfx(0.9, 0x2011);
-    s.noise(0.0, 0.18, { clock: (u) => 2500 + 3000 * Math.sin(2 * Math.PI * 2.5 * u) ** 2, gain: env.swell(0.3) });
-    s.thud(0.17, 0.85, 0.6);
-    s.noise(0.17, 0.05, { clock: () => 10000, gain: env.decay(0.25, 1) });
-    s.flinch(0.6, 0.2);
+    const s = new MoveSfx(1.1, 0x2011);
+    s.noise(0.0, 0.55, { clock: (u) => 2500 + 3000 * Math.sin(2 * Math.PI * 2 * u) ** 2, gain: env.swell(0.28) });
+    s.thud(0.55, 0.85, 0.6);
+    s.noise(0.55, 0.05, { clock: () => 10000, gain: env.decay(0.25, 1) });
+    s.sparkle(0.6, 0.35, 4, { lo: 2500, hi: 4500, gain: 0.08 });
     return s;
   },
 

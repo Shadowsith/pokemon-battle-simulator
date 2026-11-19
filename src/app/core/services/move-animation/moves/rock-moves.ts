@@ -19,12 +19,53 @@ export class RockMoveAnimations {
     powergem: (refs, launch, target) => PowerGem.play(refs, launch, target),
     rockpolish: (refs, launch) => RockPolish.play(refs, launch),
     rockslide: (refs, _launch, target) => RockMoveAnimations.playRockSlide(refs, target),
+    rockthrow: (refs, _launch, target) => RockMoveAnimations.playRockThrow(refs, target),
     rockwrecker: (refs, launch, target, v) => RockWrecker.play(refs, launch, target, v),
     sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs),
     stealthrock: (refs, launch, target) => StealthRock.play(refs, launch, target),
     stoneedge: (refs, _launch, target) => StoneEdge.play(refs, target),
     wideguard: (refs, launch, _target, v) => WideGuard.play(refs, launch, v.dir)
   };
+
+  /**
+   * Rock Throw, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/c/c7/Steinwurf_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/a/a9/Steinwurf_Gen5.png
+   *
+   * A big rock appears high above the target and drops onto it (0-0.4 s;
+   * hit at 0.4 s). It breaks into small stones that bounce off to both sides
+   * and tumble down (0.4-1.05 s).
+   */
+  private static async playRockThrow(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const size = Math.max(tr.width * 0.5, 34);
+    const drop = Math.max(tr.height * 0.9, 70);
+    const hit: Point = { x: target.x, y: target.y - tr.height * 0.15 };
+    await Fx.spawn(fxEl, FxGlyphs.rockChunk(size), hit, [
+      { transform: `translateY(${-drop}px) rotate(0deg)`, opacity: 0 },
+      { transform: `translateY(${-drop}px) rotate(0deg)`, opacity: 1, offset: 0.25 },
+      { transform: 'translateY(0) rotate(40deg)', opacity: 1 }
+    ], { duration: 400, easing: 'ease-in' });
+
+    Fx.flash(targetEl, '#F2CF6B', 0.45);
+    Fx.shake(targetEl, 5);
+    const floor = Fx.footOf(targetEl, fieldEl).y - hit.y;
+    const stones: Promise<void>[] = [];
+    for (let i = 0; i < 6; i++) {
+      const side = i % 2 ? 1 : -1;
+      const x = side * (tr.width * (0.25 + Math.random() * 0.35));
+      const up = 18 + Math.random() * 22;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 8; k++) {
+        const t = k / 8;
+        const y = t < 0.35 ? -up * Math.sin((t / 0.35) * (Math.PI / 2)) : -up + ((t - 0.35) / 0.65) ** 2 * (up + floor);
+        frames.push({ transform: `translate(${x * t}px,${y}px) rotate(${side * t * 300}deg)`, opacity: k === 8 ? 0 : 1 });
+      }
+      stones.push(Fx.spawn(fxEl, FxGlyphs.rockChunk(size * (0.25 + Math.random() * 0.2)), hit, frames, { duration: 650, delay: i * 15, easing: 'linear' }));
+    }
+    await Promise.all(stones);
+  }
 
   /**
    * Diamond Storm, after the XY animation: a white glow swells at the user

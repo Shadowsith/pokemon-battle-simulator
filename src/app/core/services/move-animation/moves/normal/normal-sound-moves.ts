@@ -1,4 +1,5 @@
 import { Point, BattleStageRefs, MoveAnimRegistry } from '../../animation.types';
+import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
@@ -12,8 +13,216 @@ export class NormalSoundMoveAnimations {
     confide: (refs, launch, target) => NormalSoundMoveAnimations.playConfide(refs, launch, target),
     growl: (refs, launch, target) => NormalSoundMoveAnimations.playGrowl(refs, launch, target),
     nobleroar: (refs, launch, target) => NormalSoundMoveAnimations.playNobleRoar(refs, launch, target),
-    relicsong: (refs, launch, target) => RelicSong.play(refs, launch, target)
+    relicsong: (refs, launch, target) => RelicSong.play(refs, launch, target),
+    roar: (refs, launch, target) => NormalSoundMoveAnimations.playRoar(refs, launch, target),
+    screech: (refs, launch, target) => NormalSoundMoveAnimations.playScreech(refs, launch, target),
+    sing: (refs, launch, target) => NormalSoundMoveAnimations.playSing(refs, launch, target),
+    supersonic: (refs, _launch, target) => NormalSoundMoveAnimations.playSupersonic(refs, target)
   };
+
+  /**
+   * Roar, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/e/e7/Br%C3%BCller_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/b/b4/Br%C3%BCller_Gen5.png
+   *
+   * The user rears up and roars (0-0.25 s): three waves of orange zigzag
+   * bolts fly out of it at the target in a wide fan (0.15-0.8 s). The first
+   * reach the target at 0.45 s (hit), which is blown back a good way and
+   * slides back into place (0.45-1.2 s).
+   */
+  private static async playRoar(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dir = target.x >= launch.x ? 1 : -1;
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const base = launchEl.style.transform;
+    const effects: Promise<void>[] = [
+      Fx.anim(launchEl, [
+        { transform: `${base} translateY(0) scale(1)` },
+        { transform: `${base} translateY(-6px) scale(1.05)`, offset: 0.3 },
+        { transform: `${base} translateY(-6px) scale(1.05)`, offset: 0.7 },
+        { transform: `${base} translateY(0) scale(1)` }
+      ], { duration: 800, easing: 'ease-out', fill: 'none' })
+    ];
+    const mouth: Point = { x: launch.x + dir * lr.width * 0.25, y: launch.y - lr.height * 0.15 };
+    const bolt = Math.max(tr.width * 0.16, 12);
+    for (let wave = 0; wave < 3; wave++) {
+      for (let i = 0; i < 5; i++) {
+        // Fan out round the line to the target.
+        const spread = (i - 2) * tr.height * 0.45 + (Math.random() * 2 - 1) * 10;
+        const wrap = Fx.box(bolt, bolt * 1.6, 'filter:drop-shadow(0 0 3px #FF8A20)');
+        wrap.appendChild(FxGlyphs.boltGlyph(i % 2 ? '#F8A030' : '#FFC040', bolt));
+        effects.push(
+          Fx.spawn(fxEl, wrap, mouth, [
+            { transform: 'translate(0,0) scale(.4) rotate(0deg)', opacity: 0 },
+            { transform: `translate(${dx * 0.3}px,${dy * 0.3 + spread * 0.3}px) scale(1) rotate(${dir * 20}deg)`, opacity: 1, offset: 0.25 },
+            { transform: `translate(${dx * 1.15}px,${dy * 1.15 + spread}px) scale(1.3) rotate(${dir * 40}deg)`, opacity: 0 }
+          ], { duration: 380, delay: 150 + wave * 130 + i * 15, easing: 'linear' })
+        );
+      }
+    }
+    await Fx.wait(450);
+    // Blown back by the roar, then sliding home.
+    const tbase = targetEl.style.transform;
+    Fx.shake(targetEl, 3);
+    effects.push(
+      Fx.anim(targetEl, [
+        { transform: `${tbase} translateX(0)` },
+        { transform: `${tbase} translateX(${dir * 36}px)`, offset: 0.35 },
+        { transform: `${tbase} translateX(${dir * 36}px)`, offset: 0.55 },
+        { transform: `${tbase} translateX(0)` }
+      ], { duration: 750, easing: 'ease-out', fill: 'none' })
+    );
+    await Promise.all(effects);
+  }
+
+  /**
+   * Screech, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/6/65/Kreideschrei_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/c/c8/Kreideschrei_Gen5.png
+   *
+   * The user shrieks and trembles: a jagged yellow ring flares round it
+   * three times with little yellow zigzag bolts shooting out (0-0.75 s).
+   * Then the target's Defense falls sharply: it turns blue under stat-down
+   * bubbles (0.75-1.65 s).
+   */
+  private static async playScreech(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const r = Fx.rect(launchEl);
+    const size = Math.max(Math.max(r.width, r.height) * 1.2, 70);
+    const base = launchEl.style.transform;
+    const shiver: Keyframe[] = [];
+    for (let k = 0; k <= 16; k++) shiver.push({ transform: `${base} translateX(${k === 0 || k === 16 ? 0 : k % 2 ? 2 : -2}px)` });
+    const effects: Promise<void>[] = [Fx.anim(launchEl, shiver, { duration: 750, easing: 'linear', fill: 'none' })];
+    for (let i = 0; i < 3; i++) {
+      effects.push(
+        Fx.spawn(fxEl, NormalSoundMoveAnimations.jaggedRing(size), launch, [
+          { transform: 'scale(.5) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(.9) rotate(8deg)', opacity: 1, offset: 0.35 },
+          { transform: 'scale(1.2) rotate(16deg)', opacity: 0 }
+        ], { duration: 320, delay: i * 210, easing: 'ease-out' })
+      );
+      for (let j = 0; j < 6; j++) {
+        const a = (j / 6) * Math.PI * 2 + i * 0.5;
+        const d = size * 0.45;
+        effects.push(
+          Fx.spawn(fxEl, FxGlyphs.boltGlyph('#FFE040', 9), { x: launch.x + Math.cos(a) * d, y: launch.y + Math.sin(a) * d * 0.8 }, [
+            { transform: 'translate(0,0) scale(.4)', opacity: 0 },
+            { transform: `translate(${Math.cos(a) * 8}px,${Math.sin(a) * 8}px) scale(1.1)`, opacity: 1, offset: 0.4 },
+            { transform: `translate(${Math.cos(a) * 20}px,${Math.sin(a) * 20}px) scale(.7)`, opacity: 0 }
+          ], { duration: 300, delay: i * 210 + 40, easing: 'ease-out' })
+        );
+      }
+    }
+    await Promise.all(effects);
+    Fx.shake(targetEl, 3);
+    await FxEffects.blueStatDrop(refs, target);
+  }
+
+  /**
+   * Sing, after the Gen 4 / Gen 5 animation:
+   * - Gen 4 (DP): https://www.pokewiki.de/images/9/92/Gesang_DP.png
+   * - Gen 4 (PtHGSS): https://www.pokewiki.de/images/f/f3/Gesang_PtHGSS.png
+   * - Gen 5: https://www.pokewiki.de/images/c/cb/Gesang_Gen5.png
+   *
+   * The scene pales (0-0.25 s) and a soft white ring pulses round the user
+   * (0.25-0.7 s). Eight black, orange and red notes leave the user one after
+   * another and float to the target on wavy paths, fading on it
+   * (0.25-1.7 s), then the scene's colours come back (1.7-1.95 s).
+   */
+  private static async playSing(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dir = target.x >= launch.x ? 1 : -1;
+    const pale = Fx.backdrop(fieldEl, 'background:radial-gradient(ellipse at 50% 60%,#FFFDF6,#E8E4D8)');
+    await Fx.anim(pale, [{ opacity: 0 }, { opacity: 0.8 }], { duration: 250, easing: 'ease-out' });
+
+    const ring = Math.max(lr.width * 0.9, 60);
+    const effects: Promise<unknown>[] = [
+      Fx.spawn(fxEl, Fx.box(ring, ring, 'border-radius:50%;border:3px solid #ffffffdd;box-shadow:0 0 8px #fff,inset 0 0 8px #fff'), launch, [
+        { transform: 'scale(.4)', opacity: 0 },
+        { transform: 'scale(.9)', opacity: 1, offset: 0.4 },
+        { transform: 'scale(1.25)', opacity: 0 }
+      ], { duration: 450, easing: 'ease-out' })
+    ];
+    const start: Point = { x: launch.x + dir * lr.width * 0.2, y: launch.y - lr.height * 0.15 };
+    const end: Point = { x: target.x, y: target.y - tr.height * 0.15 };
+    const colors = ['#2A2A2A', '#F08A30', '#E04A3A', '#2A2A2A', '#F0A040', '#2A2A2A', '#E85A30', '#2A2A2A'];
+    colors.forEach((color, i) => {
+      const amp = 12 + (i % 3) * 6;
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 10; k++) {
+        const t = k / 10;
+        const x = (end.x - start.x) * t;
+        const y = (end.y - start.y) * t + Math.sin(t * Math.PI * 3 + i) * amp;
+        const opacity = t < 0.15 ? t / 0.15 : t > 0.85 ? (1 - t) / 0.15 : 1;
+        frames.push({ transform: `translate(${x}px,${y}px) scale(${0.7 + t * 0.5})`, opacity });
+      }
+      const note = FxGlyphs.musicNote(16 + (i % 2) * 4, color, i % 2 ? '♫' : '♪');
+      effects.push(Fx.spawn(fxEl, note, start, frames, { duration: 750, delay: i * 100, easing: 'linear' }));
+    });
+    await Promise.all(effects);
+    await Fx.anim(pale, [{ opacity: 0.8 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' });
+    pale.remove();
+  }
+
+  /**
+   * Supersonic, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/3/3e/Superschall_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/2/21/Superschall_Gen5.png
+   *
+   * The scene darkens (0-0.2 s) and three glowing yellow rings ripple out of
+   * the target one after another (0.2-0.95 s) while it trembles. The dark
+   * lifts (0.95-1.15 s), then little birds circle the confused target's head
+   * (1.15-2.55 s).
+   */
+  private static async playSupersonic(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+    const size = Math.max(r.width, r.height) * 1.1;
+    const rings: Promise<unknown>[] = [];
+    for (let i = 0; i < 3; i++) {
+      const ring = Fx.box(size, size, 'border-radius:50%;border:5px solid #F8E040;box-shadow:0 0 10px #F8E040,inset 0 0 10px #F8E04088');
+      rings.push(
+        Fx.spawn(fxEl, ring, target, [
+          { transform: 'scale(.15)', opacity: 0 },
+          { transform: 'scale(.35)', opacity: 1, offset: 0.25 },
+          { transform: 'scale(1)', opacity: 0 }
+        ], { duration: 450, delay: i * 150, easing: 'ease-out' })
+      );
+    }
+    const base = targetEl.style.transform;
+    rings.push(Fx.anim(targetEl, [
+      { transform: `${base} translateX(0)` },
+      { transform: `${base} translateX(-2px)`, offset: 0.25 },
+      { transform: `${base} translateX(2px)`, offset: 0.5 },
+      { transform: `${base} translateX(-2px)`, offset: 0.75 },
+      { transform: `${base} translateX(0)` }
+    ], { duration: 750, easing: 'linear', fill: 'none' }));
+    await Promise.all(rings);
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in' });
+    dim.remove();
+    await FxEffects.dizzyBirds(fxEl, { x: target.x, y: target.y - r.height * 0.45 }, Math.max(r.width * 0.35, 24), Math.max(r.height * 0.12, 10), 1400);
+  }
+
+  /** A jagged yellow ring (a star-edged outline) `size` px across. */
+  private static jaggedRing(size: number): HTMLElement {
+    const pts: string[] = [];
+    const spikes = 16;
+    for (let i = 0; i < spikes * 2; i++) {
+      const a = (Math.PI * 2 * i) / (spikes * 2);
+      const rad = i % 2 ? 38 : 47;
+      pts.push(`${(50 + Math.cos(a) * rad).toFixed(1)},${(50 + Math.sin(a) * rad).toFixed(1)}`);
+    }
+    const el = Fx.box(size, size, 'filter:drop-shadow(0 0 4px #FFD020)');
+    el.innerHTML = `<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block"><polygon points="${pts.join(' ')}" fill="none" stroke="#FFE84A" stroke-width="3"/></svg>`;
+    return el;
+  }
 
   /**
    * Growl, after the Gen 4 / Gen 5 animation:

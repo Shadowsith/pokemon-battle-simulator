@@ -127,13 +127,13 @@ export const POISON = {
     return s;
   },
 
-  /** Generic target aura (0-0.8 s) + poison fleck (≈0.6 s): a hissing cloud of toxic gas. */
+  /** PoisonGas.play (gas streams over 0-0.6 s, cloud wraps the target 0.6-1.2 s, bubbles rise 1.0-1.5 s): a hissing jet of toxic gas, a muffled poof and a bubbling fizz. */
   poisongas: () => {
-    const s = new MoveSfx(1.15, 0xf9a5);
-    s.noise(0.0, 0.8, { clock: (u) => 1200 + 800 * Math.sin(Math.PI * u), gain: env.swell(0.32) });
-    s.noise(0.05, 0.6, { clock: () => 12000, gain: env.swell(0.1) });
-    s.bubbles(0.1, 0.5, 5, { lo: 150, hi: 300, gain: 0.15 });
-    s.poison(0.6);
+    const s = new MoveSfx(1.65, 0xf9a5);
+    s.noise(0.0, 0.6, { clock: (u) => 1200 + 1200 * u, gain: env.swell(0.3) });
+    s.noise(0.05, 0.55, { clock: () => 12000, gain: env.swell(0.1) });
+    s.noise(0.6, 0.6, { clock: (u) => 1800 - 1000 * u, gain: env.attackDecay(0.28, 0.1) });
+    s.bubbles(1.0, 0.5, 5, { lo: 150, hi: 300, gain: 0.15 });
     return s;
   },
 
@@ -150,22 +150,23 @@ export const POISON = {
     return s;
   },
 
-  /** Generic powder (stream 0.76 s) + poison fleck at 0.76 s: a fizzing purple dust. */
+  /** PoisonPowder.play (powder appears 0-0.25 s, sifts down 0.25-0.85 s, target purple 0.45-1.1 s, specks rise to ~1.35 s): a fizzing purple dust and a sickly wobble. */
   poisonpowder: () => {
-    const s = new MoveSfx(1.3, 0xf4d0);
-    s.noise(0.0, 0.8, { clock: (u) => 7000 - 2000 * u, gain: env.swell(0.25) });
-    s.sparkle(0.05, 0.7, 7, { lo: 1500, hi: 3000, gain: 0.12 });
-    s.poison(0.76, 0.3);
+    const s = new MoveSfx(1.55, 0xf4d0);
+    s.noise(0.0, 0.9, { clock: (u) => 7000 - 2500 * u, gain: env.swell(0.24) });
+    s.sparkle(0.05, 1.2, 9, { lo: 1500, hi: 3000, gain: 0.12 });
+    s.poison(0.5, 0.25);
     return s;
   },
 
-  /** Generic projectile (0.43 s impact) + poison fleck: a tiny barb whistles in and pricks. */
+  /** PoisonMoveAnimations.playPoisonSting (barb flies 0-0.35 s, stings at 0.35 s, bubbles float up 0.35-1.1 s): a tiny barb whistles in, pricks and the poison bubbles. */
   poisonsting: () => {
-    const s = new MoveSfx(1.15, 0xf457);
-    s.pulse(0.02, 0.4, { freq: (u) => 1500 + 1500 * u, gain: (u) => 0.1 * (0.5 + 0.5 * u), duty: 0.125 });
-    s.pulse(0.43, 0.04, { freq: () => 2800, gain: env.decay(0.3, 1.5), duty: 0.25 });
-    s.thud(0.43, 0.35, 0.15);
-    s.poison(0.58);
+    const s = new MoveSfx(1.25, 0xf457);
+    s.pulse(0.02, 0.33, { freq: (u) => 1500 + 1500 * u, gain: (u) => 0.1 * (0.5 + 0.5 * u), duty: 0.125 });
+    s.pulse(0.35, 0.04, { freq: () => 2800, gain: env.decay(0.3, 1.5), duty: 0.25 });
+    s.thud(0.35, 0.35, 0.15);
+    s.poison(0.4);
+    s.bubbles(0.45, 0.6, 5, { lo: 250, hi: 500, gain: 0.12 });
     return s;
   },
 
@@ -179,12 +180,13 @@ export const POISON = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + poison fleck (0.55 s): a gloopy glob of sludge. */
+  /** Custom (glob lobbed 0-0.45 s, splat 0.45 s, target magenta + bubbles 0.5-1.35 s): a gloopy wobble, a wet splat, bubbling. */
   sludge: () => {
-    const s = new MoveSfx(1.05, 0x51d6);
-    s.pulse(0.0, 0.43, { freq: (u) => (250 + 150 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 12 * u)), gain: env.ramp(0.1, 0.22), duty: 0.25 });
-    s.splash(0.43, 0.45);
-    s.poison(0.55);
+    const s = new MoveSfx(1.5, 0x51d6);
+    s.pulse(0.0, 0.45, { freq: (u) => (250 + 150 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 12 * u)), gain: env.ramp(0.1, 0.22), duty: 0.25 });
+    s.splash(0.45, 0.45);
+    s.thud(0.45, 0.4, 0.4);
+    s.bubbles(0.5, 0.85, 10, { lo: 200, hi: 450, gain: 0.18 });
     return s;
   },
 
@@ -210,12 +212,12 @@ export const POISON = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + poison fleck (0.55 s): a hissing puff of exhaust gas. */
+  /** Custom (smog cloud billows over the target 0-1.1 s, shudder 0.4 s, target darkened 0.9-1.45 s): a churning hiss of exhaust, then a low choke. */
   smog: () => {
-    const s = new MoveSfx(1.05, 0x5309);
-    s.noise(0.0, 0.45, { clock: env.ramp(500, 1200), gain: env.swell(0.35) });
-    s.noise(0.43, 0.25, { clock: env.ramp(2000, 600), gain: env.attackDecay(0.35, 0.1) });
-    s.poison(0.55);
+    const s = new MoveSfx(1.6, 0x5309);
+    s.noise(0.0, 1.1, { clock: (u) => 700 + 300 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.32) });
+    s.noise(0.4, 0.2, { clock: env.ramp(1800, 600), gain: env.attackDecay(0.3, 0.1) });
+    s.pulse(0.9, 0.5, { freq: env.ramp(180, 110), gain: env.decay(0.14, 1), duty: 0.25 });
     return s;
   },
 

@@ -4,9 +4,13 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { Judgment } from './judgment';
+import { PayDay } from './pay-day';
+import { SonicBoom } from './sonic-boom';
+import { SpikeCannon } from './spike-cannon';
+import { Swift } from './swift';
 import { TechnoBlast } from './techno-blast';
 
-/** Hand-made animations for Normal-type ranged moves (orbs, beams, blasts, gazes; Judgment lives in `judgment.ts`, Techno Blast in `techno-blast.ts`). */
+/** Hand-made animations for Normal-type ranged moves (orbs, beams, blasts, gazes; Judgment lives in `judgment.ts`, Pay Day in `pay-day.ts`, Sonic Boom in `sonic-boom.ts`, Spike Cannon in `spike-cannon.ts`, Swift in `swift.ts`, Techno Blast in `techno-blast.ts`). */
 export class NormalRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -17,11 +21,15 @@ export class NormalRangedMoveAnimations {
     judgment: (refs, _launch, target) => Judgment.play(refs, target),
     hypervoice: (refs, launch, target) => NormalRangedMoveAnimations.playHyperVoice(refs, launch, target),
     hyperbeam: (refs, launch, target) => NormalRangedMoveAnimations.playHyperBeam(refs, launch, target),
+    payday: (refs, launch, target) => PayDay.play(refs, launch, target),
     technoblast: (refs, launch, target, v) => TechnoBlast.play(refs, launch, target, v.dir),
     triattack: (refs, launch, target) => NormalRangedMoveAnimations.playTriAttack(refs, launch, target),
     razorwind: (refs, _launch, target) => NormalRangedMoveAnimations.playRazorBlades(refs, target),
     secretpower: (refs) => NormalRangedMoveAnimations.playSecretPower(refs),
     selfdestruct: (refs, launch, target, v) => NormalRangedMoveAnimations.playSelfDestruct(refs, launch, target, v),
+    sonicboom: (refs, launch, target) => SonicBoom.play(refs, launch, target),
+    spikecannon: (refs, launch, target, v) => SpikeCannon.play(refs, launch, target, v),
+    swift: (refs, launch, target) => Swift.play(refs, launch, target),
     uproar: (refs, launch) => NormalRangedMoveAnimations.playUproar(refs, launch)
   };
 

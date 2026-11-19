@@ -24,9 +24,62 @@ export class PsychicStatusMoveAnimations {
     meditate: (refs, launch) => PsychicStatusMoveAnimations.playMeditate(refs, launch),
     reflect: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.REFLECT),
     rest: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playRest(refs, launch, v),
+    teleport: (refs) => PsychicStatusMoveAnimations.playTeleport(refs),
     trick: (refs, launch, target) => PsychicStatusMoveAnimations.playTrick(refs, launch, target),
     trickroom: (refs) => TrickRoom.play(refs)
   };
+
+  /**
+   * Teleport, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/a/ae/Teleport_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/b/ba/Teleport_Gen5.png
+   *
+   * The scene darkens (0-0.25 s) and the user narrows into a glowing yellow
+   * streak (0.25-0.5 s) while white sparkles pop round it (0.4-0.75 s). The
+   * streak shoots up out of view (0.55-0.8 s). In a trainer battle there is
+   * nowhere to flee, so after a beat the user drops back in (1.1-1.4 s) and
+   * the dark lifts (1.4-1.65 s).
+   */
+  private static async playTeleport(refs: BattleStageRefs) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const f = Fx.rect(fieldEl);
+    const at: Point = { x: r.left - f.left + r.width / 2, y: r.top - f.top + r.height / 2 };
+    const base = launchEl.style.transform;
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 250, easing: 'ease-out' });
+
+    const streak = 'sepia(1) saturate(5) hue-rotate(5deg) brightness(2.2) drop-shadow(0 0 6px #FFE84A)';
+    const away = Fx.anim(launchEl, [
+      { transform: `${base} translateY(0) scale(1,1)`, filter: 'none', opacity: 1 },
+      { transform: `${base} translateY(0) scale(.08,1.25)`, filter: streak, opacity: 1, offset: 0.45 },
+      { transform: `${base} translateY(0) scale(.08,1.25)`, filter: streak, opacity: 1, offset: 0.55 },
+      { transform: `${base} translateY(-320px) scale(.08,1.6)`, filter: streak, opacity: 0 }
+    ], { duration: 550, easing: 'ease-in', fill: 'none' });
+    const sparkles: Promise<unknown>[] = [];
+    for (let i = 0; i < 4; i++) {
+      const side = i % 2 ? 1 : -1;
+      const p: Point = { x: at.x + side * r.width * (0.25 + (i >> 1) * 0.15), y: at.y + ((i >> 1) ? -1 : 1) * r.height * 0.15 };
+      sparkles.push(
+        Fx.spawn(fxEl, FxGlyphs.sparkStar(16, '#ffffff'), p, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1.1) rotate(45deg)', opacity: 1, offset: 0.4 },
+          { transform: 'scale(0) rotate(90deg)', opacity: 0 }
+        ], { duration: 350, delay: 150 + i * 30, easing: 'ease-in-out' })
+      );
+    }
+    // Hidden once the streak animation ends (the animation overrides it until then).
+    launchEl.style.opacity = '0';
+    await Promise.all([away, ...sparkles]);
+    await Fx.wait(300);
+    launchEl.style.opacity = '';
+    await Fx.anim(launchEl, [
+      { transform: `${base} translateY(-46px) scale(.6)`, filter: 'none', opacity: 0 },
+      { transform: `${base} translateY(0) scale(1)`, filter: 'none', opacity: 1 }
+    ], { duration: 300, easing: 'ease-out', fill: 'none' });
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 250, easing: 'ease-in' });
+    dim.remove();
+  }
 
   /**
    * Kinesis, after the Gen 4 / Gen 5 animation:

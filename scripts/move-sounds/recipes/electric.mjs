@@ -323,14 +323,15 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + paralysis fleck (~0.55 s): a small buzzing jolt flies over and zaps. */
+  /** Custom (dark 0-0.2 s, a thin bolt flickers down three times 0.2-0.5 s, hit 0.25 s, sparks crackle 0.5-0.9 s, dark lifts 0.9-1.1 s): three sharp zaps, then a fizzing crackle. */
   thundershock: () => {
-    const s = new MoveSfx(0.95, 0x75c0);
-    s.noise(0.0, 0.43, { clock: () => 5500, gain: (u) => 0.16 * (0.6 + 0.4 * Math.sin(2 * Math.PI * 12 * u)), short: true });
-    s.pulse(0.0, 0.43, { freq: (u) => 900 + 400 * u, gain: env.ramp(0.05, 0.12), duty: 0.125 });
-    s.noise(0.43, 0.14, { clock: (u) => 18000 - 10000 * u, gain: env.attackDecay(0.5, 0.03) });
-    s.pulse(0.43, 0.16, { freq: (u) => 1800 - 1200 * u, gain: env.decay(0.3, 2), duty: 0.25 });
-    s.paralyze(0.6, 0.22);
+    const s = new MoveSfx(1.15, 0x75c0);
+    for (let i = 0; i < 3; i++) {
+      const at = 0.2 + i * 0.1;
+      s.noise(at, 0.1, { clock: (u) => 18000 - 10000 * u, gain: env.attackDecay(i ? 0.3 : 0.45, 0.03) });
+      s.pulse(at, 0.1, { freq: (u) => 1800 - 1200 * u, gain: env.decay(0.22, 2), duty: 0.25 });
+    }
+    s.noise(0.5, 0.4, { clock: () => 5500, gain: (u) => 0.14 * (1 - u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 16 * u)), short: true });
     return s;
   },
 

@@ -7,7 +7,11 @@ import { Guillotine } from './guillotine';
 import { HeadCharge } from './head-charge';
 import { HornDrill } from './horn-drill';
 import { LastResort } from './last-resort';
+import { QuickAttack } from './quick-attack';
+import { Rage } from './rage';
 import { RockClimb } from './rock-climb';
+import { Scratch } from './scratch';
+import { Struggle } from './struggle';
 
 /** Crush Claw's marks: black with a red glow. */
 const CRUSH_CLAW: ClawStyle = { glow: ['#FF2A2A', '#E01818'] };
@@ -27,7 +31,7 @@ interface BladeStyle {
 const SLASH: BladeStyle = { blade: '#fff', glow: '#FFF3A0', width: 7, sparks: 16, reach: 1, sink: 10, sparkMs: 520 };
 const CUT: BladeStyle = { blade: '#FFF0A0', glow: '#F8C030', width: 5, sparks: 22, reach: 1.5, sink: 30, sparkMs: 950 };
 
-/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Guillotine, Head Charge, Horn Drill, Last Resort and Rock Climb live in their own files). */
+/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Guillotine, Head Charge, Horn Drill, Last Resort, Quick Attack, Rage, Rock Climb, Scratch and Struggle live in their own files). */
 export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -46,10 +50,14 @@ export class NormalStrikeMoveAnimations {
     horndrill: (refs, launch, target) => HornDrill.play(refs, launch, target),
     hyperfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playHyperFang(refs, target, v),
     lastresort: (refs, _launch, target, v) => LastResort.play(refs, target, v),
+    quickattack: (refs, _launch, target, v) => QuickAttack.play(refs, target, v),
+    rage: (refs, launch, target, v) => Rage.play(refs, launch, target, v),
     rockclimb: (refs, launch, target, v) => RockClimb.play(refs, launch, target, v),
+    scratch: (refs, _launch, target) => Scratch.play(refs, target),
     skullbash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSkullBash(refs, target, v),
     slash: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v),
     smellingsalts: (refs, _launch, target) => NormalStrikeMoveAnimations.playSmellingSalts(refs, target),
+    struggle: (refs, _launch, target, v) => Struggle.play(refs, target, v),
     superfang: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSuperFang(refs, target, v)
   };
 

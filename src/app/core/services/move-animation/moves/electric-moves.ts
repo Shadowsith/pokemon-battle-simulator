@@ -22,6 +22,7 @@ export class ElectricMoveAnimations {
     discharge: (refs, launch, target) => ElectricMoveAnimations.playDischarge(refs, launch, target),
     fusionbolt: (refs, launch, target) => FusionBolt.play(refs, launch, target),
     thunder: (refs, _launch, target) => ElectricMoveAnimations.playThunder(refs, target),
+    thundershock: (refs, _launch, target) => ElectricMoveAnimations.playThunderShock(refs, target),
     thunderbolt: (refs, _launch, target) => ElectricMoveAnimations.playThunderbolt(refs, target),
     thunderwave: (refs, _launch, target) => ElectricMoveAnimations.playThunderWave(refs, target),
     volttackle: (refs, launch, target) => ElectricMoveAnimations.playVoltTackle(refs, launch, target),
@@ -31,6 +32,43 @@ export class ElectricMoveAnimations {
     thunderpunch: (refs, _launch, target) =>
       FxEffects.playElementalPunch(refs, target, 'yellow', '#FFE04A', () => FxGlyphs.sparkBolt())
   };
+
+  /**
+   * Thunder Shock, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/8/8d/Donnerschock_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/c/c3/Donnerschock_Gen5.png
+   *
+   * The scene darkens (0-0.2 s) and a thin yellow-green bolt flickers down onto
+   * the target from above, redrawn three times (0.2-0.5 s; hit at 0.25 s).
+   * Small yellow sparks then crackle round the target (0.5-0.9 s) and the
+   * dark lifts (0.9-1.1 s).
+   */
+  private static async playThunderShock(refs: BattleStageRefs, target: Point) {
+    const { fieldEl, fxEl, targetEl } = refs;
+    const W = fieldEl.clientWidth;
+    const H = fieldEl.clientHeight;
+    const r = Fx.rect(targetEl);
+    const dim = Fx.backdrop(fieldEl, DIM_BACKDROP);
+    await Fx.anim(dim, [{ opacity: 0 }, { opacity: 1 }], { duration: 200, easing: 'ease-out' });
+
+    const top: Point = { x: target.x, y: target.y - Math.max(r.height * 1.1, 80) };
+    const foot: Point = { x: target.x, y: target.y + r.height * 0.4 };
+    for (let i = 0; i < 3; i++) {
+      const bolt = FxGlyphs.lightning(W, H, { x: top.x + (Math.random() * 2 - 1) * 8, y: top.y }, foot, 9, '#F4FF9A', '#C8E830', 3);
+      fxEl.appendChild(bolt);
+      if (i === 0) setTimeout(() => {
+        Fx.flash(targetEl, '#E4F44A', 0.6);
+        Fx.shake(targetEl, 3);
+      }, 50);
+      await Fx.anim(bolt, [{ opacity: 0 }, { opacity: 1, offset: 0.2 }, { opacity: 0.6, offset: 0.7 }, { opacity: 0 }], { duration: 100, easing: 'linear' });
+      bolt.remove();
+    }
+    const stop = FxEffects.crackleOver(fxEl, target, Math.max(r.width, r.height) * 0.8, '#F4FF6A');
+    await Fx.wait(400);
+    stop();
+    await Fx.anim(dim, [{ opacity: 1 }, { opacity: 0 }], { duration: 200, easing: 'ease-in' });
+    dim.remove();
+  }
 
   /**
    * Thunder: the scene goes dark under a band of storm clouds along the top,

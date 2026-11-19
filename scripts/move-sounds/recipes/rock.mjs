@@ -98,12 +98,13 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a rock is hurled and smacks into the target. */
+  /** RockMoveAnimations.playRockThrow (rock drops 0-0.4 s, hit at 0.4 s, stones bounce and land ~0.9-1.05 s): a falling rock smacks the target and breaks into clattering stones. */
   rockthrow: () => {
-    const s = new MoveSfx(0.85, 0x7a20);
-    s.whoosh(0.0, 0.43, { from: 700, to: 2500, gain: 0.22 });
-    s.thud(0.43, 0.8, 0.9);
-    for (let i = 0; i < 3; i++) s.noise(0.48 + i * 0.06, 0.04, { clock: () => 1500 + s.random() * 1500, gain: env.decay(0.22 - i * 0.05, 1) });
+    const s = new MoveSfx(1.2, 0x7a20);
+    s.whoosh(0.1, 0.3, { from: 2500, to: 700, gain: 0.2 });
+    s.thud(0.4, 0.8, 0.9);
+    for (let i = 0; i < 3; i++) s.noise(0.44 + i * 0.05, 0.04, { clock: () => 1500 + s.random() * 1500, gain: env.decay(0.2 - i * 0.05, 1) });
+    for (let i = 0; i < 5; i++) s.noise(0.9 + i * 0.035, 0.03, { clock: () => 1200 + s.random() * 1200, gain: env.decay(0.12, 1), short: true });
     return s;
   },
 

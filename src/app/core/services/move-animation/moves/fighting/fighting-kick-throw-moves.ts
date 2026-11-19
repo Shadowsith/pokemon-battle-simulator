@@ -13,10 +13,74 @@ export class FightingKickThrowMoveAnimations {
     highjumpkick: (refs, _launch, target, v) => FightingKickThrowMoveAnimations.playHighJumpKick(refs, target, v),
     jumpkick: (refs, launch, target) => FightingKickThrowMoveAnimations.playJumpKick(refs, launch, target),
     lowkick: (refs, _launch, target) => FightingKickThrowMoveAnimations.playLowKick(refs, target),
+    rollingkick: (refs, _launch, target, v) => FightingKickThrowMoveAnimations.playRollingKick(refs, target, v),
     seismictoss: (refs, _launch, target) => FightingKickThrowMoveAnimations.playSeismicToss(refs, target),
     submission: (refs, _launch, target) => FightingKickThrowMoveAnimations.playSubmission(refs, target),
     vitalthrow: (refs, _launch, target) => FightingKickThrowMoveAnimations.playVitalThrow(refs, target)
   };
+
+  /**
+   * Rolling Kick, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/2/2f/Fegekick_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/5/5b/Fegekick_Gen5.png
+   *
+   * A pale blue whirl spins round the target while a black foot sweeps
+   * round it once from above (0-0.55 s). The kick lands at 0.55 s (hit): a yellow spiky
+   * burst with yellow sparks, then orange specks drift away (to ~1.0 s).
+   */
+  private static async playRollingKick(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const rx = Math.max(tr.width * 0.75, 50);
+    const ry = rx * 0.4;
+    const centre: Point = { x: target.x, y: target.y + tr.height * 0.1 };
+    // The whirl: a flattened ring, part bright and part clear, spinning round.
+    const flat = Fx.box(rx * 2, rx * 2, 'transform:scaleY(.4)');
+    const ring = Fx.box(rx * 2, rx * 2, 'left:0;top:0;border-radius:50%;border:7px solid;border-color:#C8F0FF #8FD0F0 #8FD0F000 #8FD0F000;box-shadow:0 0 8px #8FD8FF');
+    flat.appendChild(ring);
+    Fx.place(flat, centre);
+    fxEl.appendChild(flat);
+    const whirl = Fx.anim(ring, [
+      { transform: 'rotate(0deg)', opacity: 0 },
+      { transform: `rotate(${-v.dir * 200}deg)`, opacity: 1, offset: 0.3 },
+      { transform: `rotate(${-v.dir * 560}deg)`, opacity: 1, offset: 0.75 },
+      { transform: `rotate(${-v.dir * 720}deg)`, opacity: 0 }
+    ], { duration: 700, easing: 'linear' }).then(() => flat.remove());
+    // The foot sweeps once round the target, starting above it.
+    const foot = Math.max(tr.width * 0.3, 22);
+    const frames: Keyframe[] = [];
+    for (let k = 0; k <= 12; k++) {
+      const t = k / 12;
+      const a = -Math.PI / 2 - v.dir * t * Math.PI * 2;
+      frames.push({ transform: `translate(${Math.cos(a) * rx * 0.8}px,${Math.sin(a) * ry - tr.height * 0.15}px)`, opacity: k === 0 ? 0 : 1 });
+    }
+    const sweep = Fx.spawn(fxEl, FxGlyphs.footGlyph(foot), centre, frames, { duration: 550, easing: 'ease-in' });
+    await sweep;
+
+    Fx.flash(targetEl, '#FFE84A', 0.55);
+    Fx.shake(targetEl, 5);
+    const size = Math.max(tr.width * 0.5, 36);
+    const effects: Promise<void>[] = [
+      whirl,
+      Fx.spawn(fxEl, FxGlyphs.spikyBurst(size, '#F8C820', '#FFEA5A', '#ffffff'), target, [
+        { transform: 'scale(.3) rotate(0deg)', opacity: 1 },
+        { transform: 'scale(1) rotate(15deg)', opacity: 1, offset: 0.35 },
+        { transform: 'scale(1.1) rotate(25deg)', opacity: 0 }
+      ], { duration: 300, easing: 'ease-out' })
+    ];
+    for (let i = 0; i < 8; i++) {
+      const a = (Math.PI * 2 * i) / 8 + Math.random() * 0.4;
+      const d = size * (0.7 + Math.random() * 0.6);
+      const orange = i % 2 === 1;
+      effects.push(
+        Fx.spawn(fxEl, orange ? Fx.box(5, 5, 'border-radius:50%;background:#FF9A30;box-shadow:0 0 4px #FF7A10') : FxGlyphs.sparkStar(10, '#FFE04A'), target, [
+          { transform: 'translate(0,0) scale(.4)', opacity: 1 },
+          { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d + (orange ? 10 : 0)}px) scale(${orange ? 1 : 0.6})`, opacity: 0 }
+        ], { duration: orange ? 450 : 300, delay: orange ? 80 : 0, easing: 'ease-out' })
+      );
+    }
+    await Promise.all(effects);
+  }
 
   /**
    * Double Kick, after the Gen 4 / Gen 5 animation:

@@ -14,9 +14,69 @@ export class NormalFoeStatusMoveAnimations {
     leer: (refs, launch, target, v) => NormalFoeStatusMoveAnimations.playLeer(refs, launch, target, v),
     lovelykiss: (refs, _launch, target, v) => NormalFoeStatusMoveAnimations.playLovelyKiss(refs, target, v),
     mimic: (refs, launch, target) => NormalFoeStatusMoveAnimations.playMimic(refs, launch, target),
+    smokescreen: (refs, launch, target) => NormalFoeStatusMoveAnimations.playSmokescreen(refs, launch, target),
+    tailwhip: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playTailWhip(refs, target),
     whirlwind: (refs, _launch, target, v) => NormalFoeStatusMoveAnimations.playWhirlwind(refs, target, v),
     yawn: (refs, launch, target) => NormalFoeStatusMoveAnimations.playYawn(refs, launch, target)
   };
+
+  /**
+   * Tail Whip, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/1/18/Rutenschlag_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/1/16/Rutenschlag_Gen5.png
+   *
+   * The user wags its tail: it sways side to side with little hops, four times
+   * (0-0.8 s). Then the target turns blue under stat-down bubbles (0.85-1.75 s).
+   */
+  private static async playTailWhip(refs: BattleStageRefs, target: Point) {
+    const { launchEl } = refs;
+    const base = launchEl.style.transform;
+    const sway = Math.max(Fx.rect(launchEl).width * 0.08, 6);
+    const frames: Keyframe[] = [{ transform: `${base} translate(0,0)` }];
+    for (let k = 0; k < 4; k++) {
+      const side = k % 2 ? -1 : 1;
+      frames.push(
+        { transform: `${base} translate(${side * sway}px,-4px)`, offset: (k + 0.5) / 4 },
+        { transform: `${base} translate(0,0)`, offset: (k + 1) / 4 }
+      );
+    }
+    await Fx.anim(launchEl, frames, { duration: 800, easing: 'ease-in-out', fill: 'none' });
+    await Fx.wait(50);
+    await FxEffects.blueStatDrop(refs, target);
+  }
+
+  /**
+   * Smokescreen, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/4/4d/Rauchwolke_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/b/bc/Rauchwolke_Gen5.png
+   *
+   * A puff of yellowish dust kicks up at the user's feet as it fires a black
+   * smoke ball in a low arc at the target (0-0.4 s). The ball bursts into a
+   * thick black smoke cloud over the target (0.4-1.15 s), then the target
+   * turns blue under stat-down bubbles (1.15-2.05 s).
+   */
+  private static async playSmokescreen(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const lr = Fx.rect(launchEl);
+    const tr = Fx.rect(targetEl);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const lift = 30 + Math.abs(dx) * 0.08;
+    const dust = FxEffects.smokePuff(fxEl, Fx.footOf(launchEl, fieldEl), Math.max(lr.width * 0.6, 44), ['#F4E08A', '#D8B850']);
+    const size = Math.max(tr.width * 0.3, 22);
+    const frames: Keyframe[] = [];
+    for (let k = 0; k <= 8; k++) {
+      const t = k / 8;
+      frames.push({ transform: `translate(${dx * t}px,${dy * t - Math.sin(t * Math.PI) * lift}px) scale(${0.6 + t * 0.5})`, opacity: t === 0 ? 0 : 1 });
+    }
+    const ball = Fx.box(size, size, 'border-radius:50%;background:radial-gradient(circle at 35% 30%,#6A6A6A,#1A1A1A 55%,#000);box-shadow:0 0 6px #0008');
+    await Fx.spawn(fxEl, ball, launch, frames, { duration: 400, easing: 'linear' });
+
+    const w = Math.max(tr.width * 1.1, 70);
+    const h = Math.max(tr.height * 0.9, 56);
+    await Promise.all([dust, FxEffects.smokeCloud(fxEl, target, w, h, ['#3A3A3A', '#0A0A0A'], 14, 600, 150)]);
+    await FxEffects.blueStatDrop(refs, target);
+  }
 
   /**
    * Leer, after the Gen 4 / Gen 5 animation:

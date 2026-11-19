@@ -415,14 +415,13 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + confusion fleck: a wobbling rainbow ray, then dizzy tweets. */
+  /** PsychicAttackMoveAnimations.playPsybeam (rings pour out 0-1.0 s, first ring hits at 0.35 s, target purple and trembling to ~1.2 s): a wobbling rainbow ray that keeps buzzing on the target. */
   psybeam: () => {
-    const s = new MoveSfx(1.15, 0x9b3a);
-    s.pulse(0.0, 0.45, { freq: (u) => (500 + 700 * u) * (1 + 0.1 * Math.sin(2 * Math.PI * 9 * u)), gain: env.attackDecay(0.22, 0.2), duty: 0.25 });
-    s.wave(0.0, 0.45, { freq: (u) => (750 + 900 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.25) });
-    s.noise(0.43, 0.12, { clock: (u) => 8000 - 5000 * u, gain: env.attackDecay(0.32, 0.05) });
-    s.wave(0.43, 0.2, { freq: (u) => 600 * Math.pow(0.5, u), gain: env.decay(0.3, 1.5) });
-    s.confusion(0.58);
+    const s = new MoveSfx(1.4, 0x9b3a);
+    s.pulse(0.0, 1.0, { freq: (u) => (500 + 500 * Math.min(u * 3, 1)) * (1 + 0.1 * Math.sin(2 * Math.PI * 16 * u)), gain: env.attackDecay(0.2, 0.3), duty: 0.25 });
+    s.wave(0.0, 1.0, { freq: (u) => (750 + 600 * Math.min(u * 3, 1)) * (1 + 0.08 * Math.sin(2 * Math.PI * 12 * u)), gain: env.swell(0.22) });
+    s.noise(0.35, 0.12, { clock: (u) => 8000 - 5000 * u, gain: env.attackDecay(0.3, 0.05) });
+    s.wave(0.35, 0.85, { freq: (u) => 600 * (1 + 0.1 * Math.sin(2 * Math.PI * 14 * u)) * Math.pow(0.6, u), gain: env.decay(0.22, 1.2) });
     return s;
   },
 
@@ -514,13 +513,15 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): wavering rings with an unsteady pitch. */
+  /** PsychicAttackMoveAnimations.playPsywave (glow 0-0.3 s, wavy ribbon 0.15-1.0 s, hits at 0.6 s, rings ripple at 0.6 / 0.77 / 0.94 s to ~1.4 s): wavering energy with an unsteady pitch, then pulsing ripples. */
   psywave: () => {
-    const s = new MoveSfx(0.95, 0x95a3);
-    s.wave(0.0, 0.45, { freq: (u) => 600 * (1 + 0.25 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.3) });
-    s.pulse(0.0, 0.45, { freq: (u) => 900 * (1 + 0.2 * Math.sin(2 * Math.PI * 5 * u + 1.5)), gain: env.swell(0.12), duty: 0.25 });
-    s.noise(0.43, 0.1, { clock: () => 4500, gain: env.decay(0.3, 1) });
-    s.wave(0.43, 0.4, { freq: (u) => 500 * (1 + 0.2 * Math.sin(2 * Math.PI * 4 * u)) * Math.pow(0.6, u), gain: env.decay(0.28, 1.5) });
+    const s = new MoveSfx(1.6, 0x95a3);
+    s.wave(0.0, 0.6, { freq: (u) => 600 * (1 + 0.25 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.28) });
+    s.pulse(0.15, 0.45, { freq: (u) => 900 * (1 + 0.2 * Math.sin(2 * Math.PI * 4 * u + 1.5)), gain: env.swell(0.12), duty: 0.25 });
+    s.noise(0.6, 0.1, { clock: () => 4500, gain: env.decay(0.28, 1) });
+    for (const at of [0.6, 0.77, 0.94]) {
+      s.wave(at, 0.4, { freq: (u) => 520 * (1 + 0.15 * Math.sin(2 * Math.PI * 4 * u)) * Math.pow(0.6, u), gain: env.decay(0.22, 1.5) });
+    }
     return s;
   },
 
@@ -625,13 +626,14 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s, no fleck): the user vanishes - a fast rising warp shimmer ending in a soft "blink". */
+  /** Custom (dark 0-0.25 s, user narrows to a streak 0.25-0.5 s with sparkles 0.4-0.75 s, shoots up 0.55-0.8 s, drops back in 1.1-1.4 s, dark lifts 1.4-1.65 s): a shimmering rise, a zip away, a soft return. */
   teleport: () => {
-    const s = new MoveSfx(1.05, 0x7e1f);
-    s.chord(0.02, 0.7, [72, 79, 84], { rate: 0.025, gain: 0.16, vibrato: 0.01 });
-    s.wave(0.02, 0.7, { freq: (u) => 220 * Math.pow(8, u), gain: env.swell(0.2) });
-    s.noise(0.1, 0.6, { clock: env.ramp(3000, 12000), gain: env.swell(0.08) });
-    s.pulse(0.72, 0.12, { freq: (u) => 2400 * (1 + u), gain: env.decay(0.2, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.7, 0x7e1f);
+    s.chord(0.1, 0.65, [72, 79, 84], { rate: 0.025, gain: 0.14, vibrato: 0.01 });
+    s.sparkle(0.4, 0.35, 4, { lo: 3500, hi: 6000, gain: 0.12 });
+    s.wave(0.55, 0.25, { freq: (u) => 440 * Math.pow(8, u), gain: env.attackDecay(0.22, 0.3) });
+    s.noise(0.55, 0.25, { clock: env.ramp(3000, 12000), gain: env.decay(0.1, 1) });
+    s.wave(1.1, 0.3, { freq: (u) => 1400 * Math.pow(0.4, u), gain: env.decay(0.16, 1) });
     return s;
   },
 

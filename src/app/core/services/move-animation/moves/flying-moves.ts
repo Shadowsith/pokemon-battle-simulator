@@ -27,6 +27,7 @@ export class FlyingMoveAnimations {
     hurricane: (refs, launch, target) => Hurricane.play(refs, launch, target),
     mirrormove: (refs, _launch, target) => FlyingMoveAnimations.playMirrorMove(refs, target),
     oblivionwing: (refs, launch, target, v) => FlyingMoveAnimations.playOblivionWing(refs, launch, target, v),
+    peck: (refs, _launch, target, v) => FlyingMoveAnimations.playPeck(refs, target, v),
     roost: (refs, launch) => Roost.play(refs, launch),
     skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target),
     tailwind: (refs, launch) => Tailwind.play(refs, launch)
@@ -754,6 +755,36 @@ export class FlyingMoveAnimations {
       fill: 'none'
     });
     launchEl.getAnimations().forEach((a) => a.cancel());
+  }
+
+  /**
+   * Peck, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/d/df/Pikser_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/9/94/Pikser_Gen5.png
+   *
+   * The user lunges forward (0-0.15 s) and jabs twice: a yellow starburst
+   * with a spray of dust pops on the target with each peck (hits at 0.17 s
+   * and 0.31 s), then the user draws back (to ~0.55 s).
+   */
+  private static async playPeck(refs: BattleStageRefs, target: Point, v: MoveVisual) {
+    const { launchEl, targetEl, fxEl } = refs;
+    const r = Fx.rect(targetEl);
+    const base = launchEl.style.transform;
+    const at = (i: number): Point => ({ x: target.x + (i ? 1 : -1) * r.width * 0.08, y: target.y - r.height * (0.08 + i * 0.1) });
+    const lunge = Fx.anim(launchEl, [
+      { transform: `${base} translateX(0)` },
+      { transform: `${base} translateX(${v.dir * 30}px)`, offset: 0.3 },
+      { transform: `${base} translateX(${v.dir * 20}px)`, offset: 0.45 },
+      { transform: `${base} translateX(${v.dir * 32}px)`, offset: 0.58 },
+      { transform: `${base} translateX(0)` }
+    ], { duration: 550, easing: 'ease-out', fill: 'none' });
+    for (const [i, t] of [[0, 170], [1, 140]] as const) {
+      await Fx.wait(t);
+      FlyingMoveAnimations.peckSpark(fxEl, at(i));
+      Fx.flash(targetEl, '#FFF2A0', 0.35);
+      Fx.shake(targetEl, 3);
+    }
+    await lunge;
   }
 
   /** One peck: a small yellow starburst that pops, with grey dust spraying out. */

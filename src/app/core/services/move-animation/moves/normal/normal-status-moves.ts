@@ -4,9 +4,10 @@ import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { DoubleTeam } from './double-team';
 import { ShellSmash } from './shell-smash';
+import { Transform } from './transform';
 import { WorkUp } from './work-up';
 
-/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Double Team lives in `double-team.ts`, Shell Smash in `shell-smash.ts`, Work Up in `work-up.ts`). */
+/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Double Team lives in `double-team.ts`, Shell Smash in `shell-smash.ts`, Transform in `transform.ts`, Work Up in `work-up.ts`). */
 export class NormalStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -23,11 +24,95 @@ export class NormalStatusMoveAnimations {
     minimize: (refs, launch) => NormalStatusMoveAnimations.playMinimize(refs, launch),
     painsplit: (refs, launch, target) => NormalStatusMoveAnimations.playPainSplit(refs, launch, target),
     protect: (refs, launch) => NormalStatusMoveAnimations.playProtect(refs, launch),
+    sharpen: (refs, launch) => NormalStatusMoveAnimations.playSharpen(refs, launch),
     shellsmash: (refs, launch) => ShellSmash.play(refs, launch),
     sleeptalk: (refs, launch, target, v) => NormalStatusMoveAnimations.playSleepTalk(refs, launch, target, v),
+    splash: (refs) => NormalStatusMoveAnimations.playSplash(refs),
     swordsdance: (refs, launch) => NormalStatusMoveAnimations.playSwordsDance(refs, launch),
+    transform: (refs) => Transform.play(refs),
     workup: (refs, launch) => WorkUp.play(refs, launch),
   };
+
+  /**
+   * Splash, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/9/9f/Platscher_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/2/27/Platscher_Gen5.png
+   *
+   * The user hops on the spot three times (one hop every 0.4 s, 0-1.2 s).
+   * Each time it lands (0.4 / 0.8 / 1.2 s) blue water drops splash out from
+   * its feet to both sides and fall away (to ~1.6 s). Nothing else happens.
+   */
+  private static async playSplash(refs: BattleStageRefs) {
+    const { fieldEl, fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const foot = Fx.footOf(launchEl, fieldEl);
+    const base = launchEl.style.transform;
+    const hop = Math.max(r.height * 0.18, 14);
+    const frames: Keyframe[] = [];
+    for (let k = 0; k < 3; k++) {
+      frames.push(
+        { transform: `${base} translateY(0) scale(1.06,.94)`, offset: k / 3 },
+        { transform: `${base} translateY(${-hop}px) scale(.96,1.04)`, offset: (k + 0.5) / 3, easing: 'ease-in' }
+      );
+    }
+    frames.push({ transform: `${base} translateY(0) scale(1)`, offset: 1 });
+    const effects: Promise<unknown>[] = [Fx.anim(launchEl, frames, { duration: 1200, easing: 'ease-out', fill: 'none' })];
+    for (let k = 1; k <= 3; k++) {
+      for (let i = 0; i < 6; i++) {
+        const side = i % 2 ? 1 : -1;
+        const x = side * (r.width * 0.3 + Math.random() * 18);
+        const up = 14 + Math.random() * 14;
+        const s = 5 + Math.random() * 4;
+        const drop = Fx.box(s, s * 1.3, 'border-radius:50% 50% 50% 50%/60% 60% 40% 40%;background:radial-gradient(circle at 35% 30%,#fff,#6AB4F8 50%,#2A6CD0);box-shadow:0 0 3px #8AC8FF');
+        effects.push(
+          Fx.spawn(fxEl, drop, { x: foot.x + side * r.width * 0.15, y: foot.y }, [
+            { transform: 'translate(0,0) scale(.5)', opacity: 1 },
+            { transform: `translate(${x * 0.6}px,${-up}px) scale(1)`, opacity: 1, offset: 0.45 },
+            { transform: `translate(${x}px,8px) scale(.8)`, opacity: 0 }
+          ], { duration: 420, delay: k * 400 - 20, easing: 'ease-out' })
+        );
+      }
+    }
+    await Promise.all(effects);
+  }
+
+  /**
+   * Sharpen, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/7/7f/Sch%C3%A4rfer_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/9/96/Sch%C3%A4rfer_Gen5.png
+   *
+   * A silver-white cube grows over the user, which turns steely grey, as if
+   * its body were honed into hard edges (0-0.45 s). A white glint flashes on
+   * the cube's corner (0.45-0.75 s), the cube fades away (0.75-1.0 s) and the
+   * stat-up aura plays (1.0-1.8 s).
+   */
+  private static async playSharpen(refs: BattleStageRefs, launch: Point) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const size = Math.max(Math.min(r.width, r.height) * 0.75, 44);
+    const cube = Fx.box(size, size, 'filter:drop-shadow(0 0 4px #FFFFFF) drop-shadow(0 0 2px #707078)');
+    // An isometric cube: top, left and right faces.
+    cube.innerHTML =
+      '<svg viewBox="0 0 100 100" width="100%" height="100%" style="display:block">' +
+      '<polygon points="50,6 92,28 50,50 8,28" fill="#FFFFFF" stroke="#8A8A94" stroke-width="3"/>' +
+      '<polygon points="8,28 50,50 50,96 8,72" fill="#D8D8E0" stroke="#8A8A94" stroke-width="3"/>' +
+      '<polygon points="92,28 50,50 50,96 92,72" fill="#B0B0BC" stroke="#8A8A94" stroke-width="3"/></svg>';
+    await Promise.all([
+      Fx.glow(launchEl, 'grayscale(1) brightness(1.15) contrast(1.2)', 1000),
+      Fx.spawn(fxEl, cube, launch, [
+        { transform: 'scale(.2)', opacity: 0 },
+        { transform: 'scale(1)', opacity: 0.95, offset: 0.45 },
+        { transform: 'scale(1)', opacity: 0.95, offset: 0.75 },
+        { transform: 'scale(1.1)', opacity: 0 }
+      ], { duration: 1000, easing: 'ease-out' }),
+      Fx.spawn(fxEl, FxGlyphs.sparkStar(size * 0.5, '#FFFFFF'), { x: launch.x + size * 0.32, y: launch.y - size * 0.24 }, [
+        { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+        { transform: 'scale(1) rotate(30deg)', opacity: 1, offset: 0.5 },
+        { transform: 'scale(0) rotate(60deg)', opacity: 0 }
+      ], { duration: 300, delay: 450, easing: 'ease-in-out' })
+    ]);
+    await FxEffects.statUpAura(refs, launch);
+  }
 
   /**
    * Metronome, after the Gen 4 animation:

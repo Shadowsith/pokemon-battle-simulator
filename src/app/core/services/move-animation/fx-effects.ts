@@ -644,6 +644,32 @@ export class FxEffects {
   }
 
   /**
+   * A thick cloud of soft, blurred puffs billowing over a `w` × `h` area round
+   * `at`: the puffs swell in one after another (over `stagger` ms), drift and
+   * fade, each lasting `dur` ms. `tone` is [core, edge] as 6-digit hex
+   * (Smog dark slate blue, Smokescreen black).
+   */
+  static smokeCloud(fxEl: HTMLElement, at: Point, w: number, h: number, tone: [string, string], count = 12, dur = 900, stagger = 400): Promise<void> {
+    const puffs: Promise<void>[] = [];
+    for (let i = 0; i < count; i++) {
+      const s = Math.max(w, h) * (0.45 + Math.random() * 0.3);
+      const puff = Fx.box(s, s, `border-radius:50%;filter:blur(2px);background:radial-gradient(circle at 42% 40%,${tone[0]}f0,${tone[1]}d0 50%,${tone[1]}00 72%)`);
+      const from: Point = { x: at.x + (Math.random() * 2 - 1) * w * 0.35, y: at.y + (Math.random() * 2 - 1) * h * 0.35 };
+      const ang = Math.random() * Math.PI * 2;
+      const drift = `translate(${Math.cos(ang) * w * 0.15}px,${Math.sin(ang) * h * 0.12 - 6}px)`;
+      puffs.push(
+        Fx.spawn(fxEl, puff, from, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: 'translate(0,0) scale(.85)', opacity: 0.9, offset: 0.3 },
+          { transform: `${drift} scale(1.1)`, opacity: 0.85, offset: 0.7 },
+          { transform: `${drift} scale(1.3)`, opacity: 0 }
+        ], { duration: dur, delay: (stagger * i) / count, easing: 'ease-out' })
+      );
+    }
+    return Promise.all(puffs).then(() => void 0);
+  }
+
+  /**
    * A backdrop with flickering burst rays centred on `at`, behind the sprites:
    * red with yellow rays (Dynamic Punch, Megahorn), blue with white rays
    * (Focus Punch), red-brown with peach rays (Psycho Boost), magenta with pink rays (Giga Impact), orange on deep blue (Head Smash), bright green with white rays (Power Whip), yellow fading to black (Bolt Strike) red-orange rays on black (Fusion Flare) or orange rays on a white-hot amber fading to black (Head Charge). Resolves once it has faded in; the caller fades it out and removes it.

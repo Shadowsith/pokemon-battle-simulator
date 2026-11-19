@@ -13,12 +13,14 @@ import { HornLeech } from './grass/horn-leech';
 import { LeafStorm } from './grass/leaf-storm';
 import { PetalBlizzard } from './grass/petal-blizzard';
 import { PowerWhip } from './grass/power-whip';
+import { RazorLeaf } from './grass/razor-leaf';
 import { SeedBomb } from './grass/seed-bomb';
 import { SeedFlare } from './grass/seed-flare';
 import { SpikyShield } from './grass/spiky-shield';
+import { VineWhip } from './grass/vine-whip';
 import { WoodHammer } from './grass/wood-hammer';
 
-/** Hand-made animations for Grass-type moves (Cotton Guard, Energy Ball, Forest's Curse, Grass Knot, Grass Pledge, Horn Leech, Leaf Storm, Petal Blizzard, Power Whip, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
+/** Hand-made animations for Grass-type moves (Cotton Guard, Energy Ball, Forest's Curse, Grass Knot, Grass Pledge, Horn Leech, Leaf Storm, Petal Blizzard, Power Whip, Razor Leaf, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -40,13 +42,16 @@ export class GrassMoveAnimations {
     petalblizzard: (refs, _launch, target, v) => PetalBlizzard.play(refs, target, v),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     powerwhip: (refs, _launch, target) => PowerWhip.play(refs, target),
+    razorleaf: (refs, launch, target) => RazorLeaf.play(refs, launch, target),
     seedbomb: (refs, launch, target) => SeedBomb.play(refs, launch, target),
     seedflare: (refs, launch, target, v) => SeedFlare.play(refs, launch, target, v),
     sleeppowder: (refs, _launch, target, v) => GrassMoveAnimations.playSleepPowder(refs, target, v),
     solarbeam: (refs, _launch, target) => GrassMoveAnimations.playSolarBeam(refs, target),
     spikyshield: (refs, launch, _target, v) => SpikyShield.play(refs, launch, v),
     spore: (refs, _launch, target, v) => GrassMoveAnimations.playSpore(refs, target, v),
+    stunspore: (refs, _launch, target) => GrassMoveAnimations.playStunSpore(refs, target),
     synthesis: (refs, launch) => GrassMoveAnimations.playSynthesis(refs, launch),
+    vinewhip: (refs, _launch, target, v) => VineWhip.play(refs, target, v),
     woodhammer: (refs, launch, target, v) => WoodHammer.play(refs, launch, target, v)
   };
 
@@ -506,9 +511,31 @@ export class GrassMoveAnimations {
     await GrassMoveAnimations.sleepOnTarget(refs, target, v);
   }
 
+  /**
+   * Stun Spore, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/f/f0/Stachelspore_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/7/76/Stachelspore_Gen5.png
+   *
+   * Glowing yellow spores drift down over the target (0-~1.9 s) while it turns
+   * yellow (0.5-1.5 s). Then it is paralysed: it goes dark with yellow sparks
+   * crackling round it (~1.9-2.45 s).
+   */
+  private static async playStunSpore(refs: BattleStageRefs, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    await Promise.all([
+      GrassMoveAnimations.powderFall(refs, target, [GrassMoveAnimations.YELLOW_GRAIN]),
+      Fx.glow(targetEl, 'sepia(1) saturate(4) hue-rotate(5deg) brightness(1.2)', 1000, 500)
+    ]);
+    const stop = FxEffects.crackleOver(fxEl, target, Math.max(r.width, r.height) * 0.9, '#FFF26A');
+    await Fx.glow(targetEl, 'brightness(.2)', 550);
+    stop();
+  }
+
   /** Powder grain colours: bright core, body, glow. */
   private static readonly GREEN_GRAIN: GrainColors = ['#C8FFD8', '#3FCB78', '#2FB868'];
   private static readonly ORANGE_GRAIN: GrainColors = ['#FFE6C0', '#FF8A2A', '#F07020'];
+  private static readonly YELLOW_GRAIN: GrainColors = ['#FFFBD0', '#FFE03A', '#F8D020'];
 
   /** Glowing powder drifts down from above onto the target, swaying; grains cycle through `colors`. */
   private static async powderFall(refs: BattleStageRefs, target: Point, colors: GrainColors[]) {

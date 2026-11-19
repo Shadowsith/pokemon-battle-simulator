@@ -20,8 +20,54 @@ export class IceMoveAnimations {
     iciclecrash: (refs, _launch, target) => IcicleCrash.play(refs, target),
     icebeam: (refs, launch, target) => IceMoveAnimations.playIceBeam(refs, launch, target),
     hail: (refs) => IceMoveAnimations.playHail(refs),
-    haze: (refs) => IceMoveAnimations.playHaze(refs)
+    haze: (refs) => IceMoveAnimations.playHaze(refs),
+    mist: (refs, launch, _target, v) => IceMoveAnimations.playMist(refs, launch, v.dir)
   };
+
+  /**
+   * Mist, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/e/ec/Wei%C3%9Fnebel_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/9/97/Wei%C3%9Fnebel_Gen5.png
+   *
+   * A white mist rolls in over the whole field (0-0.4 s) and drifts across
+   * it from the user's side, wrapping the user in a pale glow while a few
+   * white glints twinkle round it (0.2-1.2 s); then the mist thins out and
+   * clears (1.2-1.6 s).
+   */
+  private static async playMist(refs: BattleStageRefs, launch: Point, dir: 1 | -1) {
+    const { fxEl, launchEl } = refs;
+    const r = Fx.rect(launchEl);
+    const total = 1600;
+    const layer = document.createElement('div');
+    layer.style.cssText = 'position:absolute;inset:0;overflow:hidden;pointer-events:none';
+    const fog = document.createElement('div');
+    fog.style.cssText =
+      'position:absolute;inset:-10% -60%;background:' +
+      'radial-gradient(ellipse 22% 30% at 25% 60%,#FFFFFFdd,#FFFFFF00),' +
+      'radial-gradient(ellipse 26% 26% at 50% 35%,#F4F8FFcc,#F4F8FF00),' +
+      'radial-gradient(ellipse 24% 32% at 72% 70%,#FFFFFFd0,#FFFFFF00),' +
+      'radial-gradient(ellipse 20% 24% at 88% 30%,#EEF4FFbb,#EEF4FF00),' +
+      'linear-gradient(#FFFFFF55,#FFFFFF77)';
+    layer.appendChild(fog);
+    fxEl.appendChild(layer);
+    const effects: Promise<unknown>[] = [
+      Fx.anim(fog, [{ transform: `translateX(${-dir * 18}%)` }, { transform: `translateX(${dir * 18}%)` }], { duration: total, easing: 'ease-in-out' }),
+      Fx.anim(layer, [{ opacity: 0 }, { opacity: 0.9, offset: 0.25 }, { opacity: 0.9, offset: 0.72 }, { opacity: 0 }], { duration: total, easing: 'ease-in-out' }),
+      Fx.glow(launchEl, 'brightness(1.35) saturate(.5) drop-shadow(0 0 8px #FFFFFF)', 1100, 200)
+    ];
+    for (let i = 0; i < 7; i++) {
+      const at: Point = { x: launch.x + (Math.random() * 2 - 1) * r.width * 0.55, y: launch.y + (Math.random() * 2 - 1) * r.height * 0.45 };
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.sparkStar(8 + Math.random() * 6, '#FFFFFF'), at, [
+          { transform: 'scale(0) rotate(0deg)', opacity: 0 },
+          { transform: 'scale(1) rotate(30deg)', opacity: 1, offset: 0.5 },
+          { transform: 'scale(0) rotate(60deg)', opacity: 0 }
+        ], { duration: 420, delay: 250 + i * 120, easing: 'ease-in-out' })
+      );
+    }
+    await Promise.all(effects);
+    layer.remove();
+  }
 
   /** Turn-1 animations of two-turn Ice moves, by @pkmn/sim move id. */
   static readonly chargeAnims: MoveAnimRegistry = {

@@ -337,12 +337,13 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic field (~0.6 s, hits all foes at once): a flurry of sharp leaves whirling and cutting. */
+  /** RazorLeaf.play (leaves whirl 0-0.55 s, shoot 0.55-1.0 s, cuts at 0.85 / 0.92 / 0.99 / 1.06 s): a rustling whirl of leaves, then sharp cutting slices. */
   razorleaf: () => {
-    const s = new MoveSfx(0.8, 0x7a1f);
-    s.noise(0.0, 0.6, { clock: (u) => 4000 + 2000 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.15) });
-    for (let i = 0; i < 6; i++) {
-      const at = 0.04 + i * 0.09;
+    const s = new MoveSfx(1.45, 0x7a1f);
+    s.noise(0.0, 0.85, { clock: (u) => 4000 + 2000 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.16) });
+    s.whoosh(0.55, 0.3, { from: 3000, to: 9000, gain: 0.18 });
+    for (let i = 0; i < 4; i++) {
+      const at = 0.85 + i * 0.07;
       s.noise(at, 0.06, { clock: (u) => 15000 - 6000 * u, gain: env.attackDecay(0.32, 0.2) });
       s.pulse(at, 0.05, { freq: (u) => (1800 + 200 * (i % 3)) * (1 - 0.4 * u), gain: env.decay(0.14, 1.5), duty: 0.125 });
     }
@@ -435,12 +436,12 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic powder (spores stream 0.76 s, paralysis fleck 0.76 s): fizzy, crackly spores drift down. */
+  /** Custom (yellow spores drift down 0-~1.9 s, target yellow 0.5-1.5 s, paralysed: dark + crackling sparks ~1.9-2.45 s): a glittering hiss of powder, then the paralysis zap. */
   stunspore: () => {
-    const s = new MoveSfx(1.15, 0x5759);
-    s.noise(0.0, 0.76, { clock: (u) => 5000 + 2000 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.18) });
-    s.sparkle(0.05, 0.65, 10, { lo: 2500, hi: 5000, gain: 0.14 });
-    s.paralyze(0.76, 0.26);
+    const s = new MoveSfx(2.6, 0x5759);
+    s.noise(0.0, 1.8, { clock: (u) => 5000 + 2000 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.16) });
+    s.sparkle(0.1, 1.6, 16, { lo: 2500, hi: 5000, gain: 0.13 });
+    s.paralyze(1.9, 0.26);
     return s;
   },
 
@@ -454,14 +455,16 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a thin vine swishes and cracks like a whip. */
+  /** Custom (two vine lashes 0-0.18 s and 0.15-0.33 s, hit 0.18 s, vine strips flutter off 0.3-1.1 s): two whip cracks and a papery flutter. */
   vinewhip: () => {
-    const s = new MoveSfx(0.7, 0x01e1);
-    s.whoosh(0.0, 0.17, { from: 2000, to: 9000, gain: 0.25 });
-    s.noise(0.17, 0.07, { clock: () => 18000, gain: env.attackDecay(0.4, 0.05) });
-    s.pulse(0.17, 0.1, { freq: (u) => 2400 - 1500 * u, gain: env.decay(0.25, 1.5), duty: 0.125 });
-    s.thud(0.17, 0.35, 0.2);
-    s.noise(0.24, 0.3, { clock: () => 3000, gain: env.decay(0.18, 1.5) });
+    const s = new MoveSfx(1.2, 0x01e1);
+    for (const at of [0.0, 0.15]) {
+      s.whoosh(at, 0.18, { from: 2000, to: 9000, gain: 0.22 });
+      s.noise(at + 0.18, 0.07, { clock: () => 18000, gain: env.attackDecay(0.4, 0.05) });
+      s.pulse(at + 0.18, 0.1, { freq: (u) => 2400 - 1500 * u, gain: env.decay(0.22, 1.5), duty: 0.125 });
+    }
+    s.thud(0.18, 0.35, 0.25);
+    s.noise(0.3, 0.75, { clock: (u) => 3000 + 1500 * Math.sin(2 * Math.PI * 8 * u), gain: env.decay(0.12, 1) });
     return s;
   },
 

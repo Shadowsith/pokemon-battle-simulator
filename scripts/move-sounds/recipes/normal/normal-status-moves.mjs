@@ -349,13 +349,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a fierce bellowing roar that blows the target away. */
+  /** NormalSoundMoveAnimations.playRoar (rear up 0-0.25 s, bolts fly 0.15-0.8 s, target blown back at 0.45 s, slides home to ~1.2 s): a fierce bellowing roar that blows the target away. */
   roar: () => {
-    const s = new MoveSfx(1.0, 0x50a2);
-    s.pulse(0.0, 0.75, { freq: (u) => (190 - 70 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 18 * u)), gain: (u) => 0.3 * Math.min(1, u * 8) * Math.pow(1 - u, 0.7), duty: 0.25 });
-    s.pulse(0.0, 0.75, { freq: (u) => (285 - 100 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 18 * u)), gain: (u) => 0.15 * Math.min(1, u * 8) * Math.pow(1 - u, 0.7), duty: 0.125 });
-    s.noise(0.0, 0.8, { clock: env.ramp(3500, 1200), gain: (u) => 0.3 * Math.min(1, u * 6) * Math.pow(1 - u, 0.8) });
-    s.whoosh(0.55, 0.35, { from: 6000, to: 2000, gain: 0.2 });
+    const s = new MoveSfx(1.35, 0x50a2);
+    s.pulse(0.05, 0.8, { freq: (u) => (190 - 70 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 18 * u)), gain: (u) => 0.3 * Math.min(1, u * 8) * Math.pow(1 - u, 0.7), duty: 0.25 });
+    s.pulse(0.05, 0.8, { freq: (u) => (285 - 100 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 18 * u)), gain: (u) => 0.15 * Math.min(1, u * 8) * Math.pow(1 - u, 0.7), duty: 0.125 });
+    s.noise(0.05, 0.85, { clock: env.ramp(3500, 1200), gain: (u) => 0.3 * Math.min(1, u * 6) * Math.pow(1 - u, 0.8) });
+    s.whoosh(0.45, 0.4, { from: 6000, to: 2000, gain: 0.22 });
     return s;
   },
 
@@ -370,13 +370,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Defense drop fleck (~0.85 s): a grating, dissonant shriek that wavers on and on. */
+  /** NormalSoundMoveAnimations.playScreech (jagged rings flare at 0 / 0.21 / 0.42 s, shriek to 0.75 s, blue Defense drop 0.75-1.65 s): a grating, dissonant shriek. */
   screech: () => {
-    const s = new MoveSfx(1.45, 0x5c4e);
-    s.pulse(0.02, 0.8, { freq: (u) => 2400 * (1 + 0.05 * Math.sin(2 * Math.PI * 14 * u)), gain: env.swell(0.2), duty: 0.125 });
-    s.pulse(0.02, 0.8, { freq: (u) => 2550 * (1 + 0.05 * Math.sin(2 * Math.PI * 11 * u + 1)), gain: env.swell(0.16), duty: 0.25 });
-    s.noise(0.02, 0.8, { clock: () => 9000, gain: env.swell(0.08), short: true });
-    s.statDown(0.85);
+    const s = new MoveSfx(1.75, 0x5c4e);
+    s.pulse(0.02, 0.75, { freq: (u) => 2400 * (1 + 0.05 * Math.sin(2 * Math.PI * 14 * u)), gain: env.swell(0.2), duty: 0.125 });
+    s.pulse(0.02, 0.75, { freq: (u) => 2550 * (1 + 0.05 * Math.sin(2 * Math.PI * 11 * u + 1)), gain: env.swell(0.16), duty: 0.25 });
+    s.noise(0.02, 0.75, { clock: () => 9000, gain: env.swell(0.08), short: true });
+    s.statDown(0.8);
     return s;
   },
 
@@ -389,12 +389,16 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) + sleep fleck (~0.6 s): a gentle sung lullaby melody drifting over the target. */
+  /**
+   * NormalSoundMoveAnimations.playSing: the scene pales (0-0.25 s), a white ring pulses
+   * round the user (0.25-0.7 s), eight notes float to the target (0.25-1.7 s), colours
+   * return (1.7-1.95 s). A soft shimmer, then an eight-note lullaby.
+   */
   sing: () => {
-    const s = new MoveSfx(1.3, 0x5129);
-    s.arpeggio(0.02, [76, 79, 81, 79], 0.14, { gain: 0.24, voice: 'wave', hold: 0.18 });
-    s.arpeggio(0.02, [88, 91, 93, 91], 0.14, { gain: 0.06, duty: 0.125, hold: 0.12 });
-    s.sleep(0.62, 0.22);
+    const s = new MoveSfx(2.05, 0x5129);
+    s.sparkle(0.25, 0.4, 3, { lo: 3000, hi: 5000, gain: 0.08 });
+    s.arpeggio(0.25, [76, 79, 81, 79, 76, 79, 81, 84], 0.17, { gain: 0.22, voice: 'wave', hold: 0.2 });
+    s.arpeggio(0.25, [88, 91, 93, 91, 88, 91, 93, 96], 0.17, { gain: 0.05, duty: 0.125, hold: 0.12 });
     return s;
   },
 
@@ -410,21 +414,27 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura (0-0.8 s) + accuracy drop fleck (0.85 s): a thick puff of smoke billows out. */
+  /**
+   * NormalFoeStatusMoveAnimations.playSmokescreen: dust kicks up as a black ball is fired
+   * (0-0.4 s), it bursts into a smoke cloud over the target (0.4-1.15 s), stat drop
+   * (1.15-2.05 s). A puff, a whoosh, a muffled pop, billowing smoke, then the drop.
+   */
   smokescreen: () => {
-    const s = new MoveSfx(1.5, 0x5305);
-    s.noise(0.02, 0.15, { clock: env.ramp(3000, 900), gain: env.attackDecay(0.35, 0.1) });
-    s.noise(0.05, 0.75, { clock: env.ramp(900, 400), gain: env.swell(0.3) });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.2, 0x5305);
+    s.noise(0.0, 0.12, { clock: env.ramp(3000, 1200), gain: env.attackDecay(0.25, 0.1) });
+    s.whoosh(0.02, 0.38, { from: 900, to: 2500, gain: 0.2 });
+    s.noise(0.4, 0.15, { clock: env.ramp(3000, 900), gain: env.attackDecay(0.4, 0.1) });
+    s.noise(0.42, 0.7, { clock: env.ramp(900, 400), gain: env.swell(0.28) });
+    s.statDown(1.2);
     return s;
   },
 
-  /** Generic target aura + confusion fleck (~0.6 s): piercing ultrasonic rings sweep at the foe. */
+  /** Custom (dark 0-0.2 s, three yellow rings ripple out of the target at 0.2 / 0.35 / 0.5 s, dark lifts 0.95-1.15 s, dizzy birds 1.15-2.55 s): piercing ultrasonic rings, then the confusion jingle. */
   supersonic: () => {
-    const s = new MoveSfx(1.15, 0x5502);
-    for (let i = 0; i < 4; i++) s.pulse(0.02 + i * 0.13, 0.13, { freq: (u) => 2600 + 600 * u, gain: env.attackDecay(0.16, 0.2), duty: 0.125 });
-    s.wave(0.02, 0.55, { freq: (u) => 1400 + 300 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.2) });
-    s.confusion(0.6, 0.2);
+    const s = new MoveSfx(2.6, 0x5502);
+    for (let i = 0; i < 3; i++) s.pulse(0.2 + i * 0.15, 0.4, { freq: (u) => 2600 + 600 * u, gain: env.attackDecay(0.16, 0.2), duty: 0.125 });
+    s.wave(0.2, 0.75, { freq: (u) => 1400 + 300 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.2) });
+    s.confusion(1.15, 0.2);
     return s;
   },
 
@@ -447,11 +457,11 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Defense-down fleck (~0.85 s): a cute tail wag - swishing back and forth, then the falling jingle. */
+  /** Custom (four tail wags 0-0.8 s, 0.2 s each; stat drop 0.85-1.75 s): swishy wags, then the drop. */
   tailwhip: () => {
-    const s = new MoveSfx(1.5, 0x7a1f);
+    const s = new MoveSfx(1.8, 0x7a1f);
     for (let i = 0; i < 4; i++) {
-      const at = 0.05 + i * 0.19;
+      const at = i * 0.2;
       s.noise(at, 0.13, { clock: i % 2 ? env.ramp(7000, 3000) : env.ramp(3000, 7000), gain: env.swell(0.2) });
       s.pulse(at, 0.1, { freq: () => (i % 2 ? 1175 : 1397), gain: env.decay(0.13, 1.5), duty: 0.25 });
     }
@@ -484,13 +494,17 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): the user's shape melts and remolds, a wobbling morph that settles. */
+  /** Custom (white flash 0-0.2 s, melts flat 0.2-0.45 s, stretches back up under a flickering pixel mosaic 0.45-0.95 s, white flash 0.95 s, settles to 1.2 s): a warbling melt, glitchy blips, a bright chime. */
   transform: () => {
-    const s = new MoveSfx(1.2, 0x7a5f);
-    s.wave(0.02, 0.85, { freq: (u) => (400 + 400 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.3) });
-    s.pulse(0.02, 0.85, { freq: (u) => (800 - 300 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.1), duty: 0.125 });
-    s.sparkle(0.2, 0.6, 5, { lo: 2000, hi: 3500, gain: 0.12 });
-    s.arpeggio(0.8, [72, 79], 0.08, { gain: 0.15, voice: 'wave', hold: 0.15 });
+    const s = new MoveSfx(1.35, 0x7a5f);
+    s.pulse(0.0, 0.08, { freq: () => 1760, gain: env.decay(0.15, 1.5), duty: 0.25 });
+    s.wave(0.2, 0.25, { freq: (u) => (600 - 350 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.28) });
+    for (let i = 0; i < 8; i++) {
+      const at = 0.45 + i * 0.0625;
+      s.pulse(at, 0.05, { freq: () => 400 + s.random() * 1400, gain: env.decay(0.12, 1), duty: 0.125 });
+    }
+    s.wave(0.45, 0.5, { freq: (u) => 250 + 450 * u, gain: env.swell(0.14) });
+    s.arpeggio(0.95, [72, 79], 0.08, { gain: 0.15, voice: 'wave', hold: 0.15 });
     return s;
   },
 

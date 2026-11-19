@@ -143,15 +143,16 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile (0.43 s impact): a coin flicked at the foe, then coins jingling on the ground. */
+  /** PayDay.play (coin arcs over 0-0.43 s, strikes at 0.43 s, coin shower lands 1.0-1.25 s): a coin flicked at the foe, a bright clink, then coins jingling down to the ground. */
   payday: () => {
-    const s = new MoveSfx(1.1, 0x9ad4);
+    const s = new MoveSfx(1.45, 0x9ad4);
     s.pulse(0.02, 0.05, { freq: () => 2600, gain: env.decay(0.25, 1), duty: 0.125 });
     s.pulse(0.03, 0.38, { freq: (u) => 3200 + 400 * Math.sin(2 * Math.PI * 12 * u), gain: (u) => 0.06 * (1 - 0.5 * u), duty: 0.125 });
     s.thud(0.43, 0.35, 0.2);
-    for (const [at, f] of [[0.45, 3950], [0.55, 3500], [0.63, 4200], [0.74, 3700], [0.82, 4400]]) {
-      s.pulse(at, 0.12, { freq: () => f, gain: env.decay(0.22, 1.5), duty: 0.125 });
-      s.pulse(at + 0.01, 0.1, { freq: () => f * 1.5, gain: env.decay(0.1, 1.5), duty: 0.25 });
+    s.pulse(0.43, 0.15, { freq: () => 4700, gain: env.decay(0.22, 1.5), duty: 0.125 });
+    for (const [at, f] of [[0.5, 3950], [0.6, 4400], [1.0, 3500], [1.06, 4200], [1.12, 3700], [1.18, 4400], [1.24, 3950]]) {
+      s.pulse(at, 0.12, { freq: () => f, gain: env.decay(0.2, 1.5), duty: 0.125 });
+      s.pulse(at + 0.01, 0.1, { freq: () => f * 1.5, gain: env.decay(0.09, 1.5), duty: 0.25 });
     }
     return s;
   },
@@ -259,28 +260,30 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a shockwave whistles over and cracks with a boom. */
+  /** Custom (six crescent waves fly 0-0.73 s, 0.08 s apart; bursts on the target from the hit at 0.33 s to ~0.9 s): a rising whistle and a run of sharp cracks. */
   sonicboom: () => {
-    const s = new MoveSfx(0.85, 0x50b0);
-    s.pulse(0.0, 0.43, { freq: (u) => 600 + 2400 * u, gain: env.ramp(0.08, 0.2), duty: 0.125 });
-    s.whoosh(0.0, 0.43, { from: 2000, to: 9000, gain: 0.22 });
-    s.noise(0.43, 0.3, { clock: env.ramp(6000, 600), gain: env.attackDecay(0.45, 0.05) });
-    s.thud(0.43, 0.5, 0.8);
+    const s = new MoveSfx(1.1, 0x50b0);
+    s.whoosh(0.0, 0.75, { from: 2000, to: 8000, gain: 0.2 });
+    for (let i = 0; i < 6; i++) {
+      s.pulse(i * 0.08, 0.3, { freq: (u) => 800 + 2000 * u, gain: env.ramp(0.05, 0.12), duty: 0.125 });
+      s.noise(0.33 + i * 0.08, 0.12, { clock: env.ramp(8000, 1500), gain: env.attackDecay(0.3, 0.05) });
+    }
+    s.thud(0.33, 0.45, 0.6);
     return s;
   },
 
   /**
-   * Generic beam at minimum power (grows 0.26 s, holds ~0.16 s, fades to ~0.62 s),
-   * 3 hits: three spikes are fired in quick succession, landing at 0.26 / 0.36 / 0.46 s.
+   * SpikeCannon (custom), 3 hits: a spike is fired every 0.4 s and lands 0.24 s later
+   * (0.24 / 0.64 / 1.04 s), the target blacks out and shards scatter. A pop, a whizz, a clank.
    */
   spikecannon: () => {
-    const s = new MoveSfx(0.8, 0x5c4a);
+    const s = new MoveSfx(1.45, 0x5c4a);
     for (let hit = 0; hit < 3; hit++) {
-      const at = hit * 0.1;
+      const at = hit * 0.4;
       s.pulse(at, 0.04, { freq: (u) => 900 + 900 * u, gain: env.decay(0.2, 1), duty: 0.25 });
-      s.pulse(at + 0.02, 0.22, { freq: (u) => 2200 - 900 * u, gain: (u) => 0.07 * (1 - 0.5 * u), duty: 0.125 });
-      s.noise(at + 0.26, 0.05, { clock: () => 14000, gain: env.decay(0.3, 1) });
-      s.thud(at + 0.26, 0.4, 0.25);
+      s.whoosh(at, 0.24, { from: 2500, to: 7000, gain: 0.15 });
+      s.noise(at + 0.24, 0.05, { clock: () => 14000, gain: env.decay(0.3, 1) });
+      s.thud(at + 0.24, 0.45, 0.35);
     }
     return s;
   },
@@ -295,13 +298,13 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic field (~0.6 s, all foes): a shower of star rays, twinkling and swooshing. */
+  /** Custom (dark 0-0.2 s, eight stars stream over 0.2-1.02 s, bursting on the target from 0.6 s, ring sparkles to ~1.3 s, dark lifts 1.3-1.5 s): a twinkling whoosh, a run of star pops. */
   swift: () => {
-    const s = new MoveSfx(1.0, 0x5f17);
-    s.whoosh(0.0, 0.5, { from: 3000, to: 8000, gain: 0.18 });
-    s.arpeggio(0.02, [84, 88, 91, 96, 91, 88], 0.08, { gain: 0.2, duty: 0.25, hold: 0.1 });
-    s.sparkle(0.05, 0.55, 10, { lo: 3000, hi: 6000, gain: 0.16 });
-    for (const at of [0.3, 0.45, 0.6]) s.noise(at, 0.06, { clock: () => 8000, gain: env.decay(0.25, 1) });
+    const s = new MoveSfx(1.55, 0x5f17);
+    s.whoosh(0.2, 0.8, { from: 3000, to: 8000, gain: 0.16 });
+    s.arpeggio(0.2, [84, 88, 91, 96, 91, 88, 91, 96], 0.06, { gain: 0.16, duty: 0.25, hold: 0.08 });
+    s.sparkle(0.25, 1.0, 12, { lo: 3000, hi: 6000, gain: 0.14 });
+    for (let i = 0; i < 8; i++) s.noise(0.6 + i * 0.06, 0.05, { clock: () => 8000, gain: env.decay(0.2, 1) });
     return s;
   },
 

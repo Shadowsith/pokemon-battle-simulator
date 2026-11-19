@@ -4,9 +4,12 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { DoubleSlap } from './double-slap';
+import { Pound } from './pound';
 import { Retaliate } from './retaliate';
+import { Stomp } from './stomp';
+import { Tackle } from './tackle';
 
-/** Hand-made animations for Normal-type punches, kicks and body blows (Double Slap lives in `double-slap.ts`, Retaliate in `retaliate.ts`). */
+/** Hand-made animations for Normal-type punches, kicks and body blows (Double Slap lives in `double-slap.ts`, Pound in `pound.ts`, Retaliate in `retaliate.ts`, Stomp in `stomp.ts`, Tackle in `tackle.ts`). */
 export class NormalBlowMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -20,9 +23,12 @@ export class NormalBlowMoveAnimations {
     headbutt: (refs, _launch, target, v) => NormalBlowMoveAnimations.playHeadbutt(refs, target, v),
     megakick: (refs, _launch, target) => NormalBlowMoveAnimations.playMegaKick(refs, target),
     megapunch: (refs, _launch, target) => NormalBlowMoveAnimations.playMegaPunch(refs, target),
+    pound: (refs, _launch, target, v) => Pound.play(refs, target, v),
     retaliate: (refs, launch, target, v) => Retaliate.play(refs, launch, target, v),
     slam: (refs, _launch, target) => NormalBlowMoveAnimations.playSlam(refs, target),
+    stomp: (refs, _launch, target) => Stomp.play(refs, target),
     strength: (refs, _launch, target) => NormalBlowMoveAnimations.playStrength(refs, target),
+    tackle: (refs, _launch, target, v) => Tackle.play(refs, target, v),
     takedown: (refs, _launch, target, v) => NormalBlowMoveAnimations.playTakeDown(refs, target, v),
     thrash: (refs, _launch, target) => NormalBlowMoveAnimations.playThrash(refs, target)
   };

@@ -240,12 +240,14 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic melee (0.17 s impact): a sharp little beak jab. */
+  /** FlyingMoveAnimations.playPeck (lunge 0-0.15 s, pecks at 0.17 / 0.31 s): two sharp little beak jabs. */
   peck: () => {
-    const s = new MoveSfx(0.55, 0xbec4);
+    const s = new MoveSfx(0.7, 0xbec4);
     s.whoosh(0.0, 0.15, { from: 2500, to: 8000, gain: 0.2 });
-    s.pulse(0.17, 0.05, { freq: (u) => 2200 - 1000 * u, gain: env.decay(0.35, 1.5), duty: 0.25 });
-    s.thud(0.17, 0.45, 0.2);
+    for (const at of [0.17, 0.31]) {
+      s.pulse(at, 0.05, { freq: (u) => 2200 - 1000 * u, gain: env.decay(0.32, 1.5), duty: 0.25 });
+      s.thud(at, 0.4, 0.2);
+    }
     return s;
   },
 

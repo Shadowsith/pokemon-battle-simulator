@@ -3,11 +3,14 @@ import { Fx } from '../fx';
 import { FxEffects } from '../fx-effects';
 import { FxGlyphs } from '../fx-glyphs';
 import { Coil } from './poison/coil';
+import { PoisonGas } from './poison/poison-gas';
 import { PoisonJab } from './poison/poison-jab';
+import { PoisonPowder } from './poison/poison-powder';
 import { SludgeWave } from './poison/sludge-wave';
+import { Smog } from './poison/smog';
 import { ToxicSpikes } from './poison/toxic-spikes';
 
-/** Hand-made animations for Poison-type moves (Coil, Poison Jab, Sludge Wave and Toxic Spikes live in `poison/`). */
+/** Hand-made animations for Poison-type moves (Coil, Poison Gas, Poison Jab, Poison Powder, Sludge Wave, Smog and Toxic Spikes live in `poison/`). */
 export class PoisonMoveAnimations {
   /** Hand-made Poison move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -17,9 +20,14 @@ export class PoisonMoveAnimations {
     coil: (refs, launch) => Coil.play(refs, launch),
     crosspoison: (refs, _launch, target) => PoisonMoveAnimations.playCrossPoison(refs, target),
     gunkshot: (refs, launch, target) => PoisonMoveAnimations.playGunkShot(refs, launch, target),
+    poisongas: (refs, launch, target) => PoisonGas.play(refs, launch, target),
     poisonjab: (refs, _launch, target, v) => PoisonJab.play(refs, target, v),
+    poisonpowder: (refs, _launch, target) => PoisonPowder.play(refs, target),
+    poisonsting: (refs, launch, target) => PoisonMoveAnimations.playPoisonSting(refs, launch, target),
+    sludge: (refs, launch, target) => PoisonMoveAnimations.playSludge(refs, launch, target),
     sludgebomb: (refs, launch, target) => PoisonMoveAnimations.playSludgeBomb(refs, launch, target),
     sludgewave: (refs, launch, target) => SludgeWave.play(refs, launch, target),
+    smog: (refs, _launch, target) => Smog.play(refs, target),
     toxic: (refs, _launch, target) => PoisonMoveAnimations.playToxic(refs, target),
     toxicspikes: (refs, launch, target) => ToxicSpikes.play(refs, launch, target),
     venomdrench: (refs, _launch, target) => PoisonMoveAnimations.playVenomDrench(refs, target)
@@ -67,6 +75,45 @@ export class PoisonMoveAnimations {
     }
     await Promise.all([melt, ...drops]);
     await FxEffects.statUpAura(refs, launch);
+  }
+
+  /**
+   * Poison Sting, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/c/c0/Giftstachel_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/f/f1/Giftstachel_Gen5.png
+   *
+   * A small white barb with a pink tip flies straight at the target
+   * (0-0.35 s). It stings (hit at 0.35 s): the target turns purple and poison
+   * bubbles pop out round it and float up and away (0.35-1.1 s).
+   */
+  private static async playPoisonSting(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const len = Math.max(tr.width * 0.3, 22);
+    const barb = Fx.box(len, 6, 'clip-path:polygon(0 30%,70% 20%,100% 50%,70% 80%,0 70%);background:linear-gradient(90deg,#E8E8EE,#FFFFFF 55%,#F070C8)');
+    await Fx.spawn(fxEl, barb, launch, [
+      { transform: `translate(0,0) rotate(${deg}deg)`, opacity: 0 },
+      { transform: `translate(${dx * 0.15}px,${dy * 0.15}px) rotate(${deg}deg)`, opacity: 1, offset: 0.15 },
+      { transform: `translate(${dx}px,${dy}px) rotate(${deg}deg)`, opacity: 1 }
+    ], { duration: 350, easing: 'linear' });
+
+    Fx.shake(targetEl, 4);
+    const effects: Promise<unknown>[] = [Fx.glow(targetEl, 'sepia(1) saturate(3.5) hue-rotate(240deg) brightness(1.05)', 650)];
+    for (let i = 0; i < 9; i++) {
+      const a = -Math.PI / 2 + (Math.random() * 2 - 1) * Math.PI * 0.6;
+      const d = Math.max(tr.width * 0.5, 34) * (0.5 + Math.random() * 0.6);
+      effects.push(
+        Fx.spawn(fxEl, FxGlyphs.poisonBubble(7 + Math.random() * 7), target, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `translate(${Math.cos(a) * d * 0.5}px,${Math.sin(a) * d * 0.5}px) scale(1)`, opacity: 1, offset: 0.3 },
+          { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d - 24}px) scale(.6)`, opacity: 0 }
+        ], { duration: 700, delay: i * 30, easing: 'ease-out' })
+      );
+    }
+    await Promise.all(effects);
   }
 
   /**
@@ -204,6 +251,63 @@ export class PoisonMoveAnimations {
       `radial-gradient(circle,#9A4CC2,${PoisonMoveAnimations.PURPLE} 55%,${PoisonMoveAnimations.DARK}cc 72%,${PoisonMoveAnimations.DARK}00 74%);` +
       'filter:blur(.4px)';
     return el;
+  }
+
+  /**
+   * Sludge, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/4/42/Schlammbad_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/e/e9/Schlammbad_Gen5.png
+   *
+   * A single wobbling purple sludge glob is lobbed at the target (0-0.45 s)
+   * and splats on it (hit at 0.45 s), throwing small blobs off. The target
+   * turns magenta (0.45-1.25 s) while purple and blue bubbles rise off it and
+   * pop (0.5-1.35 s).
+   */
+  private static async playSludge(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, targetEl } = refs;
+    const r = Fx.rect(targetEl);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const lift = 40 + Math.abs(dx) * 0.1;
+    const size = Math.max(r.width * 0.35, 26);
+    const frames: Keyframe[] = [];
+    for (let k = 0; k <= 8; k++) {
+      const t = k / 8;
+      const wob = k % 2 ? 1.12 : 0.9;
+      const s = 0.6 + t * 0.5;
+      frames.push({ transform: `translate(${dx * t}px,${dy * t - Math.sin(t * Math.PI) * lift}px) scale(${s * wob},${s / wob})`, opacity: t === 0 ? 0 : 1 });
+    }
+    await Fx.spawn(fxEl, PoisonMoveAnimations.sludgeGlob(size), launch, frames, { duration: 450, easing: 'linear' });
+
+    Fx.shake(targetEl, 4);
+    const effects: Promise<unknown>[] = [Fx.glow(targetEl, 'sepia(1) saturate(5) hue-rotate(255deg) brightness(1.15)', 800)];
+    for (let i = 0; i < 6; i++) {
+      const a = (Math.PI * 2 * i) / 6 + Math.random() * 0.4;
+      const d = size * (0.8 + Math.random() * 0.4);
+      effects.push(
+        Fx.spawn(fxEl, PoisonMoveAnimations.sludgeGlob(size * 0.35), target, [
+          { transform: 'translate(0,0) scale(1)', opacity: 1 },
+          { transform: `translate(${Math.cos(a) * d}px,${Math.sin(a) * d * 0.7}px) scale(.5)`, opacity: 0 }
+        ], { duration: 380, easing: 'ease-out' })
+      );
+    }
+    for (let i = 0; i < 10; i++) {
+      const s = 7 + Math.random() * 8;
+      const bubble = i % 3 === 0
+        ? Fx.box(s, s, 'border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#5A7CF0 45%,#2A3CB0);box-shadow:0 0 4px #5A7CF0')
+        : FxGlyphs.poisonBubble(s);
+      const x = (Math.random() * 2 - 1) * r.width * 0.4;
+      const rise = 20 + Math.random() * 22;
+      effects.push(
+        Fx.spawn(fxEl, bubble, { x: target.x + x, y: target.y - r.height * (Math.random() * 0.3) }, [
+          { transform: 'translate(0,0) scale(.3)', opacity: 0 },
+          { transform: `translate(${x * 0.1}px,${-rise * 0.5}px) scale(1)`, opacity: 1, offset: 0.4 },
+          { transform: `translate(${-x * 0.1}px,${-rise}px) scale(1.2)`, opacity: 1, offset: 0.85 },
+          { transform: `translate(${-x * 0.1}px,${-rise}px) scale(1.6)`, opacity: 0 }
+        ], { duration: 550, delay: 50 + Math.random() * 300, easing: 'ease-out' })
+      );
+    }
+    await Promise.all(effects);
   }
 
   /**

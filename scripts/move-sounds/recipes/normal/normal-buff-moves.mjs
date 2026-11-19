@@ -384,15 +384,15 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Attack rise fleck (~0.85 s): a blade being honed, steady whetstone scrapes and a gleam. */
+  /** NormalStatusMoveAnimations.playSharpen (cube grows 0-0.45 s, glint 0.45-0.75 s, cube fades to 1.0 s, stat-up aura 1.0-1.8 s): whetstone scrapes, a gleam and the stat-up jingle. */
   sharpen: () => {
-    const s = new MoveSfx(1.45, 0x54a7);
-    for (let i = 0; i < 4; i++) {
-      s.noise(0.05 + i * 0.18, 0.14, { clock: env.ramp(6000, 14000), gain: env.attackDecay(0.3, 0.4) });
-      s.pulse(0.05 + i * 0.18, 0.1, { freq: env.ramp(1800, 2600), gain: env.decay(0.1, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.95, 0x54a7);
+    for (let i = 0; i < 3; i++) {
+      s.noise(0.03 + i * 0.14, 0.12, { clock: env.ramp(6000, 14000), gain: env.attackDecay(0.3, 0.4) });
+      s.pulse(0.03 + i * 0.14, 0.1, { freq: env.ramp(1800, 2600), gain: env.decay(0.1, 1.5), duty: 0.125 });
     }
-    s.pulse(0.72, 0.12, { freq: () => 3520, gain: env.decay(0.15, 1.5), duty: 0.125 });
-    s.statUp(0.85);
+    s.pulse(0.58, 0.14, { freq: () => 3520, gain: env.decay(0.16, 1.5), duty: 0.125 });
+    s.statUp(1.0);
     return s;
   },
 
@@ -454,12 +454,12 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): flops around uselessly - two boing hops, two tiny splashes. */
+  /** Custom (three hops 0-1.2 s, landing with water splashes at 0.4 / 0.8 / 1.2 s): flops around uselessly - three boing hops, three little splashes. */
   splash: () => {
-    const s = new MoveSfx(1.0, 0x5b1a);
-    for (const at of [0.02, 0.42]) {
-      s.pulse(at, 0.2, { freq: (u) => 300 + 600 * Math.sin(Math.PI * u), gain: env.decay(0.25, 0.8), duty: 0.5 });
-      s.splash(at + 0.22, 0.3);
+    const s = new MoveSfx(1.7, 0x5b1a);
+    for (let k = 0; k < 3; k++) {
+      s.pulse(k * 0.4, 0.22, { freq: (u) => 300 + 600 * Math.sin(Math.PI * u), gain: env.decay(0.22, 0.8), duty: 0.5 });
+      s.splash((k + 1) * 0.4, 0.3);
     }
     return s;
   },

@@ -441,30 +441,32 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (0.17 s impact): a plain, round slap. */
+  /** Pound.play (dart 0-0.26 s, hit at 0.12 s, stars scatter and fade to ~0.75 s): a plain, round slap with a little twinkle. */
   pound: () => {
-    const s = new MoveSfx(0.6, 0x90d0);
-    s.whoosh(0.0, 0.16, { from: 1500, to: 5000, gain: 0.2 });
-    s.thud(0.17, 0.6, 0.45);
+    const s = new MoveSfx(0.9, 0x90d0);
+    s.whoosh(0.0, 0.11, { from: 1500, to: 5000, gain: 0.2 });
+    s.thud(0.12, 0.6, 0.45);
+    s.sparkle(0.15, 0.4, 4, { lo: 2500, hi: 4500, gain: 0.08 });
     return s;
   },
 
-  /** Generic melee (priority, impact 0.12 s): a lightning-fast dash and a light tap. */
+  /** QuickAttack.play (dash 0-0.36 s, hit at 0.12 s, stars drift up to ~0.65 s): a lightning-fast dash, a light tap and a twinkle. */
   quickattack: () => {
-    const s = new MoveSfx(0.55, 0x9a77);
+    const s = new MoveSfx(0.8, 0x9a77);
     s.whoosh(0.0, 0.13, { from: 3000, to: 12000, gain: 0.45 });
     s.pulse(0.0, 0.12, { freq: (u) => 800 + 1600 * u, gain: env.swell(0.12), duty: 0.125 });
     s.thud(0.12, 0.6, 0.3);
+    s.sparkle(0.18, 0.45, 5, { lo: 3000, hi: 5500, gain: 0.08 });
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): an angry charge with a growl and a hard blow. */
+  /** Rage.play (red flush + anger mark 0-0.5 s, dart 0.5-0.76 s, hit at 0.62 s, specks to ~1.15 s): an angry growl building up, then a hard blow. */
   rage: () => {
-    const s = new MoveSfx(0.75, 0x7a6e);
-    s.pulse(0.0, 0.18, { freq: (u) => 110 + 40 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.2), duty: 0.125 });
-    s.whoosh(0.0, 0.18, { from: 1000, to: 3500, gain: 0.3 });
-    s.thud(0.17, 0.8, 0.8);
-    s.thud(0.27, 0.35, 0.5);
+    const s = new MoveSfx(1.25, 0x7a6e);
+    s.pulse(0.0, 0.5, { freq: (u) => 110 + 40 * Math.sin(2 * Math.PI * 8 * u), gain: env.swell(0.22), duty: 0.125 });
+    s.whoosh(0.48, 0.14, { from: 1000, to: 3500, gain: 0.3 });
+    s.thud(0.62, 0.8, 0.8);
+    s.thud(0.72, 0.35, 0.5);
     return s;
   },
 
@@ -511,13 +513,12 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee slash (impact 0.17 s): quick claw scratches – two bright rasps. */
+  /** Scratch.play (three claw streaks at 0 / 0.045 / 0.09 s, hit at 0.12 s, specks to ~0.65 s): three quick bright rasps. */
   scratch: () => {
-    const s = new MoveSfx(0.6, 0x5c7a);
-    s.whoosh(0.0, 0.16, { from: 3000, to: 9000, gain: 0.25 });
-    s.slash(0.17, 0.55);
-    s.noise(0.22, 0.08, { clock: (u) => 14000 - 6000 * u, gain: env.attackDecay(0.3, 0.1) });
-    s.pulse(0.2, 0.08, { freq: (u) => 1800 - 800 * u, gain: env.decay(0.12, 1.5), duty: 0.125 });
+    const s = new MoveSfx(0.75, 0x5c7a);
+    for (const at of [0.0, 0.045, 0.09]) s.slash(at, 0.4);
+    s.noise(0.12, 0.08, { clock: (u) => 14000 - 6000 * u, gain: env.attackDecay(0.3, 0.1) });
+    s.pulse(0.12, 0.08, { freq: (u) => 1800 - 800 * u, gain: env.decay(0.12, 1.5), duty: 0.125 });
     return s;
   },
 
@@ -581,13 +582,13 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (kick style) + flinch fleck: a heavy foot stamps down. */
+  /** Custom (footprint comes down 0-0.22 s, stamp 0.22 s, sparkles + specks to ~0.85 s): a heavy foot stamps down. */
   stomp: () => {
-    const s = new MoveSfx(0.85, 0x5707);
-    s.whoosh(0.0, 0.18, { from: 700, to: 2000, gain: 0.3 });
-    s.thud(0.17, 0.85, 1);
-    s.rumble(0.2, 0.25, { from: 260, to: 100, gain: 0.25 });
-    s.flinch(0.6);
+    const s = new MoveSfx(1.0, 0x5707);
+    s.whoosh(0.0, 0.22, { from: 700, to: 2000, gain: 0.3 });
+    s.thud(0.22, 0.85, 1);
+    s.rumble(0.25, 0.25, { from: 260, to: 100, gain: 0.25 });
+    s.sparkle(0.25, 0.4, 5, { lo: 2500, hi: 4500, gain: 0.1 });
     return s;
   },
 
@@ -611,13 +612,14 @@ export const NORMAL_STRIKE = {
   },
 
 
-  /** Generic melee + 1/4 HP self-damage (~0.12 s after impact): a desperate flailing hit. */
+  /** Custom (lunge, hit 0.12 s, yellow stars twinkle to 0.6 s, recoil shudder 0.65-0.95 s): a desperate flailing hit, then it hurts itself. */
   struggle: () => {
-    const s = new MoveSfx(0.7, 0x5706);
-    s.whoosh(0.0, 0.18, { from: 1200, to: 3500, gain: 0.3 });
-    s.thud(0.17, 0.7, 0.5);
-    s.thud(0.3, 0.35, 0.3);
-    s.pulse(0.32, 0.25, { freq: (u) => 400 * Math.pow(0.5, u), gain: env.decay(0.15, 1.5), duty: 0.25 });
+    const s = new MoveSfx(1.1, 0x5706);
+    s.whoosh(0.0, 0.12, { from: 1200, to: 3500, gain: 0.3 });
+    s.thud(0.12, 0.7, 0.5);
+    s.sparkle(0.15, 0.4, 4, { lo: 3000, hi: 5000, gain: 0.09 });
+    s.thud(0.65, 0.35, 0.3);
+    s.pulse(0.65, 0.25, { freq: (u) => 400 * Math.pow(0.5, u), gain: env.decay(0.15, 1.5), duty: 0.25 });
     return s;
   },
 
@@ -638,12 +640,13 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): the classic clean body tackle - short rush, solid thump. */
+  /** Custom (charge, hit 0.12 s, yellow glow to 0.45 s, specks float up to ~0.9 s): a quick rush and a solid bump. */
   tackle: () => {
-    const s = new MoveSfx(0.6, 0x7ac1);
-    s.whoosh(0.0, 0.18, { from: 1200, to: 4000, gain: 0.3 });
-    s.thud(0.17, 0.75, 0.6);
-    s.noise(0.2, 0.15, { clock: () => 1200, gain: env.decay(0.15, 1.5) });
+    const s = new MoveSfx(0.95, 0x7ac1);
+    s.whoosh(0.0, 0.12, { from: 1200, to: 4000, gain: 0.3 });
+    s.thud(0.12, 0.75, 0.6);
+    s.noise(0.15, 0.15, { clock: () => 1200, gain: env.decay(0.15, 1.5) });
+    s.sparkle(0.2, 0.55, 4, { lo: 2000, hi: 3500, gain: 0.07 });
     return s;
   },
 

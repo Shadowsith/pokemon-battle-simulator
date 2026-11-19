@@ -250,12 +250,12 @@ export const ICE = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s, team side): a cold white mist rolls out over the party with a faint glassy shimmer. */
+  /** IceMoveAnimations.playMist (mist rolls in 0-0.4 s, drifts over the field, glints twinkle 0.25-1.3 s, clears 1.2-1.6 s): a cold white mist breathing over the field with a faint glassy shimmer. */
   mist: () => {
-    const s = new MoveSfx(1.1, 0x3157);
-    s.noise(0.02, 0.85, { clock: (u) => 3500 + 2500 * Math.sin(Math.PI * u), gain: env.swell(0.32) });
-    s.wave(0.05, 0.8, { freq: (u) => 1320 * (1 + 0.02 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.12) });
-    s.sparkle(0.2, 0.6, 6, { lo: 3500, hi: 6000, gain: 0.1 });
+    const s = new MoveSfx(1.8, 0x3157);
+    s.noise(0.0, 1.6, { clock: (u) => 3500 + 2500 * Math.sin(Math.PI * u), gain: env.swell(0.3) });
+    s.wave(0.1, 1.3, { freq: (u) => 1320 * (1 + 0.02 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.1) });
+    s.sparkle(0.25, 1.05, 7, { lo: 3500, hi: 6000, gain: 0.1 });
     return s;
   },
 

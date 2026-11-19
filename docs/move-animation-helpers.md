@@ -63,6 +63,7 @@ static readonly anims: MoveAnimRegistry = {
 | `dizzyBirds(fxEl, head, rx, ry, duration)` | Confused: three little birds circle a head on an ellipse while stars twinkle (Dynamic Punch, Confuse Ray). |
 | `speedLines(layer, W, H, flow, [c1, c2])` | Endless speed lines inside `layer` (stop when it is removed). |
 | `smokePuff(fxEl, at, size, [c1, c2]?)` | Puff cloud; white by default, also dust / spray. |
+| `smokeCloud(fxEl, at, w, h, [core, edge], count=12, dur=900, stagger=400)` | Thick cloud of blurred puffs billowing over a `w` × `h` area (Smog, Smokescreen). |
 | `groundRipples(fxEl, foot, width, [edge, glow], count=4, gap=140, dur=700)` | Flat ripple rings spreading over the ground from `foot` (Night Daze, Psystrike, Quiver Dance). |
 | `burstBackdrop(fieldEl, at, 'red'\|'blue'\|'ember'\|'magenta'\|'orange'\|'green'\|'yellow'\|'flare'\|'amber')` | Backdrop with flickering burst rays; caller fades out + removes it. |
 | `cornerSun(fxEl, sun, size, total)` | Pulsing sun with sparkles. |

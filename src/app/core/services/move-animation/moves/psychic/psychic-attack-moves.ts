@@ -23,12 +23,115 @@ export class PsychicAttackMoveAnimations {
     lusterpurge: (refs, launch, target) => PsychicAttackMoveAnimations.playLusterPurge(refs, launch, target),
     psychic: (refs) => PsychicAttackMoveAnimations.playPsychic(refs),
     psychoboost: (refs, launch, target) => PsychicAttackMoveAnimations.playPsychoBoost(refs, launch, target),
+    psybeam: (refs, launch, target) => PsychicAttackMoveAnimations.playPsybeam(refs, launch, target),
     psychocut: (refs, launch, target, v) => PsychoCut.play(refs, launch, target, v),
     psyshock: (refs, _launch, target) => Psyshock.play(refs, target),
     psystrike: (refs, launch, target) => Psystrike.play(refs, launch, target),
+    psywave: (refs, launch, target) => PsychicAttackMoveAnimations.playPsywave(refs, launch, target),
     synchronoise: (refs, launch, target) => Synchronoise.play(refs, launch, target),
     zenheadbutt: (refs, launch, target, v) => ZenHeadbutt.play(refs, launch, target, v)
   };
+
+  /**
+   * Psybeam, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/7/70/Psystrahl_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/7/7a/Psystrahl_Gen5.png
+   *
+   * A beam of rainbow rings (pink, violet, blue, gold) pours out of the user
+   * one after another, each ring swelling as it flies to the target
+   * (0-1.0 s). The first rings reach it at 0.35 s (hit): the target turns
+   * purple and trembles until the last ring has passed (to ~1.2 s).
+   */
+  private static async playPsybeam(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fxEl, launchEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const lr = Fx.rect(launchEl);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const deg = (Math.atan2(dy, dx) * 180) / Math.PI;
+    const size = Math.max(Math.min(tr.height, lr.height) * 0.55, 40);
+    const colors = ['#F070D0', '#A070F0', '#60A8F0', '#F0C840'];
+    const rings: Promise<void>[] = [];
+    for (let i = 0; i < 14; i++) {
+      const c = colors[i % colors.length];
+      // A ring seen edge-on: a narrow ellipse standing across the beam.
+      const ring = Fx.box(size * 0.4, size, `border-radius:50%;border:3px solid ${c};box-shadow:0 0 6px ${c},inset 0 0 4px ${c}`);
+      rings.push(
+        Fx.spawn(fxEl, ring, launch, [
+          { transform: `translate(0,0) rotate(${deg}deg) scale(.3)`, opacity: 0 },
+          { transform: `translate(${dx * 0.15}px,${dy * 0.15}px) rotate(${deg}deg) scale(.5)`, opacity: 1, offset: 0.15 },
+          { transform: `translate(${dx}px,${dy}px) rotate(${deg}deg) scale(1.1)`, opacity: 0.9, offset: 0.9 },
+          { transform: `translate(${dx * 1.06}px,${dy * 1.06}px) rotate(${deg}deg) scale(1.25)`, opacity: 0 }
+        ], { duration: 380, delay: i * 45, easing: 'linear' })
+      );
+    }
+    await Fx.wait(350);
+    Fx.flash(targetEl, '#C860FF', 0.5);
+    await Promise.all([
+      ...rings,
+      Fx.glow(targetEl, 'sepia(1) saturate(3) hue-rotate(230deg) brightness(1.05)', 850),
+      PsychicFx.tremble(targetEl, 700, 3)
+    ]);
+  }
+
+  /**
+   * Psywave, after the Gen 4 / Gen 5 animation:
+   * - Gen 4: https://www.pokewiki.de/images/a/a6/Psywelle_Gen4.png
+   * - Gen 5: https://www.pokewiki.de/images/c/cb/Psywelle_Gen5.png
+   *
+   * A pink-violet glow wells up round the user (0-0.3 s) and a wavy ribbon
+   * of pink energy snakes over to the target (0.15-1.0 s; hit at 0.6 s).
+   * Pink rings ripple out round the target three times while it trembles
+   * (0.6-1.4 s).
+   */
+  private static async playPsywave(refs: BattleStageRefs, launch: Point, target: Point) {
+    const { fieldEl, fxEl, launchEl, targetEl } = refs;
+    const tr = Fx.rect(targetEl);
+    const dx = target.x - launch.x;
+    const dy = target.y - launch.y;
+    const len = Math.hypot(dx, dy) || 1;
+    // Unit normal to the path, for the sideways sway of the wave.
+    const nx = -dy / len;
+    const ny = dx / len;
+    const amp = Math.max(tr.height * 0.25, 18);
+    const blob = Math.max(tr.width * 0.32, 24);
+    const effects: Promise<unknown>[] = [Fx.glow(launchEl, 'drop-shadow(0 0 10px #E060F0) brightness(1.1)', 500)];
+    await Fx.wait(150);
+
+    // The ribbon: blobs follow the same wavy path one after another.
+    for (let i = 0; i < 18; i++) {
+      const c = i % 3 ? '#F070C8' : '#B060F0';
+      const el = Fx.box(blob, blob * 0.6, `border-radius:50%;background:radial-gradient(ellipse,#FFD0F4ee,${c}cc 55%,${c}00 75%)`);
+      const frames: Keyframe[] = [];
+      for (let k = 0; k <= 10; k++) {
+        const t = k / 10;
+        const sway = Math.sin(t * Math.PI * 3) * amp * (1 - t * 0.6);
+        frames.push({ transform: `translate(${dx * t + nx * sway}px,${dy * t + ny * sway}px) scale(${0.6 + t * 0.5})`, opacity: k === 0 ? 0 : k === 10 ? 0.3 : 0.95 });
+      }
+      effects.push(Fx.spawn(fxEl, el, launch, frames, { duration: 450, delay: i * 22, easing: 'linear' }));
+    }
+    await Fx.wait(450);
+
+    // Pink rings ripple out round the target.
+    Fx.flash(targetEl, '#F070D0', 0.5);
+    effects.push(
+      Fx.glow(targetEl, 'sepia(1) saturate(3) hue-rotate(260deg) brightness(1.05)', 750),
+      PsychicFx.tremble(targetEl, 750, 3)
+    );
+    const foot = Fx.footOf(targetEl, fieldEl);
+    const at: Point = { x: target.x, y: (target.y + foot.y) / 2 };
+    const ring = Math.max(tr.width * 1.1, 70);
+    for (let i = 0; i < 3; i++) {
+      effects.push(
+        Fx.spawn(fxEl, Fx.box(ring, ring * 0.45, 'border-radius:50%;border:4px solid #F070D0;box-shadow:0 0 8px #C050F0,inset 0 0 8px #C050F0'), at, [
+          { transform: 'scale(.2)', opacity: 0 },
+          { transform: 'scale(.6)', opacity: 1, offset: 0.3 },
+          { transform: 'scale(1.2)', opacity: 0 }
+        ], { duration: 450, delay: i * 170, easing: 'ease-out' })
+      );
+    }
+    await Promise.all(effects);
+  }
 
   /**
    * Confusion, after the Gen 4 / Gen 5 animation:
