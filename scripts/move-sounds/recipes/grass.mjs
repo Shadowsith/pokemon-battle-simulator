@@ -55,13 +55,13 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic self aura + Speed drop fleck: cotton spores drift down over the foes. */
+  /** CottonSpore.play (cotton puffs drift down 0-0.9 s, sparkles 0.25-0.85 s, Speed drop 0.9 s on): a soft fluffy hush with twinkles, then the stat-down. */
   cottonspore: () => {
-    const s = new MoveSfx(1.5, 0xc075);
-    s.noise(0.02, 0.8, { clock: () => 3000, gain: env.swell(0.12) });
-    s.sparkle(0.05, 0.75, 10, { lo: 1800, hi: 3200, gain: 0.12 });
-    s.wave(0.05, 0.75, { freq: env.ramp(900, 500), gain: env.swell(0.12) });
-    s.statDown(0.85);
+    const s = new MoveSfx(1.9, 0xc075);
+    s.noise(0.02, 0.85, { clock: () => 3000, gain: env.swell(0.12) });
+    s.sparkle(0.25, 0.6, 6, { lo: 2500, hi: 4500, gain: 0.12 });
+    s.wave(0.05, 0.8, { freq: env.ramp(900, 500), gain: env.swell(0.12) });
+    s.statDown(0.9);
     return s;
   },
 

@@ -96,12 +96,12 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), no fleck: a nightmare creeps in, slow detuned moans that sink into the dark. */
+  /** Nightmare.play (swirling dream scene 0-0.2 s, flickers at 0.45 / 1.05 s, target trembles 0.25-1.25 s, clears 1.3-1.5 s): slow detuned moans sinking into the dark, cut by two eerie blips. */
   nightmare: () => {
-    const s = new MoveSfx(1.2, 0x9b7a);
-    s.wave(0.02, 0.95, { freq: (u) => 392 * (1 - 0.3 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.28) });
-    s.pulse(0.02, 0.95, { freq: (u) => 415 * (1 - 0.3 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.1), duty: 0.125 });
-    s.pulse(0.1, 0.9, { freq: () => 62, gain: env.swell(0.14), duty: 0.25 });
+    const s = new MoveSfx(1.6, 0x4a6e);
+    s.wave(0.0, 1.45, { freq: (u) => 220 - 70 * u + 6 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.2) });
+    s.wave(0.0, 1.45, { freq: (u) => 233 - 75 * u, gain: env.swell(0.14) });
+    for (const at of [0.45, 1.05]) s.pulse(at, 0.1, { freq: env.ramp(1200, 600), gain: env.decay(0.14, 1), duty: 0.125 });
     return s;
   },
 
@@ -208,12 +208,12 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a spiteful curse drains PP with an eerie, sinking wail. */
+  /** Spite.play (scene darkens 0-0.25 s, user flares pale at 0.35 / 0.65 s, target dims at 0.85 s): a hollow ghostly drone, two spiteful whines and a draining drop. */
   spite: () => {
-    const s = new MoveSfx(1.0, 0x5917e);
-    s.wave(0.02, 0.8, { freq: (u) => 500 * Math.pow(0.5, u) * (1 + 0.04 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.35) });
-    s.wave(0.02, 0.8, { freq: (u) => 530 * Math.pow(0.5, u), gain: env.swell(0.15) });
-    s.pulse(0.6, 0.3, { freq: (u) => 200 - 80 * u, gain: env.decay(0.2, 1.5), duty: 0.25 });
+    const s = new MoveSfx(1.35, 0x5b17);
+    s.wave(0.0, 1.15, { freq: () => 130, gain: env.swell(0.16) });
+    for (const at of [0.35, 0.65]) s.wave(at, 0.2, { freq: env.ramp(900, 1300), gain: env.attackDecay(0.14, 0.05) });
+    s.pulse(0.85, 0.25, { freq: env.ramp(600, 150), gain: env.decay(0.18, 1), duty: 0.125 });
     return s;
   },
 

@@ -6,11 +6,12 @@ import { FxEffects } from '../fx-effects';
 import { ElectricCheekMoveAnimations } from './electric/electric-cheek-moves';
 import { ElectricFieldMoveAnimations } from './electric/electric-field-moves';
 import { FusionBolt } from './electric/fusion-bolt';
+import { Spark } from './electric/spark';
 import { VoltSwitch } from './electric/volt-switch';
 import { WildCharge } from './electric/wild-charge';
 
 /**
- * Hand-made animations for Electric-type moves. Fusion Bolt, Volt Switch, Wild
+ * Hand-made animations for Electric-type moves. Fusion Bolt, Spark, Volt Switch, Wild
  * Charge and the Gen 6 field / cheek moves live in `electric/`.
  */
 export class ElectricMoveAnimations {
@@ -21,6 +22,7 @@ export class ElectricMoveAnimations {
     boltstrike: (refs, launch, target) => ElectricMoveAnimations.playBoltStrike(refs, launch, target),
     discharge: (refs, launch, target) => ElectricMoveAnimations.playDischarge(refs, launch, target),
     fusionbolt: (refs, launch, target) => FusionBolt.play(refs, launch, target),
+    spark: (refs, launch, target, v) => Spark.play(refs, launch, target, v),
     thunder: (refs, _launch, target) => ElectricMoveAnimations.playThunder(refs, target),
     thundershock: (refs, _launch, target) => ElectricMoveAnimations.playThunderShock(refs, target),
     thunderbolt: (refs, _launch, target) => ElectricMoveAnimations.playThunderbolt(refs, target),

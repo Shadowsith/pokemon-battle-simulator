@@ -2,18 +2,21 @@ import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../animati
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { AncientPower } from './rock/ancient-power';
 import { HeadSmash } from './rock/head-smash';
 import { PowerGem } from './rock/power-gem';
 import { RockPolish } from './rock/rock-polish';
 import { RockWrecker } from './rock/rock-wrecker';
+import { Rollout } from './rock/rollout';
 import { StealthRock } from './rock/stealth-rock';
 import { StoneEdge } from './rock/stone-edge';
 import { WideGuard } from './rock/wide-guard';
 
-/** Hand-made animations for Rock-type moves (Head Smash, Power Gem, Rock Polish, Rock Wrecker, Stealth Rock, Stone Edge and Wide Guard live in `rock/`). */
+/** Hand-made animations for Rock-type moves (Ancient Power, Head Smash, Power Gem, Rock Polish, Rock Wrecker, Rollout, Stealth Rock, Stone Edge and Wide Guard live in `rock/`). */
 export class RockMoveAnimations {
   /** Hand-made Rock move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    ancientpower: (refs, launch, target) => AncientPower.play(refs, launch, target),
     diamondstorm: (refs, launch, target, v) => RockMoveAnimations.playDiamondStorm(refs, launch, target, v),
     headsmash: (refs, _launch, target, v) => HeadSmash.play(refs, target, v),
     powergem: (refs, launch, target) => PowerGem.play(refs, launch, target),
@@ -21,6 +24,7 @@ export class RockMoveAnimations {
     rockslide: (refs, _launch, target) => RockMoveAnimations.playRockSlide(refs, target),
     rockthrow: (refs, _launch, target) => RockMoveAnimations.playRockThrow(refs, target),
     rockwrecker: (refs, launch, target, v) => RockWrecker.play(refs, launch, target, v),
+    rollout: (refs, _launch, target, v) => Rollout.play(refs, target, v),
     sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs),
     stealthrock: (refs, launch, target) => StealthRock.play(refs, launch, target),
     stoneedge: (refs, _launch, target) => StoneEdge.play(refs, target),

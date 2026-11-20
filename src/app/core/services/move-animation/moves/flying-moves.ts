@@ -10,8 +10,9 @@ import { DragonAscent } from './flying/dragon-ascent';
 import { Hurricane } from './flying/hurricane';
 import { Roost } from './flying/roost';
 import { Tailwind } from './flying/tailwind';
+import { WingAttack } from './flying/wing-attack';
 
-/** Hand-made animations for Flying-type moves (Air Slash, Brave Bird, Defog, Dragon Ascent, Roost and Tailwind live in `flying/`). */
+/** Hand-made animations for Flying-type moves (Air Slash, Brave Bird, Defog, Dragon Ascent, Roost, Tailwind and Wing Attack live in `flying/`). */
 export class FlyingMoveAnimations {
   /** Hand-made Flying move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -30,7 +31,8 @@ export class FlyingMoveAnimations {
     peck: (refs, _launch, target, v) => FlyingMoveAnimations.playPeck(refs, target, v),
     roost: (refs, launch) => Roost.play(refs, launch),
     skyattack: (refs, launch, target) => FlyingMoveAnimations.playSkyAttack(refs, launch, target),
-    tailwind: (refs, launch) => Tailwind.play(refs, launch)
+    tailwind: (refs, launch) => Tailwind.play(refs, launch),
+    wingattack: (refs, _launch, target, v) => WingAttack.play(refs, target, v)
   };
 
   /**

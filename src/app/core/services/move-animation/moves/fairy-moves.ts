@@ -2,13 +2,15 @@ import { BattleStageRefs, MoveAnimRegistry, Point } from '../animation.types';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { Charm } from './fairy/charm';
 import { DazzlingGleam } from './fairy/dazzling-gleam';
 import { FairySpecialMoveAnimations } from './fairy/fairy-special-moves';
 import { FairySupportMoveAnimations } from './fairy/fairy-support-moves';
 import { Geomancy } from './fairy/geomancy';
+import { SweetKiss } from './fairy/sweet-kiss';
 
 /**
- * Hand-made animations for Fairy-type moves. Dazzling Gleam, Geomancy and the
+ * Hand-made animations for Fairy-type moves. Charm, Dazzling Gleam, Geomancy, Sweet Kiss and the
  * Gen 6 support moves / special attacks live in `fairy/`.
  */
 export class FairyMoveAnimations {
@@ -16,11 +18,13 @@ export class FairyMoveAnimations {
   static readonly anims: MoveAnimRegistry = {
     ...FairySupportMoveAnimations.anims,
     ...FairySpecialMoveAnimations.anims,
+    charm: (refs, launch, target) => Charm.play(refs, launch, target),
     dazzlinggleam: (refs, launch, target) => DazzlingGleam.play(refs, launch, target),
     geomancy: (refs, launch) => Geomancy.release(refs, launch),
     moonblast: (refs, launch, target) => FairyMoveAnimations.playMoonblast(refs, launch, target),
     moonlight: (refs, launch) => FairyMoveAnimations.playMoonlight(refs, launch),
-    playrough: (refs, launch, target) => FairyMoveAnimations.playPlayRough(refs, launch, target)
+    playrough: (refs, launch, target) => FairyMoveAnimations.playPlayRough(refs, launch, target),
+    sweetkiss: (refs, _launch, target) => SweetKiss.play(refs, target)
   };
 
   /** Turn-1 animations of two-turn Fairy moves, by @pkmn/sim move id. */

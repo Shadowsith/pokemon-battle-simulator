@@ -11,14 +11,15 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura: hearts pop up three times. */
+  /** Attract.play (8 hearts pop 0-0.63 s, 0.09 s apart, target blushes 0.2-1.1 s, one small heart floats up 1.1-1.6 s): a run of sweet heart blips, then a last soft ping. */
   attract: () => {
-    const s = new MoveSfx(1.25, 0xa77c);
-    for (const at of [0.02, 0.35, 0.68]) {
-      s.arpeggio(at, [79, 84], 0.08, { gain: 0.26, voice: 'wave', hold: 0.16 });
-      s.pulse(at + 0.08, 0.12, { freq: () => 1046.5 * 2, gain: env.decay(0.06, 2), duty: 0.5 });
+    const s = new MoveSfx(1.8, 0xa77c);
+    for (let i = 0; i < 8; i++) {
+      s.pulse(i * 0.09, 0.1, { freq: () => [1046.5, 1318.5, 1568, 1318.5][i % 4] * (i < 4 ? 1 : 1.25), gain: env.decay(0.14, 2), duty: 0.5 });
     }
-    s.sparkle(0.8, 0.35, 5, { lo: 3000, hi: 5000, gain: 0.12 });
+    s.wave(0.2, 0.8, { freq: (u) => 784 * (1 + 0.02 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.12) });
+    s.arpeggio(1.1, [79, 84], 0.08, { gain: 0.22, voice: 'wave', hold: 0.16 });
+    s.sparkle(1.2, 0.35, 4, { lo: 3000, hi: 5000, gain: 0.1 });
     return s;
   },
 
@@ -65,12 +66,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura: digital bleeps that read the target, then the type changes. */
+  /** Conversion2.play (pixels flicker on the target 0-0.55 s, stream to the user 0.55-0.9 s, user flickers 0.9-1.4 s): digital bleeps read the target, a falling zip, then the type flips. */
   conversion2: () => {
-    const s = new MoveSfx(1.0, 0xc0b2);
-    s.arpeggio(0.02, [91, 86, 88, 81, 84, 76, 79, 72], 0.045, { gain: 0.22, duty: 0.125, hold: 0.04 });
-    s.pulse(0.4, 0.4, { freq: (u) => 1600 * Math.pow(0.25, u), gain: env.swell(0.16), duty: 0.5 });
-    s.arpeggio(0.75, [79, 84], 0.06, { gain: 0.15, duty: 0.25, hold: 0.06 });
+    const s = new MoveSfx(1.5, 0xc0b2);
+    s.arpeggio(0.02, [91, 86, 88, 81, 84, 76, 79, 72, 84, 79], 0.05, { gain: 0.2, duty: 0.125, hold: 0.04 });
+    s.pulse(0.55, 0.35, { freq: (u) => 1600 * Math.pow(0.4, u), gain: env.swell(0.16), duty: 0.5 });
+    for (let i = 0; i < 4; i++) s.pulse(0.9 + i * 0.1, 0.06, { freq: () => (i % 2 ? 1568 : 1046.5), gain: env.decay(0.16, 1), duty: 0.25 });
+    s.arpeggio(1.3, [79, 84], 0.05, { gain: 0.12, duty: 0.25, hold: 0.05 });
     return s;
   },
 
@@ -133,15 +135,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s, fleck at ~0.6 s): a keen eye fixes on the target - high searching blips, then a lock-on ping. */
+  /** Foresight.play (magnifying glass circles the target 0-0.9 s, target spotted 0.9-1.3 s): high searching blips, then a lock-on ping. */
   foresight: () => {
-    const s = new MoveSfx(1.0, 0xf05e);
-    for (let i = 0; i < 4; i++) {
-      s.pulse(0.03 + i * 0.12, 0.06, { freq: () => 2093 + i * 260, gain: env.decay(0.18, 1), duty: 0.25 });
-    }
-    s.wave(0.0, 0.55, { freq: (u) => 1200 + 400 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.1) });
-    s.pulse(0.6, 0.35, { freq: () => 3520, gain: env.decay(0.22, 1.5), duty: 0.125 });
-    s.pulse(0.6, 0.35, { freq: () => 1760, gain: env.decay(0.14, 1.5), duty: 0.5 });
+    const s = new MoveSfx(1.4, 0xf05e);
+    for (let i = 0; i < 6; i++) s.pulse(0.05 + i * 0.14, 0.06, { freq: () => 2093 + i * 180, gain: env.decay(0.16, 1), duty: 0.25 });
+    s.wave(0.0, 0.85, { freq: (u) => 1200 + 400 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.1) });
+    s.pulse(0.9, 0.4, { freq: () => 3520, gain: env.decay(0.22, 1.5), duty: 0.125 });
+    s.pulse(0.9, 0.4, { freq: () => 1760, gain: env.decay(0.14, 1.5), duty: 0.5 });
     return s;
   },
 
@@ -193,14 +193,17 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s, no fleck): a targeting reticle closes in - quick sonar beeps speeding up into a lock tone. */
+  /** LockOn.play (reticles close in 0-0.6 s, locked reticle blinks 0.6-0.9 s): sonar beeps speeding up, then a blinking lock tone. */
   lockon: () => {
     const s = new MoveSfx(1.1, 0x10c0);
     [0.0, 0.18, 0.32, 0.43, 0.51, 0.57].forEach((at, i) => {
       s.pulse(at, 0.05, { freq: () => 1760 + i * 60, gain: env.decay(0.22, 1), duty: 0.25 });
     });
-    s.pulse(0.64, 0.35, { freq: () => 2093, gain: (u) => 0.22 * (u < 0.85 ? 1 : (1 - u) / 0.15), duty: 0.5 });
-    s.pulse(0.64, 0.35, { freq: () => 1046, gain: (u) => 0.12 * (u < 0.85 ? 1 : (1 - u) / 0.15), duty: 0.25 });
+    for (const at of [0.6, 0.75]) {
+      s.pulse(at, 0.075, { freq: () => 2093, gain: () => 0.22, duty: 0.5 });
+      s.pulse(at, 0.075, { freq: () => 1046, gain: () => 0.12, duty: 0.25 });
+    }
+    s.pulse(0.9, 0.12, { freq: () => 2093, gain: env.decay(0.2, 1.5), duty: 0.5 });
     return s;
   },
 
@@ -222,13 +225,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (≈ 0.8 s): a piercing, unblinking stare - a cold low drone with a creeping dissonant whine. */
+  /** MeanLook.play (scene washes magenta 0-0.25 s, eye opens 0.3-0.6 s, pulses at 0.8 s, shuts 1.0-1.3 s): a cold low drone, a creeping dissonant whine as the eye opens, a throb, then it fades. */
   meanlook: () => {
-    const s = new MoveSfx(1.15, 0x3ea1);
-    s.wave(0.0, 1.0, { freq: () => 110, gain: env.swell(0.24) });
-    s.pulse(0.1, 0.85, { freq: (u) => 1760 * (1 + 0.015 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.1), duty: 0.125 });
-    s.pulse(0.1, 0.85, { freq: () => 1865, gain: env.swell(0.07), duty: 0.125 });
-    s.arpeggio(0.6, [64, 63], 0.15, { gain: 0.16, voice: 'wave', hold: 0.3 });
+    const s = new MoveSfx(1.5, 0x3e10);
+    s.wave(0.0, 1.35, { freq: () => 98, gain: env.swell(0.22) });
+    s.wave(0.3, 1.0, { freq: (u) => 740 + 40 * u + 8 * Math.sin(2 * Math.PI * 5 * u), gain: env.swell(0.1) });
+    s.wave(0.3, 1.0, { freq: (u) => 784 + 40 * u, gain: env.swell(0.07) });
+    s.pulse(0.8, 0.2, { freq: () => 110, gain: env.decay(0.25, 1.5), duty: 0.25 });
     return s;
   },
 
@@ -255,13 +258,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a focused probing hum locks onto the target with a click. */
+  /** MindReader.play (scene darkens 0-0.25 s, ring closes in 0.25-0.75 s, flares 0.75-0.95 s): a focused probing hum that narrows and rises, then locks on with a click. */
   mindreader: () => {
-    const s = new MoveSfx(1.1, 0x3d8e);
-    s.wave(0.02, 0.6, { freq: (u) => 700 + 500 * u + 40 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.26) });
-    s.pulse(0.02, 0.6, { freq: (u) => 1400 + 1000 * u, gain: env.swell(0.06), duty: 0.125 });
-    s.noise(0.6, 0.04, { clock: () => 10000, gain: env.decay(0.3, 1), short: true });
-    s.pulse(0.6, 0.3, { freq: () => 2349, gain: env.decay(0.18, 2), duty: 0.25 });
+    const s = new MoveSfx(1.35, 0x31de);
+    s.wave(0.2, 0.6, { freq: env.ramp(330, 990), gain: env.swell(0.16) });
+    s.wave(0.2, 0.6, { freq: env.ramp(337, 1000), gain: env.swell(0.1) });
+    s.pulse(0.75, 0.05, { freq: () => 3136, gain: env.decay(0.22, 1), duty: 0.25 });
+    s.wave(0.75, 0.4, { freq: () => 1318.5, gain: env.decay(0.14, 1.5) });
     return s;
   },
 
@@ -308,11 +311,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (0-0.8 s, all active mons): a haunting, falling dirge in minor. */
+  /** PerishSong.play (dark + spotlight rays 0-0.3 s, notes drift 0.2-1.15 s, rays fade 1.15-1.35 s, red eyes glint 1.3-1.7 s): a haunting falling dirge in minor, then a low ominous sting. */
   perishsong: () => {
-    const s = new MoveSfx(1.45, 0x9e15);
-    s.arpeggio(0.02, [76, 75, 71, 68, 64], 0.2, { gain: 0.3, voice: 'wave', hold: 0.32 });
-    s.chord(0.1, 1.05, [52, 55, 59], { rate: 0.05, gain: 0.12, vibrato: 0.015 });
+    const s = new MoveSfx(2.0, 0x9e15);
+    s.arpeggio(0.2, [76, 74, 72, 71, 69, 68, 69], 0.135, { gain: 0.2, voice: 'wave', hold: 0.2 });
+    s.wave(0.15, 1.05, { freq: () => 220, gain: env.swell(0.08) });
+    s.wave(1.3, 0.45, { freq: () => 110, gain: env.decay(0.22, 1) });
+    s.wave(1.3, 0.45, { freq: () => 116.5, gain: env.decay(0.16, 1) });
     return s;
   },
 
@@ -330,12 +335,12 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): the user tunes in and copies the target's mood - a rising, humming focus. */
+  /** PsychUp.play (4 swirl rings spiral in 0-0.95 s, 0.15 s apart; user glows pink 0.2-1.1 s): a rising, humming focus with a wobble per ring. */
   psychup: () => {
-    const s = new MoveSfx(0.95, 0x95c9);
-    s.wave(0.02, 0.75, { freq: (u) => (220 + 220 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 8 * u)), gain: env.swell(0.32) });
-    s.pulse(0.02, 0.75, { freq: (u) => 110 + 110 * u, gain: env.swell(0.12), duty: 0.5 });
-    s.arpeggio(0.6, [69, 76], 0.08, { gain: 0.2, voice: 'wave', hold: 0.2 });
+    const s = new MoveSfx(1.2, 0x95c0);
+    s.wave(0.0, 1.05, { freq: env.ramp(330, 880), gain: env.swell(0.18) });
+    for (let i = 0; i < 4; i++) s.wave(i * 0.15, 0.4, { freq: (u) => 660 + 440 * u + 30 * Math.sin(2 * Math.PI * 10 * u), gain: env.swell(0.08) });
+    s.arpeggio(0.95, [76, 81], 0.06, { gain: 0.12, voice: 'wave', hold: 0.1 });
     return s;
   },
 
@@ -359,14 +364,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Speed drop fleck (~0.85 s): a menacing grimace – a low creepy growl and a dissonant sting. */
+  /** ScaryFace.play (scene darkens 0-0.2 s, face looms 0.15-0.6 s, holds to 0.8 s, fades by 1.0 s, Speed drop 1.0 s on): a low creepy growl swelling into a dissonant sting, then the stat-down. */
   scaryface: () => {
-    const s = new MoveSfx(1.4, 0x5ca2);
-    s.pulse(0.0, 0.7, { freq: (u) => 98 * (1 + 0.04 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.25), duty: 0.125 });
-    s.pulse(0.0, 0.7, { freq: (u) => 104 * (1 + 0.04 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.15), duty: 0.25 });
-    s.pulse(0.55, 0.18, { freq: () => 740, gain: env.decay(0.22, 1.5), duty: 0.25 });
-    s.pulse(0.55, 0.18, { freq: () => 784, gain: env.decay(0.18, 1.5), duty: 0.5 });
-    s.statDown(0.85, 0.25);
+    const s = new MoveSfx(1.9, 0x5ca7);
+    s.pulse(0.1, 0.7, { freq: (u) => 80 + 20 * u + 6 * Math.sin(2 * Math.PI * 18 * u), gain: env.swell(0.22), duty: 0.25 });
+    s.wave(0.5, 0.35, { freq: () => 622, gain: env.decay(0.16, 1.5) });
+    s.wave(0.5, 0.35, { freq: () => 659, gain: env.decay(0.14, 1.5) });
+    s.statDown(1.0);
     return s;
   },
 
@@ -402,15 +406,12 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), no fleck: quick pencil scribbles copy the target's move, ending in a little tick. */
+  /** Sketch.play (pencil scribbles 4 strokes 0-0.8 s leaving stars, target flickers 0.8-1.1 s, stars fade to ~1.4 s): scratchy pencil strokes with twinkles, then a copying blip. */
   sketch: () => {
-    const s = new MoveSfx(1.1, 0x5e7c);
-    for (let i = 0; i < 7; i++) {
-      const at = 0.04 + i * 0.1;
-      s.noise(at, 0.07, { clock: () => 5000 + s.random() * 5000, gain: env.attackDecay(0.28, 0.3) });
-    }
-    s.pulse(0.78, 0.08, { freq: () => 1760, gain: env.decay(0.22, 1.5), duty: 0.25 });
-    s.pulse(0.86, 0.1, { freq: () => 2637, gain: env.decay(0.18, 1.5), duty: 0.25 });
+    const s = new MoveSfx(1.45, 0x5e7c);
+    for (let i = 0; i < 4; i++) s.noise(i * 0.2, 0.18, { clock: () => 6000 + s.random() * 2000, gain: (u) => 0.12 * Math.sin(Math.PI * u) });
+    s.sparkle(0.1, 0.75, 8, { lo: 3000, hi: 5500, gain: 0.1 });
+    s.arpeggio(0.8, [84, 79, 84, 88], 0.075, { gain: 0.16, duty: 0.25, hold: 0.06 });
     return s;
   },
 
@@ -438,22 +439,23 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura + confusion fleck (~0.85 s): a cocky taunt, then the foe reels. */
+  /** Swagger.play (anger mark throbs 0-0.45 s, target flushes red 0.3-0.7 s, Attack up 0.6-1.4 s, confusion birds 1.4-2.3 s): a mocking blare, the stat-up, then the dizzy warble. */
   swagger: () => {
-    const s = new MoveSfx(1.45, 0x5a66);
-    s.arpeggio(0.02, [55, 59, 62], 0.1, { gain: 0.3, duty: 0.5, hold: 0.12 });
-    s.pulse(0.35, 0.3, { freq: (u) => 196 * (1 + 0.05 * Math.sin(2 * Math.PI * 7 * u)), gain: env.decay(0.3, 1.2), duty: 0.25 });
-    s.noise(0.35, 0.1, { clock: () => 4000, gain: env.decay(0.18, 1) });
-    s.confusion(0.85, 0.2);
+    const s = new MoveSfx(2.4, 0x5a99);
+    s.arpeggio(0.0, [67, 71, 74], 0.1, { gain: 0.2, duty: 0.25, hold: 0.12 });
+    s.pulse(0.3, 0.3, { freq: (u) => 160 + 20 * Math.sin(2 * Math.PI * 10 * u), gain: env.swell(0.14), duty: 0.25 });
+    s.statUp(0.6);
+    s.confusion(1.4);
     return s;
   },
 
-  /** Generic self aura + stat-down fleck (~0.85 s): a sweet, swaying waft of fragrance. */
+  /** SweetScent.play (pink haze 0-0.3 s, petals and rings drift 0.1-1.1 s, haze clears to 1.25 s, evasion drop 1.25 s on): a sweet, airy shimmer, then the stat-down. */
   sweetscent: () => {
-    const s = new MoveSfx(1.4, 0x5ee7);
-    s.chord(0.02, 0.8, [72, 76, 79], { rate: 0.05, gain: 0.22, vibrato: 0.01 });
-    s.noise(0.02, 0.8, { clock: () => 2500, gain: env.swell(0.1) });
-    s.statDown(0.85, 0.22);
+    const s = new MoveSfx(2.2, 0x5ce7);
+    s.chord(0.0, 1.15, [79, 83, 86, 91], { rate: 0.09, gain: 0.12, voice: 'wave', vibrato: 0.01 });
+    s.noise(0.0, 1.1, { clock: () => 5000, gain: env.swell(0.06) });
+    s.sparkle(0.2, 0.8, 6, { lo: 3000, hi: 5000, gain: 0.08 });
+    s.statDown(1.25);
     return s;
   },
 

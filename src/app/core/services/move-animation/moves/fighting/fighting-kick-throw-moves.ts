@@ -3,8 +3,9 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { TripleKick } from './triple-kick';
 
-/** Hand-made animations for Fighting-type kicks, throws and body dives. */
+/** Hand-made animations for Fighting-type kicks, throws and body dives (Triple Kick lives in `triple-kick.ts`). */
 export class FightingKickThrowMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -16,6 +17,7 @@ export class FightingKickThrowMoveAnimations {
     rollingkick: (refs, _launch, target, v) => FightingKickThrowMoveAnimations.playRollingKick(refs, target, v),
     seismictoss: (refs, _launch, target) => FightingKickThrowMoveAnimations.playSeismicToss(refs, target),
     submission: (refs, _launch, target) => FightingKickThrowMoveAnimations.playSubmission(refs, target),
+    triplekick: (refs, _launch, target, v) => TripleKick.play(refs, target, v),
     vitalthrow: (refs, _launch, target) => FightingKickThrowMoveAnimations.playVitalThrow(refs, target)
   };
 

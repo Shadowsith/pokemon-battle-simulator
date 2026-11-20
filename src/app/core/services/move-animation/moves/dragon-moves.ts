@@ -3,8 +3,10 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { ClawStyle, FxEffects } from '../fx-effects';
+import { DragonBreath } from './dragon/dragon-breath';
 import { RoarOfTime } from './dragon/roar-of-time';
 import { SpacialRend } from './dragon/spacial-rend';
+import { Twister } from './dragon/twister';
 
 /** Dragon Claw's marks: black with a white edge and a blue light on the tip. */
 const DRAGON_CLAW: ClawStyle = { glow: ['#ffffff', '#ffffffaa'], tip: '#3FA8FF' };
@@ -12,11 +14,12 @@ const DRAGON_CLAW: ClawStyle = { glow: ['#ffffff', '#ffffffaa'], tip: '#3FA8FF' 
 /** Sprite filter that turns a Pokémon magenta red, with a pink glow (Dragon Claw, Dragon Dance). */
 const DRAGON_RED = 'grayscale(1) brightness(.55) sepia(1) saturate(12) hue-rotate(-40deg) drop-shadow(0 0 6px #FF3C8C)';
 
-/** Hand-made animations for Dragon-type moves (Roar of Time and Spacial Rend live in `dragon/`). */
+/** Hand-made animations for Dragon-type moves (Dragon Breath, Roar of Time, Spacial Rend and Twister live in `dragon/`). */
 export class DragonMoveAnimations {
   /** Hand-made Dragon move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     dracometeor: (refs, launch, target) => DragonMoveAnimations.playDracoMeteor(refs, launch, target),
+    dragonbreath: (refs, launch, target, v) => DragonBreath.play(refs, launch, target, v),
     dragonclaw: (refs, launch, target) => DragonMoveAnimations.playDragonClaw(refs, launch, target),
     dragondance: (refs, launch) => DragonMoveAnimations.playDragonDance(refs, launch),
     dragonrage: (refs, launch, target) => DragonMoveAnimations.playDragonRage(refs, launch, target),
@@ -24,7 +27,8 @@ export class DragonMoveAnimations {
     dragonrush: (refs, _launch, target) => DragonMoveAnimations.playDragonRush(refs, target),
     outrage: (refs, launch) => DragonMoveAnimations.playOutrage(refs, launch),
     roaroftime: (refs, launch, target) => RoarOfTime.play(refs, launch, target),
-    spacialrend: (refs, launch, target) => SpacialRend.play(refs, launch, target)
+    spacialrend: (refs, launch, target) => SpacialRend.play(refs, launch, target),
+    twister: (refs, _launch, target) => Twister.play(refs, target)
   };
 
   /**

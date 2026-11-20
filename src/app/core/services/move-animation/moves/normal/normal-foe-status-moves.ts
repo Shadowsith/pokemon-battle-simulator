@@ -3,18 +3,38 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { Attract } from './attract';
+import { Conversion2 } from './conversion-2';
+import { Foresight } from './foresight';
+import { LockOn } from './lock-on';
+import { MeanLook } from './mean-look';
+import { MindReader } from './mind-reader';
+import { ScaryFace } from './scary-face';
+import { Sketch } from './sketch';
+import { Swagger } from './swagger';
+import { SweetScent } from './sweet-scent';
 
-/** Hand-made animations for Normal-type status moves aimed at the foe (stat drops, sleep, disabling, forcing out, copying). */
+/** Hand-made animations for Normal-type status moves aimed at the foe (stat drops, sleep, disabling, forcing out, copying; Attract, Conversion 2, Foresight, Lock-On, Mean Look, Mind Reader, Scary Face, Sketch, Swagger and Sweet Scent live in their own files). */
 export class NormalFoeStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    attract: (refs, _launch, target) => Attract.play(refs, target),
+    conversion2: (refs, launch, target) => Conversion2.play(refs, launch, target),
     disable: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playDisable(refs, target),
     encore: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playEncore(refs, target),
     flash: (refs, launch, target) => NormalFoeStatusMoveAnimations.playFlash(refs, launch, target),
+    foresight: (refs, _launch, target) => Foresight.play(refs, target),
     leer: (refs, launch, target, v) => NormalFoeStatusMoveAnimations.playLeer(refs, launch, target, v),
+    lockon: (refs, _launch, target, v) => LockOn.play(refs, target, v),
     lovelykiss: (refs, _launch, target, v) => NormalFoeStatusMoveAnimations.playLovelyKiss(refs, target, v),
+    meanlook: (refs, _launch, target) => MeanLook.play(refs, target),
     mimic: (refs, launch, target) => NormalFoeStatusMoveAnimations.playMimic(refs, launch, target),
+    mindreader: (refs, _launch, target) => MindReader.play(refs, target),
+    scaryface: (refs, launch, target) => ScaryFace.play(refs, launch, target),
+    sketch: (refs, _launch, target) => Sketch.play(refs, target),
     smokescreen: (refs, launch, target) => NormalFoeStatusMoveAnimations.playSmokescreen(refs, launch, target),
+    swagger: (refs, _launch, target) => Swagger.play(refs, target),
+    sweetscent: (refs, _launch, target) => SweetScent.play(refs, target),
     tailwhip: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playTailWhip(refs, target),
     whirlwind: (refs, _launch, target, v) => NormalFoeStatusMoveAnimations.playWhirlwind(refs, target, v),
     yawn: (refs, launch, target) => NormalFoeStatusMoveAnimations.playYawn(refs, launch, target)

@@ -160,14 +160,16 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic melee slash (impact 0.17 s): steel claws rake with a bright clink. */
+  /** MetalClaw.play (silver shine sweeps over the user 0-0.45 s, claws rake at 0.5 / 0.62 s): a bright metallic glint, then two raking slashes with a clink. */
   metalclaw: () => {
-    const s = new MoveSfx(0.7, 0xc1a3);
-    s.whoosh(0.0, 0.17, { from: 3000, to: 10000, gain: 0.3 });
-    s.slash(0.17, 0.5);
-    s.noise(0.17, 0.06, { clock: () => 9500, gain: env.decay(0.3, 1), short: true });
-    s.pulse(0.17, 0.4, { freq: () => 2090, gain: env.decay(0.14, 2), duty: 0.5 });
-    s.pulse(0.25, 0.3, { freq: () => 2790, gain: env.decay(0.08, 2), duty: 0.5 });
+    const s = new MoveSfx(1.0, 0x3e7c);
+    s.sparkle(0.05, 0.35, 4, { lo: 4000, hi: 7000, gain: 0.12 });
+    s.wave(0.05, 0.35, { freq: env.ramp(1800, 2600), gain: env.swell(0.08) });
+    for (const at of [0.5, 0.62]) {
+      s.slash(at, 0.45);
+      s.pulse(at + 0.01, 0.15, { freq: () => 2637, gain: env.decay(0.12, 2), duty: 0.125 });
+    }
+    s.thud(0.5, 0.35, 0.3);
     return s;
   },
 

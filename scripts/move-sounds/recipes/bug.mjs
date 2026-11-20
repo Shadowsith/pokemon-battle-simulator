@@ -72,13 +72,13 @@ export const BUG = {
     return s;
   },
 
-  /** Generic melee (impact at 0.17 s): a scything slash, a quick double cut with a rising ring. */
+  /** FuryCutter.play (scene dims 0-0.3 s, blade slashes 0.3-0.5 s, hit 0.4 s): a hush, then a scything slash with a rising ring. */
   furycutter: () => {
-    const s = new MoveSfx(0.75, 0xf0c7);
-    s.whoosh(0.0, 0.15, { from: 3000, to: 9000, gain: 0.3 });
-    s.slash(0.17, 0.55);
-    s.slash(0.26, 0.4);
-    s.pulse(0.27, 0.25, { freq: (u) => 1800 + 600 * u, gain: env.decay(0.12, 1.5), duty: 0.125 });
+    const s = new MoveSfx(0.95, 0xf0c7);
+    s.wave(0.0, 0.3, { freq: () => 220, gain: env.swell(0.06) });
+    s.whoosh(0.28, 0.12, { from: 3000, to: 9000, gain: 0.3 });
+    s.slash(0.4, 0.55);
+    s.pulse(0.42, 0.3, { freq: (u) => 1800 + 600 * u, gain: env.decay(0.12, 1.5), duty: 0.125 });
     return s;
   },
 
@@ -210,15 +210,13 @@ export const BUG = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a sticky web is spun round the target, thread by thread. */
+  /** SpiderWeb.play (thread shoots 0-0.25 s, spiral winds round the target 0.25-0.6 s, web spreads 0.55-0.75 s, holds to 1.15 s): a silky zip, a winding whirr, then a sticky stretch. */
   spiderweb: () => {
-    const s = new MoveSfx(1.0, 0x5d1e);
-    for (let i = 0; i < 6; i++) {
-      const at = 0.02 + i * 0.12;
-      s.pulse(at, 0.1, { freq: (u) => 1400 + 800 * u, gain: env.decay(0.18, 1), duty: 0.125 });
-      s.noise(at, 0.08, { clock: () => 6000, gain: env.swell(0.12) });
-    }
-    s.wave(0.72, 0.25, { freq: env.ramp(500, 350), gain: env.decay(0.25, 1.2) });
+    const s = new MoveSfx(1.4, 0x5b3e);
+    s.whoosh(0.0, 0.25, { from: 3000, to: 9000, gain: 0.22 });
+    s.noise(0.25, 0.35, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.12) });
+    s.wave(0.55, 0.3, { freq: env.ramp(500, 300), gain: env.decay(0.18, 1) });
+    s.sparkle(0.6, 0.4, 4, { lo: 3000, hi: 5000, gain: 0.08 });
     return s;
   },
 

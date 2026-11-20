@@ -230,14 +230,14 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + burn fleck (~0.55 s): a rolling wheel of fire slams in. */
+  /** FlameWheel.play (fire wheel spins up 0-0.6 s, rolls in 0.6-0.8 s, hit 0.8 s, embers to ~1.3 s): a swelling whirl of flame, a rush, a fiery slam. */
   flamewheel: () => {
-    const s = new MoveSfx(1.0, 0xf1e1);
-    s.noise(0.0, 0.2, { clock: (u) => 800 + 600 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => (0.15 + 0.25 * u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 6 * u)) });
-    s.pulse(0.0, 0.17, { freq: env.ramp(100, 200), gain: env.ramp(0.05, 0.18), duty: 0.5 });
-    s.thud(0.17, 0.6, 0.6);
-    s.noise(0.18, 0.3, { clock: env.ramp(1500, 500), gain: env.decay(0.3, 1.5) });
-    s.burn(0.55);
+    const s = new MoveSfx(1.4, 0xf1e1);
+    s.noise(0.0, 0.8, { clock: (u) => 800 + 600 * Math.sin(2 * Math.PI * 6 * u), gain: (u) => (0.1 + 0.25 * u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * 8 * u)) });
+    s.pulse(0.0, 0.8, { freq: env.ramp(100, 220), gain: env.ramp(0.05, 0.18), duty: 0.5 });
+    s.whoosh(0.6, 0.2, { from: 1500, to: 5000, gain: 0.25 });
+    s.thud(0.8, 0.6, 0.6);
+    s.noise(0.8, 0.45, { clock: env.ramp(1500, 500), gain: env.decay(0.3, 1.5) });
     return s;
   },
 

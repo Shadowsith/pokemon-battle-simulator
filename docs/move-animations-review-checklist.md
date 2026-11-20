@@ -460,25 +460,25 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/9/9d/Rankenhieb_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/0/01/Rankenhieb_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c7/Rankenhieb_Gen5.png
-- [ ] **Vise Grip** / Klammer — `visegrip` · Normal · Physical · `melee`
+- [x] **Vise Grip** / Klammer — `visegrip` · Normal · Physical · two dark pincer jaws rise beside the target and snap shut, glowing red, target squeezed, pink-white sparkles spray out (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Klammer
   - Gen 4 APNG: https://www.pokewiki.de/images/c/ce/Klammer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/5b/Klammer_Gen5.png
-- [ ] **Water Gun** / Aquaknarre — `watergun` · Water · Special · `projectile`
+- [x] **Water Gun** / Aquaknarre — `watergun` · Water · Special · stream of glowing cyan droplets arcs to the target, small white splashes and rising bubbles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Aquaknarre
   - Gen 4 APNG: https://www.pokewiki.de/images/1/1a/Aquaknarre_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e4/Aquaknarre_Gen5.png
 - [x] ⭐ **Waterfall** / Kaskade — `waterfall` · Water · Physical · black backdrop → rising wave backdrop + blue splash column hit (custom, needs review)
 - [x] ⭐ **Whirlwind** / Wirbelwind — `whirlwind` · Normal · Status · white/grey flakes and wind streaks sweep past the leaning target, which is then blown away (move resolver) and a reserve is dragged in (custom, needs review)
-- [ ] **Wing Attack** / Flügelschlag — `wingattack` · Flying · Physical · `melee`
+- [x] **Wing Attack** / Flügelschlag — `wingattack` · Flying · Physical · user darts in, two white-yellow bursts (one per wing), yellow feathers flutter down round the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Fl%C3%BCgelschlag
   - Gen 4 APNG: https://www.pokewiki.de/images/5/5e/Fl%C3%BCgelschlag_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/3a/Fl%C3%BCgelschlag_Gen5.png
-- [ ] **Withdraw** / Panzerschutz — `withdraw` · Water · Status · `selfAura`
+- [x] **Withdraw** / Panzerschutz — `withdraw` · Water · Status · ribbed blue-violet shell closes over the ducking user, bubbles rise, shell sinks away, stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Panzerschutz
   - Gen 4 APNG: https://www.pokewiki.de/images/0/0c/Panzerschutz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/f8/Panzerschutz_Gen5.png
-- [ ] **Wrap** / Wickel — `wrap` · Normal · Physical · `melee`
+- [x] **Wrap** / Wickel — `wrap` · Normal · Physical · pale cloud swirls in, three teal coils drop round the target and squeeze three times, yellow flash per squeeze (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Wickel
   - Gen 4 APNG: https://www.pokewiki.de/images/b/b6/Wickel_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/cc/Wickel_Gen5.png
@@ -486,34 +486,34 @@ Changes to the generic delivery animations or to this review list alone don't ne
 ## Gen 2 (86)
 
 - [x] ⭐ **Aeroblast** / Luftstoß — `aeroblast` · Flying · Special · cyan vortex, air gathers into a white-blue orb, coiling ring beam hits the target (custom, needs review)
-- [ ] **Ancient Power** / Antik-Kraft — `ancientpower` · Rock · Special · `projectile`
+- [x] **Ancient Power** / Antik-Kraft — `ancientpower` · Rock · Special · six dark olive rocks with a purple glow rise round the user, hover, then pelt the target one after another and bounce off (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Antik-Kraft
   - Gen 4 APNG: https://www.pokewiki.de/images/f/f5/Antik-Kraft_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/7/73/Antik-Kraft_Gen5.png
-- [ ] **Attract** / Anziehung — `attract` · Normal · Status · `targetAura`
+- [x] **Attract** / Anziehung — `attract` · Normal · Status · pink hearts pop up all over the blushing target, then one small heart floats up off its head (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Anziehung
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/a/ab/Anziehung_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/f/f6/Anziehung_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/d0/Anziehung_Gen5.png
 - [x] ⭐ **Baton Pass** / Stafette — `batonpass` · Normal · Status · red baton tossed up and caught by a white glove, then the user is recalled and the chosen reserve takes over (battle flow) (custom, needs review)
-- [ ] **Beat Up** / Prügler — `beatup` · Dark · Physical · `projectile`
+- [x] **Beat Up** / Prügler — `beatup` · Dark · Physical · three blows: a dark shadow streaks in, a black-purple spiky burst pops on the target each time (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Pr%C3%BCgler
   - Gen 4 APNG: https://www.pokewiki.de/images/c/cb/Pr%C3%BCgler_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/8d/Pr%C3%BCgler_Gen5.png
 - [x] ⭐ **Belly Drum** / Bauchtrommel — `bellydrum` · Normal · Status · two dark hands drum the belly, white music-note bubbles float up, then orange stat sparkles (custom, needs review)
-- [ ] **Bone Rush** / Knochenhatz — `bonerush` · Ground · Physical · `projectile`
+- [x] **Bone Rush** / Knochenhatz — `bonerush` · Ground · Physical · one whack per hit: a bone swings down from alternating sides, yellow flash + green ring, target blinks dark (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Knochenhatz
   - Gen 4 APNG: https://www.pokewiki.de/images/d/df/Knochenhatz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/bd/Knochenhatz_Gen5.png
-- [ ] **Charm** / Charme — `charm` · Fairy · Status · `selfAura`
+- [x] **Charm** / Charme — `charm` · Fairy · Status · user sways cutely while pink hearts float up, then the target turns blue under stat-down bubbles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Charme
   - Gen 4 APNG: https://www.pokewiki.de/images/a/a3/Charme_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/1e/Charme_Gen5.png
-- [ ] **Conversion 2** / Umwandlung2 — `conversion2` · Normal · Status · `targetAura`
+- [x] **Conversion 2** / Umwandlung2 — `conversion2` · Normal · Status · pastel pixel squares flicker on the target, stream over to the user and flicker round it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Umwandlung_2
   - Gen 4 APNG: https://www.pokewiki.de/images/1/18/Umwandlung_2_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/25/Umwandlung_2_Gen5.png
-- [ ] **Cotton Spore** / Baumwollsaat — `cottonspore` · Grass · Status · `selfAura`
+- [x] **Cotton Spore** / Baumwollsaat — `cottonspore` · Grass · Status · fluffy white-pink cotton puffs drift down onto the target with sparkles, then blue stat drop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Baumwollsaat
   - Gen 4 APNG: https://www.pokewiki.de/images/c/ce/Baumwollsaat_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/86/Baumwollsaat_Gen5.png
@@ -522,215 +522,215 @@ Changes to the generic delivery animations or to this review list alone don't ne
 - [x] ⭐ **Curse** / Fluch — `curse` · Ghost · Status · dark purple circle behind the caster, a nail is hammered into it (same animation for the Ghost and non-Ghost version) (custom, needs review)
 - [x] ⭐ **Destiny Bond** / Abgangsbund — `destinybond` · Ghost · Status · ghostly red-purple haze, a white ground disc glides to the foe, which glows white (custom, needs review)
 - [x] ⭐ **Detect** / Scanner — `detect` · Fighting · Status · dark, a cyan ring sparkle flares at the caster's head, caster glows white (custom, needs review)
-- [ ] **Dragon Breath** / Feuerodem — `dragonbreath` · Dragon · Special · `projectile`
+- [x] **Dragon Breath** / Feuerodem — `dragonbreath` · Dragon · Special · stream of magenta-pink dragon fire with pink sparkles, the target flickers and glows red (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Feuerodem
   - Gen 4 APNG: https://www.pokewiki.de/images/7/71/Feuerodem_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/50/Feuerodem_Gen5.png
 - [x] ⭐ **Dynamic Punch** / Wuchtschlag — `dynamicpunch` · Fighting · Physical · red burst backdrop, yellow fist blast with flying stones, then little birds circle the target's head (custom, needs review)
 - [x] ⭐ **Encore** / Zugabe — `encore` · Normal · Status · dark stage, pink-white spotlight on the target, confetti flutters down (custom, needs review)
-- [ ] **Endure** / Ausdauer — `endure` · Normal · Status · `selfAura`
+- [x] **Endure** / Ausdauer — `endure` · Normal · Status · user braces (squats a little) and glows red while pale yellow light streaks rise round it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Ausdauer
   - Gen 4 APNG: https://www.pokewiki.de/images/3/3f/Ausdauer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/0f/Ausdauer_Gen5.png
 - [x] ⭐ **Extreme Speed** / Turbotempo — `extremespeed` · Normal · Physical · dark, green-cyan speed lines, caster vanishes upward in grey dust, two yellow strikes, caster drops back in (custom, needs review)
-- [ ] **False Swipe** / Trugschlag — `falseswipe` · Normal · Physical · `melee`
+- [x] **False Swipe** / Trugschlag — `falseswipe` · Normal · Physical · thin white streak sweeps diagonally across the target, small white puffs and violet sparkles along it, target blinks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Trugschlag
   - Gen 4 APNG: https://www.pokewiki.de/images/1/13/Trugschlag_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a6/Trugschlag_Gen5.png
-- [ ] **Feint Attack** / Finte — `feintattack` · Dark · Physical · `melee`
+- [x] **Feint Attack** / Finte — `feintattack` · Dark · Physical · scene darkens, user fades away, white sparkles burst on the target out of nowhere, user fades back in (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Finte
   - Gen 4 APNG: https://www.pokewiki.de/images/8/87/Finte_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/bf/Finte_Gen5.png
-- [ ] **Flail** / Dreschflegel — `flail` · Normal · Physical · `melee`
+- [x] **Flail** / Dreschflegel — `flail` · Normal · Physical · user flails frantically, cyan sweat drops fly off, then two white-orange bursts on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Dreschflegel
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/f/f9/Dreschflegel_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/c/c2/Dreschflegel_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a8/Dreschflegel_Gen5.png
-- [ ] **Flame Wheel** / Flammenrad — `flamewheel` · Fire · Physical · `melee`
+- [x] **Flame Wheel** / Flammenrad — `flamewheel` · Fire · Physical · ring of flames spins round the glowing user, which rolls into the target in the fire wheel, hot burst + scattering embers (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Flammenrad
   - Gen 4 APNG: https://www.pokewiki.de/images/6/67/Flammenrad_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/27/Flammenrad_Gen5.png
-- [ ] **Foresight** / Scharfblick — `foresight` · Normal · Status · `targetAura`
+- [x] **Foresight** / Scharfblick — `foresight` · Normal · Status · magnifying glass sweeps once round the target, then the target flashes pale and see-through (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Scharfblick
   - Gen 4 APNG: https://www.pokewiki.de/images/7/71/Scharfblick_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/ac/Scharfblick_Gen5.png
-- [ ] **Frustration** / Frustration — `frustration` · Normal · Physical · `melee`
+- [x] **Frustration** / Frustration — `frustration` · Normal · Physical · user flushes red twice under a throbbing anger mark, then three red-white bursts with red sparks on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Frustration
   - Gen 4 APNG: https://www.pokewiki.de/images/9/98/Frustration_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/da/Frustration_Gen5.png
-- [ ] **Fury Cutter** / Zornklinge — `furycutter` · Bug · Physical · `melee`
+- [x] **Fury Cutter** / Zornklinge — `furycutter` · Bug · Physical · scene dims, a yellow-white blade streak slashes diagonally across the target, yellow burst, target blinks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Zornklinge
   - Gen 4 APNG: https://www.pokewiki.de/images/e/e0/Zornklinge_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/2d/Zornklinge_Gen5.png
 - [x] ⭐ **Future Sight** / Seher — `futuresight` · Psychic · Special · turn 1: brief dim + caster trembles; hit 2 turns later: dim + target trembles and blanks white, field jolt + blink (custom, needs review)
 - [x] ⭐ **Giga Drain** / Gigasauger — `gigadrain` · Grass · Special · like Absorb but mightier: target flares green, big glowing green energy orbs swarm to caster on wide arcs, then green HP sparkles (custom, needs review)
 - [x] ⭐ **Heal Bell** / Vitalglocke — `healbell` · Normal · Status · golden bell swings in front of the caster, pulsing yellow rings + yellow/red/green/blue music notes, bell fades (custom, needs review)
-- [ ] **Hidden Power** / Kraftreserve — `hiddenpower` · Normal · Special · `projectile`
+- [x] **Hidden Power** / Kraftreserve — `hiddenpower` · Normal · Special · dark scene, orange orbs spiral into the user, it flares white, then spiky green orbs burst out with a ring and fly at the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kraftreserve
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/e/e2/Kraftreserve_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/f/f4/Kraftreserve_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/87/Kraftreserve_Gen5.png
-- [ ] **Icy Wind** / Eissturm — `icywind` · Ice · Special · `field`
+- [x] **Icy Wind** / Eissturm — `icywind` · Ice · Special · chilly white-blue mist gusts to the target with ice sparkles, target frosts over icy blue, then blue stat drop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Eissturm
   - Gen 4 APNG: https://www.pokewiki.de/images/2/21/Eissturm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/4/46/Eissturm_Gen5.png
 - [x] ⭐ **Iron Tail** / Eisenschweif — `irontail` · Steel · Physical · caster glints with silver sparkles, then a wide silver swipe sweeps across the target (attack direction) with glittering iron dust clouds (custom, needs review)
-- [ ] **Lock-On** / Zielschuss — `lockon` · Normal · Status · `targetAura`
+- [x] **Lock-On** / Zielschuss — `lockon` · Normal · Status · three cyan reticles slide in and close in on the target, the locked one blinks twice, target flashes pale (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Zielschuss
   - Gen 4 APNG: https://www.pokewiki.de/images/9/97/Zielschuss_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b6/Zielschuss_Gen5.png
-- [ ] **Mach Punch** / Tempohieb — `machpunch` · Fighting · Physical · `melee`
+- [x] **Mach Punch** / Tempohieb — `machpunch` · Fighting · Physical · white speed rings rush in round the target as a big pale fist zooms in, white starburst, pale blue sparkles, target blinks white (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Tempohieb
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/4/4b/Tempohieb_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/9/99/Tempohieb_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/61/Tempohieb_Gen5.png
-- [ ] **Magnitude** / Intensität — `magnitude` · Ground · Physical · `field`
+- [x] **Magnitude** / Intensität — `magnitude` · Ground · Physical · the whole field quakes in two rumbling jolts, brown dust puffs round the target's feet, target shudders (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Intensit%C3%A4t
   - Gen 4 APNG: https://www.pokewiki.de/images/8/89/Intensit%C3%A4t_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/0e/Intensit%C3%A4t_Gen5.png
-- [ ] **Mean Look** / Horrorblick — `meanlook` · Normal · Status · `targetAura`
+- [x] **Mean Look** / Horrorblick — `meanlook` · Normal · Status · scene washes magenta, a huge black eye with a glowing yellow iris opens over the target, stares, pulses and shuts (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Horrorblick
   - Gen 4 APNG: https://www.pokewiki.de/images/1/1d/Horrorblick_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/bc/Horrorblick_Gen5.png
 - [x] ⭐ **Megahorn** / Vielender — `megahorn` · Bug · Physical · black horn shoots at the target with red streaks, then red burst backdrop + yellow blast + yellow sparkle stripes (custom, needs review)
-- [ ] **Metal Claw** / Metallklaue — `metalclaw` · Steel · Physical · `melee`
+- [x] **Metal Claw** / Metallklaue — `metalclaw` · Steel · Physical · silver shine sweeps over the user, then two black claw strokes with a silver-blue glow rake the target, blue sparks fly (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Metallklaue
   - Gen 4 APNG: https://www.pokewiki.de/images/c/c8/Metallklaue_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/09/Metallklaue_Gen5.png
 - [x] ⭐ **Milk Drink** / Milchgetränk — `milkdrink` · Normal · Status · milk bottle drops in and shakes left/right, blue sparkles in a small blue ring, then green HP sparkles (custom, needs review)
-- [ ] **Mind Reader** / Willensleser — `mindreader` · Normal · Status · `targetAura`
+- [x] **Mind Reader** / Willensleser — `mindreader` · Normal · Status · dark scene, a hazy violet ring closes in on the target to a cyan core and flares green-yellow, target turns see-through violet (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Willensleser
   - Gen 4 APNG: https://www.pokewiki.de/images/8/84/Willensleser_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a9/Willensleser_Gen5.png
-- [ ] **Mirror Coat** / Spiegelcape — `mirrorcoat` · Psychic · Special · `projectile`
+- [x] **Mirror Coat** / Spiegelcape — `mirrorcoat` · Psychic · Special · pale blue glass panel in a white frame grows in front of the user, glint + sparkles, then it flashes and a cyan-white streak shoots back at the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Spiegelcape
   - Gen 4 APNG: https://www.pokewiki.de/images/2/20/Spiegelcape_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/28/Spiegelcape_Gen5.png
 - [x] ⭐ **Moonlight** / Mondschein — `moonlight` · Fairy · Status · scene goes dark, dark-grey night sky with a rising full moon and falling yellow stars, then green HP sparkles (custom, needs review)
 - [x] ⭐ **Morning Sun** / Morgengrauen — `morningsun` · Normal · Status · pulsing sun glow in the top-left corner, light rays + yellow sparkles, white light pulses drift toward the caster, then green HP sparkles (custom, needs review)
-- [ ] **Mud-Slap** / Lehmschelle — `mudslap` · Ground · Special · `projectile`
+- [x] **Mud-Slap** / Lehmschelle — `mudslap` · Ground · Special · brown mud clumps flung in a low arc, a mud cloud billows over the target, then blue stat drop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Lehmschelle
   - Gen 4 APNG: https://www.pokewiki.de/images/5/5f/Lehmschelle_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/4/47/Lehmschelle_Gen5.png
-- [ ] **Nightmare** / Nachtmahr — `nightmare` · Ghost · Status · `targetAura`
+- [x] **Nightmare** / Nachtmahr — `nightmare` · Ghost · Status · scene turns into a dark maroon dream of drifting swirls that flickers away twice, the target trembles tinted violet (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Nachtmahr
   - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/3/3d/Nachtmahr_DPPt.png
   - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/5/5d/Nachtmahr_HGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/ae/Nachtmahr_Gen5.png
-- [ ] **Octazooka** / Octazooka — `octazooka` · Water · Special · `lob`
+- [x] **Octazooka** / Octazooka — `octazooka` · Water · Special · black ink balls shoot out in a puff of smoke, a thick black ink cloud bursts over the target, then blue stat drop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Octazooka
   - Gen 4 APNG: https://www.pokewiki.de/images/2/20/Octazooka_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/6c/Octazooka_Gen5.png
 - [x] ⭐ **Outrage** / Wutanfall — `outrage` · Dragon · Physical · scene goes dark, then purple/magenta dragon fire rolls left to right across the background, caster flares with pulsing orange sparkles, target shakes (custom, needs review)
 - [x] ⭐ **Pain Split** / Leidteiler — `painsplit` · Normal · Status · three orange spiky bursts with white rings hit caster and target at the same time (custom, needs review)
-- [ ] **Perish Song** / Abgesang — `perishsong` · Normal · Status · `targetAura`
+- [x] **Perish Song** / Abgesang — `perishsong` · Normal · Status · dark scene with cyan spotlight rays, glowing cyan music notes drift across, then red eyes glint on both Pokémon (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Abgesang
   - Gen 4 APNG: https://www.pokewiki.de/images/f/f2/Abgesang_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/30/Abgesang_Gen5.png
-- [ ] **Powder Snow** / Pulverschnee — `powdersnow` · Ice · Special · `field`
+- [x] **Powder Snow** / Pulverschnee — `powdersnow` · Ice · Special · dark scene, fine white snow sparkles drift to the target, pale blue snowflakes whirl round it, target flickers icy blue (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Pulverschnee
   - Gen 4 APNG: https://www.pokewiki.de/images/1/1a/Pulverschnee_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/00/Pulverschnee_Gen5.png
-- [ ] **Present** / Geschenk — `present` · Normal · Physical · `projectile`
+- [x] **Present** / Geschenk — `present` · Normal · Physical · a white gift box with a red ribbon is tossed over, bounces on the target and bursts in a white puff with pink stars (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Geschenk
   - Gen 4 APNG: https://www.pokewiki.de/images/9/92/Geschenk_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/1f/Geschenk_Gen5.png
 - [x] ⭐ **Protect** / Schutzschild — `protect` · Normal · Status · barrier of tightly packed green, white and light-blue particles gathers over the caster, shimmers, then breaks up (custom, needs review)
-- [ ] **Psych Up** / Psycho-Plus — `psychup` · Normal · Status · `targetAura`
+- [x] **Psych Up** / Psycho-Plus — `psychup` · Normal · Status · yellow and pink swirl rings spiral in on the user, which glows pink (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Psycho-Plus
   - Gen 4 APNG: https://www.pokewiki.de/images/a/a6/Psycho-Plus_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/fb/Psycho-Plus_Gen5.png
-- [ ] **Pursuit** / Verfolgung — `pursuit` · Dark · Physical · `melee`
+- [x] **Pursuit** / Verfolgung — `pursuit` · Dark · Physical · scene darkens, a jagged grey-white ring closes in round the target and snaps shut in a white-violet starburst, purple specks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Verfolgung
   - Gen 4 APNG: https://www.pokewiki.de/images/0/03/Verfolgung_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/8d/Verfolgung_Gen5.png
 - [x] ⭐ **Rain Dance** / Regentanz — `raindance` · Water · Status · scene darkens under clouds, slanted rain streaks pour down over the field, then the sky clears (custom, needs review)
-- [ ] **Rapid Spin** / Turbodreher — `rapidspin` · Normal · Physical · `melee`
+- [x] **Rapid Spin** / Turbodreher — `rapidspin` · Normal · Physical · white whirlwind ring spins up round the bobbing user (sprite never turns), it darts into the target in the whirl, white starburst (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Turbodreher
   - Gen 4 APNG: https://www.pokewiki.de/images/e/e2/Turbodreher_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/0a/Turbodreher_Gen5.png
-- [ ] **Return** / Rückkehr — `return` · Normal · Physical · `melee`
+- [x] **Return** / Rückkehr — `return` · Normal · Physical · user hops happily twice, then a white starburst on the target with pale blue sparkles drifting up (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/R%C3%BCckkehr
   - Gen 4 APNG: https://www.pokewiki.de/images/8/86/R%C3%BCckkehr_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/33/R%C3%BCckkehr_Gen5.png
-- [ ] **Reversal** / Gegenschlag — `reversal` · Fighting · Physical · `melee`
+- [x] **Reversal** / Gegenschlag — `reversal` · Fighting · Physical · blue-white sparks streak into the user and form a glowing blue orb, which shoots at the target and bursts (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Gegenschlag
   - Gen 4 APNG: https://www.pokewiki.de/images/1/18/Gegenschlag_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/df/Gegenschlag_Gen5.png
-- [ ] **Rock Smash** / Zertrümmerer — `rocksmash` · Fighting · Physical · `melee`
+- [x] **Rock Smash** / Zertrümmerer — `rocksmash` · Fighting · Physical · a yellow fist smashes into the target, yellow burst, olive rock fragments burst up and fall (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Zertr%C3%BCmmerer
   - Gen 4 APNG: https://www.pokewiki.de/images/d/d6/Zertr%C3%BCmmerer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e8/Zertr%C3%BCmmerer_Gen5.png
-- [ ] **Rollout** / Walzer — `rollout` · Rock · Physical · `melee`
+- [x] **Rollout** / Walzer — `rollout` · Rock · Physical · a brown boulder rolls along the ground from the user to the target with dust puffs, smashes and breaks into chunks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Walzer
   - Gen 4 APNG: https://www.pokewiki.de/images/1/12/Walzer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/60/Walzer_Gen5.png
 - [x] ⭐ **Sacred Fire** / Läuterfeuer — `sacredfire` · Fire · Physical · scene goes dark, cool blue fire backdrop, purple orb on the target with a closing purple ring, then it bursts into many small purple flames (custom, needs review)
-- [ ] **Safeguard** / Bodyguard — `safeguard` · Normal · Status · `selfAura`
+- [x] **Safeguard** / Bodyguard — `safeguard` · Normal · Status · soft cyan rings ripple out round the user, white sparkles, the user turns pale and see-through (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Bodyguard
   - Gen 4 APNG: https://www.pokewiki.de/images/0/02/Bodyguard_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/52/Bodyguard_Gen5.png
 - [x] ⭐ **Sandstorm** / Sandsturm — `sandstorm` · Rock · Status · sandy haze over the whole scene with wind streaks, rolling dust clouds and whipping sand grains (custom, needs review)
-- [ ] **Scary Face** / Grimasse — `scaryface` · Normal · Status · `selfAura`
+- [x] **Scary Face** / Grimasse — `scaryface` · Normal · Status · dark scene, a huge ghostly face with slanted purple eyes and a jagged grin looms over the user, then blue stat drop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Grimasse
   - Gen 4 APNG: https://www.pokewiki.de/images/3/3c/Grimasse_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/bd/Grimasse_Gen5.png
 - [x] ⭐ **Shadow Ball** / Spukball — `shadowball` · Ghost · Special · dark purple wispy ball gathers before the caster and is hurled at the target, dark purple shadow puffs + darkening on hit (custom, needs review)
-- [ ] **Sketch** / Nachahmer — `sketch` · Normal · Status · `targetAura`
+- [x] **Sketch** / Nachahmer — `sketch` · Normal · Status · a green pencil scribbles across the target leaving colourful little stars, the target flickers see-through as it is copied (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Nachahmer
   - Gen 4 APNG: https://www.pokewiki.de/images/c/cc/Nachahmer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/2a/Nachahmer_Gen5.png
 - [x] ⭐ **Sleep Talk** / Schlafrede — `sleeptalk` · Normal · Status · pale blue rings + blue "Z"s round the sleeping caster, tackle-like lunge, yellow burst + sparkles on the target (custom, needs review)
 - [x] ⭐ **Sludge Bomb** / Matschbombe — `sludgebomb` · Poison · Special · trail of lumpy purple sludge globs hurled in an arc, bursts into a wobbling sludge mass with poison bubbles + purple tint (custom, needs review)
-- [ ] **Snore** / Schnarcher — `snore` · Normal · Special · `sonic`
+- [x] **Snore** / Schnarcher — `snore` · Normal · Special · purple Zs float up off the user, then three jagged pale blue sound rings burst out and rush into the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schnarcher
   - Gen 4 APNG: https://www.pokewiki.de/images/d/dc/Schnarcher_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/87/Schnarcher_Gen5.png
-- [ ] **Spark** / Funkensprung — `spark` · Electric · Physical · `melee`
+- [x] **Spark** / Funkensprung — `spark` · Electric · Physical · user crackles yellow with a flare of light, darts into the target, yellow light orbs scatter, the target turns yellow and crackles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Funkensprung
   - Gen 4 APNG: https://www.pokewiki.de/images/e/e9/Funkensprung_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/04/Funkensprung_Gen5.png
-- [ ] **Spider Web** / Spinnennetz — `spiderweb` · Bug · Status · `targetAura`
+- [x] **Spider Web** / Spinnennetz — `spiderweb` · Bug · Status · a white silk thread shoots to the target, a spinning white spiral winds round it, then a sticky web spreads over it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Spinnennetz
   - Gen 4 APNG: https://www.pokewiki.de/images/5/58/Spinnennetz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/7/78/Spinnennetz_Gen5.png
 - [x] ⭐ **Spikes** / Stachler — `spikes` · Ground · Status · five metal caltrops tossed in arcs onto the ground round the target, bounce, rest briefly and fade (custom, needs review)
-- [ ] **Spite** / Groll — `spite` · Ghost · Status · `targetAura`
+- [x] **Spite** / Groll — `spite` · Ghost · Status · scene darkens, the user flares ghostly pale twice, the target dims and shudders (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Groll
   - Gen 4 APNG: https://www.pokewiki.de/images/f/fd/Groll_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/be/Groll_Gen5.png
 - [x] ⭐ **Steel Wing** / Stahlflügel — `steelwing` · Steel · Physical · three steel feathers appear on the caster, fly at the target one by one and strike with silver slash streaks + sparkles (custom, needs review)
 - [x] ⭐ **Sunny Day** / Sonnentag — `sunnyday` · Fire · Status · warm bright backdrop, pulsing sun with sparkles in the top-left corner, broad sun shafts slanting across the field (custom, needs review)
-- [ ] **Swagger** / Angeberei — `swagger` · Normal · Status · `selfAura`
+- [x] **Swagger** / Angeberei — `swagger` · Normal · Status · an anger mark throbs on the target, it flushes red, orange stat-up aura on it, then little birds circle its head (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Angeberei
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/4/4d/Angeberei_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/1/1e/Angeberei_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/4/46/Angeberei_Gen5.png
-- [ ] **Sweet Kiss** / Bitterkuss — `sweetkiss` · Fairy · Status · `targetAura`
+- [x] **Sweet Kiss** / Bitterkuss — `sweetkiss` · Fairy · Status · a pale blue cherub puff floats in and kisses the target, three red hearts pop, then little birds circle its head (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Bitterkuss
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/b/bb/Bitterkuss_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/3/3a/Bitterkuss_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/29/Bitterkuss_Gen5.png
-- [ ] **Sweet Scent** / Lockduft — `sweetscent` · Normal · Status · `selfAura`
+- [x] **Sweet Scent** / Lockduft — `sweetscent` · Normal · Status · a pink haze washes over the scene with drifting pink petals and rings, the target turns pink, then blue stat drop (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Lockduft
   - Gen 4 APNG: https://www.pokewiki.de/images/0/02/Lockduft_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/1d/Lockduft_Gen5.png
 - [x] ⭐ **Synthesis** / Synthese — `synthesis` · Grass · Status · bright sun orb with white light rays on the caster, then green HP sparkles (custom, needs review)
-- [ ] **Thief** / Raub — `thief` · Dark · Physical · `melee`
+- [x] **Thief** / Raub — `thief` · Dark · Physical · a grey scuffle dust cloud on the target, then an item sack pops off it and flies over to the user (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Raub
   - Gen 4 APNG: https://www.pokewiki.de/images/4/4e/Raub_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/de/Raub_Gen5.png
-- [ ] **Triple Kick** / Dreifachkick — `triplekick` · Fighting · Physical · `melee`
+- [x] **Triple Kick** / Dreifachkick — `triplekick` · Fighting · Physical · one kick per hit: an orange-yellow foot stamps onto the target, each kick bigger, yellow burst (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Dreifachkick
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/3/35/Dreifachkick_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/0/06/Dreifachkick_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/fd/Dreifachkick_Gen5.png
-- [ ] **Twister** / Windhose — `twister` · Dragon · Special · `field`
+- [x] **Twister** / Windhose — `twister` · Dragon · Special · a white-pink twister of whirling wind bands rises round the target with grey dust at its base, buffeting it three times (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Windhose
   - Gen 4 APNG: https://www.pokewiki.de/images/0/06/Windhose_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/f6/Windhose_Gen5.png
 - [x] ⭐ **Vital Throw** / Überwurf — `vitalthrow` · Fighting · Physical · clockwise circle lap + orange hit flash + orange orbs flying away (custom, needs review)
-- [ ] **Whirlpool** / Whirlpool — `whirlpool` · Water · Special · `projectile`
+- [x] **Whirlpool** / Whirlpool — `whirlpool` · Water · Special · scene turns deep sea blue, blue bubbles swirl up round the target in a closing vortex, the target flickers blue (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Whirlpool
   - Gen 4 APNG: https://www.pokewiki.de/images/b/b0/Whirlpool_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/d7/Whirlpool_Gen5.png

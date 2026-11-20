@@ -32,12 +32,12 @@ export const FAIRY = {
     return s;
   },
 
-  /** Generic self aura + stat-down fleck: an adorable, disarming look. */
+  /** Charm.play (user sways and hearts float up 0-0.95 s, Attack drop 0.95 s on): a cute rising trill with heart blips, then the stat-down. */
   charm: () => {
-    const s = new MoveSfx(1.5, 0xc4a7);
-    s.wave(0.02, 0.7, { freq: (u) => [784, 1047, 1319][Math.min(2, Math.floor(u * 3))] * (1 + 0.015 * Math.sin(2 * Math.PI * 12 * u)), gain: env.swell(0.3) });
-    s.sparkle(0.2, 0.5, 6, { lo: 3000, hi: 5000, gain: 0.12 });
-    s.statDown(0.85);
+    const s = new MoveSfx(1.95, 0xc4a7);
+    s.wave(0.02, 0.85, { freq: (u) => [784, 1047, 1319][Math.min(2, Math.floor(u * 3))] * (1 + 0.015 * Math.sin(2 * Math.PI * 12 * u)), gain: env.swell(0.3) });
+    for (let i = 0; i < 5; i++) s.pulse(0.05 + i * 0.09, 0.08, { freq: () => 2093, gain: env.decay(0.06, 2), duty: 0.5 });
+    s.statDown(0.95);
     return s;
   },
 
@@ -242,13 +242,14 @@ export const FAIRY = {
     return s;
   },
 
-  /** Generic target aura + confusion fleck (~0.6 s): a sweet blown kiss with a heart chime. */
+  /** SweetKiss.play (cherub floats in 0-0.5 s, kiss at 0.5 s, hearts pop 0.5-0.95 s, confusion birds 1.0-1.9 s): a soft airy float, a smooch, heart blips, then the dizzy warble. */
   sweetkiss: () => {
-    const s = new MoveSfx(1.15, 0x5ee1);
-    s.pulse(0.02, 0.08, { freq: env.ramp(1200, 2000), gain: env.decay(0.25, 1), duty: 0.25 });
-    s.arpeggio(0.12, [79, 84, 88], 0.09, { gain: 0.26, voice: 'wave', hold: 0.18 });
-    s.sparkle(0.2, 0.35, 5, { lo: 3000, hi: 5000, gain: 0.12 });
-    s.confusion(0.6, 0.18);
+    const s = new MoveSfx(2.0, 0x5c55);
+    s.wave(0.0, 0.5, { freq: env.ramp(900, 1300), gain: env.swell(0.1) });
+    s.noise(0.5, 0.06, { clock: () => 6000, gain: env.decay(0.25, 2) });
+    s.pulse(0.5, 0.08, { freq: env.ramp(1200, 1800), gain: env.decay(0.14, 1), duty: 0.5 });
+    for (let i = 0; i < 3; i++) s.pulse(0.55 + i * 0.05, 0.08, { freq: () => [1318.5, 1568, 2093][i], gain: env.decay(0.12, 2), duty: 0.5 });
+    s.confusion(1.0);
     return s;
   },
 };

@@ -3,10 +3,12 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxEffects } from '../fx-effects';
 import { FxGlyphs } from '../fx-glyphs';
+import { Nightmare } from './ghost/nightmare';
 import { ShadowClaw } from './ghost/shadow-claw';
 import { ShadowForce } from './ghost/shadow-force';
+import { Spite } from './ghost/spite';
 
-/** Hand-made animations for Ghost-type moves (Shadow Claw and Shadow Force live in `ghost/`). */
+/** Hand-made animations for Ghost-type moves (Nightmare, Shadow Claw, Shadow Force and Spite live in `ghost/`). */
 export class GhostMoveAnimations {
   /** Hand-made Ghost move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -14,11 +16,13 @@ export class GhostMoveAnimations {
     curse: (refs, launch) => GhostMoveAnimations.playCurse(refs, launch),
     destinybond: (refs, launch, target) => GhostMoveAnimations.playDestinyBond(refs, launch, target),
     lick: (refs, _launch, target) => GhostMoveAnimations.playLick(refs, target),
+    nightmare: (refs) => Nightmare.play(refs),
     nightshade: (refs, launch) => GhostMoveAnimations.playNightShade(refs, launch),
     phantomforce: (refs, launch, target, v) => GhostMoveAnimations.playPhantomForceStrike(refs, launch, target, v),
     shadowball: (refs, launch, target, v) => GhostMoveAnimations.playShadowBall(refs, launch, target, v),
     shadowclaw: (refs, _launch, target, v) => ShadowClaw.play(refs, target, v),
     shadowforce: (refs, _launch, target, v) => ShadowForce.strike(refs, target, v),
+    spite: (refs) => Spite.play(refs),
     trickortreat: (refs, launch, target) => GhostMoveAnimations.playTrickOrTreat(refs, launch, target)
   };
 

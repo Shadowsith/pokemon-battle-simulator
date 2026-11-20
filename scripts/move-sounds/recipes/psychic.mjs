@@ -365,14 +365,15 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic projectile (0.43 s → impact): a shimmering reflective coat flings the blow back with a glassy ring. */
+  /** MirrorCoat.play (glass panel grows 0-0.3 s, glint 0.33-0.73 s, flash + reflected streak 0.75-0.95 s, hit 0.95 s): a glassy shimmer, a bright ring as it flings the blow back, a hit. */
   mirrorcoat: () => {
-    const s = new MoveSfx(0.95, 0x3c0a);
-    s.chord(0.0, 0.43, [84, 88, 91], { rate: 0.03, gain: 0.2, vibrato: 0.01 });
-    s.wave(0.0, 0.43, { freq: env.ramp(600, 1200), gain: env.ramp(0.08, 0.2) });
-    s.noise(0.43, 0.15, { clock: () => 12000, gain: env.attackDecay(0.25, 0.03), short: true });
-    s.thud(0.43, 0.3, 0.3);
-    s.pulse(0.43, 0.4, { freq: () => 2794, gain: env.decay(0.16, 2), duty: 0.25 });
+    const s = new MoveSfx(1.3, 0x3c0a);
+    s.wave(0.0, 0.3, { freq: env.ramp(800, 1600), gain: env.swell(0.12) });
+    s.sparkle(0.3, 0.45, 5, { lo: 3500, hi: 6500, gain: 0.12 });
+    s.wave(0.75, 0.4, { freq: () => 2093, gain: env.decay(0.2, 1.5) });
+    s.wave(0.75, 0.4, { freq: () => 3136, gain: env.decay(0.1, 1.5) });
+    s.whoosh(0.75, 0.2, { from: 3000, to: 9000, gain: 0.22 });
+    s.thud(0.95, 0.5, 0.4);
     return s;
   },
 

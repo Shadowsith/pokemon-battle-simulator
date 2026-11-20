@@ -3,22 +3,28 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { BoneRush } from './ground/bone-rush';
 import { DrillRun } from './ground/drill-run';
+import { Magnitude } from './ground/magnitude';
+import { MudSlap } from './ground/mud-slap';
 import { SandAttack } from './ground/sand-attack';
 import { ThousandMoves } from './ground/thousand-moves';
 
-/** Hand-made animations for Ground-type moves (Drill Run, Sand Attack, Thousand Arrows and Thousand Waves live in `ground/`). */
+/** Hand-made animations for Ground-type moves (Bone Rush, Drill Run, Magnitude, Mud-Slap, Sand Attack, Thousand Arrows and Thousand Waves live in `ground/`). */
 export class GroundMoveAnimations {
   /** Hand-made Ground move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     boneclub: (refs, launch, target, v) => GroundMoveAnimations.playBoneClub(refs, launch, target, v),
     bonemerang: (refs, launch, target, v) => GroundMoveAnimations.playBonemerang(refs, launch, target, v),
+    bonerush: (refs, _launch, target, v) => BoneRush.play(refs, target, v),
     dig: (refs, _launch, target) => GroundMoveAnimations.playDigUp(refs, target),
     drillrun: (refs, launch, target, v) => DrillRun.play(refs, launch, target, v),
     earthpower: (refs, _launch, target) => GroundMoveAnimations.playEarthPower(refs, target),
     earthquake: (refs) => GroundMoveAnimations.playEarthquake(refs),
     fissure: (refs, _launch, target) => GroundMoveAnimations.playFissure(refs, target),
     landswrath: (refs, launch, target) => GroundMoveAnimations.playLandsWrath(refs, launch, target),
+    magnitude: (refs) => Magnitude.play(refs),
+    mudslap: (refs, launch, target, v) => MudSlap.play(refs, launch, target, v),
     precipiceblades: (refs, _launch, target) => GroundMoveAnimations.playPrecipiceBlades(refs, target),
     rototiller: (refs) => GroundMoveAnimations.playRototiller(refs),
     sandattack: (refs, launch, target) => SandAttack.play(refs, launch, target),

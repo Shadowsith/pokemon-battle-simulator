@@ -20,13 +20,13 @@ export const DRAGON = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + paralysis fleck: a breath of dragon fire. */
+  /** DragonBreath.play (pink dragon fire gushes 0-0.68 s, first puff lands 0.3 s, target glows red 0.68-1.13 s): a roaring breath, a hit, a hot crackle. */
   dragonbreath: () => {
-    const s = new MoveSfx(1.1, 0xd2b2);
-    s.noise(0.0, 0.5, { clock: env.ramp(400, 1400), gain: env.swell(0.45) });
-    s.pulse(0.0, 0.45, { freq: (u) => 90 + 30 * u, gain: env.swell(0.2), duty: 0.25 });
-    s.thud(0.43, 0.45, 0.5);
-    s.paralyze(0.6);
+    const s = new MoveSfx(1.25, 0xd2b2);
+    s.noise(0.0, 0.7, { clock: env.ramp(400, 1400), gain: env.swell(0.45) });
+    s.pulse(0.0, 0.65, { freq: (u) => 90 + 30 * u, gain: env.swell(0.2), duty: 0.25 });
+    s.thud(0.3, 0.45, 0.5);
+    s.noise(0.68, 0.4, { clock: env.ramp(1500, 600), gain: env.decay(0.2, 1.5) });
     return s;
   },
 
@@ -162,13 +162,12 @@ export const DRAGON = {
     return s;
   },
 
-  /** Generic field (~0.6 s) + flinch fleck (~0.7 s): a draconic whirlwind howls across the field. */
+  /** Twister.play (twister rises 0-0.4 s, whirls to 1.1 s buffeting the target at 0.3 / 0.6 / 0.9 s, fades to ~1.35 s): a howling, swirling wind with three gusting hits. */
   twister: () => {
-    const s = new MoveSfx(1.1, 0x7a15);
-    s.noise(0.0, 0.75, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.35) });
-    s.pulse(0.0, 0.75, { freq: (u) => 140 * (1 + 0.1 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.15), duty: 0.25 });
-    s.wave(0.1, 0.6, { freq: (u) => 500 + 300 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.12) });
-    s.flinch(0.75);
+    const s = new MoveSfx(1.45, 0x7015);
+    s.noise(0.0, 1.3, { clock: (u) => 1500 + 1200 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.28 * Math.min(u * 4, 1) * (u > 0.82 ? (1 - u) / 0.18 : 1) });
+    s.wave(0.0, 1.2, { freq: (u) => 500 + 200 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.08) });
+    for (const at of [0.3, 0.6, 0.9]) s.thud(at, 0.35, 0.4);
     return s;
   },
 };

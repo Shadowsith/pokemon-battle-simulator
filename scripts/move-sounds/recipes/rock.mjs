@@ -3,15 +3,17 @@ import { env } from '../track.mjs';
 
 /** Rock-type move sounds. */
 export const ROCK = {
-  /** Generic projectile (0.43 s): an ancient hum lifts rocks that crash into the target. */
+  /** AncientPower.play (rocks rise 0-0.5 s, hover to ~0.7 s, land 0.9-1.1 s, scatter to ~1.45 s): an ancient hum lifts the rocks, a rush, then a rattle of stony hits. */
   ancientpower: () => {
-    const s = new MoveSfx(1.0, 0xa9c1);
-    s.wave(0.0, 0.5, { freq: () => 90, gain: env.swell(0.3) });
-    s.wave(0.0, 0.5, { freq: () => 135, gain: env.swell(0.18) });
-    s.rumble(0.0, 0.45, { from: 300, to: 500, gain: 0.3 });
-    s.thud(0.43, 0.7, 0.9);
-    for (let i = 0; i < 5; i++) {
-      s.noise(0.5 + i * 0.07 + s.random() * 0.03, 0.05, { clock: () => 1500 + s.random() * 1500, gain: env.decay(0.25 - i * 0.03, 1) });
+    const s = new MoveSfx(1.7, 0xa9c1);
+    s.wave(0.0, 0.7, { freq: () => 90, gain: env.swell(0.3) });
+    s.wave(0.0, 0.7, { freq: () => 135, gain: env.swell(0.18) });
+    s.rumble(0.0, 0.5, { from: 300, to: 500, gain: 0.3 });
+    s.whoosh(0.68, 0.22, { from: 800, to: 3000, gain: 0.2 });
+    for (let i = 0; i < 6; i++) {
+      const at = 0.9 + i * 0.04;
+      if (i % 2 === 0) s.thud(at, 0.6 - i * 0.05, 0.7);
+      s.noise(at + s.random() * 0.02, 0.05, { clock: () => 1500 + s.random() * 1500, gain: env.decay(0.25 - i * 0.025, 1) });
     }
     return s;
   },
@@ -134,13 +136,14 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): the user rolls in like a boulder – a rolling rumble and a blunt crash. */
+  /** Rollout.play (boulder rolls in 0-0.55 s, smashes at 0.55 s, chunks fly to ~1.15 s): a rolling rumble that builds, a blunt crash, clattering chunks. */
   rollout: () => {
-    const s = new MoveSfx(0.8, 0x7011);
-    s.noise(0.0, 0.18, { clock: (u) => 300 + 300 * u, gain: (u) => 0.35 * Math.min(1, u * 4) * (0.7 + 0.3 * Math.sin(2 * Math.PI * 6 * u)) });
-    s.pulse(0.0, 0.17, { freq: env.ramp(60, 90), gain: env.swell(0.2), duty: 0.5 });
-    s.thud(0.17, 0.85, 0.9);
-    s.rumble(0.2, 0.35, { from: 400, to: 120, gain: 0.25 });
+    const s = new MoveSfx(1.25, 0x7011);
+    s.rumble(0.0, 0.55, { from: 120, to: 260, gain: 0.35 });
+    s.noise(0.0, 0.55, { clock: (u) => 700 + 600 * u, gain: (u) => 0.12 * u * (0.6 + 0.4 * Math.sin(2 * Math.PI * 12 * u)) });
+    s.thud(0.55, 0.75, 0.9);
+    s.noise(0.55, 0.12, { clock: () => 2000, gain: env.decay(0.3, 1.5) });
+    for (let i = 0; i < 4; i++) s.noise(0.85 + i * 0.07 + s.random() * 0.03, 0.04, { clock: () => 1500 + s.random() * 1200, gain: env.decay(0.12, 1) });
     return s;
   },
 

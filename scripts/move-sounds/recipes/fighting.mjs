@@ -293,13 +293,14 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee, priority (impact 0.12 s): a lightning-fast jab - a short zip and a snappy punch. */
+  /** MachPunch.play, priority (rings + fist rush in 0-0.15 s, hit 0.15 s, sparkles to ~0.55 s): a lightning-fast zip, a snappy punch, a glint. */
   machpunch: () => {
-    const s = new MoveSfx(0.65, 0x3ac4);
-    s.whoosh(0.0, 0.12, { from: 3000, to: 12000, gain: 0.32 });
-    s.pulse(0.02, 0.1, { freq: env.ramp(800, 2400), gain: env.decay(0.12, 1), duty: 0.125 });
-    s.thud(0.12, 0.65, 0.45);
-    s.noise(0.12, 0.1, { clock: (u) => 12000 - 6000 * u, gain: env.attackDecay(0.3, 0.03) });
+    const s = new MoveSfx(0.7, 0x3ac4);
+    s.whoosh(0.0, 0.15, { from: 3000, to: 12000, gain: 0.32 });
+    s.pulse(0.02, 0.12, { freq: env.ramp(800, 2400), gain: env.decay(0.12, 1), duty: 0.125 });
+    s.thud(0.15, 0.65, 0.45);
+    s.noise(0.15, 0.1, { clock: (u) => 12000 - 6000 * u, gain: env.attackDecay(0.3, 0.03) });
+    s.sparkle(0.18, 0.35, 5, { lo: 3500, hi: 6000, gain: 0.1 });
     return s;
   },
 
@@ -356,23 +357,24 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a desperate comeback strike – a rising strain then a punchy blow. */
+  /** Reversal.play (sparks streak in 0-0.6 s, orb grows 0.3-0.65 s, flung 0.65 s, hit 0.85 s): a rising strain as energy gathers, a whoosh, then a punchy blow. */
   reversal: () => {
-    const s = new MoveSfx(0.7, 0x2e5a);
-    s.pulse(0.0, 0.17, { freq: env.ramp(200, 600), gain: env.swell(0.18), duty: 0.25 });
-    s.whoosh(0.0, 0.18, { from: 1500, to: 6000, gain: 0.3 });
-    s.thud(0.17, 0.85, 0.7);
-    s.pulse(0.19, 0.2, { freq: (u) => 700 * Math.pow(0.5, u), gain: env.decay(0.15, 1.5), duty: 0.5 });
+    const s = new MoveSfx(1.25, 0x5e7a);
+    s.pulse(0.0, 0.65, { freq: env.ramp(150, 600), gain: env.swell(0.18), duty: 0.25 });
+    s.sparkle(0.0, 0.55, 6, { lo: 3000, hi: 5500, gain: 0.1 });
+    s.whoosh(0.65, 0.2, { from: 1500, to: 6000, gain: 0.25 });
+    s.thud(0.85, 0.7, 0.6);
+    s.noise(0.85, 0.12, { clock: (u) => 10000 - 5000 * u, gain: env.decay(0.25, 1.5) });
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + Defense drop fleck (~0.6 s): a punch that cracks rock apart. */
+  /** RockSmash.play (fist smashes in, hit 0.15 s, rock fragments fly and fall 0.15-0.95 s): a punch that cracks rock apart, then rattling debris. */
   rocksmash: () => {
-    const s = new MoveSfx(1.15, 0x2c55);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 5000, gain: 0.3 });
-    s.thud(0.17, 0.85, 0.75);
-    for (let i = 0; i < 5; i++) s.noise(0.2 + i * 0.05 + s.random() * 0.02, 0.04, { clock: () => 1800 + s.random() * 2000, gain: env.decay(0.28 - i * 0.04, 1) });
-    s.statDown(0.6, 0.22);
+    const s = new MoveSfx(1.05, 0x50c5);
+    s.whoosh(0.0, 0.15, { from: 2000, to: 8000, gain: 0.25 });
+    s.thud(0.15, 0.7, 0.8);
+    s.noise(0.15, 0.12, { clock: () => 2500, gain: env.decay(0.35, 1.5) });
+    for (let i = 0; i < 5; i++) s.noise(0.5 + i * 0.08 + s.random() * 0.03, 0.04, { clock: () => 1800 + s.random() * 1500, gain: env.decay(0.14, 1) });
     return s;
   },
 
@@ -517,14 +519,15 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee kick, 3 hits (impacts 0.17 / 0.59 / 1.01 s), each harder and lower than the last. */
+  /** TripleKick.play, 3 hits (kicks land at 0.1 / 0.4 / 0.7 s, each harder): three kicks, each heavier than the last. */
   triplekick: () => {
-    const s = new MoveSfx(1.35, 0x7a1c);
-    [0, 1, 2].forEach((hit) => {
-      const at = 0.17 + hit * 0.42;
-      s.whoosh(at - 0.12, 0.13, { from: 2000, to: 7000, gain: 0.22 + hit * 0.03 });
-      s.thud(at, 0.5 + hit * 0.1, 0.4 + hit * 0.25);
-    });
+    const s = new MoveSfx(1.0, 0x3c1c);
+    for (let hit = 0; hit < 3; hit++) {
+      const at = 0.1 + hit * 0.3;
+      s.whoosh(at - 0.09, 0.09, { from: 2000, to: 7000, gain: 0.16 });
+      s.thud(at, 0.45 + hit * 0.1, 0.4 + hit * 0.15);
+      s.noise(at, 0.05, { clock: () => 9000, gain: env.decay(0.2 + hit * 0.05, 1.5) });
+    }
     return s;
   },
 

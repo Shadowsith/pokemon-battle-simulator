@@ -89,13 +89,15 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): a shimmering orb of hidden power, popping on impact. */
+  /** HiddenPower.play (orbs gather 0.15-0.75 s, user flares 0.75-0.9 s, green orbs fly 0.85 s on and land at 1.1 s): a rising shimmering chord, a flash, a burst and popping hits. */
   hiddenpower: () => {
-    const s = new MoveSfx(0.95, 0x41dd);
-    s.chord(0.0, 0.45, [67, 71, 74, 79], { rate: 0.03, gain: 0.2, voice: 'pulse' });
-    s.whoosh(0.0, 0.45, { from: 1500, to: 5000, gain: 0.18 });
-    s.thud(0.43, 0.5, 0.4);
-    s.sparkle(0.45, 0.35, 7, { gain: 0.15 });
+    const s = new MoveSfx(1.6, 0x41dd);
+    s.chord(0.15, 0.6, [67, 71, 74, 79], { rate: 0.06, gain: 0.18, voice: 'pulse' });
+    s.wave(0.15, 0.6, { freq: env.ramp(300, 900), gain: env.swell(0.12) });
+    s.pulse(0.75, 0.12, { freq: () => 2093, gain: env.decay(0.18, 1.5), duty: 0.5 });
+    s.whoosh(0.85, 0.25, { from: 1500, to: 5000, gain: 0.2 });
+    s.thud(1.1, 0.5, 0.4);
+    s.sparkle(1.1, 0.35, 7, { gain: 0.15 });
     return s;
   },
 
@@ -157,18 +159,15 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /**
-   * Generic projectile (impact 0.43 s): a wrapped gift tumbles over with a
-   * cheerful little jingle and pops open on the target. No plain original
-   * exists (damage and heal both use this clip).
-   */
+  /** Present.play (gift tossed 0-0.6 s, bounces 0.6-0.75 s, bursts at 0.75 s, pink stars to ~1.4 s): a cheerful toss, a bounce, a pop and a festive twinkle. */
   present: () => {
-    const s = new MoveSfx(0.9, 0x9e5e);
-    s.arpeggio(0.0, [79, 84, 88, 91], 0.1, { gain: 0.22, voice: 'wave', hold: 0.12 });
-    s.pulse(0.05, 0.3, { freq: () => 3136, gain: (u) => 0.06 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 12 * u)), duty: 0.5 });
-    s.noise(0.43, 0.12, { clock: (u) => 9000 - 6000 * u, gain: env.attackDecay(0.4, 0.05) });
-    s.pulse(0.43, 0.15, { freq: (u) => 200 * Math.pow(0.4, u), gain: env.decay(0.35, 2), duty: 0.5 });
-    s.sparkle(0.48, 0.35, 6, { lo: 3000, hi: 5500, gain: 0.14 });
+    const s = new MoveSfx(1.5, 0x9e5e);
+    s.whoosh(0.0, 0.3, { from: 1500, to: 4000, gain: 0.18 });
+    s.arpeggio(0.05, [72, 76, 79], 0.1, { gain: 0.14, voice: 'pulse', duty: 0.25 });
+    s.thud(0.6, 0.3, 0.3);
+    s.thud(0.75, 0.6, 0.5);
+    s.noise(0.75, 0.15, { clock: () => 5000, gain: env.decay(0.3, 1.5) });
+    s.sparkle(0.8, 0.55, 8, { lo: 3000, hi: 6000, gain: 0.14 });
     return s;
   },
 
@@ -248,15 +247,15 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic sonic (4 rings every 0.11 s, impact 0.43 s) + flinch fleck (0.55 s): a loud, rasping snore. */
+  /** Snore.play (Zs float up 0-0.6 s, three sound rings burst out at 0.65 / 0.8 / 0.95 s, landing 0.26 s later): a slow sleepy breath, then three loud, buzzy snorts. */
   snore: () => {
-    const s = new MoveSfx(0.85, 0x5302);
-    for (let i = 0; i < 2; i++) {
-      s.pulse(0.02 + i * 0.2, 0.2, { freq: (u) => (90 + 40 * u) * (1 + 0.1 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.35), duty: 0.25 });
-      s.noise(0.02 + i * 0.2, 0.2, { clock: () => 500, gain: env.swell(0.25) });
+    const s = new MoveSfx(1.4, 0x5a0e);
+    s.noise(0.0, 0.55, { clock: env.ramp(400, 900), gain: env.swell(0.12) });
+    for (const at of [0.65, 0.8, 0.95]) {
+      s.pulse(at, 0.15, { freq: (u) => 90 + 40 * Math.sin(2 * Math.PI * 30 * u), gain: env.attackDecay(0.3, 0.02), duty: 0.25 });
+      s.noise(at, 0.15, { clock: () => 500, gain: env.decay(0.2, 1) });
+      s.thud(at + 0.26, 0.3, 0.3);
     }
-    s.thud(0.43, 0.45, 0.6);
-    s.flinch(0.55);
     return s;
   },
 

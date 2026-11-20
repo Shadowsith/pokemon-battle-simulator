@@ -226,33 +226,35 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a light, held-back slash that leaves the foe hanging on. */
+  /** FalseSwipe.play (light streak crosses the target at 0.15 s, puffs fade to ~0.65 s): a quick swish and a soft, held-back cut. */
   falseswipe: () => {
     const s = new MoveSfx(0.75, 0xfa15);
-    s.whoosh(0.0, 0.18, { from: 2000, to: 7000, gain: 0.3 });
-    s.slash(0.17, 0.4);
-    s.thud(0.19, 0.3, 0.2);
-    s.wave(0.25, 0.3, { freq: env.ramp(660, 520), gain: env.decay(0.18, 1.5) });
+    s.whoosh(0.0, 0.15, { from: 2000, to: 7000, gain: 0.3 });
+    s.slash(0.15, 0.4);
+    s.thud(0.17, 0.3, 0.2);
+    s.wave(0.22, 0.3, { freq: env.ramp(660, 520), gain: env.decay(0.18, 1.5) });
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): frantic flailing, a burst of wild flurried blows. */
+  /** Flail.play (frantic flailing 0-0.7 s, blows at 0.75 / 0.9 s): wild flapping swishes, then two thumps. */
   flail: () => {
-    const s = new MoveSfx(0.95, 0xf1a1);
-    s.whoosh(0.0, 0.17, { from: 1500, to: 5000, gain: 0.3 });
-    for (const [at, g] of [[0.17, 0.55], [0.26, 0.35], [0.33, 0.45], [0.42, 0.3], [0.5, 0.4]]) s.thud(at, g, 0.3 + s.random() * 0.4);
-    s.whoosh(0.2, 0.35, { from: 4000, to: 2000, gain: 0.15 });
+    const s = new MoveSfx(1.2, 0xf1a1);
+    for (let i = 0; i < 6; i++) s.whoosh(i * 0.11, 0.1, { from: 1500 + s.random() * 1000, to: 4000, gain: 0.14 });
+    s.thud(0.75, 0.55, 0.5);
+    s.thud(0.9, 0.45, 0.4);
+    s.noise(0.75, 0.2, { clock: () => 6000, gain: env.decay(0.18, 1.5) });
     return s;
   },
 
-  /** Generic melee (impact at 0.17 s): a grudging, angry swat with a grumbling low tone. */
+  /** Frustration.play (user seethes red 0-0.5 s, blows at 0.55 / 0.7 / 0.85 s): an angry grumble, then three grudging thumps. */
   frustration: () => {
-    const s = new MoveSfx(0.85, 0xf2a7);
-    s.pulse(0.0, 0.16, { freq: (u) => 140 + 30 * Math.sin(2 * Math.PI * 6 * u), gain: env.ramp(0.08, 0.2), duty: 0.25 });
-    s.whoosh(0.03, 0.14, { from: 2000, to: 7000, gain: 0.25 });
-    s.thud(0.17, 0.7, 0.6);
-    s.thud(0.3, 0.4, 0.4);
-    s.pulse(0.32, 0.3, { freq: (u) => 180 - 60 * u, gain: env.decay(0.15, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.15, 0xf2a7);
+    s.pulse(0.0, 0.5, { freq: (u) => 140 + 30 * Math.sin(2 * Math.PI * 8 * u), gain: env.swell(0.2), duty: 0.25 });
+    for (const [i, at] of [0.55, 0.7, 0.85].entries()) {
+      s.whoosh(at - 0.08, 0.08, { from: 2000, to: 7000, gain: 0.18 });
+      s.thud(at, 0.6 - i * 0.08, 0.5);
+    }
+    s.pulse(0.9, 0.25, { freq: (u) => 180 - 60 * u, gain: env.decay(0.12, 1.5), duty: 0.125 });
     return s;
   },
 
@@ -470,13 +472,12 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): the user spins in, a whirring buzz around a hit. */
+  /** RapidSpin.play (whirl spins up 0-0.5 s, darts in 0.5-0.65 s, hit 0.65 s, whirl fades to 1.0 s): a whirring buzz that speeds up, a hit, the whirr dying away. */
   rapidspin: () => {
-    const s = new MoveSfx(0.8, 0x7a95);
-    s.pulse(0.0, 0.55, { freq: (u) => 300 + 500 * u, gain: (u) => 0.18 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 14 * u)), duty: 0.25 });
-    s.whoosh(0.0, 0.55, { from: 2000, to: 7000, gain: 0.25 });
-    s.thud(0.17, 0.6, 0.4);
-    s.noise(0.5, 0.15, { clock: (u) => 6000 - 3000 * u, gain: env.decay(0.15, 1) });
+    const s = new MoveSfx(1.1, 0x5a91);
+    s.noise(0.0, 0.95, { clock: (u) => 2000 + 2000 * Math.min(u * 1.6, 1), gain: (u) => 0.2 * Math.sin(Math.PI * u) * (0.6 + 0.4 * Math.sin(2 * Math.PI * (8 + 14 * u) * u)) });
+    s.pulse(0.0, 0.65, { freq: env.ramp(200, 500), gain: env.swell(0.1), duty: 0.25 });
+    s.thud(0.65, 0.6, 0.5);
     return s;
   },
 
@@ -492,12 +493,13 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a heartfelt blow – clean hit with a warm, friendly chime. */
+  /** Return.play (user hops at 0 / 0.3 s, blow at 0.7 s, sparkles drift up to ~1.2 s): two happy bounces, a clean hit and a warm, friendly chime. */
   return: () => {
-    const s = new MoveSfx(0.85, 0x7e70);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 5000, gain: 0.3 });
-    s.thud(0.17, 0.7, 0.55);
-    s.arpeggio(0.25, [76, 81, 84], 0.07, { gain: 0.16, voice: 'wave', hold: 0.18 });
+    const s = new MoveSfx(1.3, 0x7e70);
+    for (const at of [0, 0.3]) s.pulse(at, 0.12, { freq: env.ramp(500, 900), gain: env.decay(0.14, 1), duty: 0.5 });
+    s.whoosh(0.6, 0.1, { from: 2000, to: 6000, gain: 0.2 });
+    s.thud(0.7, 0.6, 0.5);
+    s.arpeggio(0.75, [72, 76, 79, 84], 0.06, { gain: 0.14, voice: 'wave', hold: 0.15 });
     return s;
   },
 
@@ -680,14 +682,14 @@ export const NORMAL_STRIKE = {
   },
 
 
-  /** Generic melee (impact 0.17 s): a sneaky swipe - quick slap, then a little "snatched it" pickup jingle. */
+  /** Thief.play (scuffle hit 0.15 s, dust to ~0.6 s, item pops up and flies to the user 0.6-1.1 s): a quick scuffle, a pop and a sneaky swish away. */
   thief: () => {
-    const s = new MoveSfx(0.85, 0x7d1e);
-    s.whoosh(0.0, 0.17, { from: 2500, to: 8000, gain: 0.28 });
-    s.thud(0.17, 0.55, 0.4);
-    s.noise(0.17, 0.05, { clock: () => 14000, gain: env.decay(0.35, 1) });
-    s.arpeggio(0.36, [76, 83], 0.07, { gain: 0.16, duty: 0.25, hold: 0.1 });
-    s.pulse(0.5, 0.18, { freq: env.ramp(500, 260), gain: env.decay(0.12, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.25, 0x7a1e);
+    s.whoosh(0.0, 0.15, { from: 2000, to: 6000, gain: 0.2 });
+    s.thud(0.15, 0.55, 0.5);
+    for (let i = 0; i < 3; i++) s.noise(0.15 + i * 0.13, 0.08, { clock: () => 3000, gain: env.decay(0.15, 1.5) });
+    s.pulse(0.6, 0.08, { freq: env.ramp(800, 1600), gain: env.decay(0.16, 1), duty: 0.25 });
+    s.whoosh(0.7, 0.4, { from: 4000, to: 1500, gain: 0.16 });
     return s;
   },
 
@@ -707,24 +709,30 @@ export const NORMAL_STRIKE = {
   },
 
 
-  /** Generic melee (impact 0.17 s): pincers swing in and clamp shut with a hard metallic snap. */
+  /** ViseGrip.play (jaws rise 0-0.25 s, snap shut 0.4 s with red glow + pink sparkles to ~0.85 s, part 0.9-1.15 s): a grinding slide-in, a hard metallic snap, a strained hold, then a release. */
   visegrip: () => {
-    const s = new MoveSfx(0.75, 0x515e);
-    s.whoosh(0.0, 0.17, { from: 1500, to: 5000, gain: 0.25 });
-    s.thud(0.17, 0.55, 0.45);
-    s.noise(0.17, 0.06, { clock: () => 12000, gain: env.decay(0.35, 1.5), short: true });
-    s.pulse(0.19, 0.12, { freq: () => 1760, gain: env.decay(0.18, 2), duty: 0.125 });
-    s.wave(0.24, 0.3, { freq: env.ramp(260, 200), gain: env.decay(0.18, 1) });
+    const s = new MoveSfx(1.3, 0x515e);
+    s.whoosh(0.0, 0.25, { from: 800, to: 2500, gain: 0.18 });
+    s.whoosh(0.28, 0.12, { from: 1500, to: 5000, gain: 0.25 });
+    s.thud(0.4, 0.55, 0.45);
+    s.noise(0.4, 0.06, { clock: () => 12000, gain: env.decay(0.35, 1.5), short: true });
+    s.pulse(0.42, 0.12, { freq: () => 1760, gain: env.decay(0.18, 2), duty: 0.125 });
+    s.sparkle(0.45, 0.35, 5, { gain: 0.12 });
+    s.pulse(0.5, 0.4, { freq: (u) => 200 + 10 * Math.sin(2 * Math.PI * 12 * u), gain: env.decay(0.12, 1), duty: 0.125 });
+    s.whoosh(0.9, 0.2, { from: 3000, to: 1200, gain: 0.15 });
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): the user coils round the target and squeezes tight - a creaking constriction. */
+  /** Wrap.play (cloud + coils drop in 0-0.35 s, squeezes at 0.4 / 0.7 / 1.0 s, coils loosen 1.15-1.35 s): a soft rustle, then three creaking squeezes. */
   wrap: () => {
-    const s = new MoveSfx(0.95, 0x3e9a);
-    s.whoosh(0.0, 0.17, { from: 1500, to: 4000, gain: 0.25 });
-    s.thud(0.17, 0.5, 0.4);
-    s.pulse(0.2, 0.55, { freq: (u) => 180 + 60 * u + 15 * Math.sin(2 * Math.PI * 8 * u), gain: (u) => 0.2 * Math.sin(Math.PI * u), duty: 0.125 });
-    s.noise(0.2, 0.55, { clock: () => 2500, gain: (u) => 0.12 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 7 * u)) });
+    const s = new MoveSfx(1.5, 0x3e9a);
+    s.whoosh(0.0, 0.35, { from: 1200, to: 3500, gain: 0.2 });
+    for (const t of [0.4, 0.7, 1.0]) {
+      s.thud(t, 0.4, 0.35);
+      s.pulse(t, 0.22, { freq: (u) => 200 + 70 * u, gain: env.attackDecay(0.18, 0.2), duty: 0.125 });
+      s.noise(t, 0.18, { clock: () => 2500, gain: env.decay(0.12, 1.5) });
+    }
+    s.whoosh(1.15, 0.2, { from: 3000, to: 1200, gain: 0.12 });
     return s;
   },
 

@@ -5,13 +5,14 @@ import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { PsychicFx } from './psychic-fx';
 import { HyperspaceHole } from './hyperspace-hole';
+import { MirrorCoat } from './mirror-coat';
 import { PsychoCut } from './psycho-cut';
 import { Psyshock } from './psyshock';
 import { Psystrike } from './psystrike';
 import { Synchronoise } from './synchronoise';
 import { ZenHeadbutt } from './zen-headbutt';
 
-/** Hand-made animations for Psychic-type attacks (Hyperspace Hole, Psycho Cut, Psyshock, Psystrike, Synchronoise and Zen Headbutt have their own files). */
+/** Hand-made animations for Psychic-type attacks (Hyperspace Hole, Mirror Coat, Psycho Cut, Psyshock, Psystrike, Synchronoise and Zen Headbutt have their own files). */
 export class PsychicAttackMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -21,6 +22,7 @@ export class PsychicAttackMoveAnimations {
     futuresight: (refs) => PsychicAttackMoveAnimations.playFutureSightHit(refs),
     hyperspacehole: (refs, launch, target, v) => HyperspaceHole.play(refs, launch, target, v),
     lusterpurge: (refs, launch, target) => PsychicAttackMoveAnimations.playLusterPurge(refs, launch, target),
+    mirrorcoat: (refs, launch, target) => MirrorCoat.play(refs, launch, target),
     psychic: (refs) => PsychicAttackMoveAnimations.playPsychic(refs),
     psychoboost: (refs, launch, target) => PsychicAttackMoveAnimations.playPsychoBoost(refs, launch, target),
     psybeam: (refs, launch, target) => PsychicAttackMoveAnimations.playPsybeam(refs, launch, target),

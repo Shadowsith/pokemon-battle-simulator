@@ -135,13 +135,13 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (priority): the user braces itself, a firm low hum that holds. */
+  /** Endure.play (user braces at 0.15 s and glows red to 0.95 s, light streaks rise 0.1-0.9 s): a firm low hum that holds, with rising shimmer. */
   endure: () => {
-    const s = new MoveSfx(1.05, 0xe2d7);
-    s.pulse(0.02, 0.8, { freq: () => 110, gain: env.swell(0.3), duty: 0.25 });
-    s.wave(0.02, 0.8, { freq: () => 220, gain: env.swell(0.2) });
-    s.pulse(0.05, 0.12, { freq: env.ramp(300, 500), gain: env.decay(0.25, 1), duty: 0.5 });
-    s.thud(0.5, 0.3, 0.3);
+    const s = new MoveSfx(1.1, 0xe2d7);
+    s.pulse(0.02, 0.9, { freq: () => 110, gain: env.swell(0.3), duty: 0.25 });
+    s.wave(0.02, 0.9, { freq: () => 220, gain: env.swell(0.2) });
+    s.thud(0.15, 0.35, 0.3);
+    for (let i = 0; i < 7; i++) s.wave(0.1 + i * 0.07, 0.2, { freq: env.ramp(700, 1400), gain: env.decay(0.06, 1) });
     return s;
   },
 
@@ -374,13 +374,11 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): a protective veil settles over the team – a calm, shimmering major chord. */
+  /** Safeguard.play (veil rings ripple out 0-1.0 s, 0.16 s apart; sparkles 0.3-0.9 s; user turns pale 0.5-1.2 s): a calm, shimmering major chord that settles over the team. */
   safeguard: () => {
-    const s = new MoveSfx(1.4, 0x5afe);
-    s.chord(0.0, 1.0, [72, 76, 79, 84], { rate: 0.04, gain: 0.25 });
-    s.wave(0.0, 1.1, { freq: () => 262, gain: env.swell(0.15) });
-    s.sparkle(0.2, 0.9, 10, { lo: 3000, hi: 5500, gain: 0.12 });
-    s.pulse(0.85, 0.4, { freq: () => 1047, gain: env.decay(0.15, 1.5), duty: 0.25 });
+    const s = new MoveSfx(1.35, 0x5afe);
+    s.chord(0.0, 1.1, [72, 76, 79, 84], { rate: 0.16, gain: 0.16, voice: 'wave', vibrato: 0.01 });
+    s.sparkle(0.3, 0.6, 8, { lo: 3500, hi: 6000, gain: 0.12 });
     return s;
   },
 

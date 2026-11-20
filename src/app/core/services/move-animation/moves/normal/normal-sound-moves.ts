@@ -3,9 +3,11 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { PerishSong } from './perish-song';
 import { RelicSong } from './relic-song';
+import { Snore } from './snore';
 
-/** Hand-made animations for Normal-type sound moves (Relic Song lives in `relic-song.ts`). */
+/** Hand-made animations for Normal-type sound moves (Perish Song lives in `perish-song.ts`, Relic Song in `relic-song.ts`, Snore in `snore.ts`). */
 export class NormalSoundMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -13,10 +15,12 @@ export class NormalSoundMoveAnimations {
     confide: (refs, launch, target) => NormalSoundMoveAnimations.playConfide(refs, launch, target),
     growl: (refs, launch, target) => NormalSoundMoveAnimations.playGrowl(refs, launch, target),
     nobleroar: (refs, launch, target) => NormalSoundMoveAnimations.playNobleRoar(refs, launch, target),
+    perishsong: (refs, launch, target) => PerishSong.play(refs, launch, target),
     relicsong: (refs, launch, target) => RelicSong.play(refs, launch, target),
     roar: (refs, launch, target) => NormalSoundMoveAnimations.playRoar(refs, launch, target),
     screech: (refs, launch, target) => NormalSoundMoveAnimations.playScreech(refs, launch, target),
     sing: (refs, launch, target) => NormalSoundMoveAnimations.playSing(refs, launch, target),
+    snore: (refs, launch, target, v) => Snore.play(refs, launch, target, v),
     supersonic: (refs, _launch, target) => NormalSoundMoveAnimations.playSupersonic(refs, target)
   };
 

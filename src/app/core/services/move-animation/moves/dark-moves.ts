@@ -2,21 +2,27 @@ import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../animati
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { BeatUp } from './dark/beat-up';
+import { FeintAttack } from './dark/feint-attack';
 import { FoulPlay } from './dark/foul-play';
 import { HoneClaws } from './dark/hone-claws';
 import { NastyPlot } from './dark/nasty-plot';
 import { NightDaze } from './dark/night-daze';
 import { NightSlash } from './dark/night-slash';
+import { Pursuit } from './dark/pursuit';
 import { SuckerPunch } from './dark/sucker-punch';
 import { Switcheroo } from './dark/switcheroo';
+import { Thief } from './dark/thief';
 
-/** Hand-made animations for Dark-type moves (Foul Play, Hone Claws, Nasty Plot, Night Slash, Sucker Punch and Switcheroo live in `dark/`). */
+/** Hand-made animations for Dark-type moves (Beat Up, Feint Attack, Foul Play, Hone Claws, Nasty Plot, Night Slash, Pursuit, Sucker Punch, Switcheroo and Thief live in `dark/`). */
 export class DarkMoveAnimations {
   /** Hand-made Dark move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    beatup: (refs, _launch, target, v) => BeatUp.play(refs, target, v.dir),
     bite: (refs, _launch, target) => DarkMoveAnimations.playBite(refs, target),
     crunch: (refs, _launch, target) => DarkMoveAnimations.playCrunch(refs, target),
     darkpulse: (refs, launch, target) => DarkMoveAnimations.playDarkPulse(refs, launch, target),
+    feintattack: (refs, _launch, target) => FeintAttack.play(refs, target),
     foulplay: (refs, launch, target, v) => FoulPlay.play(refs, launch, target, v),
     honeclaws: (refs, launch, target) => HoneClaws.play(refs, launch, target),
     hyperspacefury: (refs, launch, target) => DarkMoveAnimations.playHyperspaceFury(refs, launch, target),
@@ -24,9 +30,11 @@ export class DarkMoveAnimations {
     nightdaze: (refs, launch, target) => NightDaze.play(refs, launch, target),
     nightslash: (refs, _launch, target, v) => NightSlash.play(refs, target, v),
     partingshot: (refs, launch, target, v) => DarkMoveAnimations.playPartingShot(refs, launch, target, v),
+    pursuit: (refs, _launch, target) => Pursuit.play(refs, target),
     suckerpunch: (refs, launch, target, v) => SuckerPunch.play(refs, launch, target, v),
     switcheroo: (refs, launch, target, v) => Switcheroo.play(refs, launch, target, v),
     taunt: (refs, launch, target, v) => DarkMoveAnimations.playTaunt(refs, launch, target, v),
+    thief: (refs, launch, target) => Thief.play(refs, launch, target),
     topsyturvy: (refs, _launch, target) => DarkMoveAnimations.playTopsyTurvy(refs, target)
   };
 

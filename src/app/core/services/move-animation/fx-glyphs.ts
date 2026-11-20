@@ -574,6 +574,42 @@ export class FxGlyphs {
     return el;
   }
 
+  /**
+   * A round spider web `size` px across: ten spokes and five rings of threads
+   * that sag a little toward the centre between the spokes, with a soft glow (String Shot, Sticky Web, Spider Web).
+   */
+  static webGlyph(size: number, thread: string, glow: string, stroke = 1.3): HTMLElement {
+    const spokes = 10;
+    const at = (rad: number, i: number) => {
+      const a = (Math.PI * 2 * i) / spokes - Math.PI / 2;
+      return [rad * Math.cos(a), rad * Math.sin(a)].map((n) => n.toFixed(1)).join(' ');
+    };
+    let d = '';
+    for (let i = 0; i < spokes; i++) d += `M0 0L${at(49, i)}`;
+    for (const rad of [9, 18, 27, 36, 45]) {
+      d += `M${at(rad, 0)}`;
+      for (let i = 0; i < spokes; i++) d += `Q${at(rad * 0.86, i + 0.5)} ${at(rad, i + 1)}`;
+    }
+    const el = document.createElement('div');
+    el.style.cssText = `width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 3px ${glow})`;
+    el.innerHTML =
+      `<svg viewBox="-50 -50 100 100" width="100%" height="100%" style="display:block;overflow:visible">` +
+      `<path d="${d}" fill="none" stroke="${thread}" stroke-width="${stroke}" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
+    return el;
+  }
+
+  /** A glossy heart `size` px wide in `fill`, with a lighter shine and a soft `glow` (Attract, Charm). */
+  static heartGlyph(size: number, fill = '#FF7AB8', glow = '#FFC2E0'): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 24 22');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${size}px;height:${size * (22 / 24)}px;filter:drop-shadow(0 0 3px ${glow})`);
+    svg.innerHTML =
+      `<path d="M12 21C5 15.2 1 11.3 1 6.6 1 3.5 3.4 1 6.4 1c2.2 0 4.3 1.3 5.6 3.3C13.3 2.3 15.4 1 17.6 1 20.6 1 23 3.5 23 6.6c0 4.7-4 8.6-11 14.4Z" fill="${fill}" stroke="#ffffff" stroke-width="1.2"/>` +
+      '<ellipse cx="7" cy="6.2" rx="2.6" ry="1.7" fill="#ffffff" opacity=".7" transform="rotate(-30 7 6.2)"/>';
+    return svg;
+  }
+
   static pokeball(size: number): HTMLElement {
     const ns = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;

@@ -175,14 +175,17 @@ export const WATER = {
     return s;
   },
 
-  /** Generic lob (0.52 s arc) + accuracy drop fleck (~0.65 s): an ink blob is shot up with a "blorp" and splats inky. */
+  /** Octazooka.play (ink balls shot 0-0.6 s, first hits 0.42 s, ink cloud 0.42-1.2 s, accuracy drop 1.2 s on): a "blorp", inky splats, a murky hiss, then the stat-down. */
   octazooka: () => {
-    const s = new MoveSfx(1.15, 0x0c7a);
-    s.pulse(0.0, 0.1, { freq: (u) => 180 * (1 + 2 * u), gain: env.decay(0.35, 1), duty: 0.5 });
-    s.noise(0.02, 0.48, { clock: env.ramp(1500, 3000), gain: env.swell(0.12) });
-    s.splash(0.52, 0.55);
-    s.pulse(0.52, 0.2, { freq: (u) => 120 * Math.pow(0.5, u), gain: env.decay(0.3, 1.5), duty: 0.5 });
-    s.statDown(0.68);
+    const s = new MoveSfx(2.2, 0x0c7a);
+    s.wave(0.0, 0.15, { freq: env.ramp(500, 140), gain: env.decay(0.35, 1) });
+    s.noise(0.0, 0.2, { clock: () => 1500, gain: env.decay(0.15, 1) });
+    for (let i = 0; i < 4; i++) {
+      s.noise(0.42 + i * 0.06, 0.07, { clock: () => 1000 + s.random() * 500, gain: env.decay(0.3, 1.5) });
+      s.thud(0.42 + i * 0.06, 0.35 - i * 0.05, 0.6);
+    }
+    s.noise(0.55, 0.65, { clock: () => 700, gain: env.swell(0.1) });
+    s.statDown(1.2);
     return s;
   },
 
@@ -308,12 +311,13 @@ export const WATER = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a thin squirt of water and a small splash. */
+  /** WaterGun.play (droplet stream 0-0.6 s, first lands 0.3 s, splashes 0.3-0.6 s, bubbles to ~0.9 s): a thin squirt of water, a run of small splashes, bubbles. */
   watergun: () => {
-    const s = new MoveSfx(0.85, 0x3a61);
-    s.noise(0.0, 0.43, { clock: (u) => 4000 + 2500 * u, gain: (u) => 0.28 * Math.min(1, u * 6) });
-    s.bubbles(0.02, 0.38, 5, { lo: 400, hi: 900, gain: 0.12 });
-    s.splash(0.43, 0.55);
+    const s = new MoveSfx(1.05, 0x3a61);
+    s.noise(0.0, 0.6, { clock: (u) => 4000 + 2500 * u, gain: (u) => 0.26 * Math.min(1, u * 6) * (u > 0.85 ? (1 - u) / 0.15 : 1) });
+    s.bubbles(0.02, 0.3, 4, { lo: 400, hi: 900, gain: 0.1 });
+    for (const [t, g] of [[0.3, 0.5], [0.44, 0.3], [0.58, 0.25]]) s.splash(t, g);
+    s.bubbles(0.45, 0.45, 5, { gain: 0.1 });
     return s;
   },
 
@@ -387,24 +391,27 @@ export const WATER = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a spinning vortex of water swirls in and engulfs the target. */
+  /** Whirlpool.play (scene turns deep blue 0-0.25 s, bubbles spiral up 0.2-1.0 s, target dragged in at 0.4 / 0.7 s, clears to ~1.3 s): a deep swirling rush of water full of bubbles. */
   whirlpool: () => {
-    const s = new MoveSfx(1.2, 0x3a67);
-    s.noise(0.0, 1.0, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 5 * u), gain: (u) => 0.3 * Math.min(1, u * 4) * Math.pow(1 - u, 0.8) });
-    s.wave(0.0, 1.0, { freq: (u) => 300 + 120 * Math.sin(2 * Math.PI * 5 * u), gain: (u) => 0.18 * Math.sin(Math.PI * u) });
-    s.splash(0.43, 0.5);
-    s.bubbles(0.5, 0.5, 7, { gain: 0.12 });
+    const s = new MoveSfx(1.4, 0x3c9a);
+    s.noise(0.15, 0.95, { clock: (u) => 700 + 400 * Math.sin(2 * Math.PI * 3 * u), gain: env.swell(0.25) });
+    s.bubbles(0.2, 0.8, 12, { lo: 300, hi: 900, gain: 0.2 });
+    for (const at of [0.4, 0.7]) {
+      s.splash(at, 0.3);
+      s.thud(at, 0.3, 0.5);
+    }
     return s;
   },
 
-  /** Generic self aura + stat-up fleck (0.85 s): the user pulls into its shell with a hollow knock. */
+  /** Withdraw.play (shell closes 0-0.3 s with a knock at 0.3 s, bubbles 0.35-0.85 s, shell sinks 0.8-1.0 s, stat-up aura 1.0-1.8 s): the user pulls into its shell with a hollow knock, bubbles, then the stat-up jingle. */
   withdraw: () => {
-    const s = new MoveSfx(1.5, 0x3a68);
-    s.whoosh(0.02, 0.2, { from: 4000, to: 1500, gain: 0.22 });
-    s.thud(0.22, 0.4, 0.3);
-    s.wave(0.24, 0.35, { freq: () => 392, gain: env.decay(0.25, 1.5) });
-    s.bubbles(0.35, 0.4, 4, { gain: 0.1 });
-    s.statUp(0.85);
+    const s = new MoveSfx(1.95, 0x3a68);
+    s.whoosh(0.02, 0.26, { from: 4000, to: 1500, gain: 0.22 });
+    s.thud(0.3, 0.4, 0.3);
+    s.wave(0.32, 0.35, { freq: () => 392, gain: env.decay(0.25, 1.5) });
+    s.bubbles(0.35, 0.5, 4, { gain: 0.1 });
+    s.whoosh(0.8, 0.2, { from: 1500, to: 3500, gain: 0.15 });
+    s.statUp(1.0);
     return s;
   },
 };

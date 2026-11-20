@@ -12,11 +12,14 @@ export const DARK = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): the whole party piles in with quick blows. */
+  /** BeatUp.play (3 blows at 0.15 / 0.45 / 0.75 s, a shadow streaking in before each): swish - thump, three times. */
   beatup: () => {
-    const s = new MoveSfx(0.95, 0xbea7);
-    s.whoosh(0.0, 0.45, { from: 1000, to: 4000, gain: 0.3 });
-    for (const [at, g] of [[0.43, 0.6], [0.52, 0.4], [0.6, 0.45], [0.69, 0.35]]) s.thud(at, g, 0.4);
+    const s = new MoveSfx(1.1, 0xbea7);
+    for (const [i, at] of [0.15, 0.45, 0.75].entries()) {
+      s.whoosh(at - 0.12, 0.12, { from: 1000, to: 4000, gain: 0.22 });
+      s.thud(at, 0.6 - i * 0.05, 0.45);
+      s.noise(at, 0.05, { clock: () => 3000, gain: env.decay(0.25, 1.5) });
+    }
     return s;
   },
 
@@ -96,13 +99,14 @@ export const DARK = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a sly vanishing sidestep, then an unseen blow. */
+  /** FeintAttack.play (scene darkens 0-0.25 s, user vanishes 0.2-0.45 s, unseen hit 0.55 s, user fades back 0.8-1.15 s): a sly vanishing zip, a sudden blow, then a shimmer back. */
   feintattack: () => {
-    const s = new MoveSfx(0.8, 0xfe1a);
-    s.pulse(0.0, 0.15, { freq: env.ramp(400, 1200), gain: env.decay(0.18, 1), duty: 0.125 });
-    s.whoosh(0.02, 0.15, { from: 3000, to: 1200, gain: 0.25 });
-    s.thud(0.17, 0.6, 0.6);
-    s.pulse(0.2, 0.35, { freq: env.ramp(130, 80), gain: env.decay(0.18, 1), duty: 0.125 });
+    const s = new MoveSfx(1.25, 0xfe1a);
+    s.pulse(0.2, 0.25, { freq: env.ramp(400, 1200), gain: env.decay(0.18, 1), duty: 0.125 });
+    s.whoosh(0.4, 0.15, { from: 3000, to: 1200, gain: 0.25 });
+    s.thud(0.55, 0.6, 0.6);
+    s.sparkle(0.55, 0.3, 5, { gain: 0.12 });
+    s.pulse(0.8, 0.3, { freq: env.ramp(1200, 400), gain: env.decay(0.12, 1), duty: 0.125 });
     return s;
   },
 
@@ -253,13 +257,14 @@ export const DARK = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a sneaky dash from the shadows and a sharp blow. */
+  /** Pursuit.play (scene darkens 0-0.25 s, jagged ring closes in 0.2-0.6 s, snaps shut with a hit at 0.6 s): a sneaky tightening swish, then a sharp blow. */
   pursuit: () => {
-    const s = new MoveSfx(0.7, 0xd905);
-    s.pulse(0.0, 0.18, { freq: (u) => 180 - 60 * u, gain: env.ramp(0.05, 0.15), duty: 0.125 });
-    s.whoosh(0.0, 0.18, { from: 1500, to: 6000, gain: 0.3 });
-    s.thud(0.17, 0.7, 0.45);
-    s.thud(0.3, 0.3, 0.3);
+    const s = new MoveSfx(1.15, 0x9055);
+    s.pulse(0.2, 0.4, { freq: env.ramp(300, 900), gain: env.swell(0.12), duty: 0.125 });
+    s.whoosh(0.3, 0.3, { from: 1500, to: 6000, gain: 0.22 });
+    s.thud(0.6, 0.65, 0.6);
+    s.noise(0.6, 0.08, { clock: () => 9000, gain: env.decay(0.3, 1.5) });
+    s.sparkle(0.62, 0.3, 4, { lo: 3000, hi: 5000, gain: 0.1 });
     return s;
   },
 

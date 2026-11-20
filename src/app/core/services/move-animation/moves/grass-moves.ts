@@ -5,6 +5,7 @@ import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { TerrainFx } from '../terrain-fx';
 import { CottonGuard } from './grass/cotton-guard';
+import { CottonSpore } from './grass/cotton-spore';
 import { EnergyBall } from './grass/energy-ball';
 import { ForestsCurse } from './grass/forests-curse';
 import { GrassKnot } from './grass/grass-knot';
@@ -20,13 +21,14 @@ import { SpikyShield } from './grass/spiky-shield';
 import { VineWhip } from './grass/vine-whip';
 import { WoodHammer } from './grass/wood-hammer';
 
-/** Hand-made animations for Grass-type moves (Cotton Guard, Energy Ball, Forest's Curse, Grass Knot, Grass Pledge, Horn Leech, Leaf Storm, Petal Blizzard, Power Whip, Razor Leaf, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
+/** Hand-made animations for Grass-type moves (Cotton Guard, Cotton Spore, Energy Ball, Forest's Curse, Grass Knot, Grass Pledge, Horn Leech, Leaf Storm, Petal Blizzard, Power Whip, Razor Leaf, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     absorb: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target),
     aromatherapy: (refs, launch) => GrassMoveAnimations.playAromatherapy(refs, launch),
     cottonguard: (refs, launch) => CottonGuard.play(refs, launch),
+    cottonspore: (refs, _launch, target) => CottonSpore.play(refs, target),
     energyball: (refs, launch, target) => EnergyBall.play(refs, launch, target),
     forestscurse: (refs, _launch, target) => ForestsCurse.play(refs, target),
     frenzyplant: (refs, launch, target) => GrassMoveAnimations.playFrenzyPlant(refs, launch, target),

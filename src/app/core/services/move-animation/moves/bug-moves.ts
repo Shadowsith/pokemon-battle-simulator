@@ -4,18 +4,21 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { GrassMoveAnimations } from './grass-moves';
+import { FuryCutter } from './bug/fury-cutter';
 import { QuiverDance } from './bug/quiver-dance';
 import { RagePowder } from './bug/rage-powder';
+import { SpiderWeb } from './bug/spider-web';
 import { UTurn } from './bug/u-turn';
 import { XScissor } from './bug/x-scissor';
 
-/** Hand-made animations for Bug-type moves (U-turn and X-Scissor live in `bug/`). */
+/** Hand-made animations for Bug-type moves (Fury Cutter, Spider Web, U-turn and X-Scissor live in `bug/`). */
 export class BugMoveAnimations {
   /** Hand-made Bug move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     attackorder: (refs, _launch, target) => BugMoveAnimations.playAttackOrder(refs, target),
     bugbuzz: (refs, launch, target) => BugMoveAnimations.playBugBuzz(refs, launch, target),
     fellstinger: (refs, launch, target) => BugMoveAnimations.playFellStinger(refs, launch, target),
+    furycutter: (refs, _launch, target, v) => FuryCutter.play(refs, target, v),
     infestation: (refs, _launch, target) => BugMoveAnimations.playInfestation(refs, target),
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
@@ -25,6 +28,7 @@ export class BugMoveAnimations {
     quiverdance: (refs, launch) => QuiverDance.play(refs, launch),
     ragepowder: (refs, launch) => RagePowder.play(refs, launch),
     signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target),
+    spiderweb: (refs, launch, target, v) => SpiderWeb.play(refs, launch, target, v),
     stickyweb: (refs, launch, target) => BugMoveAnimations.playStickyWeb(refs, launch, target),
     stringshot: (refs, launch, target) => BugMoveAnimations.playStringShot(refs, launch, target),
     twineedle: (refs, launch, target, v) => BugMoveAnimations.playPinMissile(refs, launch, target, v, BugMoveAnimations.TWINEEDLE),
@@ -186,7 +190,7 @@ export class BugMoveAnimations {
     fxEl.appendChild(layer);
 
     // The green web and the orb fly together, both centred on `hover` at the end of the arc.
-    const web = BugMoveAnimations.webGlyph(big, '#4AF0A0', '#1AC878');
+    const web = FxGlyphs.webGlyph(big, '#4AF0A0', '#1AC878');
     Fx.place(web, hover);
     const orbSize = Math.max(r.width * 0.3, 20);
     const orb = document.createElement('div');
@@ -238,7 +242,7 @@ export class BugMoveAnimations {
 
     // A white web spreads over the ground from the target outward, lies a moment and fades.
     const groundSize = Math.max(r.width * 3.6, 260);
-    const ground = BugMoveAnimations.webGlyph(groundSize, '#FFFFFF', '#C8FFE8', 2.2);
+    const ground = FxGlyphs.webGlyph(groundSize, '#FFFFFF', '#C8FFE8', 2.2);
     ground.style.transform = `scale(1,${flat})`;
     Fx.place(ground, foot);
     layer.insertBefore(ground, web);
@@ -257,30 +261,6 @@ export class BugMoveAnimations {
       ], { duration: total, easing: 'ease-out' })
     ]);
     layer.remove();
-  }
-
-  /**
-   * A round spider web `size` px across: ten spokes and five rings of threads
-   * that sag a little toward the centre between the spokes, with a soft glow.
-   */
-  private static webGlyph(size: number, thread: string, glow: string, stroke = 1.3): HTMLElement {
-    const spokes = 10;
-    const at = (rad: number, i: number) => {
-      const a = (Math.PI * 2 * i) / spokes - Math.PI / 2;
-      return [rad * Math.cos(a), rad * Math.sin(a)].map((n) => n.toFixed(1)).join(' ');
-    };
-    let d = '';
-    for (let i = 0; i < spokes; i++) d += `M0 0L${at(49, i)}`;
-    for (const rad of [9, 18, 27, 36, 45]) {
-      d += `M${at(rad, 0)}`;
-      for (let i = 0; i < spokes; i++) d += `Q${at(rad * 0.86, i + 0.5)} ${at(rad, i + 1)}`;
-    }
-    const el = document.createElement('div');
-    el.style.cssText = `width:${size}px;height:${size}px;pointer-events:none;filter:drop-shadow(0 0 3px ${glow})`;
-    el.innerHTML =
-      `<svg viewBox="-50 -50 100 100" width="100%" height="100%" style="display:block;overflow:visible">` +
-      `<path d="${d}" fill="none" stroke="${thread}" stroke-width="${stroke}" stroke-linejoin="round" stroke-linecap="round"/></svg>`;
-    return el;
   }
 
   /**

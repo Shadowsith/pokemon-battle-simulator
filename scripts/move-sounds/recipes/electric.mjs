@@ -281,14 +281,13 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s) + paralysis fleck (~0.6 s): a sparking body tackle. */
+  /** Spark.play (user crackles 0-0.45 s, light flares 0.25-0.5 s, dashes 0.45-0.6 s, hit 0.6 s, target crackles 0.6-1.0 s): a building electric fizz, a zap and a crackling hit. */
   spark: () => {
-    const s = new MoveSfx(0.95, 0x5ba4);
-    s.noise(0.0, 0.17, { clock: () => 6000, gain: env.ramp(0.08, 0.25), short: true });
-    s.thud(0.17, 0.4, 0.4);
-    s.noise(0.17, 0.45, { clock: () => 8000, gain: env.decay(0.28, 1), short: true });
-    s.sparkle(0.25, 0.35, 5, { lo: 3000, hi: 6000, gain: 0.15 });
-    s.pulse(0.17, 0.15, { freq: (u) => 2000 - 1200 * u, gain: env.decay(0.18, 1), duty: 0.25 });
+    const s = new MoveSfx(1.1, 0x5a2c);
+    s.noise(0.0, 0.45, { clock: (u) => 3000 + 3000 * Math.sin(2 * Math.PI * 9 * u), gain: env.swell(0.18) });
+    s.pulse(0.25, 0.25, { freq: env.ramp(600, 1800), gain: env.swell(0.12), duty: 0.125 });
+    s.whoosh(0.45, 0.15, { from: 2000, to: 8000, gain: 0.25 });
+    s.thud(0.6, 0.55, 0.5);
     s.paralyze(0.6, 0.22);
     return s;
   },

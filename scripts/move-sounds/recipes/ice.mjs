@@ -240,13 +240,13 @@ export const ICE = {
     return s;
   },
 
-  /** Generic field (gust over all foes ~0.6 s) + Speed drop fleck (0.7 s): a howling chilly wind with drifting flakes. */
+  /** IcyWind.play (chilly gust 0-0.75 s, lands 0.35 s, target frosts 0.45-0.95 s, Speed drop 0.95 s on): a howling wind with drifting flakes, then the stat-down. */
   icywind: () => {
-    const s = new MoveSfx(1.4, 0x1c3d);
-    s.noise(0.0, 0.75, { clock: (u) => 3000 + 1500 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.3) });
-    s.wave(0.0, 0.7, { freq: (u) => 800 + 250 * Math.sin(2 * Math.PI * 1.5 * u), gain: env.swell(0.14) });
-    s.sparkle(0.1, 0.55, 8, { lo: 3500, hi: 6000, gain: 0.12 });
-    s.statDown(0.7, 0.24);
+    const s = new MoveSfx(1.95, 0x1c3d);
+    s.noise(0.0, 0.85, { clock: (u) => 3000 + 1500 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.3) });
+    s.wave(0.0, 0.8, { freq: (u) => 800 + 250 * Math.sin(2 * Math.PI * 1.5 * u), gain: env.swell(0.14) });
+    s.sparkle(0.12, 0.6, 8, { lo: 3500, hi: 6000, gain: 0.12 });
+    s.statDown(0.95, 0.24);
     return s;
   },
 
@@ -259,12 +259,13 @@ export const ICE = {
     return s;
   },
 
-  /** Generic field (≈0.6 s) + freeze fleck: a chilly gust of fine snow over the foes. */
+  /** PowderSnow.play (scene darkens 0-0.2 s, snow sparkles drift 0.1-1.0 s, first arrives 0.55 s, flakes whirl round the target 0.55-1.1 s): a soft chilly breeze with fine tinkling flakes. */
   powdersnow: () => {
-    const s = new MoveSfx(1.25, 0x1ce5);
-    s.noise(0.0, 0.7, { clock: (u) => 6000 + 3000 * u, gain: env.attackDecay(0.28, 0.3) });
-    s.sparkle(0.05, 0.6, 9, { lo: 3500, hi: 6500, gain: 0.15 });
-    s.freeze(0.65);
+    const s = new MoveSfx(1.45, 0x9a50);
+    s.noise(0.1, 0.95, { clock: (u) => 4000 + 1000 * Math.sin(2 * Math.PI * 2 * u), gain: env.swell(0.16) });
+    s.sparkle(0.15, 0.85, 10, { lo: 4000, hi: 7000, gain: 0.12 });
+    s.thud(0.55, 0.25, 0.2);
+    s.sparkle(0.55, 0.5, 6, { lo: 2500, hi: 4500, gain: 0.1 });
     return s;
   },
 

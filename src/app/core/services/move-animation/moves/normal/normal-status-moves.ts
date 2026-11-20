@@ -3,11 +3,14 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { DoubleTeam } from './double-team';
+import { Endure } from './endure';
+import { PsychUp } from './psych-up';
+import { Safeguard } from './safeguard';
 import { ShellSmash } from './shell-smash';
 import { Transform } from './transform';
 import { WorkUp } from './work-up';
 
-/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Double Team lives in `double-team.ts`, Shell Smash in `shell-smash.ts`, Transform in `transform.ts`, Work Up in `work-up.ts`). */
+/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Double Team lives in `double-team.ts`, Endure in `endure.ts`, Psych Up in `psych-up.ts`, Safeguard in `safeguard.ts`, Shell Smash in `shell-smash.ts`, Transform in `transform.ts`, Work Up in `work-up.ts`). */
 export class NormalStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -16,6 +19,7 @@ export class NormalStatusMoveAnimations {
     conversion: (refs, launch) => NormalStatusMoveAnimations.playConversion(refs, launch),
     defensecurl: (refs, launch) => NormalStatusMoveAnimations.playDefenseCurl(refs, launch),
     doubleteam: (refs, launch) => DoubleTeam.play(refs, launch),
+    endure: (refs, launch) => Endure.play(refs, launch),
     focusenergy: (refs, launch) => NormalStatusMoveAnimations.playFocusEnergy(refs, launch),
     followme: (refs, launch) => NormalStatusMoveAnimations.playFollowMe(refs, launch),
     growth: (refs, launch) => NormalStatusMoveAnimations.playGrowth(refs, launch),
@@ -24,6 +28,8 @@ export class NormalStatusMoveAnimations {
     minimize: (refs, launch) => NormalStatusMoveAnimations.playMinimize(refs, launch),
     painsplit: (refs, launch, target) => NormalStatusMoveAnimations.playPainSplit(refs, launch, target),
     protect: (refs, launch) => NormalStatusMoveAnimations.playProtect(refs, launch),
+    psychup: (refs, launch) => PsychUp.play(refs, launch),
+    safeguard: (refs, launch) => Safeguard.play(refs, launch),
     sharpen: (refs, launch) => NormalStatusMoveAnimations.playSharpen(refs, launch),
     shellsmash: (refs, launch) => ShellSmash.play(refs, launch),
     sleeptalk: (refs, launch, target, v) => NormalStatusMoveAnimations.playSleepTalk(refs, launch, target, v),

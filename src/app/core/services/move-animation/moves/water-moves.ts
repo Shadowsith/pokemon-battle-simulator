@@ -4,16 +4,20 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { AquaTail } from './water/aqua-tail';
 import { Clamp } from './water/clamp';
+import { Octazooka } from './water/octazooka';
 import { OriginPulse } from './water/origin-pulse';
 import { RazorShell } from './water/razor-shell';
 import { Scald } from './water/scald';
 import { SteamEruption } from './water/steam-eruption';
 import { SurfWave } from './water/surf-wave';
 import { WaterCrash } from './water/water-crash';
+import { WaterGun } from './water/water-gun';
 import { WaterPledge } from './water/water-pledge';
 import { WaterShuriken } from './water/water-shuriken';
+import { Withdraw } from './water/withdraw';
+import { Whirlpool } from './water/whirlpool';
 
-/** Hand-made animations for Water-type moves (the Surf wave, Clamp, Steam Eruption, Origin Pulse, Aqua Tail, Razor Shell, Scald, Water Pledge, Water Shuriken and the shared water crash live in `water/`). */
+/** Hand-made animations for Water-type moves (the Surf wave, Clamp, Steam Eruption, Octazooka, Origin Pulse, Aqua Tail, Razor Shell, Scald, Water Gun, Water Pledge, Water Shuriken, Whirlpool, Withdraw and the shared water crash live in `water/`). */
 export class WaterMoveAnimations {
   /** Hand-made Water move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -25,6 +29,7 @@ export class WaterMoveAnimations {
     dive: (refs, _launch, target) => WaterMoveAnimations.playDiveHit(refs, target),
     hydrocannon: (refs, launch, target) => WaterMoveAnimations.playHydroCannon(refs, launch, target),
     hydropump: (refs, launch, target) => WaterMoveAnimations.playHydroPump(refs, launch, target),
+    octazooka: (refs, launch, target, v) => Octazooka.play(refs, launch, target, v),
     originpulse: (refs, launch, target) => OriginPulse.play(refs, launch, target),
     razorshell: (refs, _launch, target, v) => RazorShell.play(refs, target, v),
     raindance: (refs) => WaterMoveAnimations.playRainDance(refs),
@@ -33,9 +38,12 @@ export class WaterMoveAnimations {
     steameruption: (refs, launch, target) => SteamEruption.play(refs, launch, target),
     surf: (refs, launch, target, v) => SurfWave.play(refs, launch, target, v, SurfWave.SURF),
     waterpledge: (refs, _launch, target) => WaterPledge.play(refs, target),
+    watergun: (refs, launch, target, v) => WaterGun.play(refs, launch, target, v),
     waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target),
     watershuriken: (refs, launch, target, v) => WaterShuriken.play(refs, launch, target, v),
-    waterspout: (refs, launch, target) => WaterMoveAnimations.playWaterSpout(refs, launch, target)
+    waterspout: (refs, launch, target) => WaterMoveAnimations.playWaterSpout(refs, launch, target),
+    whirlpool: (refs, _launch, target) => Whirlpool.play(refs, target),
+    withdraw: (refs, launch) => Withdraw.play(refs, launch)
   };
 
   /** Turn-1 animations of two-turn Water moves, by @pkmn/sim move id. */

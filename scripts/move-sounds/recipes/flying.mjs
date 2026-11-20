@@ -316,13 +316,15 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic melee, slash (impact 0.17 s): wings beat in and strike. */
+  /** WingAttack.play (dart 0-0.26 s, wing bursts at 0.12 / 0.24 s, feathers flutter down 0.25-1.25 s): two wing beats striking, then soft fluttering. */
   wingattack: () => {
-    const s = new MoveSfx(0.65, 0x3f17);
-    s.whoosh(0.0, 0.08, { from: 1200, to: 4000, gain: 0.3 });
-    s.whoosh(0.08, 0.09, { from: 1500, to: 6000, gain: 0.35 });
-    s.slash(0.17, 0.55);
-    s.thud(0.17, 0.35, 0.3);
+    const s = new MoveSfx(1.3, 0x3f17);
+    s.whoosh(0.0, 0.1, { from: 1200, to: 4000, gain: 0.3 });
+    s.slash(0.12, 0.5);
+    s.thud(0.12, 0.35, 0.3);
+    s.slash(0.24, 0.45);
+    s.thud(0.24, 0.3, 0.25);
+    for (const t of [0.35, 0.55, 0.75, 0.95]) s.whoosh(t, 0.14, { from: 2500, to: 1500, gain: 0.08 });
     return s;
   },
 };

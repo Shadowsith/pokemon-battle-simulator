@@ -77,7 +77,7 @@ All return an absolutely positioned element; place it with `Fx.place`.
 - **Energy:** `sparkStar(size, color)` 4-point star · `fivePointStar(size, glow)` · `ringSparkle(size, color, ring)` · `psySparkle(size)` · `spikyBurst(size, outer, inner, centre?)` comic impact burst · `glyph(v, size)` type particle · `boltGlyph(color, size)` · `sparkBolt()` · `lightning(W, H, from, to, jag, color?, glow?, width?)` field-sized jagged bolt SVG · `hexagon(s, fill, glow)` glowing hex tile.
 - **Elements:** `firePuff(size, 'hot'|'red'|'blue')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `pointedRock(w)` sharp stone, tip up · `poisonBubble(size)` glossy purple bubble · `petalGlyph(s, color)` · `leafGlyph(s)`.
 - **Body parts:** `fistGlyph(w, tone)` (tones in `FIST_TONES`: yellow, red, ice, blue, dark, brown) · `footGlyph(w, color?)` · `chopHandGlyph(w)` · `gloveGlyph(w)` · `pointingHandGlyph(w)` · `jawGlyph(w, h, lower)` · `incisorGlyph(h)` · `snakeEyeGlyph(w, side)`.
-- **Props:** `swordGlyph(h)` · `hornGlyph(len)` black horn pointing right · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `itemBag(size)` cream item sack (Trick, Switcheroo) · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
+- **Props:** `swordGlyph(h)` · `hornGlyph(len)` black horn pointing right · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `heartGlyph(size, fill?, glow?)` glossy pink heart (Attract, Charm) · `webGlyph(size, thread, glow, stroke?)` round spider web (no `position`, wrap or set it; String Shot, Sticky Web, Spider Web) · `itemBag(size)` cream item sack (Trick, Switcheroo) · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
 
 ## Constants (`animation.constants.ts`)
 `DIM_BACKDROP` (dark scene) · `HEAT_BACKDROP` (red-hot) · `PSYCHIC_WAVES`, `WATERFALL_WAVES` (tiling backgrounds) · `FIST_TONES` · `FLECK_COLOR` (statUp green, statDown red, poison purple, …) · `TYPE_STYLE` · `BUBBLE_DRIFT` / `BUBBLE_BEAM`.
@@ -86,7 +86,7 @@ All return an absolutely positioned element; place it with `Fx.place`.
 - `TerrainFx.play(refs, launch, TerrainFx.ELECTRIC | GRASSY | MISTY)` (terrain-fx.ts): the shared terrain animation; a new terrain is a new `TerrainStyle`.
 - `ElectricMoveAnimations.groundStreak(...)` (electric-moves.ts).
 - `PoisonMoveAnimations.sludgeGlob(size)` (poison-moves.ts).
-- `BugMoveAnimations.webGlyph(...)`, `beeGlyph(w)` (bug-moves.ts).
+- `BugMoveAnimations.beeGlyph(w)` (bug-moves.ts).
 - `PsychicFx` dim / tremble effects (psychic/psychic-fx.ts), `FireFlames` (fire/fire-flames.ts), `WaterCrash` splash (water/water-crash.ts).
 
 If one of these is needed in another type file, move it to `FxEffects` / `FxGlyphs` instead of copying it.

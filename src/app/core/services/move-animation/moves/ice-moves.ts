@@ -5,9 +5,11 @@ import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { FreezeShock } from './ice/freeze-shock';
 import { IceBurn } from './ice/ice-burn';
+import { IcyWind } from './ice/icy-wind';
+import { PowderSnow } from './ice/powder-snow';
 import { IcicleCrash } from './ice/icicle-crash';
 
-/** Hand-made animations for Ice-type moves (Freeze Shock, Ice Burn and Icicle Crash live in `ice/`). */
+/** Hand-made animations for Ice-type moves (Freeze Shock, Ice Burn, Icicle Crash, Icy Wind and Powder Snow live in `ice/`). */
 export class IceMoveAnimations {
   /** Hand-made Ice move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -19,6 +21,8 @@ export class IceMoveAnimations {
     iceburn: (refs, launch, target) => IceBurn.play(refs, launch, target),
     iciclecrash: (refs, _launch, target) => IcicleCrash.play(refs, target),
     icebeam: (refs, launch, target) => IceMoveAnimations.playIceBeam(refs, launch, target),
+    icywind: (refs, launch, target, v) => IcyWind.play(refs, launch, target, v),
+    powdersnow: (refs, launch, target, v) => PowderSnow.play(refs, launch, target, v),
     hail: (refs) => IceMoveAnimations.playHail(refs),
     haze: (refs) => IceMoveAnimations.playHaze(refs),
     mist: (refs, launch, _target, v) => IceMoveAnimations.playMist(refs, launch, v.dir)

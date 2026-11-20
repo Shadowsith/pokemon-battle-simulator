@@ -33,14 +33,14 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic projectile, 3 hits (impacts at 0.43 / 1.0 / 1.57 s): a bone strikes again and again. */
+  /** BoneRush.play, 3 hits (whacks at 0.16 / 0.56 / 0.96 s): a bone swings down and cracks against the target, again and again. */
   bonerush: () => {
-    const s = new MoveSfx(2.0, 0xb02a);
+    const s = new MoveSfx(1.4, 0xb02a);
     for (let hit = 0; hit < 3; hit++) {
-      const at = hit * 0.57;
-      s.pulse(at, 0.43, { freq: env.ramp(450, 550), gain: (u) => 0.14 * (0.4 + 0.6 * Math.abs(Math.sin(2 * Math.PI * 4 * u))), duty: 0.25 });
-      s.wave(at + 0.43, 0.12, { freq: env.ramp(620, 420), gain: env.decay(0.35, 1.5) });
-      s.thud(at + 0.43, 0.5, 0.35);
+      const at = 0.16 + hit * 0.4;
+      s.whoosh(at - 0.14, 0.14, { from: 1500, to: 5000, gain: 0.18 });
+      s.wave(at, 0.12, { freq: env.ramp(620, 420), gain: env.decay(0.35, 1.5) });
+      s.thud(at, 0.5, 0.35);
     }
     return s;
   },
@@ -143,12 +143,15 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic field (shake + waves ≈ 0.6 s): an earthquake of random strength - deep rolling rumble with heavy jolts. */
+  /** Magnitude.play (field jolts 0-0.5 s and 0.5-1.0 s, target shudders at 0.1 / 0.3 / 0.6 / 0.8 s): two deep rolling rumbles with heavy jolts. */
   magnitude: () => {
-    const s = new MoveSfx(1.1, 0x6a91);
-    s.rumble(0.0, 1.0, { from: 450, to: 120, gain: 0.5 });
-    s.pulse(0.0, 0.9, { freq: (u) => 70 * (1 + 0.1 * Math.sin(2 * Math.PI * 14 * u)), gain: env.swell(0.25), duty: 0.5 });
-    for (const at of [0.05, 0.3, 0.55]) s.thud(at, 0.4, 1);
+    const s = new MoveSfx(1.25, 0x3a91);
+    for (const at of [0, 0.5]) {
+      s.rumble(at, 0.5, { from: 220, to: 90, gain: 0.45 });
+      s.thud(at + 0.1, 0.6, 0.9);
+      s.thud(at + 0.3, 0.45, 0.8);
+      s.noise(at, 0.45, { clock: () => 600 + s.random() * 300, gain: env.decay(0.18, 1) });
+    }
     return s;
   },
 
@@ -176,14 +179,16 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic projectile (0.43 s) + stat-down fleck: a quick fling of mud slaps the face. */
+  /** MudSlap.play (mud clumps flung 0-0.56 s, first splats 0.32 s, mud cloud 0.32-0.9 s, accuracy drop 0.9 s on): a quick fling, wet slaps, then the stat-down. */
   mudslap: () => {
-    const s = new MoveSfx(1.25, 0x3d51);
-    s.whoosh(0.0, 0.43, { from: 1000, to: 3000, gain: 0.18 });
-    s.noise(0.43, 0.14, { clock: (u) => 5000 - 3500 * u, gain: env.attackDecay(0.5, 0.03) });
-    s.thud(0.43, 0.4, 0.4);
-    s.bubbles(0.45, 0.15, 3, { lo: 180, hi: 320, gain: 0.12 });
-    s.statDown(0.58, 0.22);
+    const s = new MoveSfx(1.9, 0x3d5a);
+    s.whoosh(0.0, 0.3, { from: 800, to: 2500, gain: 0.2 });
+    for (let i = 0; i < 4; i++) {
+      s.noise(0.32 + i * 0.08, 0.08, { clock: () => 1200 + s.random() * 600, gain: env.decay(0.3, 1.5) });
+      if (i % 2 === 0) s.thud(0.32 + i * 0.08, 0.35, 0.5);
+    }
+    s.noise(0.5, 0.4, { clock: () => 900, gain: env.decay(0.12, 1) });
+    s.statDown(0.9);
     return s;
   },
 
