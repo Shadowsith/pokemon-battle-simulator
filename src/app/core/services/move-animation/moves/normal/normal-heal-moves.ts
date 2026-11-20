@@ -2,8 +2,9 @@ import { Point, BattleStageRefs, MoveAnimRegistry } from '../../animation.types'
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { Refresh } from './refresh';
 
-/** Hand-made animations for Normal-type healing moves (HP recovery, status cures). */
+/** Hand-made animations for Normal-type healing moves (HP recovery, status cures; Refresh lives in `refresh.ts`). */
 export class NormalHealMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -11,6 +12,7 @@ export class NormalHealMoveAnimations {
     milkdrink: (refs, launch) => NormalHealMoveAnimations.playMilkDrink(refs, launch),
     morningsun: (refs, launch) => NormalHealMoveAnimations.playMorningSun(refs, launch),
     recover: (refs, launch) => NormalHealMoveAnimations.playRecover(refs, launch),
+    refresh: (refs, launch) => Refresh.play(refs, launch),
     slackoff: (refs, launch) => NormalHealMoveAnimations.playSlackOff(refs, launch),
     softboiled: (refs, launch) => NormalHealMoveAnimations.playSoftBoiled(refs, launch),
     wish: (refs, launch) => NormalHealMoveAnimations.playWish(refs, launch)

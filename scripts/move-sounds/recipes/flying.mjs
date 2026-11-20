@@ -16,12 +16,13 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic melee: a very fast swoop that ends in a clean cut. */
+  /** AerialAce.play (dark scene, user darts as an afterimage 0-0.3 s, streak slashes the target at 0.25 s, orbs scatter to 0.65 s): a quick dash whoosh, then a sharp slash with a ringing glint. */
   aerialace: () => {
-    const s = new MoveSfx(0.65, 0xae1a);
-    s.whoosh(0.0, 0.18, { from: 2000, to: 12000, gain: 0.45 });
-    s.slash(0.17, 0.6);
-    s.pulse(0.19, 0.25, { freq: () => 3100, gain: env.decay(0.12, 2), duty: 0.5 });
+    const s = new MoveSfx(0.8, 0xae1a);
+    s.whoosh(0.0, 0.25, { from: 2000, to: 12000, gain: 0.45 });
+    s.slash(0.25, 0.6);
+    s.pulse(0.27, 0.25, { freq: () => 3100, gain: env.decay(0.12, 2), duty: 0.5 });
+    s.sparkle(0.3, 0.3, 4, { lo: 3000, hi: 5000, gain: 0.08 });
     return s;
   },
 
@@ -43,13 +44,15 @@ export const FLYING = {
   },
 
 
-  /** Generic field move (0.62 s waves) hitting both foes: two crossing gusts. */
+  /** AirCutter.play (wind lines rush 0-1.0 s, two blades cut the target at 0.3 / 0.55 s): a rushing wind with two whirling slashes. */
   aircutter: () => {
-    const s = new MoveSfx(0.85, 0xa1c7);
-    s.whoosh(0.0, 0.35, { from: 2000, to: 9000, gain: 0.35 });
-    s.slash(0.1, 0.5);
-    s.slash(0.25, 0.45);
-    s.whoosh(0.3, 0.5, { from: 6000, to: 1500, gain: 0.22 });
+    const s = new MoveSfx(1.05, 0xa1c7);
+    s.noise(0.0, 1.0, { clock: () => 5000, gain: env.swell(0.1) });
+    s.whoosh(0.15, 0.2, { from: 2000, to: 9000, gain: 0.3 });
+    s.slash(0.3, 0.5);
+    s.whoosh(0.4, 0.2, { from: 2000, to: 9000, gain: 0.28 });
+    s.slash(0.55, 0.45);
+    s.whoosh(0.6, 0.4, { from: 6000, to: 1500, gain: 0.18 });
     return s;
   },
 
@@ -150,16 +153,16 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Attack drop fleck (0.85 s): a flurry of fluttering down feathers. */
+  /** FeatherDance.play (feathers swirl down round the target 0-1.0 s, Attack drop from 1.0 s): soft feathery rustles drifting down, then the stat-down. */
   featherdance: () => {
-    const s = new MoveSfx(1.5, 0xfeda);
-    for (let i = 0; i < 6; i++) {
-      const at = 0.02 + i * 0.12;
+    const s = new MoveSfx(1.95, 0xfeda);
+    for (let i = 0; i < 7; i++) {
+      const at = 0.02 + i * 0.13;
       s.noise(at, 0.14, { clock: () => 3000 + s.random() * 2000, gain: env.swell(0.2) });
       s.wave(at, 0.12, { freq: env.ramp(1200 - i * 60, 900 - i * 60), gain: env.swell(0.12) });
     }
-    s.whoosh(0.0, 0.8, { from: 4000, to: 1500, gain: 0.12 });
-    s.statDown(0.85);
+    s.whoosh(0.0, 1.0, { from: 4000, to: 1500, gain: 0.12 });
+    s.statDown(1.0);
     return s;
   },
 

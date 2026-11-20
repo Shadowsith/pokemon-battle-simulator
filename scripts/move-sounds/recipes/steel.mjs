@@ -173,13 +173,14 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic self aura (≈ 0.8 s) + Sp. Def drop fleck (0.85 s): a grating metallic screech scrapes at the ears. */
+  /** MetalSound.play (scene darkens 0-0.2 s, three screeching rings swirl out at 0.2 / 0.38 / 0.56 s and pass over the target 0.65-1.06 s, scene clears to 1.26 s, Sp. Def drop 1.26-2.16 s): a grating metallic screech that swells with each ring, the stat-down jingle. */
   metalsound: () => {
-    const s = new MoveSfx(1.5, 0x5c4e);
-    s.pulse(0.0, 0.8, { freq: (u) => 2400 * (1 + 0.05 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.15), duty: 0.125 });
-    s.pulse(0.0, 0.8, { freq: (u) => 2540 * (1 - 0.05 * Math.sin(2 * Math.PI * 23 * u)), gain: env.swell(0.12), duty: 0.25 });
-    s.noise(0.0, 0.8, { clock: () => 7000, gain: env.swell(0.14), short: true });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.2, 0x5c4e);
+    s.pulse(0.2, 0.86, { freq: (u) => 2400 * (1 + 0.05 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.15), duty: 0.125 });
+    s.pulse(0.2, 0.86, { freq: (u) => 2540 * (1 - 0.05 * Math.sin(2 * Math.PI * 23 * u)), gain: env.swell(0.12), duty: 0.25 });
+    s.noise(0.2, 0.86, { clock: () => 7000, gain: env.swell(0.14), short: true });
+    for (const at of [0.2, 0.38, 0.56]) s.pulse(at, 0.12, { freq: (u) => 3200 - 800 * u, gain: env.decay(0.12, 1.5), duty: 0.125 });
+    s.statDown(1.26);
     return s;
   },
 

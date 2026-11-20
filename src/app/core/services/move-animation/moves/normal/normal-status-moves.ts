@@ -2,20 +2,28 @@ import { Point, BattleStageRefs, MoveAnimRegistry, MoveVisual } from '../../anim
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { Assist } from './assist';
+import { Camouflage } from './camouflage';
 import { DoubleTeam } from './double-team';
 import { Endure } from './endure';
+import { HelpingHand } from './helping-hand';
+import { Howl } from './howl';
 import { PsychUp } from './psych-up';
 import { Safeguard } from './safeguard';
 import { ShellSmash } from './shell-smash';
 import { Transform } from './transform';
 import { WorkUp } from './work-up';
+import { NaturePower } from './nature-power';
+import { Recycle } from './recycle';
 
-/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Double Team lives in `double-team.ts`, Endure in `endure.ts`, Psych Up in `psych-up.ts`, Safeguard in `safeguard.ts`, Shell Smash in `shell-smash.ts`, Transform in `transform.ts`, Work Up in `work-up.ts`). */
+/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Assist lives in `assist.ts`, Camouflage in `camouflage.ts`, Double Team in `double-team.ts`, Endure in `endure.ts`, Helping Hand in `helping-hand.ts`, Howl in `howl.ts`, Nature Power in `nature-power.ts`, Psych Up in `psych-up.ts`, Recycle in `recycle.ts`, Safeguard in `safeguard.ts`, Shell Smash in `shell-smash.ts`, Transform in `transform.ts`, Work Up in `work-up.ts`). */
 export class NormalStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    assist: (refs, launch, target) => Assist.play(refs, launch, target),
     batonpass: (refs, launch) => NormalStatusMoveAnimations.playBatonPass(refs, launch),
     bellydrum: (refs, launch) => NormalStatusMoveAnimations.playBellyDrum(refs, launch),
+    camouflage: (refs, launch) => Camouflage.play(refs, launch),
     conversion: (refs, launch) => NormalStatusMoveAnimations.playConversion(refs, launch),
     defensecurl: (refs, launch) => NormalStatusMoveAnimations.playDefenseCurl(refs, launch),
     doubleteam: (refs, launch) => DoubleTeam.play(refs, launch),
@@ -24,11 +32,15 @@ export class NormalStatusMoveAnimations {
     followme: (refs, launch) => NormalStatusMoveAnimations.playFollowMe(refs, launch),
     growth: (refs, launch) => NormalStatusMoveAnimations.playGrowth(refs, launch),
     harden: (refs, launch) => NormalStatusMoveAnimations.playHarden(refs, launch),
+    helpinghand: (refs, _launch, target) => HelpingHand.play(refs, target),
+    howl: (refs, launch, _target, v) => Howl.play(refs, launch, v),
     metronome: (refs, launch, _target, v) => NormalStatusMoveAnimations.playMetronome(refs, launch, v),
     minimize: (refs, launch) => NormalStatusMoveAnimations.playMinimize(refs, launch),
+    naturepower: (refs, launch) => NaturePower.play(refs, launch),
     painsplit: (refs, launch, target) => NormalStatusMoveAnimations.playPainSplit(refs, launch, target),
     protect: (refs, launch) => NormalStatusMoveAnimations.playProtect(refs, launch),
     psychup: (refs, launch) => PsychUp.play(refs, launch),
+    recycle: (refs, launch) => Recycle.play(refs, launch),
     safeguard: (refs, launch) => Safeguard.play(refs, launch),
     sharpen: (refs, launch) => NormalStatusMoveAnimations.playSharpen(refs, launch),
     shellsmash: (refs, launch) => ShellSmash.play(refs, launch),

@@ -6,8 +6,9 @@ import { FxEffects } from '../../fx-effects';
 import { HealingWish } from './healing-wish';
 import { PsychicFx } from './psychic-fx';
 import { TrickRoom } from './trick-room';
+import { Imprison } from './imprison';
 
-/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Healing Wish and Trick Room live in `healing-wish.ts` / `trick-room.ts`). */
+/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Healing Wish, Imprison and Trick Room live in `healing-wish.ts` / `imprison.ts` / `trick-room.ts`). */
 export class PsychicStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -18,6 +19,7 @@ export class PsychicStatusMoveAnimations {
     cosmicpower: (refs, launch) => PsychicStatusMoveAnimations.playCosmicPower(refs, launch),
     healingwish: (refs, launch) => HealingWish.play(refs, launch),
     hypnosis: (refs, launch, target) => PsychicStatusMoveAnimations.playHypnosis(refs, launch, target),
+    imprison: (refs, launch) => Imprison.play(refs, launch),
     kinesis: (refs, launch, target, v) => PsychicStatusMoveAnimations.playKinesis(refs, launch, target, v),
     lightscreen: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.LIGHT_SCREEN),
     magiccoat: (refs, launch) => PsychicStatusMoveAnimations.playMagicCoat(refs, launch),

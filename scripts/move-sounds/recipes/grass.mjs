@@ -30,14 +30,14 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic lob, 3 hits (impacts at 0.52 / 1.26 / 2.0 s): seeds are spat in arcs. */
+  /** BulletSeed.play (one seed per hit, fired every 0.25 s, landing 0.3 s later at 0.3 / 0.55 / 0.8 s for three): a pop and a short whistle per seed, a tap as it lands. */
   bulletseed: () => {
-    const s = new MoveSfx(2.45, 0xb5ee);
+    const s = new MoveSfx(1.05, 0xb5ee);
     for (let hit = 0; hit < 3; hit++) {
-      const at = hit * 0.74;
+      const at = hit * 0.25;
       s.pulse(at, 0.05, { freq: (u) => 700 + 600 * u, gain: env.decay(0.25, 1), duty: 0.25 });
-      s.pulse(at + 0.03, 0.48, { freq: (u) => 1300 - 700 * u, gain: (u) => 0.08 * (1 - 0.5 * u), duty: 0.125 });
-      s.thud(at + 0.52, 0.5, 0.2);
+      s.pulse(at + 0.03, 0.25, { freq: (u) => 1300 - 600 * u, gain: (u) => 0.07 * (1 - 0.5 * u), duty: 0.125 });
+      s.thud(at + 0.3, 0.5, 0.2);
     }
     return s;
   },
@@ -145,16 +145,16 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) + sleep fleck (≈0.6 s): a soft leaf-whistle tune lulls the foe. */
+  /** GrassWhistle.play (green scene, notes waft over to the target 0.1-1.0 s, green fades 1.0-1.25 s, two "Z"s rise 1.1-1.9 s): a gentle reed-pipe tune over a breathy hiss, then the sleep lull. */
   grasswhistle: () => {
-    const s = new MoveSfx(1.5, 0x6a55);
-    const notes = [84, 81, 84, 86, 84];
+    const s = new MoveSfx(1.9, 0x6a55);
+    const notes = [84, 81, 84, 86, 84, 81];
     notes.forEach((n, i) => {
       const f = 440 * Math.pow(2, (n - 69) / 12);
-      s.wave(i * 0.11, 0.13, { freq: (u) => f * (1 + 0.012 * Math.sin(2 * Math.PI * 14 * u)), gain: env.swell(0.2) });
+      s.wave(0.1 + i * 0.14, 0.17, { freq: (u) => f * (1 + 0.012 * Math.sin(2 * Math.PI * 14 * u)), gain: env.swell(0.2) });
     });
-    s.noise(0.0, 0.55, { clock: () => 6000, gain: env.swell(0.04) });
-    s.sleep(0.6, 0.22);
+    s.noise(0.1, 0.9, { clock: () => 6000, gain: env.swell(0.04) });
+    s.sleep(1.1, 0.22);
     return s;
   },
 
@@ -183,12 +183,14 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s, no fleck): roots creep into the ground with a soft rustle and a deep, settling chime. */
+  /** Ingrain.play (roots creep out under the user 0-0.6 s, light motes rise 0.6-1.3 s, roots fade 1.2-1.5 s): a creaking earthy rustle as the roots spread, then a soft rising chime with the motes. */
   ingrain: () => {
-    const s = new MoveSfx(1.15, 0x169a);
-    s.noise(0.0, 0.8, { clock: (u) => 2500 - 1500 * u, gain: env.swell(0.16) });
-    s.arpeggio(0.05, [67, 64, 60, 55], 0.14, { gain: 0.2, voice: 'wave', hold: 0.2 });
-    s.wave(0.65, 0.45, { freq: () => 98, gain: env.decay(0.25, 1.5) });
+    const s = new MoveSfx(1.55, 0x169a);
+    s.noise(0.0, 0.6, { clock: (u) => 1200 + 800 * u, gain: env.swell(0.16) });
+    s.pulse(0.0, 0.6, { freq: (u) => 110 + 25 * Math.sin(2 * Math.PI * 5 * u), gain: env.swell(0.08), duty: 0.25 });
+    s.wave(0.5, 0.4, { freq: () => 98, gain: env.decay(0.2, 1.5) });
+    s.arpeggio(0.62, [60, 64, 67, 72], 0.12, { gain: 0.18, voice: 'wave', hold: 0.2 });
+    s.sparkle(0.8, 0.4, 4, { lo: 2500, hi: 4500, gain: 0.08 });
     return s;
   },
 
@@ -254,14 +256,17 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): glowing leaves flutter after the foe with soft chimes and strike home. */
+  /** MagicalLeaf.play (glowing leaves whirl up round the user 0-0.6 s, curve over to the target, landing 1.02-1.34 s with sparkles to ~1.6 s): a magic shimmer and rising chimes, a fluttering whoosh, soft strikes and twinkles. */
   magicalleaf: () => {
-    const s = new MoveSfx(0.95, 0x3a91);
-    s.noise(0.0, 0.43, { clock: (u) => 3000 + 1500 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.14) });
-    s.arpeggio(0.0, [84, 88, 91, 88, 93, 96], 0.07, { gain: 0.16, voice: 'wave', hold: 0.1 });
-    s.slash(0.43, 0.35);
-    s.thud(0.43, 0.35, 0.2);
-    s.sparkle(0.45, 0.3, 5, { lo: 3000, hi: 5500, gain: 0.12 });
+    const s = new MoveSfx(1.7, 0x3a91);
+    s.noise(0.0, 0.6, { clock: (u) => 3000 + 1500 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.14) });
+    s.arpeggio(0.0, [84, 88, 91, 88, 93, 96], 0.09, { gain: 0.15, voice: 'wave', hold: 0.12 });
+    s.whoosh(0.6, 0.42, { from: 2000, to: 6000, gain: 0.18 });
+    for (const at of [1.02, 1.14, 1.26]) {
+      s.slash(at, 0.22);
+      s.thud(at, 0.25, 0.2);
+    }
+    s.sparkle(1.04, 0.5, 7, { lo: 3000, hi: 5500, gain: 0.12 });
     return s;
   },
 
@@ -280,14 +285,14 @@ export const GRASS = {
     return s;
   },
 
-  /** Generic melee hit (impact 0.17 s) + flinch fleck (~0.45 s): a thorny arm swings, spiky prickles crackle on impact. */
+  /** NeedleArm.play (green needles shoot in and stick into the target 0-0.45 s, the spiked arm swings in 0.36-0.65 s and strikes at 0.65 s, leaves scatter to 1.15 s): thin zips and prickly ticks, a swinging whoosh, a solid hit and a leafy rustle. */
   needlearm: () => {
-    const s = new MoveSfx(0.8, 0x2ee7);
-    s.whoosh(0.0, 0.18, { from: 1500, to: 5000, gain: 0.3 });
-    s.thud(0.17, 0.55, 0.5);
-    for (const at of [0.18, 0.22, 0.26, 0.3]) s.pulse(at, 0.025, { freq: () => 3800, gain: env.decay(0.18, 1), duty: 0.125 });
-    s.noise(0.2, 0.15, { clock: () => 11000, gain: env.decay(0.12, 1) });
-    s.flinch(0.45);
+    const s = new MoveSfx(1.2, 0x2ee7);
+    s.whoosh(0.05, 0.35, { from: 4000, to: 10000, gain: 0.15 });
+    for (const at of [0.35, 0.39, 0.43, 0.47, 0.51]) s.pulse(at, 0.025, { freq: () => 3800, gain: env.decay(0.16, 1), duty: 0.125 });
+    s.whoosh(0.4, 0.25, { from: 1500, to: 5000, gain: 0.28 });
+    s.thud(0.65, 0.6, 0.5);
+    s.noise(0.67, 0.45, { clock: (u) => 6000 - 2500 * u, gain: env.attackDecay(0.14, 0.1) });
     return s;
   },
 

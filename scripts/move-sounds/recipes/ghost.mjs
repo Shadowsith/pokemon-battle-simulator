@@ -3,13 +3,13 @@ import { env } from '../track.mjs';
 
 /** Ghost-type move sounds. */
 export const GHOST = {
-  /** Generic melee + flinch fleck: an eerie rise, a sudden "boo" and a hit. */
+  /** Astonish.play (the target jolts at 0.15 s, a "!" burst pops 0.15-0.55 s, sweat drops spray off to 0.65 s): a rising spooky wail, a startle hit with a "!" blip, then a flinch. */
   astonish: () => {
     const s = new MoveSfx(0.75, 0xa570);
-    s.pulse(0.0, 0.17, { freq: (u) => (300 + 600 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 4 * u)), gain: env.ramp(0.05, 0.25), duty: 0.25 });
-    s.thud(0.17, 0.5, 0.3);
-    s.arpeggio(0.18, [78], 0.15, { gain: 0.2, duty: 0.5 });
-    s.arpeggio(0.18, [79], 0.15, { gain: 0.15, voice: 'wave' });
+    s.pulse(0.0, 0.15, { freq: (u) => (300 + 600 * u) * (1 + 0.06 * Math.sin(2 * Math.PI * 4 * u)), gain: env.ramp(0.05, 0.25), duty: 0.25 });
+    s.thud(0.15, 0.5, 0.3);
+    s.arpeggio(0.16, [78], 0.15, { gain: 0.2, duty: 0.5 });
+    s.arpeggio(0.16, [79], 0.15, { gain: 0.15, voice: 'wave' });
     s.flinch(0.38);
     return s;
   },
@@ -63,12 +63,12 @@ export const GHOST = {
   },
 
 
-  /** Generic self aura (~0.8 s), no fleck: a spiteful curse, a dissonant moaning tone that fades away. */
+  /** Grudge.play (dark scene 0-0.25 s, ghost flames flicker round the user 0.2-1.25 s with a magenta tint, clear by 1.5 s): a low, wavering ghostly moan. */
   grudge: () => {
-    const s = new MoveSfx(1.3, 0x6ad6);
-    s.wave(0.02, 1.0, { freq: (u) => 330 * (1 - 0.25 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.2) });
-    s.pulse(0.1, 0.9, { freq: (u) => 349 * (1 - 0.25 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.1), duty: 0.125 });
-    s.noise(0.02, 0.9, { clock: () => 1200, gain: env.swell(0.05) });
+    const s = new MoveSfx(1.5, 0x6ad6);
+    s.wave(0.02, 1.3, { freq: (u) => 330 * (1 - 0.25 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.2) });
+    s.pulse(0.2, 1.1, { freq: (u) => 349 * (1 - 0.25 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.1), duty: 0.125 });
+    s.noise(0.2, 1.05, { clock: () => 1200, gain: env.swell(0.05) });
     return s;
   },
 

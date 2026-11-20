@@ -3,26 +3,32 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
+import { AerialAce } from './flying/aerial-ace';
+import { AirCutter } from './flying/air-cutter';
 import { AirSlash } from './flying/air-slash';
 import { BraveBird } from './flying/brave-bird';
 import { Defog } from './flying/defog';
 import { DragonAscent } from './flying/dragon-ascent';
+import { FeatherDance } from './flying/feather-dance';
 import { Hurricane } from './flying/hurricane';
 import { Roost } from './flying/roost';
 import { Tailwind } from './flying/tailwind';
 import { WingAttack } from './flying/wing-attack';
 
-/** Hand-made animations for Flying-type moves (Air Slash, Brave Bird, Defog, Dragon Ascent, Roost, Tailwind and Wing Attack live in `flying/`). */
+/** Hand-made animations for Flying-type moves (Aerial Ace, Air Cutter, Air Slash, Brave Bird, Defog, Dragon Ascent, Feather Dance, Hurricane, Roost, Tailwind and Wing Attack live in `flying/`). */
 export class FlyingMoveAnimations {
   /** Hand-made Flying move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    aerialace: (refs, launch, target, v) => AerialAce.play(refs, launch, target, v),
     aeroblast: (refs, launch, target, v) => FlyingMoveAnimations.playAeroblast(refs, launch, target, v),
+    aircutter: (refs, _launch, target) => AirCutter.play(refs, target),
     airslash: (refs, launch, target) => AirSlash.play(refs, launch, target),
     bounce: (refs, _launch, target) => FlyingMoveAnimations.playBounceDown(refs, target),
     bravebird: (refs, launch, target) => BraveBird.play(refs, launch, target),
     defog: (refs, launch, target) => Defog.play(refs, launch, target),
     dragonascent: (refs, launch, target, v) => DragonAscent.play(refs, launch, target, v),
     drillpeck: (refs, _launch, target, v) => FlyingMoveAnimations.playDrillPeck(refs, target, v),
+    featherdance: (refs, _launch, target) => FeatherDance.play(refs, target),
     fly: (refs, _launch, target) => FlyingMoveAnimations.playFlyDown(refs, target),
     gust: (refs, _launch, target) => FlyingMoveAnimations.playGust(refs, target),
     hurricane: (refs, launch, target) => Hurricane.play(refs, launch, target),

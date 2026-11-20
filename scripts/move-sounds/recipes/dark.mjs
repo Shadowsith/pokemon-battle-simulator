@@ -88,14 +88,14 @@ export const DARK = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + Sp. Def drop fleck (0.85 s): crocodile sobs, wobbling high whimpers. */
+  /** FakeTears.play (three sobs at 0 / 0.2 / 0.4 s spray tears that splash on the target 0.45-0.95 s, Sp. Def drop from 0.95 s): three sobbing whimpers, drippy splashes, then the stat-down. */
   faketears: () => {
-    const s = new MoveSfx(1.5, 0xfa7e);
-    for (const at of [0.05, 0.3, 0.55]) {
-      s.pulse(at, 0.2, { freq: (u) => (1400 - 500 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.22), duty: 0.25 });
+    const s = new MoveSfx(1.9, 0xfa7e);
+    for (const at of [0.0, 0.2, 0.4]) {
+      s.pulse(at, 0.18, { freq: (u) => (1400 - 500 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.22), duty: 0.25 });
     }
-    s.bubbles(0.15, 0.55, 4, { lo: 1500, hi: 2500, gain: 0.12 });
-    s.statDown(0.85);
+    s.bubbles(0.45, 0.5, 5, { lo: 1500, hi: 2500, gain: 0.12 });
+    s.statDown(0.95);
     return s;
   },
 
@@ -110,13 +110,14 @@ export const DARK = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + confusion fleck (0.85 s): sugary, insincere praise. */
+  /** Flatter.play (confetti rains on the target 0-0.7 s, its Sp. Atk rises 0.7-1.5 s, then birds circle it 1.5-2.4 s): a cheery fanfare with twinkles, the stat-up, then the confusion warble. */
   flatter: () => {
-    const s = new MoveSfx(1.5, 0xf1a7);
-    s.arpeggio(0.02, [72, 76, 79, 76, 81, 79], 0.11, { gain: 0.26, voice: 'wave', hold: 0.16 });
-    s.arpeggio(0.02, [84, 88, 91, 88, 93, 91], 0.11, { gain: 0.07, duty: 0.25, hold: 0.08 });
-    s.sparkle(0.3, 0.45, 5, { lo: 3000, hi: 5000, gain: 0.1 });
-    s.confusion(0.85, 0.22);
+    const s = new MoveSfx(2.4, 0xf1a7);
+    s.arpeggio(0.02, [72, 76, 79, 76, 81, 79], 0.1, { gain: 0.26, voice: 'wave', hold: 0.14 });
+    s.arpeggio(0.02, [84, 88, 91, 88, 93, 91], 0.1, { gain: 0.07, duty: 0.25, hold: 0.08 });
+    s.sparkle(0.1, 0.55, 6, { lo: 3000, hi: 5000, gain: 0.1 });
+    s.statUp(0.7);
+    s.confusion(1.5, 0.22);
     return s;
   },
 
@@ -173,13 +174,16 @@ export const DARK = {
     return s;
   },
 
-  /** Generic self aura (≈ 0.8 s) + Atk / Sp. Atk drop fleck (0.85 s): the user gives everything up - a sinking, fading dirge. */
+  /** Memento.play (scene darkens and the user turns to shadow 0-0.4 s, a shadow orb wells up 0.3-0.55 s and drifts over 0.55-1.0 s, the target darkens 1.0-1.25 s, scene clears to 1.45 s, Atk / Sp. Atk drop 1.45-2.35 s): a sinking, fading dirge, a ghostly drift, a hollow sink-in, the stat-down jingle. */
   memento: () => {
-    const s = new MoveSfx(1.55, 0xde4d);
-    s.wave(0.0, 0.85, { freq: (u) => 330 * Math.pow(0.5, u), gain: env.swell(0.25) });
-    s.pulse(0.0, 0.85, { freq: (u) => 220 * Math.pow(0.5, u) * (1 + 0.02 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.12), duty: 0.25 });
-    s.noise(0.2, 0.6, { clock: () => 1200, gain: env.swell(0.08) });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.4, 0xde4d);
+    s.wave(0.0, 0.6, { freq: (u) => 330 * Math.pow(0.5, u), gain: env.swell(0.25) });
+    s.pulse(0.0, 0.6, { freq: (u) => 220 * Math.pow(0.5, u) * (1 + 0.02 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.12), duty: 0.25 });
+    s.wave(0.5, 0.5, { freq: (u) => 180 * (1 + 0.08 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.16) });
+    s.noise(0.5, 0.5, { clock: () => 1200, gain: env.swell(0.08) });
+    s.thud(1.0, 0.4, 0.7);
+    s.wave(1.0, 0.3, { freq: (u) => 120 * Math.pow(0.6, u), gain: env.decay(0.22, 1.5) });
+    s.statDown(1.45);
     return s;
   },
 
@@ -320,14 +324,13 @@ export const DARK = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a low swipe that knocks the held item flying. */
+  /** KnockOff.play (a dark red hand swings down 0-0.3 s, swats the target at 0.3 s, silhouette flash to 0.55 s): a swooping swing and a hard slap. */
   knockoff: () => {
-    const s = new MoveSfx(0.85, 0x40cf);
-    s.whoosh(0.0, 0.18, { from: 1000, to: 4000, gain: 0.3 });
-    s.thud(0.17, 0.6, 0.5);
-    s.pulse(0.22, 0.35, { freq: (u) => 1400 - 900 * u, gain: env.decay(0.15, 1), duty: 0.125 });
-    s.noise(0.58, 0.04, { clock: () => 5000, gain: env.decay(0.25, 1) });
-    s.noise(0.66, 0.03, { clock: () => 4000, gain: env.decay(0.15, 1) });
+    const s = new MoveSfx(0.8, 0x40cf);
+    s.whoosh(0.0, 0.3, { from: 800, to: 4000, gain: 0.3 });
+    s.thud(0.3, 0.65, 0.5);
+    s.noise(0.3, 0.08, { clock: (u) => 7000 - 3000 * u, gain: env.attackDecay(0.35, 0.05) });
+    s.pulse(0.33, 0.3, { freq: (u) => 1400 - 900 * u, gain: env.decay(0.14, 1), duty: 0.125 });
     return s;
   },
 

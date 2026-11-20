@@ -73,13 +73,14 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee: an eager approach, a light hit, then a sneaky grab. */
+  /** Covet.play (hearts float over 0-0.6 s, the target jolts at 0.6 s, an item flies from it to the user 0.7-1.2 s): a sweet two-note coo, a soft hit, then a rising snatch blip and a twinkle as the item arrives. */
   covet: () => {
-    const s = new MoveSfx(0.9, 0xc0e2);
-    s.arpeggio(0.0, [76, 79], 0.08, { gain: 0.18, voice: 'wave', hold: 0.1 });
-    s.thud(0.17, 0.45, 0.3);
-    s.pulse(0.35, 0.15, { freq: env.ramp(500, 1500), gain: env.decay(0.18, 1), duty: 0.25 });
-    s.sparkle(0.5, 0.25, 4, { gain: 0.1 });
+    const s = new MoveSfx(1.3, 0xc0e2);
+    s.arpeggio(0.0, [76, 79, 84], 0.12, { gain: 0.18, voice: 'wave', hold: 0.14 });
+    s.thud(0.6, 0.45, 0.3);
+    s.pulse(0.7, 0.2, { freq: env.ramp(500, 1500), gain: env.decay(0.18, 1), duty: 0.25 });
+    s.whoosh(0.75, 0.4, { from: 3000, to: 1500, gain: 0.15 });
+    s.sparkle(1.15, 0.15, 3, { gain: 0.1 });
     return s;
   },
 
@@ -170,13 +171,13 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a desperate, gritty all-out charge. */
+  /** Endeavor.play (the user strains, shaking at 0 / 0.15 / 0.3 s with sweat drops, burst on the target at 0.6 s): a straining grunt, then a hard hit. */
   endeavor: () => {
-    const s = new MoveSfx(0.75, 0xe0de);
-    s.pulse(0.0, 0.17, { freq: env.ramp(150, 300), gain: env.ramp(0.08, 0.25), duty: 0.25 });
-    s.whoosh(0.0, 0.17, { from: 1500, to: 6000, gain: 0.25 });
-    s.thud(0.17, 0.65, 0.7);
-    s.pulse(0.2, 0.2, { freq: env.ramp(500, 250), gain: env.decay(0.2, 2), duty: 0.125 });
+    const s = new MoveSfx(0.9, 0xe0de);
+    s.pulse(0.0, 0.45, { freq: (u) => (150 + 150 * u) * (1 + 0.05 * Math.sin(2 * Math.PI * 7 * u)), gain: env.ramp(0.08, 0.25), duty: 0.25 });
+    s.whoosh(0.45, 0.15, { from: 1500, to: 6000, gain: 0.25 });
+    s.thud(0.6, 0.65, 0.7);
+    s.pulse(0.62, 0.2, { freq: env.ramp(500, 250), gain: env.decay(0.2, 2), duty: 0.125 });
     return s;
   },
 
@@ -215,13 +216,13 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee, quick (impact 0.12 s) + flinch fleck (~0.45 s): a sharp surprise clap. */
+  /** FakeOut.play (white flash 0-0.12 s, hands swing in and clap in front of the target at 0.25 s, the target flinches to 0.6 s): a swish, a sharp clap, then a flinch. */
   fakeout: () => {
-    const s = new MoveSfx(0.85, 0xfa0e);
-    s.whoosh(0.0, 0.12, { from: 3000, to: 9000, gain: 0.3 });
-    s.noise(0.12, 0.05, { clock: () => 16000, gain: env.decay(0.3, 1) });
-    s.thud(0.12, 0.5, 0.3);
-    s.pulse(0.12, 0.06, { freq: () => 1320, gain: env.decay(0.2, 1), duty: 0.25 });
+    const s = new MoveSfx(0.8, 0xfa0e);
+    s.whoosh(0.05, 0.2, { from: 3000, to: 9000, gain: 0.3 });
+    s.noise(0.25, 0.05, { clock: () => 16000, gain: env.decay(0.35, 1) });
+    s.thud(0.25, 0.45, 0.2);
+    s.pulse(0.25, 0.06, { freq: () => 1320, gain: env.decay(0.2, 1), duty: 0.25 });
     s.flinch(0.45, 0.3);
     return s;
   },

@@ -3,18 +3,22 @@ import { DIM_BACKDROP } from '../animation.constants';
 import { Fx } from '../fx';
 import { FxEffects } from '../fx-effects';
 import { FxGlyphs } from '../fx-glyphs';
+import { Astonish } from './ghost/astonish';
+import { Grudge } from './ghost/grudge';
 import { Nightmare } from './ghost/nightmare';
 import { ShadowClaw } from './ghost/shadow-claw';
 import { ShadowForce } from './ghost/shadow-force';
 import { Spite } from './ghost/spite';
 
-/** Hand-made animations for Ghost-type moves (Nightmare, Shadow Claw, Shadow Force and Spite live in `ghost/`). */
+/** Hand-made animations for Ghost-type moves (Astonish, Grudge, Nightmare, Shadow Claw, Shadow Force and Spite live in `ghost/`). */
 export class GhostMoveAnimations {
   /** Hand-made Ghost move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    astonish: (refs, _launch, target) => Astonish.play(refs, target),
     confuseray: (refs, launch, target) => GhostMoveAnimations.playConfuseRay(refs, launch, target),
     curse: (refs, launch) => GhostMoveAnimations.playCurse(refs, launch),
     destinybond: (refs, launch, target) => GhostMoveAnimations.playDestinyBond(refs, launch, target),
+    grudge: (refs, launch) => Grudge.play(refs, launch),
     lick: (refs, _launch, target) => GhostMoveAnimations.playLick(refs, target),
     nightmare: (refs) => Nightmare.play(refs),
     nightshade: (refs, launch) => GhostMoveAnimations.playNightShade(refs, launch),

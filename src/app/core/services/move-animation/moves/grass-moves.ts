@@ -4,12 +4,14 @@ import { Fx } from '../fx';
 import { FxGlyphs } from '../fx-glyphs';
 import { FxEffects } from '../fx-effects';
 import { TerrainFx } from '../terrain-fx';
+import { BulletSeed } from './grass/bullet-seed';
 import { CottonGuard } from './grass/cotton-guard';
 import { CottonSpore } from './grass/cotton-spore';
 import { EnergyBall } from './grass/energy-ball';
 import { ForestsCurse } from './grass/forests-curse';
 import { GrassKnot } from './grass/grass-knot';
 import { GrassPledge } from './grass/grass-pledge';
+import { GrassWhistle } from './grass/grass-whistle';
 import { HornLeech } from './grass/horn-leech';
 import { LeafStorm } from './grass/leaf-storm';
 import { PetalBlizzard } from './grass/petal-blizzard';
@@ -20,13 +22,17 @@ import { SeedFlare } from './grass/seed-flare';
 import { SpikyShield } from './grass/spiky-shield';
 import { VineWhip } from './grass/vine-whip';
 import { WoodHammer } from './grass/wood-hammer';
+import { Ingrain } from './grass/ingrain';
+import { MagicalLeaf } from './grass/magical-leaf';
+import { NeedleArm } from './grass/needle-arm';
 
-/** Hand-made animations for Grass-type moves (Cotton Guard, Cotton Spore, Energy Ball, Forest's Curse, Grass Knot, Grass Pledge, Horn Leech, Leaf Storm, Petal Blizzard, Power Whip, Razor Leaf, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
+/** Hand-made animations for Grass-type moves (Bullet Seed, Cotton Guard, Cotton Spore, Energy Ball, Forest's Curse, Grass Knot, Grass Pledge, Grass Whistle, Horn Leech, Ingrain, Leaf Storm, Magical Leaf, Needle Arm, Petal Blizzard, Power Whip, Razor Leaf, Seed Bomb, Seed Flare, Spiky Shield and Wood Hammer live in `grass/`). */
 export class GrassMoveAnimations {
   /** Hand-made Grass move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     absorb: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target),
     aromatherapy: (refs, launch) => GrassMoveAnimations.playAromatherapy(refs, launch),
+    bulletseed: (refs, launch, target, v) => BulletSeed.play(refs, launch, target, v),
     cottonguard: (refs, launch) => CottonGuard.play(refs, launch),
     cottonspore: (refs, _launch, target) => CottonSpore.play(refs, target),
     energyball: (refs, launch, target) => EnergyBall.play(refs, launch, target),
@@ -35,12 +41,16 @@ export class GrassMoveAnimations {
     gigadrain: (refs, launch, target) => GrassMoveAnimations.playGigaDrain(refs, launch, target),
     grassknot: (refs, _launch, target) => GrassKnot.play(refs, target),
     grasspledge: (refs, _launch, target) => GrassPledge.play(refs, target),
+    grasswhistle: (refs, launch, target) => GrassWhistle.play(refs, launch, target),
     grassyterrain: (refs, launch) => TerrainFx.play(refs, launch, TerrainFx.GRASSY),
     hornleech: (refs, launch, target, v) => HornLeech.play(refs, launch, target, v),
+    ingrain: (refs) => Ingrain.play(refs),
     leafblade: (refs, _launch, target) => GrassMoveAnimations.playLeafBlade(refs, target),
     leafstorm: (refs, launch, target) => LeafStorm.play(refs, launch, target),
     leechseed: (refs, launch, target) => GrassMoveAnimations.playLeechSeed(refs, launch, target),
+    magicalleaf: (refs, launch, target) => MagicalLeaf.play(refs, launch, target),
     megadrain: (refs, launch, target) => GrassMoveAnimations.playMegaDrain(refs, launch, target),
+    needlearm: (refs, _launch, target, v) => NeedleArm.play(refs, target, v),
     petalblizzard: (refs, _launch, target, v) => PetalBlizzard.play(refs, target, v),
     petaldance: (refs, launch, target) => GrassMoveAnimations.playPetalDance(refs, launch, target),
     powerwhip: (refs, _launch, target) => PowerWhip.play(refs, target),

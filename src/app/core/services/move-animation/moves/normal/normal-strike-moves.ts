@@ -3,6 +3,9 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { ClawStyle, FxEffects } from '../../fx-effects';
+import { Covet } from './covet';
+import { Endeavor } from './endeavor';
+import { FakeOut } from './fake-out';
 import { FalseSwipe } from './false-swipe';
 import { Guillotine } from './guillotine';
 import { HeadCharge } from './head-charge';
@@ -34,15 +37,18 @@ interface BladeStyle {
 const SLASH: BladeStyle = { blade: '#fff', glow: '#FFF3A0', width: 7, sparks: 16, reach: 1, sink: 10, sparkMs: 520 };
 const CUT: BladeStyle = { blade: '#FFF0A0', glow: '#F8C030', width: 5, sparks: 22, reach: 1.5, sink: 30, sparkMs: 950 };
 
-/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (False Swipe, Guillotine, Head Charge, Horn Drill, Last Resort, Quick Attack, Rage, Rock Climb, Scratch, Struggle, Vise Grip and Wrap live in their own files). */
+/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Covet, Endeavor, Fake Out, False Swipe, Guillotine, Head Charge, Horn Drill, Last Resort, Quick Attack, Rage, Rock Climb, Scratch, Struggle, Vise Grip and Wrap live in their own files). */
 export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     bind: (refs, _launch, target) => NormalStrikeMoveAnimations.playBind(refs, target),
     chipaway: (refs, launch, target, v) => NormalStrikeMoveAnimations.playChipAway(refs, launch, target, v),
     constrict: (refs, _launch, target) => NormalStrikeMoveAnimations.playConstrict(refs, target),
+    covet: (refs, launch, target) => Covet.play(refs, launch, target),
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
     cut: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v, CUT),
+    endeavor: (refs, launch, target) => Endeavor.play(refs, launch, target),
+    fakeout: (refs, _launch, target) => FakeOut.play(refs, target),
     falseswipe: (refs, _launch, target, v) => FalseSwipe.play(refs, target, v),
     furyattack: (refs, launch, target, v) => NormalStrikeMoveAnimations.playFuryAttack(refs, launch, target, v),
     furyswipes: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playFurySwipes(refs, target, v),

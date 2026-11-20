@@ -566,6 +566,16 @@ export class FxGlyphs {
     return el;
   }
 
+  /** A white-grey feather `len` px long: a soft vane with a grey quill down its middle (Roost, Feather Dance). */
+  static featherGlyph(len: number): HTMLElement {
+    const el = document.createElement('div');
+    el.style.cssText =
+      `position:absolute;width:${len * 0.38}px;height:${len}px;pointer-events:none;border-radius:50% 50% 45% 45% / 70% 70% 30% 30%;` +
+      'background:linear-gradient(90deg,#0000 46%,#8A8E98 46% 54%,#0000 54%),linear-gradient(90deg,#C8CCD4,#FFFFFF 40%,#E4E7EC 60%,#B4B8C2);' +
+      'box-shadow:0 1px 2px #00000040';
+    return el;
+  }
+
   /** A plain music note in `color` with a dark outline (Heal Bell). */
   static musicNote(size: number, color: string, note = '♪'): HTMLElement {
     const el = document.createElement('div');

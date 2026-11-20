@@ -3,13 +3,14 @@ import { env } from '../track.mjs';
 
 /** Fighting-type move sounds. */
 export const FIGHTING = {
-  /** Generic melee, 3 hits (one every 0.42 s, impacts at 0.17 / 0.59 / 1.01 s): rapid palm thrusts. */
+  /** ArmThrust.play (one palm shove per hit, 0.3 s apart, landing at 0.1 / 0.4 / 0.7 s for three): a short swing and a slap per hit. */
   armthrust: () => {
-    const s = new MoveSfx(1.25, 0xa7a7);
+    const s = new MoveSfx(1.0, 0xa7a7);
     for (let hit = 0; hit < 3; hit++) {
-      const at = 0.17 + hit * 0.42;
-      s.whoosh(at - 0.12, 0.13, { from: 2000, to: 6000, gain: 0.2 });
+      const at = 0.1 + hit * 0.3;
+      s.whoosh(at - 0.09, 0.1, { from: 2000, to: 6000, gain: 0.2 });
       s.thud(at, 0.55, 0.3);
+      s.noise(at, 0.04, { clock: () => 12000, gain: env.decay(0.18, 1) });
     }
     return s;
   },
@@ -346,14 +347,16 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee (impact 0.17 s): a fierce payback blow – a growled windup and a heavy hit. */
+  /** Revenge.play (scene darkens, steam of rage billows off the user 0.1-0.9 s, it darts forward 0.98-1.24 s and strikes at 1.1 s with a blue streak and sparks to 1.45 s, scene clears to 1.65 s): steamy hisses over a growl, a whoosh and a heavy hit. */
   revenge: () => {
-    const s = new MoveSfx(0.85, 0x2e7e);
-    s.pulse(0.0, 0.17, { freq: env.ramp(90, 140), gain: env.swell(0.22), duty: 0.125 });
-    s.whoosh(0.02, 0.16, { from: 1200, to: 5000, gain: 0.3 });
-    s.thud(0.17, 0.9, 0.85);
-    s.noise(0.17, 0.1, { clock: (u) => 6000 - 3000 * u, gain: env.attackDecay(0.35, 0.05) });
-    s.rumble(0.22, 0.35, { from: 350, to: 120, gain: 0.18 });
+    const s = new MoveSfx(1.75, 0x2e7e);
+    s.pulse(0.1, 0.8, { freq: (u) => 90 + 50 * u + 8 * Math.sin(2 * Math.PI * 9 * u), gain: env.swell(0.2), duty: 0.125 });
+    for (const at of [0.1, 0.27, 0.44, 0.61]) s.noise(at, 0.3, { clock: (u) => 5000 - 2000 * u, gain: env.attackDecay(0.14, 0.15) });
+    s.whoosh(0.95, 0.15, { from: 1200, to: 5000, gain: 0.3 });
+    s.thud(1.1, 0.9, 0.85);
+    s.noise(1.1, 0.1, { clock: (u) => 6000 - 3000 * u, gain: env.attackDecay(0.35, 0.05) });
+    s.rumble(1.15, 0.35, { from: 350, to: 120, gain: 0.18 });
+    s.sparkle(1.12, 0.3, 4, { lo: 2500, hi: 4500, gain: 0.1 });
     return s;
   },
 

@@ -14,12 +14,12 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura: calls out to the team, then a move is picked. */
+  /** Assist.play (dim scene, paw prints step towards the user every 0.1 s 0.1-0.8 s, four ring it 0.9-1.2 s, clear by 1.5 s): soft padding steps, then a bright little call-up jingle. */
   assist: () => {
-    const s = new MoveSfx(1.0, 0xa5c1);
-    s.arpeggio(0.02, [67, 71, 74, 79], 0.07, { gain: 0.28, duty: 0.25, hold: 0.1 });
-    s.arpeggio(0.35, [79, 74, 79], 0.09, { gain: 0.16, voice: 'wave', hold: 0.12 });
-    s.sparkle(0.4, 0.45, 6, { gain: 0.14 });
+    const s = new MoveSfx(1.5, 0xa5c1);
+    for (let i = 0; i < 8; i++) s.thud(0.1 + i * 0.1, 0.18, 0.05);
+    s.arpeggio(0.9, [67, 71, 74, 79], 0.1, { gain: 0.26, duty: 0.25, hold: 0.12 });
+    s.sparkle(1.2, 0.25, 4, { gain: 0.12 });
     return s;
   },
 
@@ -58,12 +58,13 @@ export const NORMAL_BUFF = {
   },
 
 
-  /** Generic self aura: the body fades into its surroundings. */
+  /** Camouflage.play (the user fades into the ground colours 0-0.5 s, hidden to 0.9 s, fades back 0.9-1.3 s): a soft shimmering fade-out, a hush, then a little blip as it reappears. */
   camouflage: () => {
-    const s = new MoveSfx(1.0, 0xca30);
-    s.noise(0.02, 0.6, { clock: () => 2500, gain: env.swell(0.14) });
-    s.wave(0.05, 0.75, { freq: env.ramp(700, 300), gain: (u) => 0.25 * Math.pow(1 - u, 1.5) });
-    s.pulse(0.6, 0.08, { freq: env.ramp(900, 1400), gain: env.decay(0.14, 1), duty: 0.25 });
+    const s = new MoveSfx(1.3, 0xca30);
+    s.noise(0.02, 0.5, { clock: () => 2500, gain: env.swell(0.14) });
+    s.wave(0.02, 0.55, { freq: env.ramp(700, 300), gain: (u) => 0.25 * Math.pow(1 - u, 1.5) });
+    s.wave(0.9, 0.35, { freq: env.ramp(300, 700), gain: env.swell(0.12) });
+    s.pulse(1.2, 0.08, { freq: env.ramp(900, 1400), gain: env.decay(0.14, 1), duty: 0.25 });
     return s;
   },
 
@@ -227,14 +228,16 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): an encouraging pat on the back and a bright "go!" cheer. */
+  /** HelpingHand.play (two hands clap above the ally at 0.25 / 0.5 s with a sparkle each, the ally glows yellow 0.6-1.05 s): two claps, then a bright cheering jingle. */
   helpinghand: () => {
-    const s = new MoveSfx(1.0, 0x4e1d);
-    s.thud(0.04, 0.3, 0.1);
-    s.thud(0.16, 0.3, 0.1);
-    s.arpeggio(0.32, [72, 76, 79, 84], 0.06, { gain: 0.26, duty: 0.25, hold: 0.1 });
-    s.wave(0.56, 0.3, { freq: () => 1046.5, gain: env.decay(0.2, 1.5) });
-    s.sparkle(0.45, 0.35, 5, { gain: 0.12 });
+    const s = new MoveSfx(1.1, 0x4e1d);
+    for (const at of [0.25, 0.5]) {
+      s.noise(at, 0.05, { clock: () => 14000, gain: env.decay(0.3, 1) });
+      s.thud(at, 0.3, 0.1);
+    }
+    s.arpeggio(0.6, [72, 76, 79, 84], 0.06, { gain: 0.26, duty: 0.25, hold: 0.1 });
+    s.wave(0.84, 0.25, { freq: () => 1046.5, gain: env.decay(0.2, 1.5) });
+    s.sparkle(0.7, 0.35, 5, { gain: 0.12 });
     return s;
   },
 
@@ -255,12 +258,12 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): a rising wolf howl, then the stat-up jingle (0.85 s). */
+  /** Howl.play (the user howls, red sound lines burst from its head 0-0.7 s, Attack rise from 0.75 s): a rising and falling howl, then the stat-up. */
   howl: () => {
-    const s = new MoveSfx(1.45, 0x4041);
-    s.pulse(0.02, 0.75, { freq: (u) => (330 + 330 * Math.sin(Math.PI * Math.min(1, u * 1.4))) * (1 + 0.02 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.3), duty: 0.25 });
-    s.wave(0.02, 0.75, { freq: (u) => 660 + 500 * Math.sin(Math.PI * Math.min(1, u * 1.4)), gain: env.swell(0.15) });
-    s.statUp(0.85);
+    const s = new MoveSfx(1.6, 0x4041);
+    s.pulse(0.02, 0.68, { freq: (u) => (330 + 330 * Math.sin(Math.PI * Math.min(1, u * 1.4))) * (1 + 0.02 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.3), duty: 0.25 });
+    s.wave(0.02, 0.68, { freq: (u) => 660 + 500 * Math.sin(Math.PI * Math.min(1, u * 1.4)), gain: env.swell(0.15) });
+    s.statUp(0.75);
     return s;
   },
 
@@ -354,23 +357,24 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): a used item pops back - a turning whirr, then a found-it jingle. */
+  /** Recycle.play (two round arrows spin over the user 0-1.1 s, the user flashes white with sparkles 0.85-1.25 s): a turning whirr, then a found-it jingle. */
   recycle: () => {
-    const s = new MoveSfx(1.05, 0x7ecc);
-    s.pulse(0.02, 0.45, { freq: (u) => 300 + 400 * u, gain: (u) => 0.2 * (0.55 + 0.45 * Math.sin(2 * Math.PI * 9 * u)), duty: 0.25 });
-    s.noise(0.02, 0.45, { clock: () => 2200, gain: env.swell(0.12) });
-    s.arpeggio(0.5, [76, 79, 84], 0.07, { gain: 0.26, voice: 'wave', hold: 0.18 });
-    s.pulse(0.64, 0.25, { freq: () => 2093, gain: env.decay(0.08, 2), duty: 0.5 });
+    const s = new MoveSfx(1.3, 0x7ecc);
+    s.pulse(0.02, 0.85, { freq: (u) => 300 + 400 * u, gain: (u) => 0.2 * Math.sin(Math.PI * u) * (0.55 + 0.45 * Math.sin(2 * Math.PI * 14 * u)), duty: 0.25 });
+    s.noise(0.02, 0.85, { clock: () => 2200, gain: env.swell(0.12) });
+    s.arpeggio(0.85, [76, 79, 84], 0.07, { gain: 0.26, voice: 'wave', hold: 0.18 });
+    s.sparkle(0.9, 0.35, 5, { lo: 3500, hi: 6000, gain: 0.1 });
     return s;
   },
 
-  /** Generic self aura (~0.8 s): a cool, refreshing rinse and a clean chime. */
+  /** Refresh.play (pink-white wash 0-1.15 s, green sparkles twinkle 0-0.9 s, a green ring swells 0.4-0.95 s, the user shines white 0.95-1.15 s): a cool, refreshing rinse with twinkles, a soft swell, a clean chime. */
   refresh: () => {
-    const s = new MoveSfx(1.05, 0x7ef5);
-    s.noise(0.02, 0.5, { clock: (u) => 3000 + 3000 * u, gain: env.swell(0.15) });
-    s.bubbles(0.05, 0.45, 6, { lo: 600, hi: 1400, gain: 0.16 });
-    s.arpeggio(0.5, [79, 84, 91], 0.08, { gain: 0.24, voice: 'wave', hold: 0.25 });
-    s.sparkle(0.55, 0.4, 5, { lo: 3500, hi: 6000, gain: 0.1 });
+    const s = new MoveSfx(1.35, 0x7ef5);
+    s.noise(0.02, 0.9, { clock: (u) => 3000 + 3000 * u, gain: env.swell(0.13) });
+    s.sparkle(0.02, 0.85, 8, { lo: 3500, hi: 6000, gain: 0.1 });
+    s.bubbles(0.05, 0.4, 5, { lo: 600, hi: 1400, gain: 0.14 });
+    s.wave(0.4, 0.55, { freq: (u) => 523 * (1 + 0.2 * u), gain: env.swell(0.14) });
+    s.arpeggio(0.95, [79, 84, 91], 0.06, { gain: 0.24, voice: 'wave', hold: 0.2 });
     return s;
   },
 

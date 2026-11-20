@@ -61,14 +61,14 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic lob, 3 hits (impacts 0.52 / 1.26 / 2.0 s): three boulders arc up and crash down in turn. */
+  /** RockBlast.play (one boulder per hit, hurled every 0.28 s, smashing in 0.32 s later at 0.32 / 0.6 / 0.88 s for three; dust ~0.5 s): a heavy whoosh per rock, a crash with a rumble and scattering grit. */
   rockblast: () => {
-    const s = new MoveSfx(2.35, 0xb1a5);
+    const s = new MoveSfx(1.4, 0xb1a5);
     for (let hit = 0; hit < 3; hit++) {
-      const at = 0.52 + hit * 0.74;
-      s.whoosh(at - 0.45, 0.4, { from: 600, to: 2000, gain: 0.18 });
+      const at = 0.32 + hit * 0.28;
+      s.whoosh(at - 0.3, 0.28, { from: 600, to: 2000, gain: 0.16 });
       s.thud(at, 0.75, 0.9);
-      s.rumble(at + 0.02, 0.3, { from: 600, to: 200, gain: 0.25 });
+      s.rumble(at + 0.02, 0.28, { from: 600, to: 200, gain: 0.22 });
       for (let i = 0; i < 3; i++) s.noise(at + 0.04 + i * 0.05, 0.04, { clock: () => 1500 + s.random() * 1500, gain: env.decay(0.2 - i * 0.04, 1) });
     }
     return s;
@@ -110,14 +110,14 @@ export const ROCK = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s) + Speed drop fleck (0.55 s): boulders slam down and wall the target in. */
+  /** RockTomb.play (five boulders crash down round the target, landing at 0.3 / 0.44 / 0.58 / 0.72 / 0.86 s, crumble away 1.0-1.4 s, Speed drop 1.4-2.3 s): a falling whoosh, five heavy thuds with rumble, crumbling grit, the stat-down jingle. */
   rocktomb: () => {
-    const s = new MoveSfx(1.3, 0x70b5);
-    s.whoosh(0.0, 0.43, { from: 600, to: 2000, gain: 0.2 });
-    s.thud(0.43, 0.75, 1);
-    s.thud(0.51, 0.55, 0.9);
-    s.rumble(0.45, 0.4, { from: 500, to: 150, gain: 0.25 });
-    s.statDown(0.6, 0.22);
+    const s = new MoveSfx(2.35, 0x70b5);
+    s.whoosh(0.0, 0.3, { from: 2000, to: 600, gain: 0.18 });
+    for (const [i, at] of [0.3, 0.44, 0.58, 0.72, 0.86].entries()) s.thud(at, 0.7 - i * 0.04, 0.95);
+    s.rumble(0.32, 0.7, { from: 500, to: 150, gain: 0.22 });
+    for (let i = 0; i < 6; i++) s.noise(1.0 + i * 0.06, 0.05, { clock: () => 1500 + s.random() * 1500, gain: env.decay(0.16, 1) });
+    s.statDown(1.4, 0.22);
     return s;
   },
 

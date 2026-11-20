@@ -115,15 +115,15 @@ export const POISON = {
     return s;
   },
 
-  /** Generic melee, bite style (0.17 s impact) + poison fleck: venomous fangs sink in. */
+  /** PoisonFang.play (a white jaw snaps shut on the target at 0.45 s and lets go by ~0.9 s, the target turns purple while poison bubbles rise 0.45-1.3 s): a closing hiss, a crunching snap, then bubbling venom. */
   poisonfang: () => {
-    const s = new MoveSfx(1.15, 0xf4f9);
-    s.whoosh(0.0, 0.15, { from: 2000, to: 7000, gain: 0.2 });
-    s.pulse(0.17, 0.05, { freq: (u) => 1800 - 800 * u, gain: env.decay(0.3, 1.5), duty: 0.25 });
-    s.thud(0.17, 0.45, 0.3);
-    s.pulse(0.24, 0.05, { freq: (u) => 1600 - 800 * u, gain: env.decay(0.3, 1.5), duty: 0.25 });
-    s.thud(0.24, 0.35, 0.25);
-    s.poison(0.6);
+    const s = new MoveSfx(1.4, 0xf4f9);
+    s.whoosh(0.15, 0.3, { from: 2000, to: 7000, gain: 0.18 });
+    s.pulse(0.45, 0.05, { freq: (u) => 1800 - 800 * u, gain: env.decay(0.3, 1.5), duty: 0.25 });
+    s.thud(0.45, 0.5, 0.3);
+    s.noise(0.45, 0.08, { clock: () => 9000, gain: env.decay(0.25, 1) });
+    s.bubbles(0.5, 0.75, 8, { lo: 300, hi: 700, gain: 0.2 });
+    s.wave(0.5, 0.6, { freq: (u) => 220 * (1 + 0.1 * Math.sin(2 * Math.PI * 8 * u)), gain: env.swell(0.1) });
     return s;
   },
 
@@ -170,13 +170,13 @@ export const POISON = {
     return s;
   },
 
-  /** Generic melee (0.17 s impact) + poison fleck: a swinging tail smack with a venomous drip. */
+  /** PoisonTail.play (a tail swish whips across the target, striking at 0.28 s, dust billows 0.28-1.0 s, the target turns purple while poison orbs rise 0.3-1.15 s): a swinging whoosh, a smack, a dusty puff and bubbling venom. */
   poisontail: () => {
-    const s = new MoveSfx(1.15, 0xf47a);
-    s.whoosh(0.0, 0.17, { from: 1200, to: 6000, gain: 0.3 });
-    s.thud(0.17, 0.55, 0.55);
-    s.bubbles(0.2, 0.15, 3, { lo: 200, hi: 400, gain: 0.15 });
-    s.poison(0.6);
+    const s = new MoveSfx(1.3, 0xf47a);
+    s.whoosh(0.0, 0.28, { from: 1200, to: 6000, gain: 0.3 });
+    s.thud(0.28, 0.55, 0.55);
+    s.noise(0.3, 0.6, { clock: (u) => 1800 - 800 * u, gain: env.attackDecay(0.16, 0.1) });
+    s.bubbles(0.32, 0.8, 7, { lo: 250, hi: 600, gain: 0.18 });
     return s;
   },
 

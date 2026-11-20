@@ -262,13 +262,16 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s, no fleck): a sealing glyph locks shut with a low, warbling hum and a clack. */
+  /** Imprison.play (scene darkens 0-0.25 s, a red seal drops in 0.2-0.55 s, stamps onto the user at 0.55 s with puffs, sparkles 0.63-1.1 s, fades to 1.5 s): a low warbling hum while it falls, a heavy clack-thud, a sealing chime and twinkles. */
   imprison: () => {
-    const s = new MoveSfx(1.15, 0x1a95);
-    s.wave(0.0, 0.8, { freq: (u) => 330 * (1 + 0.04 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.25) });
-    s.chord(0.1, 0.6, [57, 60, 63], { rate: 0.05, gain: 0.14, voice: 'pulse', vibrato: 0.01 });
-    s.noise(0.75, 0.05, { clock: () => 6000, gain: env.decay(0.3, 1), short: true });
-    s.pulse(0.75, 0.25, { freq: () => 196, gain: env.decay(0.25, 2), duty: 0.5 });
+    const s = new MoveSfx(1.6, 0x1a95);
+    s.wave(0.0, 0.55, { freq: (u) => 330 * (1 - 0.3 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 7 * u)), gain: env.ramp(0.08, 0.22) });
+    s.whoosh(0.25, 0.3, { from: 3000, to: 800, gain: 0.18 });
+    s.noise(0.55, 0.05, { clock: () => 6000, gain: env.decay(0.3, 1), short: true });
+    s.thud(0.55, 0.6, 0.6);
+    s.pulse(0.55, 0.3, { freq: () => 196, gain: env.decay(0.25, 2), duty: 0.5 });
+    s.chord(0.62, 0.55, [57, 60, 63], { rate: 0.05, gain: 0.12, voice: 'pulse', vibrato: 0.01 });
+    s.sparkle(0.65, 0.45, 5, { lo: 3000, hi: 5500, gain: 0.1 });
     return s;
   },
 
@@ -377,14 +380,14 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic lob (arcs 0.52 s) + stat-down fleck: a hazy, warbling down-feather orb drifts over and bursts softly. */
+  /** MistBall.play (blue sky fades in 0-0.3 s, a glassy mist ball floats over 0.3-0.75 s, bursts on the target at 0.75 s, mist billows 0.75-1.6 s, sky fades to 1.9 s): a soft breeze, a hazy warbling float, a soft burst and a long misty hiss. */
   mistball: () => {
-    const s = new MoveSfx(1.35, 0x3b0b);
-    s.wave(0.0, 0.52, { freq: (u) => 330 * (1 + 0.06 * Math.sin(2 * Math.PI * 7 * u)) * (1 + 0.4 * u), gain: env.ramp(0.14, 0.3) });
-    s.noise(0.0, 0.52, { clock: () => 3000, gain: env.ramp(0.04, 0.1) });
-    s.noise(0.52, 0.3, { clock: (u) => 5000 - 3500 * u, gain: env.attackDecay(0.4, 0.05) });
-    s.thud(0.52, 0.45, 0.5);
-    s.statDown(0.68, 0.22);
+    const s = new MoveSfx(1.95, 0x3b0b);
+    s.noise(0.0, 1.9, { clock: () => 1800, gain: env.swell(0.06) });
+    s.wave(0.3, 0.45, { freq: (u) => 330 * (1 + 0.06 * Math.sin(2 * Math.PI * 7 * u)) * (1 + 0.4 * u), gain: env.ramp(0.14, 0.3) });
+    s.noise(0.75, 0.85, { clock: (u) => 5000 - 3500 * u, gain: env.attackDecay(0.35, 0.05) });
+    s.thud(0.75, 0.4, 0.4);
+    s.chord(0.8, 0.7, [72, 76, 79], { rate: 0.04, gain: 0.08 });
     return s;
   },
 

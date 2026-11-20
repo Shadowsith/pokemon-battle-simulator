@@ -11,8 +11,10 @@ import { Rollout } from './rock/rollout';
 import { StealthRock } from './rock/stealth-rock';
 import { StoneEdge } from './rock/stone-edge';
 import { WideGuard } from './rock/wide-guard';
+import { RockBlast } from './rock/rock-blast';
+import { RockTomb } from './rock/rock-tomb';
 
-/** Hand-made animations for Rock-type moves (Ancient Power, Head Smash, Power Gem, Rock Polish, Rock Wrecker, Rollout, Stealth Rock, Stone Edge and Wide Guard live in `rock/`). */
+/** Hand-made animations for Rock-type moves (Ancient Power, Head Smash, Power Gem, Rock Blast, Rock Polish, Rock Wrecker, Rock Tomb, Rollout, Stealth Rock, Stone Edge and Wide Guard live in `rock/`). */
 export class RockMoveAnimations {
   /** Hand-made Rock move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -20,9 +22,11 @@ export class RockMoveAnimations {
     diamondstorm: (refs, launch, target, v) => RockMoveAnimations.playDiamondStorm(refs, launch, target, v),
     headsmash: (refs, _launch, target, v) => HeadSmash.play(refs, target, v),
     powergem: (refs, launch, target) => PowerGem.play(refs, launch, target),
+    rockblast: (refs, launch, target, v) => RockBlast.play(refs, launch, target, v),
     rockpolish: (refs, launch) => RockPolish.play(refs, launch),
     rockslide: (refs, _launch, target) => RockMoveAnimations.playRockSlide(refs, target),
     rockthrow: (refs, _launch, target) => RockMoveAnimations.playRockThrow(refs, target),
+    rocktomb: (refs, _launch, target) => RockTomb.play(refs, target),
     rockwrecker: (refs, launch, target, v) => RockWrecker.play(refs, launch, target, v),
     rollout: (refs, _launch, target, v) => Rollout.play(refs, target, v),
     sandstorm: (refs) => RockMoveAnimations.playSandstorm(refs),

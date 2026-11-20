@@ -84,13 +84,15 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: electricity builds up in the body. */
+  /** Charge.play (dim scene, sparks drift into the user 0.2-0.95 s while a glow builds, bright flash at 1.0 s, Sp. Def rise 1.25-2.05 s): a rising electric crackle, a zap, then the stat-up jingle. */
   charge: () => {
-    const s = new MoveSfx(1.5, 0xc4a9);
-    s.noise(0.02, 0.8, { clock: env.ramp(2000, 9000), gain: env.ramp(0.05, 0.3), short: true });
-    s.pulse(0.02, 0.8, { freq: env.ramp(200, 800), gain: env.ramp(0.05, 0.2), duty: 0.25 });
-    s.sparkle(0.3, 0.5, 7, { lo: 2000, hi: 4500, gain: 0.16 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.1, 0xc4a9);
+    s.noise(0.2, 0.8, { clock: env.ramp(2000, 9000), gain: env.ramp(0.05, 0.3), short: true });
+    s.pulse(0.2, 0.8, { freq: env.ramp(200, 800), gain: env.ramp(0.05, 0.2), duty: 0.25 });
+    s.sparkle(0.25, 0.7, 7, { lo: 2000, hi: 4500, gain: 0.16 });
+    s.noise(1.0, 0.15, { clock: () => 14000, gain: env.decay(0.3, 1), short: true });
+    s.pulse(1.0, 0.2, { freq: env.ramp(1600, 600), gain: env.decay(0.2, 1), duty: 0.5 });
+    s.statUp(1.25);
     return s;
   },
 

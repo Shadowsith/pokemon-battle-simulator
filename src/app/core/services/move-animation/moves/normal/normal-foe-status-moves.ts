@@ -4,6 +4,7 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { Attract } from './attract';
+import { Block } from './block';
 import { Conversion2 } from './conversion-2';
 import { Foresight } from './foresight';
 import { LockOn } from './lock-on';
@@ -13,12 +14,14 @@ import { ScaryFace } from './scary-face';
 import { Sketch } from './sketch';
 import { Swagger } from './swagger';
 import { SweetScent } from './sweet-scent';
+import { OdorSleuth } from './odor-sleuth';
 
-/** Hand-made animations for Normal-type status moves aimed at the foe (stat drops, sleep, disabling, forcing out, copying; Attract, Conversion 2, Foresight, Lock-On, Mean Look, Mind Reader, Scary Face, Sketch, Swagger and Sweet Scent live in their own files). */
+/** Hand-made animations for Normal-type status moves aimed at the foe (stat drops, sleep, disabling, forcing out, copying; Attract, Block, Conversion 2, Foresight, Lock-On, Mean Look, Mind Reader, Odor Sleuth, Scary Face, Sketch, Swagger and Sweet Scent live in their own files). */
 export class NormalFoeStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     attract: (refs, _launch, target) => Attract.play(refs, target),
+    block: (refs, _launch, target) => Block.play(refs, target),
     conversion2: (refs, launch, target) => Conversion2.play(refs, launch, target),
     disable: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playDisable(refs, target),
     encore: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playEncore(refs, target),
@@ -30,6 +33,7 @@ export class NormalFoeStatusMoveAnimations {
     meanlook: (refs, _launch, target) => MeanLook.play(refs, target),
     mimic: (refs, launch, target) => NormalFoeStatusMoveAnimations.playMimic(refs, launch, target),
     mindreader: (refs, _launch, target) => MindReader.play(refs, target),
+    odorsleuth: (refs, launch, target, v) => OdorSleuth.play(refs, launch, target, v),
     scaryface: (refs, launch, target) => ScaryFace.play(refs, launch, target),
     sketch: (refs, _launch, target) => Sketch.play(refs, target),
     smokescreen: (refs, launch, target) => NormalFoeStatusMoveAnimations.playSmokescreen(refs, launch, target),

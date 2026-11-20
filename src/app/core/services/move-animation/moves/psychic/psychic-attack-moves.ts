@@ -11,8 +11,9 @@ import { Psyshock } from './psyshock';
 import { Psystrike } from './psystrike';
 import { Synchronoise } from './synchronoise';
 import { ZenHeadbutt } from './zen-headbutt';
+import { MistBall } from './mist-ball';
 
-/** Hand-made animations for Psychic-type attacks (Hyperspace Hole, Mirror Coat, Psycho Cut, Psyshock, Psystrike, Synchronoise and Zen Headbutt have their own files). */
+/** Hand-made animations for Psychic-type attacks (Hyperspace Hole, Mirror Coat, Mist Ball, Psycho Cut, Psyshock, Psystrike, Synchronoise and Zen Headbutt have their own files). */
 export class PsychicAttackMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -23,6 +24,7 @@ export class PsychicAttackMoveAnimations {
     hyperspacehole: (refs, launch, target, v) => HyperspaceHole.play(refs, launch, target, v),
     lusterpurge: (refs, launch, target) => PsychicAttackMoveAnimations.playLusterPurge(refs, launch, target),
     mirrorcoat: (refs, launch, target) => MirrorCoat.play(refs, launch, target),
+    mistball: (refs, launch, target) => MistBall.play(refs, launch, target),
     psychic: (refs) => PsychicAttackMoveAnimations.playPsychic(refs),
     psychoboost: (refs, launch, target) => PsychicAttackMoveAnimations.playPsychoBoost(refs, launch, target),
     psybeam: (refs, launch, target) => PsychicAttackMoveAnimations.playPsybeam(refs, launch, target),

@@ -3,6 +3,7 @@ import { DIM_BACKDROP } from '../../animation.constants';
 import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
+import { ArmThrust } from './arm-thrust';
 import { HammerArm } from './hammer-arm';
 import { MachPunch } from './mach-punch';
 import { PowerUpPunch } from './power-up-punch';
@@ -10,11 +11,13 @@ import { Reversal } from './reversal';
 import { RockSmash } from './rock-smash';
 import { SacredSword } from './sacred-sword';
 import { WakeUpSlap } from './wake-up-slap';
+import { Revenge } from './revenge';
 
-/** Hand-made animations for Fighting-type punches, chops and full-power blows (Hammer Arm, Mach Punch, Power-Up Punch, Reversal, Rock Smash, Sacred Sword and Wake-Up Slap live in `hammer-arm.ts` / `mach-punch.ts` / `power-up-punch.ts` / `reversal.ts` / `rock-smash.ts` / `sacred-sword.ts` / `wake-up-slap.ts`). */
+/** Hand-made animations for Fighting-type punches, chops and full-power blows (Arm Thrust, Hammer Arm, Mach Punch, Power-Up Punch, Revenge, Reversal, Rock Smash, Sacred Sword and Wake-Up Slap live in `arm-thrust.ts` / `hammer-arm.ts` / `mach-punch.ts` / `power-up-punch.ts` / `revenge.ts` / `reversal.ts` / `rock-smash.ts` / `sacred-sword.ts` / `wake-up-slap.ts`). */
 export class FightingPunchMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    armthrust: (refs, _launch, target, v) => ArmThrust.play(refs, target, v),
     brickbreak: (refs, _launch, target) => FightingPunchMoveAnimations.playBrickBreak(refs, target),
     closecombat: (refs, launch, target) => FightingPunchMoveAnimations.playCloseCombat(refs, launch, target),
     counter: (refs, _launch, target) => FightingPunchMoveAnimations.playCounter(refs, target),
@@ -26,6 +29,7 @@ export class FightingPunchMoveAnimations {
     karatechop: (refs, _launch, target, v) => FightingPunchMoveAnimations.playKarateChop(refs, target, v),
     machpunch: (refs, _launch, target, v) => MachPunch.play(refs, target, v),
     poweruppunch: (refs, launch, target) => PowerUpPunch.play(refs, launch, target),
+    revenge: (refs, launch, target, v) => Revenge.play(refs, launch, target, v),
     reversal: (refs, launch, target, v) => Reversal.play(refs, launch, target, v),
     rocksmash: (refs, _launch, target) => RockSmash.play(refs, target),
     sacredsword: (refs, _launch, target, v) => SacredSword.play(refs, target, v),

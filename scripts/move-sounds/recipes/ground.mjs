@@ -167,15 +167,17 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic lob (arcs 0.52 s) + Speed-drop fleck: a spray of mud flung over, a sloppy splat. */
+  /** MudShot.play (a mud stream gushes over 0-0.65 s, clods splatter on the target 0.2-0.7 s, Speed drop 0.7-1.6 s): a gushing, gurgling spray, sloppy splats, the stat-down jingle. */
   mudshot: () => {
-    const s = new MoveSfx(1.35, 0x3d50);
-    s.noise(0.0, 0.52, { clock: (u) => 1500 + 1000 * u, gain: env.ramp(0.1, 0.25) });
-    s.pulse(0.0, 0.52, { freq: (u) => 200 + 80 * Math.sin(2 * Math.PI * 4 * u), gain: env.ramp(0.06, 0.14), duty: 0.25 });
-    s.thud(0.52, 0.5, 0.6);
-    s.noise(0.52, 0.25, { clock: (u) => 3000 - 2000 * u, gain: env.attackDecay(0.4, 0.04) });
-    s.bubbles(0.55, 0.2, 3, { lo: 150, hi: 300, gain: 0.14 });
-    s.statDown(0.68, 0.22);
+    const s = new MoveSfx(1.65, 0x3d50);
+    s.noise(0.0, 0.65, { clock: (u) => 1500 + 1000 * u, gain: env.swell(0.25) });
+    s.pulse(0.0, 0.65, { freq: (u) => 200 + 80 * Math.sin(2 * Math.PI * 6 * u), gain: env.swell(0.14), duty: 0.25 });
+    for (const at of [0.2, 0.33, 0.46]) {
+      s.thud(at, 0.4, 0.6);
+      s.noise(at, 0.12, { clock: (u) => 3000 - 2000 * u, gain: env.attackDecay(0.3, 0.04) });
+    }
+    s.bubbles(0.25, 0.4, 5, { lo: 150, hi: 300, gain: 0.14 });
+    s.statDown(0.7, 0.22);
     return s;
   },
 
@@ -192,14 +194,18 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), no fleck: mud is flung about in wet, heavy splats. */
+  /** MudSport.play (the user flings mud up in a fountain 0-0.45 s, it rains back down 0.45-0.95 s and splats round the user 0.95-1.1 s, dust puffs to ~1.65 s): wet slops as the mud is flung up, then a patter of heavy splats as it lands. */
   mudsport: () => {
-    const s = new MoveSfx(1.15, 0x3d5b);
-    for (const [at, g] of [[0.02, 0.4], [0.24, 0.34], [0.46, 0.38], [0.66, 0.3]]) {
+    const s = new MoveSfx(1.7, 0x3d5b);
+    for (const [at, g] of [[0.02, 0.38], [0.15, 0.32], [0.28, 0.34]]) {
       s.noise(at, 0.16, { clock: (u) => 2200 - 1600 * u, gain: env.attackDecay(g, 0.05) });
       s.pulse(at, 0.12, { freq: (u) => 180 * Math.pow(0.5, u), gain: env.decay(g * 0.6, 1.5), duty: 0.5 });
     }
-    s.bubbles(0.1, 0.8, 7, { lo: 140, hi: 320, gain: 0.2 });
+    for (const [at, g] of [[0.95, 0.3], [1.0, 0.26], [1.05, 0.3], [1.1, 0.24]]) {
+      s.noise(at, 0.1, { clock: (u) => 1800 - 1200 * u, gain: env.attackDecay(g, 0.05) });
+      s.thud(at, g, 0.6);
+    }
+    s.bubbles(0.95, 0.5, 5, { lo: 140, hi: 320, gain: 0.16 });
     return s;
   },
 

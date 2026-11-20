@@ -75,7 +75,7 @@ static readonly anims: MoveAnimRegistry = {
 ## `FxGlyphs` — particles and props (`fx-glyphs.ts`)
 All return an absolutely positioned element; place it with `Fx.place`.
 - **Energy:** `sparkStar(size, color)` 4-point star · `fivePointStar(size, glow)` · `ringSparkle(size, color, ring)` · `psySparkle(size)` · `spikyBurst(size, outer, inner, centre?)` comic impact burst · `glyph(v, size)` type particle · `boltGlyph(color, size)` · `sparkBolt()` · `lightning(W, H, from, to, jag, color?, glow?, width?)` field-sized jagged bolt SVG · `hexagon(s, fill, glow)` glowing hex tile.
-- **Elements:** `firePuff(size, 'hot'|'red'|'blue')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `pointedRock(w)` sharp stone, tip up · `poisonBubble(size)` glossy purple bubble · `petalGlyph(s, color)` · `leafGlyph(s)`.
+- **Elements:** `firePuff(size, 'hot'|'red'|'blue')` · `iceShard(s)` · `iceChunk()` · `bubbleGlyph(size)` water bubble · `rockChunk(size)` · `pointedRock(w)` sharp stone, tip up · `poisonBubble(size)` glossy purple bubble · `petalGlyph(s, color)` · `leafGlyph(s)` · `featherGlyph(len)` white-grey feather (Roost, Feather Dance).
 - **Body parts:** `fistGlyph(w, tone)` (tones in `FIST_TONES`: yellow, red, ice, blue, dark, brown) · `footGlyph(w, color?)` · `chopHandGlyph(w)` · `gloveGlyph(w)` · `pointingHandGlyph(w)` · `jawGlyph(w, h, lower)` · `incisorGlyph(h)` · `snakeEyeGlyph(w, side)`.
 - **Props:** `swordGlyph(h)` · `hornGlyph(len)` black horn pointing right · `boneGlyph(w)` · `nailGlyph(len)` · `batonGlyph(w)` · `eggGlyph(w)` · `girderGlyph(w)` · `bellGlyph(w)` · `milkBottleGlyph(w)` · `pokeball(size)` · `heartGlyph(size, fill?, glow?)` glossy pink heart (Attract, Charm) · `webGlyph(size, thread, glow, stroke?)` round spider web (no `position`, wrap or set it; String Shot, Sticky Web, Spider Web) · `itemBag(size)` cream item sack (Trick, Switcheroo) · `birdGlyph(w)` · `angerMark(size)` · `questionCloud(w)` thought cloud with a "?" (last child, to wobble it) · `sleepZ(size, color)` · `noteBubble(size)` · `musicNote(size, color)`.
 
@@ -84,6 +84,7 @@ All return an absolutely positioned element; place it with `Fx.place`.
 
 ## Reusable pieces inside type files (private, but worth knowing)
 - `TerrainFx.play(refs, launch, TerrainFx.ELECTRIC | GRASSY | MISTY)` (terrain-fx.ts): the shared terrain animation; a new terrain is a new `TerrainStyle`.
+- `ChompFx.chomp(refs, target, { w, tilt, grinds, rays })` (chomp-fx.ts): white jaw opens over the target and snaps shut at 0.45 s, lets go by ~0.9 s (Bite, Crunch, Poison Fang).
 - `ElectricMoveAnimations.groundStreak(...)` (electric-moves.ts).
 - `PoisonMoveAnimations.sludgeGlob(size)` (poison-moves.ts).
 - `BugMoveAnimations.beeGlyph(w)` (bug-moves.ts).

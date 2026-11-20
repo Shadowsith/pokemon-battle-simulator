@@ -33,12 +33,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura: a wall slams down behind the target. */
+  /** Block.play (dust puffs 0-0.4 s, the red X slams down at 0.4 s, holds and fades 0.9-1.2 s): a dusty shuffle, then a heavy slam with a low hum. */
   block: () => {
-    const s = new MoveSfx(0.9, 0xb10c);
-    s.whoosh(0.0, 0.2, { from: 1500, to: 600, gain: 0.25 });
-    s.thud(0.2, 0.7, 1);
-    s.wave(0.22, 0.4, { freq: () => 98, gain: env.decay(0.25, 1.5) });
+    const s = new MoveSfx(1.2, 0xb10c);
+    s.noise(0.0, 0.35, { clock: () => 2000, gain: env.swell(0.12) });
+    s.whoosh(0.25, 0.15, { from: 1500, to: 600, gain: 0.25 });
+    s.thud(0.4, 0.7, 1);
+    s.wave(0.42, 0.6, { freq: () => 98, gain: env.decay(0.25, 1.5) });
     return s;
   },
 
@@ -268,12 +269,14 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), no fleck; no original sound exists: nature's power swells up as a rustling, rising earthy chord. */
+  /** NaturePower.play (the user glows green while a red, a blue and a yellow orb circle it twice 0-1.0 s, they dive in 1.0-1.15 s, white flash with leaves and sparkles 1.15-1.6 s); no original sound exists: a rustling, swelling earthy chord with a whirring orbit, then a bright rising arpeggio. */
   naturepower: () => {
-    const s = new MoveSfx(1.1, 0x4a7e);
-    s.noise(0.02, 0.8, { clock: (u) => 3000 + 1500 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.12) });
-    s.chord(0.02, 0.8, [55, 59, 62, 67], { rate: 0.05, gain: 0.24 });
-    s.arpeggio(0.5, [67, 71, 74, 79], 0.06, { gain: 0.16, duty: 0.25, hold: 0.12 });
+    const s = new MoveSfx(1.65, 0x4a7e);
+    s.noise(0.02, 1.1, { clock: (u) => 3000 + 1500 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.12) });
+    s.chord(0.02, 1.1, [55, 59, 62, 67], { rate: 0.05, gain: 0.22 });
+    s.pulse(0.05, 0.95, { freq: (u) => 600 + 150 * Math.sin(2 * Math.PI * 4 * u), gain: env.swell(0.06), duty: 0.25 });
+    s.arpeggio(1.15, [67, 71, 74, 79], 0.06, { gain: 0.18, duty: 0.25, hold: 0.12 });
+    s.sparkle(1.2, 0.35, 5, { lo: 3000, hi: 5500, gain: 0.1 });
     return s;
   },
 
@@ -292,11 +295,14 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), no fleck: quick sniff-sniff noise puffs, then an "aha" two-note blip. */
+  /** OdorSleuth.play (the user sniffs at 0 / 0.3 / 0.6 s while scent trails drift over 0-0.9 s, the target blinks white twice 1.0-1.3 s): sniff-sniff noise puffs, then an "aha" two-note blip on the blinks. */
   odorsleuth: () => {
-    const s = new MoveSfx(1.05, 0x0d05);
-    for (const at of [0.02, 0.14, 0.26, 0.42, 0.54]) s.noise(at, 0.08, { clock: () => 4500, gain: env.swell(0.3) });
-    s.arpeggio(0.7, [76, 83], 0.08, { gain: 0.26, duty: 0.25, hold: 0.12 });
+    const s = new MoveSfx(1.4, 0x0d05);
+    for (const at of [0.0, 0.3, 0.6]) {
+      s.noise(at + 0.02, 0.07, { clock: () => 4500, gain: env.swell(0.3) });
+      s.noise(at + 0.12, 0.07, { clock: () => 4800, gain: env.swell(0.26) });
+    }
+    s.arpeggio(1.0, [76, 83], 0.15, { gain: 0.26, duty: 0.25, hold: 0.12 });
     return s;
   },
 

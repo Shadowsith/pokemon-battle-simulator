@@ -131,14 +131,14 @@ export const ICE = {
     return s;
   },
 
-  /** Generic lob (impact 0.52 s): a snowball tumbles through the air and bursts into crunchy snow. */
+  /** IceBall.play (an ice ball rolls over trailing mist 0-0.5 s, smashes into the target at 0.5 s, shards burst off to 0.95 s): a rolling icy whirr, a crunching hit and tinkling shards. */
   iceball: () => {
-    const s = new MoveSfx(1.05, 0x1ceb);
+    const s = new MoveSfx(1.0, 0x1ceb);
     s.wave(0.0, 0.5, { freq: (u) => 900 + 500 * Math.sin(Math.PI * u), gain: env.swell(0.14) });
     s.noise(0.0, 0.5, { clock: (u) => 4000 + 3000 * Math.sin(Math.PI * u), gain: env.swell(0.12) });
-    s.thud(0.52, 0.55, 0.5);
-    s.noise(0.52, 0.3, { clock: (u) => 9000 - 5000 * u, gain: env.attackDecay(0.3, 0.05) });
-    s.sparkle(0.55, 0.35, 7, { lo: 2500, hi: 5000, gain: 0.15 });
+    s.thud(0.5, 0.55, 0.5);
+    s.noise(0.5, 0.3, { clock: (u) => 9000 - 5000 * u, gain: env.attackDecay(0.3, 0.05) });
+    s.sparkle(0.52, 0.4, 7, { lo: 2500, hi: 5000, gain: 0.15 });
     return s;
   },
 
@@ -226,16 +226,16 @@ export const ICE = {
     return s;
   },
 
-  /** Generic projectile, 3 hits (impacts 0.43 / 1.0 / 1.57 s): a volley of icicles, each landing with a sharp ice crack. */
+  /** IcicleSpear.play (one icicle per hit, thrown every 0.22 s, striking 0.26 s later at 0.26 / 0.48 / 0.7 s for three; frost puffs ~0.4 s): a thin whistle per spear, a sharp ice crack and a tinkle on each strike. */
   iciclespear: () => {
-    const s = new MoveSfx(1.95, 0x1c5e);
+    const s = new MoveSfx(1.15, 0x1c5e);
     for (let i = 0; i < 3; i++) {
-      const at = 0.43 + i * 0.57;
-      s.whoosh(at - 0.3, 0.3, { from: 3000, to: 10000, gain: 0.2 });
+      const at = 0.26 + i * 0.22;
+      s.whoosh(at - 0.24, 0.24, { from: 3000, to: 10000, gain: 0.18 });
       s.noise(at, 0.06, { clock: () => 13000, gain: env.decay(0.35, 1) });
-      s.thud(at, 0.45, 0.3);
-      s.pulse(at, 0.2, { freq: () => 2637 + i * 200, gain: env.decay(0.13, 2), duty: 0.125 });
-      s.sparkle(at + 0.02, 0.2, 3, { lo: 3500, hi: 6000, gain: 0.12 });
+      s.thud(at, 0.4, 0.3);
+      s.pulse(at, 0.18, { freq: () => 2637 + i * 200, gain: env.decay(0.13, 2), duty: 0.125 });
+      s.sparkle(at + 0.02, 0.3, 3, { lo: 3500, hi: 6000, gain: 0.12 });
     }
     return s;
   },

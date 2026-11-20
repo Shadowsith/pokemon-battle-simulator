@@ -21,7 +21,7 @@ export class Roost {
     const parts: Promise<void>[] = [];
     for (let i = 0; i < 10; i++) {
       const len = 16 + Math.random() * 8;
-      const feather = Roost.feather(len);
+      const feather = FxGlyphs.featherGlyph(len);
       Fx.place(feather, { x: launch.x, y: launch.y - r.height * 0.1 });
       fxEl.appendChild(feather);
       const side = i % 2 ? 1 : -1;
@@ -61,15 +61,5 @@ export class Roost {
     await Fx.wait(350);
 
     await Promise.all([...parts, FxEffects.healSparkles(refs, launch)]);
-  }
-
-  /** A white-grey feather `len` px long: a soft vane with a grey quill down its middle. */
-  private static feather(len: number): HTMLElement {
-    const el = document.createElement('div');
-    el.style.cssText =
-      `position:absolute;width:${len * 0.38}px;height:${len}px;pointer-events:none;border-radius:50% 50% 45% 45% / 70% 70% 30% 30%;` +
-      'background:linear-gradient(90deg,#0000 46%,#8A8E98 46% 54%,#0000 54%),linear-gradient(90deg,#C8CCD4,#FFFFFF 40%,#E4E7EC 60%,#B4B8C2);' +
-      'box-shadow:0 1px 2px #00000040';
-    return el;
   }
 }
