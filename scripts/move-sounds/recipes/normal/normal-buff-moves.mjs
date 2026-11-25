@@ -466,14 +466,16 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): energy is gulped down and stored in three swelling pulses. */
+  /** Stockpile.play (orbs gather into the user 0-0.65 s, flash and puff up 0.65-0.85 s, orange glow to 1.2 s, stat-up aura 1.2-2.0 s): swelling gulps as the energy is stored, a full-up pop, then the stat-up jingle. */
   stockpile: () => {
-    const s = new MoveSfx(1.1, 0x570c);
-    for (const [at, f] of [[0.02, 110], [0.28, 130], [0.54, 155]]) {
-      s.pulse(at, 0.22, { freq: (u) => f * (1 + 0.6 * Math.sin(Math.PI * u)), gain: env.attackDecay(0.4, 0.3), duty: 0.5 });
-      s.wave(at, 0.2, { freq: () => f * 4, gain: env.swell(0.12) });
+    const s = new MoveSfx(2.15, 0x570c);
+    for (const [at, f] of [[0.02, 110], [0.24, 130], [0.46, 155]]) {
+      s.pulse(at, 0.2, { freq: (u) => f * (1 + 0.6 * Math.sin(Math.PI * u)), gain: env.attackDecay(0.4, 0.3), duty: 0.5 });
+      s.wave(at, 0.18, { freq: () => f * 4, gain: env.swell(0.12) });
     }
-    s.wave(0.8, 0.25, { freq: env.ramp(330, 440), gain: env.decay(0.18, 1) });
+    s.wave(0.65, 0.25, { freq: env.ramp(330, 440), gain: env.decay(0.2, 1) });
+    s.sparkle(0.68, 0.3, 4, { gain: 0.1 });
+    s.statUp(1.2);
     return s;
   },
 
@@ -492,12 +494,13 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s): the stockpile is swallowed in gulps, then a soothing heal. */
+  /** Swallow.play (user gulps 0-0.45 s, blue orbs drop into it 0.3-0.8 s, heal sparkles 0.85-1.75 s): three gulps, a soft drip for each orb, then a soothing heal. */
   swallow: () => {
-    const s = new MoveSfx(1.3, 0x5a11);
-    for (const at of [0.02, 0.2, 0.38]) s.pulse(at, 0.14, { freq: (u) => 260 * Math.pow(0.45, u), gain: env.decay(0.38, 1.5), duty: 0.5 });
-    s.arpeggio(0.6, [72, 76, 79, 84], 0.09, { gain: 0.24, voice: 'wave', hold: 0.16 });
-    s.sparkle(0.7, 0.45, 5, { gain: 0.12 });
+    const s = new MoveSfx(1.9, 0x5a11);
+    for (const at of [0.02, 0.17, 0.32]) s.pulse(at, 0.13, { freq: (u) => 260 * Math.pow(0.45, u), gain: env.decay(0.36, 1.5), duty: 0.5 });
+    for (let i = 0; i < 5; i++) s.wave(0.68 + i * 0.03, 0.08, { freq: env.ramp(1100, 700), gain: env.decay(0.12, 1) });
+    s.arpeggio(0.85, [72, 76, 79, 84], 0.09, { gain: 0.24, voice: 'wave', hold: 0.16 });
+    s.sparkle(0.95, 0.7, 6, { gain: 0.12 });
     return s;
   },
 

@@ -558,25 +558,25 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): the user mimics the target – a mirrored warbling copy of a phrase. */
+  /** RolePlay.play (dark 0-0.25 s, target lights up white at 0.25 / 0.57 s, motes stream to the user 0.5-0.95 s, user turns white 0.95-1.25 s, scene clears to 1.45 s): a low hum, two shimmering tones, a gliding twinkle, then the same phrase copied higher. */
   roleplay: () => {
-    const s = new MoveSfx(1.1, 0x901e);
-    [72, 76, 79].forEach((n, i) => {
-      const f = 440 * Math.pow(2, (n - 69) / 12);
-      s.wave(i * 0.12, 0.14, { freq: (u) => f * (1 + 0.03 * Math.sin(2 * Math.PI * 8 * u)), gain: env.decay(0.25, 1) });
-      s.wave(0.45 + i * 0.12, 0.16, { freq: (u) => f * 1.5 * (1 + 0.03 * Math.sin(2 * Math.PI * 8 * u)), gain: env.decay(0.22, 1) });
-    });
-    s.pulse(0.0, 0.85, { freq: (u) => 330 * (1 + 0.05 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.1), duty: 0.25 });
-    s.sparkle(0.6, 0.35, 4, { gain: 0.1 });
+    const s = new MoveSfx(1.65, 0x901e);
+    const note = (n) => 440 * Math.pow(2, (n - 69) / 12);
+    s.pulse(0.0, 1.4, { freq: (u) => 220 * (1 + 0.04 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.08), duty: 0.25 });
+    [76, 79].forEach((n, i) => s.wave(0.25 + i * 0.32, 0.22, { freq: (u) => note(n) * (1 + 0.03 * Math.sin(2 * Math.PI * 8 * u)), gain: env.decay(0.24, 1) }));
+    s.wave(0.5, 0.45, { freq: (u) => 900 - 400 * u, gain: env.swell(0.1) });
+    s.sparkle(0.5, 0.45, 5, { gain: 0.1 });
+    [76, 79].forEach((n, i) => s.wave(0.95 + i * 0.13, 0.2, { freq: (u) => note(n) * 1.5 * (1 + 0.03 * Math.sin(2 * Math.PI * 8 * u)), gain: env.decay(0.22, 1) }));
     return s;
   },
 
-  /** Generic target aura (~0.8 s), no fleck: two warbling tones swap places - one rises while the other falls, crossing midway. */
+  /** SkillSwap.play (orbs cross between user and target 0.05-0.8 s, both flash yellow 0.8-1.1 s): two warbling tones swap places - one rises while the other falls - then a bright two-note chime. */
   skillswap: () => {
-    const s = new MoveSfx(1.1, 0x5c55);
-    s.wave(0.02, 0.75, { freq: (u) => (400 + 500 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.26) });
-    s.pulse(0.02, 0.75, { freq: (u) => (900 - 500 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 7 * u + 2)), gain: env.swell(0.1), duty: 0.25 });
-    s.arpeggio(0.78, [79, 84], 0.07, { gain: 0.18, voice: 'wave', hold: 0.12 });
+    const s = new MoveSfx(1.3, 0x5c55);
+    s.wave(0.05, 0.75, { freq: (u) => (400 + 500 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.26) });
+    s.pulse(0.05, 0.75, { freq: (u) => (900 - 500 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 7 * u + 2)), gain: env.swell(0.1), duty: 0.25 });
+    s.arpeggio(0.8, [79, 84], 0.07, { gain: 0.18, voice: 'wave', hold: 0.14 });
+    s.sparkle(0.82, 0.25, 4, { gain: 0.1 });
     return s;
   },
 

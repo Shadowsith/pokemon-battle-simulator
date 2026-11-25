@@ -272,14 +272,16 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic projectile (0.43 s), no fleck: a crackling wave of electricity races out and jolts the target with a buzzing zap. */
+  /** ShockWave.play (dark 0-0.2 s, light orbs gather into the crackling user 0.1-0.65 s, bolts flash out round its feet 0.65-0.95 s, the target glows and crackles 0.95-1.35 s, scene clears to 1.55 s): a rising electric fizz, a sharp discharge, then a buzzing zap on the target. */
   shockwave: () => {
-    const s = new MoveSfx(0.85, 0x5c0e);
-    s.noise(0.0, 0.43, { clock: (u) => 5000 + 3000 * Math.sin(2 * Math.PI * 7 * u), gain: env.ramp(0.12, 0.25), short: true });
-    s.pulse(0.0, 0.43, { freq: (u) => 700 + 600 * u, gain: env.swell(0.1), duty: 0.25 });
-    s.noise(0.43, 0.25, { clock: () => 8000, gain: env.attackDecay(0.4, 0.05), short: true });
-    s.pulse(0.43, 0.2, { freq: (u) => 1800 - 1200 * u, gain: env.decay(0.2, 1.5), duty: 0.25 });
-    s.thud(0.43, 0.4, 0.3);
+    const s = new MoveSfx(1.7, 0x5c0e);
+    s.noise(0.1, 0.55, { clock: (u) => 5000 + 3000 * Math.sin(2 * Math.PI * 7 * u), gain: env.ramp(0.05, 0.22), short: true });
+    s.pulse(0.1, 0.55, { freq: (u) => 500 + 700 * u, gain: env.swell(0.1), duty: 0.25 });
+    s.noise(0.65, 0.2, { clock: () => 9000, gain: env.attackDecay(0.4, 0.05), short: true });
+    s.pulse(0.65, 0.2, { freq: (u) => 1600 - 800 * u, gain: env.decay(0.18, 1.5), duty: 0.25 });
+    s.noise(0.95, 0.4, { clock: (u) => 6000 + 2500 * Math.sin(2 * Math.PI * 11 * u), gain: env.attackDecay(0.35, 0.05), short: true });
+    s.pulse(0.95, 0.3, { freq: (u) => 1800 - 1200 * u, gain: env.decay(0.2, 1.5), duty: 0.25 });
+    s.thud(0.95, 0.3, 0.3);
     return s;
   },
 

@@ -477,28 +477,29 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) + confusion fleck (~0.6 s): a wobbly, tipsy dance tune swaying from side to side. */
+  /** TeeterDance.play (user sways 0-1.1 s with music notes floating off it, birds circle the target's head 1.1-2.1 s): a wobbly, tipsy dance tune, then dizzy tweets. */
   teeterdance: () => {
-    const s = new MoveSfx(1.25, 0x7ee7);
-    [72, 76, 74, 79, 72, 76].forEach((n, i) => {
+    const s = new MoveSfx(2.2, 0x7ee7);
+    [72, 76, 74, 79, 72, 76, 74, 72].forEach((n, i) => {
       const f = 440 * Math.pow(2, (n - 69) / 12);
-      s.wave(0.02 + i * 0.12, 0.13, { freq: (u) => f * (1 + 0.03 * Math.sin(2 * Math.PI * 3 * u)), gain: env.decay(0.28, 1) });
+      s.wave(0.02 + i * 0.13, 0.14, { freq: (u) => f * (1 + 0.03 * Math.sin(2 * Math.PI * 3 * u)), gain: env.decay(0.26, 1) });
     });
-    s.pulse(0.02, 0.75, { freq: (u) => 130 * (1 + 0.05 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.14), duty: 0.5 });
-    s.confusion(0.6, 0.2);
+    s.pulse(0.02, 1.08, { freq: (u) => 130 * (1 + 0.05 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.14), duty: 0.5 });
+    s.confusion(1.15, 0.2);
+    s.confusion(1.55, 0.16);
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + double stat-down fleck (~0.85 s): giggly tickling - fluttering high chirps, then the falling jingle. */
+  /** Tickle.play (user darkens 0-0.35 s, tickle marks flicker on the squirming target 0.35-1.05 s, stat drop 1.15-2.05 s): giggly tickling - fluttering high chirps, then the falling jingle. */
   tickle: () => {
-    const s = new MoveSfx(1.5, 0x71c1);
+    const s = new MoveSfx(2.15, 0x71c1);
     for (let i = 0; i < 9; i++) {
-      const at = 0.04 + i * 0.085;
+      const at = 0.36 + i * 0.075;
       const f = 1800 + (i % 3) * 400 + s.random() * 200;
       s.pulse(at, 0.06, { freq: (u) => f * (1 + 0.25 * Math.sin(Math.PI * u)), gain: env.decay(0.18, 1), duty: 0.125 });
     }
-    s.noise(0.04, 0.75, { clock: () => 7000, gain: (u) => 0.08 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 9 * u)) });
-    s.statDown(0.85);
+    s.noise(0.35, 0.7, { clock: () => 7000, gain: (u) => 0.08 * Math.sin(Math.PI * u) * (0.5 + 0.5 * Math.sin(2 * Math.PI * 9 * u)) });
+    s.statDown(1.15);
     return s;
   },
 

@@ -3,8 +3,9 @@ import { Fx } from '../../fx';
 import { FxGlyphs } from '../../fx-glyphs';
 import { FxEffects } from '../../fx-effects';
 import { Refresh } from './refresh';
+import { Swallow } from './swallow';
 
-/** Hand-made animations for Normal-type healing moves (HP recovery, status cures; Refresh lives in `refresh.ts`). */
+/** Hand-made animations for Normal-type healing moves (HP recovery, status cures; Refresh lives in `refresh.ts`, Swallow in `swallow.ts`). */
 export class NormalHealMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -15,6 +16,7 @@ export class NormalHealMoveAnimations {
     refresh: (refs, launch) => Refresh.play(refs, launch),
     slackoff: (refs, launch) => NormalHealMoveAnimations.playSlackOff(refs, launch),
     softboiled: (refs, launch) => NormalHealMoveAnimations.playSoftBoiled(refs, launch),
+    swallow: (refs, launch) => Swallow.play(refs, launch),
     wish: (refs, launch) => NormalHealMoveAnimations.playWish(refs, launch)
   };
 

@@ -11,8 +11,10 @@ import { SonicBoom } from './sonic-boom';
 import { SpikeCannon } from './spike-cannon';
 import { Swift } from './swift';
 import { TechnoBlast } from './techno-blast';
+import { SpitUp } from './spit-up';
+import { WeatherBall } from './weather-ball';
 
-/** Hand-made animations for Normal-type ranged moves (orbs, beams, blasts, gazes; Hidden Power lives in `hidden-power.ts`, Judgment in `judgment.ts`, Pay Day in `pay-day.ts`, Present in `present.ts`, Sonic Boom in `sonic-boom.ts`, Spike Cannon in `spike-cannon.ts`, Swift in `swift.ts`, Techno Blast in `techno-blast.ts`). */
+/** Hand-made animations for Normal-type ranged moves (orbs, beams, blasts, gazes; Hidden Power lives in `hidden-power.ts`, Judgment in `judgment.ts`, Pay Day in `pay-day.ts`, Present in `present.ts`, Sonic Boom in `sonic-boom.ts`, Spike Cannon in `spike-cannon.ts`, Spit Up in `spit-up.ts`, Swift in `swift.ts`, Techno Blast in `techno-blast.ts`, Weather Ball in `weather-ball.ts`). */
 export class NormalRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -33,8 +35,10 @@ export class NormalRangedMoveAnimations {
     selfdestruct: (refs, launch, target, v) => NormalRangedMoveAnimations.playSelfDestruct(refs, launch, target, v),
     sonicboom: (refs, launch, target) => SonicBoom.play(refs, launch, target),
     spikecannon: (refs, launch, target, v) => SpikeCannon.play(refs, launch, target, v),
+    spitup: (refs, launch, target, v) => SpitUp.play(refs, launch, target, v),
     swift: (refs, launch, target) => Swift.play(refs, launch, target),
-    uproar: (refs, launch) => NormalRangedMoveAnimations.playUproar(refs, launch)
+    uproar: (refs, launch) => NormalRangedMoveAnimations.playUproar(refs, launch),
+    weatherball: (refs, launch, target) => WeatherBall.play(refs, launch, target)
   };
 
   /** Turn-1 animations of two-turn moves, by @pkmn/sim move id. */

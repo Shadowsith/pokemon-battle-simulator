@@ -16,8 +16,10 @@ import { WaterPledge } from './water/water-pledge';
 import { WaterShuriken } from './water/water-shuriken';
 import { Withdraw } from './water/withdraw';
 import { Whirlpool } from './water/whirlpool';
+import { WaterPulse } from './water/water-pulse';
+import { WaterSport } from './water/water-sport';
 
-/** Hand-made animations for Water-type moves (the Surf wave, Clamp, Steam Eruption, Octazooka, Origin Pulse, Aqua Tail, Razor Shell, Scald, Water Gun, Water Pledge, Water Shuriken, Whirlpool, Withdraw and the shared water crash live in `water/`). */
+/** Hand-made animations for Water-type moves (the Surf wave, Clamp, Steam Eruption, Octazooka, Origin Pulse, Aqua Tail, Razor Shell, Scald, Water Gun, Water Pledge, Water Pulse, Water Shuriken, Water Sport, Whirlpool, Withdraw and the shared water crash live in `water/`). */
 export class WaterMoveAnimations {
   /** Hand-made Water move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -40,7 +42,9 @@ export class WaterMoveAnimations {
     waterpledge: (refs, _launch, target) => WaterPledge.play(refs, target),
     watergun: (refs, launch, target, v) => WaterGun.play(refs, launch, target, v),
     waterfall: (refs, _launch, target) => WaterMoveAnimations.playWaterfall(refs, target),
+    waterpulse: (refs, launch, target) => WaterPulse.play(refs, launch, target),
     watershuriken: (refs, launch, target, v) => WaterShuriken.play(refs, launch, target, v),
+    watersport: (refs, launch) => WaterSport.play(refs, launch),
     waterspout: (refs, launch, target) => WaterMoveAnimations.playWaterSpout(refs, launch, target),
     whirlpool: (refs, _launch, target) => Whirlpool.play(refs, target),
     withdraw: (refs, launch) => Withdraw.play(refs, launch)

@@ -931,87 +931,87 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Felsgrab
   - Gen 4 APNG: https://www.pokewiki.de/images/7/70/Felsgrab_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/1a/Felsgrab_Gen5.png
-- [ ] **Role Play** / Rollenspiel — `roleplay` · Psychic · Status · `targetAura`
+- [x] **Role Play** / Rollenspiel — `roleplay` · Psychic · Status · scene darkens, the target lights up white twice while light motes stream to the user, the user turns into a white copy (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Rollenspiel
   - Gen 4 APNG: https://www.pokewiki.de/images/7/7b/Rollenspiel_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/4/43/Rollenspiel_Gen5.png
-- [ ] **Sand Tomb** / Sandgrab — `sandtomb` · Ground · Physical · `projectile`
+- [x] **Sand Tomb** / Sandgrab — `sandtomb` · Ground · Physical · yellow-brown sand vortex: a dust cloud billows over the target while sand clumps whirl round it on a rising spiral, three shakes (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Sandgrab
   - Gen 4 APNG: https://www.pokewiki.de/images/b/b2/Sandgrab_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e2/Sandgrab_Gen5.png
 - [x] ⭐ **Secret Power** / Geheimpower — `secretpower` · Normal · Physical · the user hops, then low on the target a white star flashes and glowing yellow orbs burst out while it is squashed; the orbs drop to the ground cooling to orange as dust puffs spread round its feet and fade to lavender (custom, needs review)
-- [ ] **Shadow Punch** / Finsterfaust — `shadowpunch` · Ghost · Physical · `melee`
+- [x] **Shadow Punch** / Finsterfaust — `shadowpunch` · Ghost · Physical · user fades to a shadow, a see-through dark fist with shadow streaks flies to the target, yellow-black impact burst (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Finsterfaust
   - Gen 4 APNG: https://www.pokewiki.de/images/7/72/Finsterfaust_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e2/Finsterfaust_Gen5.png
-- [ ] **Sheer Cold** / Eiseskälte — `sheercold` · Ice · Special · `projectile`
+- [x] **Sheer Cold** / Eiseskälte — `sheercold` · Ice · Special · dark scene with big see-through ice crystals drifting across, cold mist rolls over the target, which freezes white with glints (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Eisesk%C3%A4lte
   - Gen 4 APNG: https://www.pokewiki.de/images/b/bb/Eisesk%C3%A4lte_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/fb/Eisesk%C3%A4lte_Gen5.png
-- [ ] **Shock Wave** / Schockwelle — `shockwave` · Electric · Special · `projectile`
+- [x] **Shock Wave** / Schockwelle — `shockwave` · Electric · Special · dark scene, yellow light orbs swirl into the crackling user, a ring of white-violet bolts flashes at its feet, the target glows yellow and crackles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schockwelle
   - Gen 4 APNG: https://www.pokewiki.de/images/c/ce/Schockwelle_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/ea/Schockwelle_Gen5.png
 - [x] ⭐ **Signal Beam** / Ampelleuchte — `signalbeam` · Bug · Special · a beam of glowing squares, blue near the user turning violet and magenta, some in thin outlined frames, streams from the user past the target, which flashes red and green in turn like a traffic light and ends on a fading green glow (custom, needs review)
-- [ ] **Silver Wind** / Silberhauch — `silverwind` · Bug · Special · `projectile`
+- [x] **Silver Wind** / Silberhauch — `silverwind` · Bug · Special · silvery grey gale with rushing wind streaks, glittering white scales blow to the target, which flickers and shakes (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Silberhauch
   - Gen 4 APNG: https://www.pokewiki.de/images/8/8f/Silberhauch_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/7/72/Silberhauch_Gen5.png
-- [ ] **Skill Swap** / Fähigkeitstausch — `skillswap` · Psychic · Status · `targetAura`
+- [x] **Skill Swap** / Fähigkeitstausch — `skillswap` · Psychic · Status · yellow light orbs (one blue) cross from user to target and back in a high and a low arc, both flash yellow (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/F%C3%A4higkeitstausch
   - Gen 4 APNG: https://www.pokewiki.de/images/8/8c/F%C3%A4higkeitstausch_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/f3/F%C3%A4higkeitstausch_Gen5.png
 - [x] ⭐ **Sky Uppercut** / Himmelhieb — `skyuppercut` · Fighting · Physical · scene turns dark red and white rings pulse on both platforms, then black and a blue sky with white streaks rushing upward; a blue fist shoots up from below, turns icy as it strikes the target in a blue-violet spiky burst and punches on up through it (custom, needs review)
 - [x] ⭐ **Slack Off** / Tagedieb — `slackoff` · Normal · Status · the user slowly flattens out lazily while cyan ring sparkles twinkle over it and it fades to a pale pink-white, then it springs back into shape and recovers HP with green heal sparkles (custom, needs review)
 - [x] ⭐ **Smelling Salts** / Riechsalz — `smellingsalts` · Normal · Physical · two white open hands appear on either side of the target and clap twice: each turns edge-on and a pale yellow-green burst with white specks flares on its outer side while the target jolts (custom, needs review)
-- [ ] **Snatch** / Übernahme — `snatch` · Dark · Status · `selfAura`
+- [x] **Snatch** / Übernahme — `snatch` · Dark · Status · user slips away backward and fades out, lies in wait, darts back in with a dark afterimage, white glint (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/%C3%9Cbernahme
   - Gen 4 APNG: https://www.pokewiki.de/images/3/3e/%C3%9Cbernahme_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/4/42/%C3%9Cbernahme_Gen5.png
-- [ ] **Spit Up** / Entfessler — `spitup` · Normal · Special · `projectile`
+- [x] **Spit Up** / Entfessler — `spitup` · Normal · Special · user swells up, then spits six glowing orange, yellow and green orbs at the target, each popping on it, yellow stars (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Entfessler
   - Gen 4 APNG: https://www.pokewiki.de/images/2/2b/Entfessler_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/4/46/Entfessler_Gen5.png
-- [ ] **Stockpile** / Horter — `stockpile` · Normal · Status · `selfAura`
+- [x] **Stockpile** / Horter — `stockpile` · Normal · Status · orange and yellow orbs gather into the user, it flashes and puffs up, glows orange, then the stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Horter
   - Gen 4 APNG: https://www.pokewiki.de/images/1/17/Horter_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/9/9b/Horter_Gen5.png
 - [x] ⭐ **Superpower** / Kraftkoloss — `superpower` · Fighting · Physical · pale yellow light streaks and a pink-red haze rise round the glowing user, it lunges as the scene goes dark, pink sparks pop on the target and a red backdrop with orange rays bursts behind it while they scatter; the target blinks and blue stat-down bubbles drift over the user (custom, needs review)
-- [ ] **Swallow** / Verzehrer — `swallow` · Normal · Status · `selfAura`
+- [x] **Swallow** / Verzehrer — `swallow` · Normal · Status · user gulps while glowing blue orbs drop into it from above, then green heal sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Verzehrer
   - Gen 4 APNG: https://www.pokewiki.de/images/1/17/Verzehrer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/89/Verzehrer_Gen5.png
-- [ ] **Tail Glow** / Schweifglanz — `tailglow` · Bug · Status · `selfAura`
+- [x] **Tail Glow** / Schweifglanz — `tailglow` · Bug · Status · scene darkens, a bright yellow-white light swells and pulses at the user's base, then the stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schweifglanz
   - Gen 4 APNG: https://www.pokewiki.de/images/5/54/Schweifglanz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a0/Schweifglanz_Gen5.png
 - [x] ⭐ **Taunt** / Verhöhner — `taunt` · Dark · Status · a white smoke puff billows up in front of the user and turns lilac, a white glove beckons the foe twice out of it and fades, then a red anger mark pops on the target's head, pulses and hops to the other side (custom, needs review)
-- [ ] **Teeter Dance** / Taumeltanz — `teeterdance` · Normal · Status · `targetAura`
+- [x] **Teeter Dance** / Taumeltanz — `teeterdance` · Normal · Status · user teeters from side to side with white and pink music notes floating off it, then yellow birds circle the target's head (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Taumeltanz
   - Gen 4 APNG: https://www.pokewiki.de/images/c/ca/Taumeltanz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e5/Taumeltanz_Gen5.png
-- [ ] **Tickle** / Spaßkanone — `tickle` · Normal · Status · `selfAura`
+- [x] **Tickle** / Spaßkanone — `tickle` · Normal · Status · user darkens, blue squiggly tickle marks flicker over the squirming target with blue sparkles rising, then the target turns blue (stat drop) (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Spa%C3%9Fkanone
   - Gen 4 APNG: https://www.pokewiki.de/images/9/93/Spa%C3%9Fkanone_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/9/93/Spa%C3%9Fkanone_Gen5.png
-- [ ] **Torment** / Folterknecht — `torment` · Dark · Status · `targetAura`
+- [x] **Torment** / Folterknecht — `torment` · Dark · Status · five white thought clouds with a black scribble pop up round the user and drift toward the target, a red anger mark throbs on the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Folterknecht
   - Gen 4 APNG: https://www.pokewiki.de/images/6/67/Folterknecht_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b3/Folterknecht_Gen5.png
 - [x] ⭐ **Trick** / Trickbetrug — `trick` · Psychic · Status · the scene dims to a dark grey, a cream bag pops up at the user and one at the target, and they swap places three times round an oval (one passing high, the other low) before fading (custom, needs review)
 - [x] ⭐ **Uproar** / Aufruhr — `uproar` · Normal · Special · three noisy rounds: the user flushes orange-red, a dome of red-orange sound rings swells out of it and music notes, lightning bolts, "Z"s and a "?" burst out in every direction while the target winces (custom, needs review)
 - [x] ⭐ **Volt Tackle** / Volttackle — `volttackle` · Electric · Physical · scene goes dark and the user is wrapped in a big pulsing yellow-white ball of electricity crackling with green-yellow sparks, then it charges behind a white lightning streak along the ground; at the hit a dark olive backdrop with yellow rays bursts in while yellow sparks crackle over the target, and the user takes recoil (custom, needs review)
-- [ ] **Water Pulse** / Aquawelle — `waterpulse` · Water · Special · `pulse`
+- [x] **Water Pulse** / Aquawelle — `waterpulse` · Water · Special · scene turns underwater blue with rising bubbles, a glowing blue ring swells on its way to the target and spreads round it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Aquawelle
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/7/71/Aquawelle_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/4/41/Aquawelle_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/83/Aquawelle_Gen5.png
-- [ ] **Water Sport** / Nassmacher — `watersport` · Water · Status · `targetAura`
+- [x] **Water Sport** / Nassmacher — `watersport` · Water · Status · a white-blue fountain spouts up from the user and splashes apart, drops rain down over the field (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Nassmacher
   - Gen 4 APNG: https://www.pokewiki.de/images/6/68/Nassmacher_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/ad/Nassmacher_Gen5.png
 - [x] ⭐ **Water Spout** / Fontränen — `waterspout` · Water · Special · a pale blue water column shoots up from the user and off the top of the screen amid fine spray, thins away, then water drops rain down round the target, blue splashes hit it and a bank of white foam builds along the ground toward it before fading (custom, needs review)
-- [ ] **Weather Ball** / Meteorologe — `weatherball` · Normal · Special · `lob`
+- [x] **Weather Ball** / Meteorologe — `weatherball` · Normal · Special · six white orbs gather round the user into a ball that shoots up out of view, drops onto the target and bursts into a ring of orbs (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Meteorologe
   - Gen 4 APNG: https://www.pokewiki.de/images/6/6a/Meteorologe_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/df/Meteorologe_Gen5.png

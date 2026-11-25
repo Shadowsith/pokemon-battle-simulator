@@ -287,13 +287,16 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): stored power is heaved up and spat out in a gush. */
+  /** SpitUp.play (user swells 0-0.35 s, six orbs spat 0.06 s apart from 0.35 s, popping on the target 0.65-0.95 s, stars to 1.25 s): a heaving gurgle, a gush, then a quick run of pops. */
   spitup: () => {
-    const s = new MoveSfx(0.9, 0x5917);
-    s.pulse(0.0, 0.3, { freq: (u) => (110 + 60 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 14 * u)), gain: env.swell(0.3), duty: 0.25 });
-    s.noise(0.25, 0.2, { clock: env.ramp(1500, 4000), gain: env.swell(0.25) });
-    s.noise(0.43, 0.35, { clock: env.ramp(4000, 900), gain: env.attackDecay(0.4, 0.06) });
-    s.thud(0.43, 0.5, 0.6);
+    const s = new MoveSfx(1.4, 0x5917);
+    s.pulse(0.0, 0.35, { freq: (u) => (110 + 60 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 14 * u)), gain: env.swell(0.3), duty: 0.25 });
+    s.noise(0.32, 0.4, { clock: env.ramp(1500, 4500), gain: env.swell(0.25) });
+    for (let i = 0; i < 6; i++) {
+      s.thud(0.65 + i * 0.06, 0.3, 0.3);
+      s.pulse(0.65 + i * 0.06, 0.05, { freq: env.ramp(900 + i * 60, 500), gain: env.decay(0.2, 1), duty: 0.5 });
+    }
+    s.sparkle(0.95, 0.3, 4, { gain: 0.12 });
     return s;
   },
 
@@ -395,14 +398,16 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic lob (impact 0.52 s): a ball of weather energy arcs over and bursts with a bright pop. */
+  /** WeatherBall.play (orbs gather round the user 0-0.5 s, ball shoots up 0.5-0.8 s, drops onto the target 0.95-1.2 s, bursts into orbs 1.2-1.6 s): a gathering shimmer, a rising zip, a falling whistle and a bright pop. */
   weatherball: () => {
-    const s = new MoveSfx(1.0, 0x3eba);
-    s.wave(0.0, 0.52, { freq: (u) => 500 + 400 * Math.sin(Math.PI * u), gain: () => 0.2 });
-    s.noise(0.0, 0.52, { clock: () => 4000, gain: env.swell(0.12) });
-    s.thud(0.52, 0.55, 0.5);
-    s.noise(0.52, 0.18, { clock: (u) => 14000 - 8000 * u, gain: env.attackDecay(0.35, 0.03) });
-    s.sparkle(0.56, 0.3, 5, { gain: 0.14 });
+    const s = new MoveSfx(1.8, 0x3eba);
+    s.sparkle(0.0, 0.45, 6, { gain: 0.12 });
+    s.wave(0.0, 0.5, { freq: (u) => 400 + 200 * u, gain: env.swell(0.14) });
+    s.wave(0.45, 0.35, { freq: (u) => 500 + 1100 * u, gain: env.ramp(0.18, 0.05) });
+    s.wave(0.95, 0.25, { freq: (u) => 1400 - 800 * u, gain: env.ramp(0.05, 0.2) });
+    s.thud(1.2, 0.55, 0.5);
+    s.noise(1.2, 0.18, { clock: (u) => 14000 - 8000 * u, gain: env.attackDecay(0.35, 0.03) });
+    s.sparkle(1.24, 0.35, 6, { gain: 0.14 });
     return s;
   },
 };

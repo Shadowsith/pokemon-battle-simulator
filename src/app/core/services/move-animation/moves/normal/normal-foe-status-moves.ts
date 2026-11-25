@@ -15,8 +15,10 @@ import { Sketch } from './sketch';
 import { Swagger } from './swagger';
 import { SweetScent } from './sweet-scent';
 import { OdorSleuth } from './odor-sleuth';
+import { TeeterDance } from './teeter-dance';
+import { Tickle } from './tickle';
 
-/** Hand-made animations for Normal-type status moves aimed at the foe (stat drops, sleep, disabling, forcing out, copying; Attract, Block, Conversion 2, Foresight, Lock-On, Mean Look, Mind Reader, Odor Sleuth, Scary Face, Sketch, Swagger and Sweet Scent live in their own files). */
+/** Hand-made animations for Normal-type status moves aimed at the foe (stat drops, sleep, disabling, forcing out, copying; Attract, Block, Conversion 2, Foresight, Lock-On, Mean Look, Mind Reader, Odor Sleuth, Scary Face, Sketch, Swagger, Sweet Scent, Teeter Dance and Tickle live in their own files). */
 export class NormalFoeStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -40,6 +42,8 @@ export class NormalFoeStatusMoveAnimations {
     swagger: (refs, _launch, target) => Swagger.play(refs, target),
     sweetscent: (refs, _launch, target) => SweetScent.play(refs, target),
     tailwhip: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playTailWhip(refs, target),
+    teeterdance: (refs, launch, target) => TeeterDance.play(refs, launch, target),
+    tickle: (refs, _launch, target) => Tickle.play(refs, target),
     whirlwind: (refs, _launch, target, v) => NormalFoeStatusMoveAnimations.playWhirlwind(refs, target, v),
     yawn: (refs, launch, target) => NormalFoeStatusMoveAnimations.playYawn(refs, launch, target)
   };

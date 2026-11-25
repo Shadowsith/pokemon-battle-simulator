@@ -291,14 +291,14 @@ export const DARK = {
     return s;
   },
 
-  /** Generic self aura (priority): the user lurks and a sneaky hand darts out to steal. */
+  /** Snatch.play (user slips away 0-0.3 s, lies in wait 0.3-0.6 s, darts back in 0.6-0.85 s, glint 0.85-1.15 s): a sly swish away, a creeping wait, a quick swish back and a bright glint. */
   snatch: () => {
-    const s = new MoveSfx(0.95, 0x5a7c);
-    s.arpeggio(0.02, [55, 54, 55, 54], 0.1, { gain: 0.18, voice: 'wave', hold: 0.1 });
-    s.whoosh(0.42, 0.15, { from: 2000, to: 9000, gain: 0.3 });
-    s.pulse(0.58, 0.08, { freq: () => 1200, gain: env.decay(0.25, 1.5), duty: 0.25 });
-    s.noise(0.58, 0.05, { clock: () => 9000, gain: env.decay(0.25, 1) });
-    s.pulse(0.66, 0.2, { freq: () => 1600, gain: env.decay(0.15, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.3, 0x5a7c);
+    s.whoosh(0.0, 0.3, { from: 6000, to: 1500, gain: 0.25 });
+    s.arpeggio(0.3, [55, 54, 55], 0.1, { gain: 0.14, voice: 'wave', hold: 0.1 });
+    s.whoosh(0.6, 0.25, { from: 2000, to: 9000, gain: 0.3 });
+    s.pulse(0.85, 0.08, { freq: () => 1600, gain: env.decay(0.2, 1.5), duty: 0.25 });
+    s.sparkle(0.87, 0.25, 3, { lo: 4000, hi: 6500, gain: 0.16 });
     return s;
   },
 
@@ -368,12 +368,13 @@ export const DARK = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s, no fleck): nagging torment - a dissonant, needling minor-second drone that pricks again and again. */
+  /** Torment.play (five mocking thought clouds pop up round the user 0.1-0.66 s, drift and fade by ~1.0 s, anger mark throbs on the target 1.05-1.6 s): a dissonant minor-second drone, a needling blip for each cloud, then a harsh buzz as the target fumes. */
   torment: () => {
-    const s = new MoveSfx(1.05, 0x7023);
-    s.chord(0.02, 0.85, [58, 59], { rate: 0.04, gain: 0.18, voice: 'pulse' });
-    s.wave(0.02, 0.85, { freq: (u) => 82 * (1 + 0.03 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.2) });
-    for (let i = 0; i < 4; i++) s.pulse(0.12 + i * 0.17, 0.06, { freq: env.ramp(1500, 1100), gain: env.decay(0.16, 1), duty: 0.125 });
+    const s = new MoveSfx(1.8, 0x7023);
+    s.chord(0.05, 1.0, [58, 59], { rate: 0.04, gain: 0.16, voice: 'pulse' });
+    s.wave(0.05, 1.0, { freq: (u) => 82 * (1 + 0.03 * Math.sin(2 * Math.PI * 7 * u)), gain: env.swell(0.18) });
+    for (let i = 0; i < 5; i++) s.pulse(0.1 + i * 0.14, 0.06, { freq: env.ramp(1500, 1100), gain: env.decay(0.16, 1), duty: 0.125 });
+    for (let i = 0; i < 2; i++) s.pulse(1.05 + i * 0.22, 0.18, { freq: (u) => 180 * (1 + 0.1 * Math.sin(2 * Math.PI * 20 * u)), gain: env.attackDecay(0.24, 0.1), duty: 0.5 });
     return s;
   },
 };

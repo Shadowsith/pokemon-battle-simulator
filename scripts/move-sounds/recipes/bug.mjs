@@ -201,12 +201,13 @@ export const BUG = {
     return s;
   },
 
-  /** Generic projectile (0.43 s), no fleck: a gust of silvery scales - airy wind with fine shimmering glints. */
+  /** SilverWind.play (silver gale 0-1.2 s, scales blow to the target 0.15-1.1 s, target flickers and shakes 0.45-0.95 s): a long airy gust with fine shimmering glints and two soft buffets. */
   silverwind: () => {
-    const s = new MoveSfx(0.85, 0x51e0);
-    s.whoosh(0.0, 0.5, { from: 2000, to: 7000, gain: 0.32 });
-    s.sparkle(0.05, 0.6, 10, { lo: 3500, hi: 6500, gain: 0.14 });
-    s.noise(0.43, 0.3, { clock: env.ramp(8000, 2500), gain: env.attackDecay(0.25, 0.1) });
+    const s = new MoveSfx(1.4, 0x51e0);
+    s.noise(0.0, 1.2, { clock: (u) => 3000 + 2000 * Math.sin(Math.PI * u), gain: env.swell(0.28) });
+    s.whoosh(0.1, 0.9, { from: 2000, to: 7000, gain: 0.22 });
+    s.sparkle(0.15, 0.95, 12, { lo: 3500, hi: 6500, gain: 0.13 });
+    for (const at of [0.45, 0.7]) s.noise(at, 0.2, { clock: env.ramp(8000, 2500), gain: env.attackDecay(0.22, 0.1) });
     return s;
   },
 
@@ -282,14 +283,14 @@ export const BUG = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s) + stat-up fleck (~0.85 s): the tail glows - a shimmering, swelling buzz of light, then a big rise. */
+  /** TailGlow.play (dark 0-0.25 s, tail light swells and pulses 0.2-0.95 s, scene clears 0.95-1.15 s, stat-up aura 1.15-1.95 s): a shimmering, swelling buzz of light that throbs twice, then the stat-up jingle. */
   tailglow: () => {
-    const s = new MoveSfx(1.5, 0x7a61);
-    s.chord(0.02, 0.8, [76, 83, 88], { rate: 0.03, gain: 0.16, voice: 'pulse' });
-    s.wave(0.02, 0.8, { freq: (u) => 330 * Math.pow(2, u) * (1 + 0.02 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.18) });
-    s.noise(0.02, 0.8, { clock: () => 3500, gain: (u) => 0.06 * Math.sin(Math.PI * u), short: true });
-    s.sparkle(0.3, 0.5, 6, { lo: 3500, hi: 6000, gain: 0.14 });
-    s.statUp(0.85);
+    const s = new MoveSfx(2.1, 0x7a61);
+    s.chord(0.2, 0.75, [76, 83, 88], { rate: 0.03, gain: 0.16, voice: 'pulse' });
+    s.wave(0.2, 0.75, { freq: (u) => 330 * Math.pow(2, u) * (1 + 0.02 * Math.sin(2 * Math.PI * 30 * u)), gain: (u) => 0.18 * Math.sin(Math.PI * u) * (0.6 + 0.4 * Math.cos(2 * Math.PI * 2 * u)) });
+    s.noise(0.2, 0.75, { clock: () => 3500, gain: (u) => 0.06 * Math.sin(Math.PI * u), short: true });
+    s.sparkle(0.45, 0.45, 6, { lo: 3500, hi: 6000, gain: 0.14 });
+    s.statUp(1.15);
     return s;
   },
 

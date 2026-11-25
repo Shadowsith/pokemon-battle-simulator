@@ -189,12 +189,14 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic melee punch (impact 0.17 s), no fleck: a fist from the shadows - a warbly wail, a dull hit and an echo. */
+  /** ShadowPunch.play (user fades to shadow 0-0.25 s, shadow fist flies 0.25-0.6 s, hit 0.6 s, burst fades to 0.95 s): a warbly wail rising as the fist flies, a dull hit and a ghostly echo. */
   shadowpunch: () => {
-    const s = new MoveSfx(0.7, 0x5a9c);
-    s.wave(0.0, 0.18, { freq: (u) => (250 + 400 * u) * (1 + 0.07 * Math.sin(2 * Math.PI * 5 * u)), gain: env.ramp(0.05, 0.22) });
-    s.thud(0.17, 0.75, 0.6);
-    s.wave(0.2, 0.4, { freq: (u) => 440 * (1 - 0.3 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 9 * u)), gain: env.decay(0.18, 1.5) });
+    const s = new MoveSfx(1.1, 0x5a9c);
+    s.wave(0.0, 0.25, { freq: (u) => 200 * (1 + 0.07 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.1) });
+    s.wave(0.25, 0.35, { freq: (u) => (250 + 400 * u) * (1 + 0.07 * Math.sin(2 * Math.PI * 5 * u)), gain: env.ramp(0.05, 0.22) });
+    s.whoosh(0.3, 0.3, { from: 1500, to: 5000, gain: 0.18 });
+    s.thud(0.6, 0.75, 0.6);
+    s.wave(0.63, 0.4, { freq: (u) => 440 * (1 - 0.3 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 9 * u)), gain: env.decay(0.18, 1.5) });
     return s;
   },
 

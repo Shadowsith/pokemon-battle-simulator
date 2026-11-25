@@ -11,8 +11,9 @@ import { SandAttack } from './ground/sand-attack';
 import { ThousandMoves } from './ground/thousand-moves';
 import { MudShot } from './ground/mud-shot';
 import { MudSport } from './ground/mud-sport';
+import { SandTomb } from './ground/sand-tomb';
 
-/** Hand-made animations for Ground-type moves (Bone Rush, Drill Run, Magnitude, Mud Shot, Mud Sport, Mud-Slap, Sand Attack, Thousand Arrows and Thousand Waves live in `ground/`). */
+/** Hand-made animations for Ground-type moves (Bone Rush, Drill Run, Magnitude, Mud Shot, Mud Sport, Mud-Slap, Sand Attack, Sand Tomb, Thousand Arrows and Thousand Waves live in `ground/`). */
 export class GroundMoveAnimations {
   /** Hand-made Ground move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -32,6 +33,7 @@ export class GroundMoveAnimations {
     precipiceblades: (refs, _launch, target) => GroundMoveAnimations.playPrecipiceBlades(refs, target),
     rototiller: (refs) => GroundMoveAnimations.playRototiller(refs),
     sandattack: (refs, launch, target) => SandAttack.play(refs, launch, target),
+    sandtomb: (refs, _launch, target) => SandTomb.play(refs, target),
     spikes: (refs, launch) => GroundMoveAnimations.playSpikes(refs, launch),
     thousandarrows: (refs, launch, target) => ThousandMoves.playArrows(refs, launch, target),
     thousandwaves: (refs, launch, target) => ThousandMoves.playWaves(refs, launch, target)

@@ -254,13 +254,13 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): a swirling vortex of sand engulfs and traps the target. */
+  /** SandTomb.play (sand whirls round the target 0-1.3 s, hits at 0.2 / 0.55 / 0.9 s): a swirling hiss of sand with a low rumble and three dull thumps. */
   sandtomb: () => {
-    const s = new MoveSfx(1.2, 0x5a70);
-    s.whoosh(0.0, 0.43, { from: 1500, to: 4500, gain: 0.25 });
-    s.thud(0.43, 0.5, 0.6);
-    s.noise(0.43, 0.7, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 4 * u), gain: (u) => 0.3 * Math.min(1, u * 6) * Math.pow(1 - u, 0.8) });
-    s.rumble(0.45, 0.65, { from: 400, to: 200, gain: 0.25 });
+    const s = new MoveSfx(1.5, 0x5a70);
+    s.noise(0.0, 1.3, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 4.5 * u), gain: (u) => 0.28 * Math.min(1, u * 5) * Math.pow(1 - u, 0.6) });
+    s.whoosh(0.0, 1.2, { from: 1200, to: 3500, gain: 0.16 });
+    s.rumble(0.1, 1.1, { from: 300, to: 180, gain: 0.18 });
+    for (const at of [0.2, 0.55, 0.9]) s.thud(at, 0.4, 0.5);
     return s;
   },
 

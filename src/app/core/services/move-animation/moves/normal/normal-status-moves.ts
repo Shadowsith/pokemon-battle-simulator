@@ -15,8 +15,9 @@ import { Transform } from './transform';
 import { WorkUp } from './work-up';
 import { NaturePower } from './nature-power';
 import { Recycle } from './recycle';
+import { Stockpile } from './stockpile';
 
-/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Assist lives in `assist.ts`, Camouflage in `camouflage.ts`, Double Team in `double-team.ts`, Endure in `endure.ts`, Helping Hand in `helping-hand.ts`, Howl in `howl.ts`, Nature Power in `nature-power.ts`, Psych Up in `psych-up.ts`, Recycle in `recycle.ts`, Safeguard in `safeguard.ts`, Shell Smash in `shell-smash.ts`, Transform in `transform.ts`, Work Up in `work-up.ts`). */
+/** Hand-made animations for Normal-type status moves on the user or its side (setup, protection, support; foe-targeted ones are in `normal-foe-status-moves.ts`; Assist lives in `assist.ts`, Camouflage in `camouflage.ts`, Double Team in `double-team.ts`, Endure in `endure.ts`, Helping Hand in `helping-hand.ts`, Howl in `howl.ts`, Nature Power in `nature-power.ts`, Psych Up in `psych-up.ts`, Recycle in `recycle.ts`, Safeguard in `safeguard.ts`, Shell Smash in `shell-smash.ts`, Stockpile in `stockpile.ts`, Transform in `transform.ts`, Work Up in `work-up.ts`). */
 export class NormalStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -46,6 +47,7 @@ export class NormalStatusMoveAnimations {
     shellsmash: (refs, launch) => ShellSmash.play(refs, launch),
     sleeptalk: (refs, launch, target, v) => NormalStatusMoveAnimations.playSleepTalk(refs, launch, target, v),
     splash: (refs) => NormalStatusMoveAnimations.playSplash(refs),
+    stockpile: (refs, launch) => Stockpile.play(refs, launch),
     swordsdance: (refs, launch) => NormalStatusMoveAnimations.playSwordsDance(refs, launch),
     transform: (refs) => Transform.play(refs),
     workup: (refs, launch) => WorkUp.play(refs, launch),

@@ -9,8 +9,9 @@ import { Nightmare } from './ghost/nightmare';
 import { ShadowClaw } from './ghost/shadow-claw';
 import { ShadowForce } from './ghost/shadow-force';
 import { Spite } from './ghost/spite';
+import { ShadowPunch } from './ghost/shadow-punch';
 
-/** Hand-made animations for Ghost-type moves (Astonish, Grudge, Nightmare, Shadow Claw, Shadow Force and Spite live in `ghost/`). */
+/** Hand-made animations for Ghost-type moves (Astonish, Grudge, Nightmare, Shadow Claw, Shadow Force, Shadow Punch and Spite live in `ghost/`). */
 export class GhostMoveAnimations {
   /** Hand-made Ghost move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -26,6 +27,7 @@ export class GhostMoveAnimations {
     shadowball: (refs, launch, target, v) => GhostMoveAnimations.playShadowBall(refs, launch, target, v),
     shadowclaw: (refs, _launch, target, v) => ShadowClaw.play(refs, target, v),
     shadowforce: (refs, _launch, target, v) => ShadowForce.strike(refs, target, v),
+    shadowpunch: (refs, launch, target, v) => ShadowPunch.play(refs, launch, target, v),
     spite: (refs) => Spite.play(refs),
     trickortreat: (refs, launch, target) => GhostMoveAnimations.playTrickOrTreat(refs, launch, target)
   };

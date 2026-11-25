@@ -10,9 +10,10 @@ import { FusionBolt } from './electric/fusion-bolt';
 import { Spark } from './electric/spark';
 import { VoltSwitch } from './electric/volt-switch';
 import { WildCharge } from './electric/wild-charge';
+import { ShockWave } from './electric/shock-wave';
 
 /**
- * Hand-made animations for Electric-type moves. Charge, Fusion Bolt, Spark, Volt Switch,
+ * Hand-made animations for Electric-type moves. Charge, Fusion Bolt, Shock Wave, Spark, Volt Switch,
  * Wild Charge and the Gen 6 field / cheek moves live in `electric/`.
  */
 export class ElectricMoveAnimations {
@@ -24,6 +25,7 @@ export class ElectricMoveAnimations {
     charge: (refs, launch) => Charge.play(refs, launch),
     discharge: (refs, launch, target) => ElectricMoveAnimations.playDischarge(refs, launch, target),
     fusionbolt: (refs, launch, target) => FusionBolt.play(refs, launch, target),
+    shockwave: (refs, launch, target) => ShockWave.play(refs, launch, target),
     spark: (refs, launch, target, v) => Spark.play(refs, launch, target, v),
     thunder: (refs, _launch, target) => ElectricMoveAnimations.playThunder(refs, target),
     thundershock: (refs, _launch, target) => ElectricMoveAnimations.playThunderShock(refs, target),

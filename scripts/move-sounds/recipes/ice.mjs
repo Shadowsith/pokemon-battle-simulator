@@ -269,14 +269,16 @@ export const ICE = {
     return s;
   },
 
-  /** Generic projectile (0.43 s), no fleck: an absolute-zero chill - a thin freezing whistle, then a glassy crackle as ice seals the target. */
+  /** SheerCold.play (dark 0-0.3 s, ice crystals drift 0.2-1.45 s, mist rolls in 0.4-1.25 s, target freezes white 0.55-1.3 s with glints, scene clears to 1.6 s): a thin icy whistle and cold hiss, a glassy crackle as the target freezes, then ringing glints. */
   sheercold: () => {
-    const s = new MoveSfx(1.0, 0x5ec0);
-    s.wave(0.0, 0.43, { freq: (u) => 1400 + 800 * u, gain: env.ramp(0.08, 0.2) });
-    s.noise(0.0, 0.43, { clock: () => 12000, gain: env.swell(0.1) });
-    s.noise(0.43, 0.15, { clock: env.ramp(14000, 6000), gain: env.attackDecay(0.35, 0.05) });
-    s.freeze(0.45, 0.24);
-    s.wave(0.45, 0.45, { freq: () => 2093, gain: env.decay(0.14, 1.2) });
+    const s = new MoveSfx(1.8, 0x5ec0);
+    s.wave(0.0, 1.4, { freq: (u) => 1400 + 600 * u, gain: env.swell(0.12) });
+    s.noise(0.2, 1.1, { clock: () => 12000, gain: env.swell(0.1) });
+    s.noise(0.4, 0.8, { clock: () => 3000, gain: env.swell(0.1) });
+    s.noise(0.55, 0.15, { clock: env.ramp(14000, 6000), gain: env.attackDecay(0.35, 0.05) });
+    s.freeze(0.57, 0.24);
+    s.sparkle(0.7, 0.5, 5, { lo: 4000, hi: 7000, gain: 0.12 });
+    s.wave(0.6, 0.7, { freq: () => 2093, gain: env.decay(0.12, 1.2) });
     return s;
   },
 };

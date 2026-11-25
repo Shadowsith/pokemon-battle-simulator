@@ -7,8 +7,10 @@ import { HealingWish } from './healing-wish';
 import { PsychicFx } from './psychic-fx';
 import { TrickRoom } from './trick-room';
 import { Imprison } from './imprison';
+import { RolePlay } from './role-play';
+import { SkillSwap } from './skill-swap';
 
-/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Healing Wish, Imprison and Trick Room live in `healing-wish.ts` / `imprison.ts` / `trick-room.ts`). */
+/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Healing Wish, Imprison, Role Play, Skill Swap and Trick Room live in `healing-wish.ts` / `imprison.ts` / `role-play.ts` / `skill-swap.ts` / `trick-room.ts`). */
 export class PsychicStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -26,6 +28,8 @@ export class PsychicStatusMoveAnimations {
     meditate: (refs, launch) => PsychicStatusMoveAnimations.playMeditate(refs, launch),
     reflect: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.REFLECT),
     rest: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playRest(refs, launch, v),
+    roleplay: (refs, launch, target) => RolePlay.play(refs, launch, target),
+    skillswap: (refs, launch, target) => SkillSwap.play(refs, launch, target),
     teleport: (refs) => PsychicStatusMoveAnimations.playTeleport(refs),
     trick: (refs, launch, target) => PsychicStatusMoveAnimations.playTrick(refs, launch, target),
     trickroom: (refs) => TrickRoom.play(refs)

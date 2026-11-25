@@ -338,15 +338,13 @@ export const WATER = {
     return s;
   },
 
-  /** Generic pulse (rings every 0.13 s, impact 0.56 s) + confusion fleck (~0.7 s): watery rings throb out, then dizzy tweets. */
+  /** WaterPulse.play (scene turns underwater blue 0-0.25 s, bubbles rise 0.15-1.3 s, ring travels 0.45-0.9 s, spreads round the target 0.9-1.3 s, scene clears to 1.55 s): bubbling water, a throbbing ring swelling in, then a splash. */
   waterpulse: () => {
-    const s = new MoveSfx(1.35, 0x3a63);
-    for (let i = 0; i < 4; i++) {
-      s.wave(i * 0.13, 0.14, { freq: (u) => (330 + i * 40) * (1 + 0.5 * u), gain: env.decay(0.3, 1.2) });
-      s.bubbles(i * 0.13, 0.08, 2, { lo: 500, hi: 900, gain: 0.1 });
-    }
-    s.splash(0.56, 0.5);
-    s.confusion(0.72);
+    const s = new MoveSfx(1.7, 0x3a63);
+    s.bubbles(0.15, 1.1, 14, { lo: 500, hi: 1100, gain: 0.12 });
+    s.wave(0.45, 0.45, { freq: (u) => 330 * (1 + 0.5 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 9 * u)), gain: env.ramp(0.08, 0.28) });
+    s.splash(0.9, 0.5);
+    s.wave(0.9, 0.4, { freq: (u) => 495 * (1 - 0.3 * u), gain: env.decay(0.18, 1.5) });
     return s;
   },
 
@@ -364,12 +362,13 @@ export const WATER = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s, field): the user soaks the field, a gentle sprinkle of drops. */
+  /** WaterSport.play (water spouts up from the user and splashes apart 0-0.6 s, drops rain down over the field 0.5-1.5 s): a gushing spout, then a gentle patter of drops. */
   watersport: () => {
-    const s = new MoveSfx(1.15, 0x3a65);
-    s.noise(0.02, 0.85, { clock: () => 7000, gain: env.swell(0.18) });
-    s.bubbles(0.02, 0.85, 16, { lo: 600, hi: 1400, gain: 0.16 });
-    s.wave(0.1, 0.7, { freq: (u) => 523 * (1 + 0.03 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.12) });
+    const s = new MoveSfx(1.7, 0x3a65);
+    s.noise(0.0, 0.6, { clock: env.ramp(2500, 6000), gain: env.swell(0.26) });
+    s.splash(0.3, 0.3);
+    s.noise(0.5, 1.0, { clock: () => 7000, gain: env.swell(0.12) });
+    s.bubbles(0.5, 1.0, 16, { lo: 900, hi: 1800, gain: 0.14 });
     return s;
   },
 

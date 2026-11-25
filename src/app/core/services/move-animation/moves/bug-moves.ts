@@ -10,8 +10,10 @@ import { RagePowder } from './bug/rage-powder';
 import { SpiderWeb } from './bug/spider-web';
 import { UTurn } from './bug/u-turn';
 import { XScissor } from './bug/x-scissor';
+import { SilverWind } from './bug/silver-wind';
+import { TailGlow } from './bug/tail-glow';
 
-/** Hand-made animations for Bug-type moves (Fury Cutter, Spider Web, U-turn and X-Scissor live in `bug/`). */
+/** Hand-made animations for Bug-type moves (Fury Cutter, Silver Wind, Spider Web, Tail Glow, U-turn and X-Scissor live in `bug/`). */
 export class BugMoveAnimations {
   /** Hand-made Bug move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -28,9 +30,11 @@ export class BugMoveAnimations {
     quiverdance: (refs, launch) => QuiverDance.play(refs, launch),
     ragepowder: (refs, launch) => RagePowder.play(refs, launch),
     signalbeam: (refs, launch, target) => BugMoveAnimations.playSignalBeam(refs, launch, target),
+    silverwind: (refs, launch, target, v) => SilverWind.play(refs, launch, target, v),
     spiderweb: (refs, launch, target, v) => SpiderWeb.play(refs, launch, target, v),
     stickyweb: (refs, launch, target) => BugMoveAnimations.playStickyWeb(refs, launch, target),
     stringshot: (refs, launch, target) => BugMoveAnimations.playStringShot(refs, launch, target),
+    tailglow: (refs, launch) => TailGlow.play(refs, launch),
     twineedle: (refs, launch, target, v) => BugMoveAnimations.playPinMissile(refs, launch, target, v, BugMoveAnimations.TWINEEDLE),
     uturn: (refs, launch, target) => UTurn.play(refs, launch, target),
     xscissor: (refs, _launch, target, v) => XScissor.play(refs, target, v)

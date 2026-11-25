@@ -18,8 +18,10 @@ import { Switcheroo } from './dark/switcheroo';
 import { Thief } from './dark/thief';
 import { KnockOff } from './dark/knock-off';
 import { Memento } from './dark/memento';
+import { Snatch } from './dark/snatch';
+import { Torment } from './dark/torment';
 
-/** Hand-made animations for Dark-type moves (Beat Up, Fake Tears, Feint Attack, Flatter, Foul Play, Hone Claws, Knock Off, Memento, Nasty Plot, Night Slash, Pursuit, Sucker Punch, Switcheroo and Thief live in `dark/`). */
+/** Hand-made animations for Dark-type moves (Beat Up, Fake Tears, Feint Attack, Flatter, Foul Play, Hone Claws, Knock Off, Memento, Nasty Plot, Night Slash, Pursuit, Snatch, Sucker Punch, Switcheroo, Thief and Torment live in `dark/`). */
 export class DarkMoveAnimations {
   /** Hand-made Dark move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -40,11 +42,13 @@ export class DarkMoveAnimations {
     nightslash: (refs, _launch, target, v) => NightSlash.play(refs, target, v),
     partingshot: (refs, launch, target, v) => DarkMoveAnimations.playPartingShot(refs, launch, target, v),
     pursuit: (refs, _launch, target) => Pursuit.play(refs, target),
+    snatch: (refs, launch, _target, v) => Snatch.play(refs, launch, v),
     suckerpunch: (refs, launch, target, v) => SuckerPunch.play(refs, launch, target, v),
     switcheroo: (refs, launch, target, v) => Switcheroo.play(refs, launch, target, v),
     taunt: (refs, launch, target, v) => DarkMoveAnimations.playTaunt(refs, launch, target, v),
     thief: (refs, launch, target) => Thief.play(refs, launch, target),
-    topsyturvy: (refs, _launch, target) => DarkMoveAnimations.playTopsyTurvy(refs, target)
+    topsyturvy: (refs, _launch, target) => DarkMoveAnimations.playTopsyTurvy(refs, target),
+    torment: (refs, launch, target) => Torment.play(refs, launch, target)
   };
 
   /**

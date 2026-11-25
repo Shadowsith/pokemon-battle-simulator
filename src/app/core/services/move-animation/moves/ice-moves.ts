@@ -10,8 +10,9 @@ import { IcyWind } from './ice/icy-wind';
 import { PowderSnow } from './ice/powder-snow';
 import { IcicleCrash } from './ice/icicle-crash';
 import { IcicleSpear } from './ice/icicle-spear';
+import { SheerCold } from './ice/sheer-cold';
 
-/** Hand-made animations for Ice-type moves (Freeze Shock, Ice Ball, Ice Burn, Icicle Crash, Icicle Spear, Icy Wind and Powder Snow live in `ice/`). */
+/** Hand-made animations for Ice-type moves (Freeze Shock, Ice Ball, Ice Burn, Icicle Crash, Icicle Spear, Icy Wind, Powder Snow and Sheer Cold live in `ice/`). */
 export class IceMoveAnimations {
   /** Hand-made Ice move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -29,7 +30,8 @@ export class IceMoveAnimations {
     powdersnow: (refs, launch, target, v) => PowderSnow.play(refs, launch, target, v),
     hail: (refs) => IceMoveAnimations.playHail(refs),
     haze: (refs) => IceMoveAnimations.playHaze(refs),
-    mist: (refs, launch, _target, v) => IceMoveAnimations.playMist(refs, launch, v.dir)
+    mist: (refs, launch, _target, v) => IceMoveAnimations.playMist(refs, launch, v.dir),
+    sheercold: (refs, _launch, target) => SheerCold.play(refs, target)
   };
 
   /**
