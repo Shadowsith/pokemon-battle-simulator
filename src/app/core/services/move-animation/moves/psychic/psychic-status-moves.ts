@@ -9,8 +9,13 @@ import { TrickRoom } from './trick-room';
 import { Imprison } from './imprison';
 import { RolePlay } from './role-play';
 import { SkillSwap } from './skill-swap';
+import { Gravity } from './gravity';
+import { HealBlock } from './heal-block';
+import { HeartSwap } from './heart-swap';
+import { LunarDance } from './lunar-dance';
+import { MiracleEye } from './miracle-eye';
 
-/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Healing Wish, Imprison, Role Play, Skill Swap and Trick Room live in `healing-wish.ts` / `imprison.ts` / `role-play.ts` / `skill-swap.ts` / `trick-room.ts`). */
+/** Hand-made animations for Psychic-type status moves (setup, screens, healing, tricks; Gravity, Heal Block, Healing Wish, Heart Swap, Imprison, Lunar Dance, Miracle Eye, Role Play, Skill Swap (also Guard Swap) and Trick Room live in `gravity.ts` / `heal-block.ts` / `healing-wish.ts` / `heart-swap.ts` / `imprison.ts` / `lunar-dance.ts` / `miracle-eye.ts` / `role-play.ts` / `skill-swap.ts` / `trick-room.ts`). */
 export class PsychicStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -19,13 +24,19 @@ export class PsychicStatusMoveAnimations {
     barrier: (refs, launch) => PsychicStatusMoveAnimations.playBarrier(refs, launch),
     calmmind: (refs, launch) => PsychicStatusMoveAnimations.playCalmMind(refs, launch),
     cosmicpower: (refs, launch) => PsychicStatusMoveAnimations.playCosmicPower(refs, launch),
+    gravity: (refs, launch) => Gravity.play(refs, launch),
+    guardswap: (refs, launch, target) => SkillSwap.play(refs, launch, target, SkillSwap.GUARD),
+    healblock: (refs, _launch, target) => HealBlock.play(refs, target),
     healingwish: (refs, launch) => HealingWish.play(refs, launch),
+    heartswap: (refs, launch, target) => HeartSwap.play(refs, launch, target),
     hypnosis: (refs, launch, target) => PsychicStatusMoveAnimations.playHypnosis(refs, launch, target),
     imprison: (refs, launch) => Imprison.play(refs, launch),
     kinesis: (refs, launch, target, v) => PsychicStatusMoveAnimations.playKinesis(refs, launch, target, v),
     lightscreen: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.LIGHT_SCREEN),
+    lunardance: (refs, launch) => LunarDance.play(refs, launch),
     magiccoat: (refs, launch) => PsychicStatusMoveAnimations.playMagicCoat(refs, launch),
     meditate: (refs, launch) => PsychicStatusMoveAnimations.playMeditate(refs, launch),
+    miracleeye: (refs, launch, target) => MiracleEye.play(refs, launch, target),
     reflect: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playScreen(refs, launch, v, PsychicStatusMoveAnimations.REFLECT),
     rest: (refs, launch, _target, v) => PsychicStatusMoveAnimations.playRest(refs, launch, v),
     roleplay: (refs, launch, target) => RolePlay.play(refs, launch, target),

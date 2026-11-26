@@ -1021,7 +1021,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
 
 ## Gen 4 (113)
 
-- [ ] **Acupressure** / Akupressur — `acupressure` · Normal · Status · `targetAura`
+- [x] **Acupressure** / Akupressur — `acupressure` · Normal · Status · user flashes white, a black hand jabs it twice with its finger, it lights up yellow, then the stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Akupressur
   - Gen 4 APNG: https://www.pokewiki.de/images/f/f1/Akupressur_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/19/Akupressur_Gen5.png
@@ -1029,11 +1029,11 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Luftschnitt
   - Gen 4 APNG: https://www.pokewiki.de/images/c/cf/Luftschnitt_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/8f/Luftschnitt_Gen5.png
-- [ ] **Aqua Jet** / Wasserdüse — `aquajet` · Water · Physical · `melee`
+- [x] **Aqua Jet** / Wasserdüse — `aquajet` · Water · Physical · user shoots off and vanishes, a pale blue water streak rushes to the target and bursts up in a tall water column, droplets scatter, user fades back in (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Wasserd%C3%BCse
   - Gen 4 APNG: https://www.pokewiki.de/images/0/09/Wasserd%C3%BCse_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/81/Wasserd%C3%BCse_Gen5.png
-- [ ] **Aqua Ring** / Wasserring — `aquaring` · Water · Status · `selfAura`
+- [x] **Aqua Ring** / Wasserring — `aquaring` · Water · Status · a white-blue water orb swells over the user while three tilted blue rings spin round it like orbits, drops trickle down (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Wasserring
   - Gen 4 APNG: https://www.pokewiki.de/images/2/22/Wasserring_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/cf/Wasserring_Gen5.png
@@ -1041,7 +1041,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Nassschweif
   - Gen 4 APNG: https://www.pokewiki.de/images/9/9b/Nassschweif_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/f8/Nassschweif_Gen5.png
-- [ ] **Assurance** / Gewissheit — `assurance` · Dark · Physical · `melee`
+- [x] **Assurance** / Gewissheit — `assurance` · Dark · Physical · a huge pink open hand shrinks down onto the target with two afterimages, white star in a pink burst, pink orbs scatter (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Gewissheit
   - Gen 4 APNG: https://www.pokewiki.de/images/6/66/Gewissheit_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/cf/Gewissheit_Gen5.png
@@ -1054,7 +1054,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/c/c6/Aurasph%C3%A4re_DPPt.png
   - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/e/e0/Aurasph%C3%A4re_HGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b5/Aurasph%C3%A4re_Gen5.png
-- [ ] **Avalanche** / Lawine — `avalanche` · Ice · Physical · `melee`
+- [x] **Avalanche** / Lawine — `avalanche` · Ice · Physical · scene turns pale lavender, grey-blue snowballs rain onto the target bursting into pinkish snow puffs, three shakes (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Lawine
   - Gen 4 APNG: https://www.pokewiki.de/images/f/f4/Lawine_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/0c/Lawine_Gen5.png
@@ -1062,11 +1062,11 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Sturzflug
   - Gen 4 APNG: https://www.pokewiki.de/images/1/1c/Sturzflug_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/2f/Sturzflug_Gen5.png
-- [ ] **Brine** / Lake — `brine` · Water · Special · `projectile`
+- [x] **Brine** / Lake — `brine` · Water · Special · white-blue salt water spurts shoot up round the target, alternating left and right, then white mist at its feet (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Lake
   - Gen 4 APNG: https://www.pokewiki.de/images/a/ad/Lake_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b7/Lake_Gen5.png
-- [ ] **Bug Bite** / Käferbiss — `bugbite` · Bug · Physical · `melee`
+- [x] **Bug Bite** / Käferbiss — `bugbite` · Bug · Physical · a small jaw snaps on the target and nibbles twice, brown and green crumbs fly off and tumble down (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/K%C3%A4ferbiss
   - Gen 4 APNG: https://www.pokewiki.de/images/2/29/K%C3%A4ferbiss_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/22/K%C3%A4ferbiss_Gen5.png
@@ -1074,19 +1074,19 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/K%C3%A4fergebrumm
   - Gen 4 APNG: https://www.pokewiki.de/images/4/41/K%C3%A4fergebrumm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a2/K%C3%A4fergebrumm_Gen5.png
-- [ ] **Bullet Punch** / Patronenhieb — `bulletpunch` · Steel · Physical · `melee`
+- [x] **Bullet Punch** / Patronenhieb — `bulletpunch` · Steel · Physical · five steel-grey fists pelt the target in quick succession, each with a dark grey spiky burst (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Patronenhieb
   - Gen 4 APNG: https://www.pokewiki.de/images/2/25/Patronenhieb_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/d4/Patronenhieb_Gen5.png
-- [ ] **Captivate** / Liebreiz — `captivate` · Normal · Status · `selfAura`
+- [x] **Captivate** / Liebreiz — `captivate` · Normal · Status · pink hearts and white sparkles pop round the user, hearts float over to the target, which flashes pink and turns blue under stat-down bubbles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Liebreiz
   - Gen 4 APNG: https://www.pokewiki.de/images/1/19/Liebreiz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/0c/Liebreiz_Gen5.png
-- [ ] **Charge Beam** / Ladestrahl — `chargebeam` · Electric · Special · `projectile`
+- [x] **Charge Beam** / Ladestrahl — `chargebeam` · Electric · Special · dark scene, green-yellow bolts flicker round the user as sparks gather into a swelling ball of light, a white-yellow beam shoots to the target, which glows yellow and crackles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Ladestrahl
   - Gen 4 APNG: https://www.pokewiki.de/images/a/ac/Ladestrahl_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a0/Ladestrahl_Gen5.png
-- [ ] **Chatter** / Geschwätz — `chatter` · Flying · Special · `sonic`
+- [x] **Chatter** / Geschwätz — `chatter` · Flying · Special · yellow, blue and orange rings pulse out round the bobbing user, a white speech bubble with music notes pops up above it, target shakes (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Geschw%C3%A4tz
   - Gen 4 APNG: https://www.pokewiki.de/images/0/0e/Geschw%C3%A4tz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/68/Geschw%C3%A4tz_Gen5.png
@@ -1094,7 +1094,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Nahkampf
   - Gen 4 APNG: https://www.pokewiki.de/images/3/3c/Nahkampf_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/63/Nahkampf_Gen5.png
-- [ ] **Copycat** / Imitator — `copycat` · Normal · Status · `selfAura`
+- [x] **Copycat** / Imitator — `copycat` · Normal · Status · an orange-pink light orb swells in front of the user and flares, a white ring spreads while the user turns into a dark silhouette (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Imitator
   - Gen 4 APNG: https://www.pokewiki.de/images/4/4b/Imitator_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/b9/Imitator_Gen5.png
@@ -1102,7 +1102,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Giftstreich
   - Gen 4 APNG: https://www.pokewiki.de/images/e/ed/Giftstreich_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/2b/Giftstreich_Gen5.png
-- [ ] **Crush Grip** / Quetschgriff — `crushgrip` · Normal · Physical · `melee`
+- [x] **Crush Grip** / Quetschgriff — `crushgrip` · Normal · Physical · a huge white hand reaches over and closes round the trembling target, turning cream and yellow as it squeezes, then a yellow spiky burst with dark specks (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Quetschgriff
   - Gen 4 APNG: https://www.pokewiki.de/images/2/25/Quetschgriff_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c4/Quetschgriff_Gen5.png
@@ -1111,12 +1111,12 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Gen 4 APNG (DP): https://www.pokewiki.de/images/0/02/Finsteraura_DP.png
   - Gen 4 APNG (PtHGSS): https://www.pokewiki.de/images/5/54/Finsteraura_PtHGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/6a/Finsteraura_Gen5.png
-- [ ] **Dark Void** / Schlummerort — `darkvoid` · Dark · Status · `targetAura`
+- [x] **Dark Void** / Schlummerort — `darkvoid` · Dark · Status · grey-violet curtain scene, a black hole with a purple rim opens under the target, which sinks in and is gone, the scene darkens, target returns asleep under Zs (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schlummerort
   - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/9/9a/Schlummerort_DPPt.png
   - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/f/fe/Schlummerort_HGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/2e/Schlummerort_Gen5.png
-- [ ] **Defend Order** / Blockbefehl — `defendorder` · Bug · Status · `selfAura`
+- [x] **Defend Order** / Blockbefehl — `defendorder` · Bug · Status · a swarm of bees flies in and gathers round the user in a beige cloud, the user flashes red in a red ring, then the stat-up aura (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Blockbefehl
   - Gen 4 APNG: https://www.pokewiki.de/images/c/cd/Blockbefehl_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/01/Blockbefehl_Gen5.png
@@ -1128,7 +1128,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Ladungssto%C3%9F
   - Gen 4 APNG: https://www.pokewiki.de/images/9/9e/Ladungssto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/09/Ladungssto%C3%9F_Gen5.png
-- [ ] **Double Hit** / Doppelschlag — `doublehit` · Normal · Physical · `melee`
+- [x] **Double Hit** / Doppelschlag — `doublehit` · Normal · Physical · two whacks: a white star in a pink glow, the target flashes black and shakes, pink sparkles burst off (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Doppelschlag
   - Gen 4 APNG: https://www.pokewiki.de/images/3/39/Doppelschlag_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/ed/Doppelschlag_Gen5.png
@@ -1152,7 +1152,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Erdkr%C3%A4fte
   - Gen 4 APNG: https://www.pokewiki.de/images/9/9d/Erdkr%C3%A4fte_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/ed/Erdkr%C3%A4fte_Gen5.png
-- [ ] **Embargo** / Itemsperre — `embargo` · Dark · Status · `targetAura`
+- [x] **Embargo** / Itemsperre — `embargo` · Dark · Status · two rows of magenta hexagon tiles slide together onto the target and lock it in, flicker while it tints pink, then drift apart (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Itemsperre
   - Gen 4 APNG: https://www.pokewiki.de/images/7/73/Itemsperre_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/52/Itemsperre_Gen5.png
@@ -1160,11 +1160,11 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Energieball
   - Gen 4 APNG: https://www.pokewiki.de/images/3/36/Energieball_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/d4/Energieball_Gen5.png
-- [ ] **Feint** / Offenlegung — `feint` · Normal · Physical · `projectile`
+- [x] **Feint** / Offenlegung — `feint` · Normal · Physical · a big grey-white fist looms in from the user's side and swings onto the target with an afterimage, pink sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Offenlegung
   - Gen 4 APNG: https://www.pokewiki.de/images/b/b2/Offenlegung_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/8e/Offenlegung_Gen5.png
-- [ ] **Fire Fang** / Feuerzahn — `firefang` · Fire · Physical · `melee`
+- [x] **Fire Fang** / Feuerzahn — `firefang` · Fire · Physical · a white jaw snaps shut on the target, which bursts into a fiery ball of flame and glows red-hot, dark smoke drifts off (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Feuerzahn
   - Gen 4 APNG: https://www.pokewiki.de/images/1/14/Feuerzahn_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/34/Feuerzahn_Gen5.png
@@ -1177,7 +1177,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Gen 4 APNG (DPPt): https://www.pokewiki.de/images/8/86/Lichtkanone_DPPt.png
   - Gen 4 APNG (HGSS): https://www.pokewiki.de/images/2/28/Lichtkanone_HGSS.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/53/Lichtkanone_Gen5.png
-- [ ] **Fling** / Schleuder — `fling` · Dark · Physical · `projectile`
+- [x] **Fling** / Schleuder — `fling` · Dark · Physical · a glowing white ball flares at the user and is hurled at the target, bursting into a ring of white puffs (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schleuder
   - Gen 4 APNG: https://www.pokewiki.de/images/e/e5/Schleuder_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/22/Schleuder_Gen5.png
@@ -1185,11 +1185,11 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Fokussto%C3%9F
   - Gen 4 APNG: https://www.pokewiki.de/images/3/32/Fokussto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/17/Fokussto%C3%9F_Gen5.png
-- [ ] **Force Palm** / Kraftwelle — `forcepalm` · Fighting · Physical · `melee`
+- [x] **Force Palm** / Kraftwelle — `forcepalm` · Fighting · Physical · a white open palm swings in and presses onto the target, a magenta shock wave bursts through it in a glowing orb and rays, the palm draws back with pink sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Kraftwelle
   - Gen 4 APNG: https://www.pokewiki.de/images/9/98/Kraftwelle_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c6/Kraftwelle_Gen5.png
-- [ ] **Gastro Acid** / Magensäfte — `gastroacid` · Poison · Status · `targetAura`
+- [x] **Gastro Acid** / Magensäfte — `gastroacid` · Poison · Status · green acid drops splash down over the target, which turns sickly green, acid pools round its feet with rising bubbles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Magens%C3%A4fte
   - Gen 4 APNG: https://www.pokewiki.de/images/b/b3/Magens%C3%A4fte_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/4/4d/Magens%C3%A4fte_Gen5.png
@@ -1202,11 +1202,11 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Strauchler
   - Gen 4 APNG: https://www.pokewiki.de/images/b/be/Strauchler_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/10/Strauchler_Gen5.png
-- [ ] **Gravity** / Erdanziehung — `gravity` · Psychic · Status · `targetAura`
+- [x] **Gravity** / Erdanziehung — `gravity` · Psychic · Status · murky violet scene with dark streaks pouring down, a dark vortex swirls at the user's feet, both Pokémon are squashed against the ground, then spring back (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Erdanziehung
   - Gen 4 APNG: https://www.pokewiki.de/images/2/2e/Erdanziehung_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/a8/Erdanziehung_Gen5.png
-- [ ] **Guard Swap** / Schutztausch — `guardswap` · Psychic · Status · `targetAura`
+- [x] **Guard Swap** / Schutztausch — `guardswap` · Psychic · Status · pale blue light orbs (one deep blue) cross between user and target in a high and a low arc, both flash blue (Skill Swap's exchange in blue) (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schutztausch
   - Gen 4 APNG: https://www.pokewiki.de/images/1/1f/Schutztausch_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/9/90/Schutztausch_Gen5.png
@@ -1226,11 +1226,11 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Kopfsto%C3%9F
   - Gen 4 APNG: https://www.pokewiki.de/images/1/17/Kopfsto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/67/Kopfsto%C3%9F_Gen5.png
-- [ ] **Heal Block** / Heilblockade — `healblock` · Psychic · Status · `targetAura`
+- [x] **Heal Block** / Heilblockade — `healblock` · Psychic · Status · golden sparkles twinkle over the target, the scene dims and the target darkens to a shadow as they fade (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Heilblockade
   - Gen 4 APNG: https://www.pokewiki.de/images/1/15/Heilblockade_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/56/Heilblockade_Gen5.png
-- [ ] **Heal Order** / Heilbefehl — `healorder` · Bug · Status · `selfAura`
+- [x] **Heal Order** / Heilbefehl — `healorder` · Bug · Status · little bees fly in round the user, a soft green cloud billows over it, cyan sparkles, then green heal sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Heilbefehl
   - Gen 4 APNG: https://www.pokewiki.de/images/d/d8/Heilbefehl_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/b/bb/Heilbefehl_Gen5.png
@@ -1238,15 +1238,15 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Heilopfer
   - Gen 4 APNG: https://www.pokewiki.de/images/2/2f/Heilopfer_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/1/18/Heilopfer_Gen5.png
-- [ ] **Heart Swap** / Statustausch — `heartswap` · Psychic · Status · `targetAura`
+- [x] **Heart Swap** / Statustausch — `heartswap` · Psychic · Status · pink-white light orbs stream from the user to the target and back, both light up in a pink-white glow with spinning orbit rings (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Statustausch
   - Gen 4 APNG: https://www.pokewiki.de/images/5/5b/Statustausch_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/8/88/Statustausch_Gen5.png
-- [ ] **Ice Fang** / Eiszahn — `icefang` · Ice · Physical · `melee`
+- [x] **Ice Fang** / Eiszahn — `icefang` · Ice · Physical · a white jaw snaps shut on the target, which freezes pale blue as ice chunks burst off and cold mist drifts over it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Eiszahn
   - Gen 4 APNG: https://www.pokewiki.de/images/2/26/Eiszahn_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/a/af/Eiszahn_Gen5.png
-- [ ] **Ice Shard** / Eissplitter — `iceshard` · Ice · Physical · `projectile`
+- [x] **Ice Shard** / Eissplitter — `iceshard` · Ice · Physical · the scene dims, cold mist puffs round the user, four ice shards shoot at the target and shatter in white starbursts, glints (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Eissplitter
   - Gen 4 APNG: https://www.pokewiki.de/images/d/d2/Eissplitter_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/63/Eissplitter_Gen5.png
@@ -1270,11 +1270,11 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Bl%C3%A4ttersturm
   - Gen 4 APNG: https://www.pokewiki.de/images/2/23/Bl%C3%A4ttersturm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/6/6b/Bl%C3%A4ttersturm_Gen5.png
-- [ ] **Lucky Chant** / Beschwörung — `luckychant` · Normal · Status · `selfAura`
+- [x] **Lucky Chant** / Beschwörung — `luckychant` · Normal · Status · pink and white sparkle stars swirl in round the user, a pink ring swells and the user glows pale pink (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Beschw%C3%B6rung
   - Gen 4 APNG: https://www.pokewiki.de/images/5/56/Beschw%C3%B6rung_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e6/Beschw%C3%B6rung_Gen5.png
-- [ ] **Lunar Dance** / Lunartanz — `lunardance` · Psychic · Status · `selfAura`
+- [x] **Lunar Dance** / Lunartanz — `lunardance` · Psychic · Status · the scene goes dark and a crescent moon rises above the user, pink rings swirl up round it from a golden glow at its feet among pink and white sparkles (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Lunartanz
   - Gen 4 APNG: https://www.pokewiki.de/images/8/87/Lunartanz_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/7/78/Lunartanz_Gen5.png
@@ -1282,31 +1282,31 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Lavasturm
   - Gen 4 APNG: https://www.pokewiki.de/images/6/6e/Lavasturm_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/fa/Lavasturm_Gen5.png
-- [ ] **Magnet Bomb** / Magnetbombe — `magnetbomb` · Steel · Physical · `lob`
+- [x] **Magnet Bomb** / Magnetbombe — `magnetbomb` · Steel · Physical · little grey and white steel balls appear round the target and are pulled in onto it, then go off in a cloud of cyan-blue blasts (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Magnetbombe
   - Gen 4 APNG: https://www.pokewiki.de/images/3/32/Magnetbombe_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/c2/Magnetbombe_Gen5.png
-- [ ] **Magnet Rise** / Magnetflug — `magnetrise` · Electric · Status · `selfAura`
+- [x] **Magnet Rise** / Magnetflug — `magnetrise` · Electric · Status · yellow sparks stream up from under the user as it lifts off the ground, hovers bobbing, then settles back (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Magnetflug
   - Gen 4 APNG: https://www.pokewiki.de/images/6/6b/Magnetflug_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/3/3c/Magnetflug_Gen5.png
-- [ ] **Me First** / Egotrip — `mefirst` · Normal · Status · `targetAura`
+- [x] **Me First** / Egotrip — `mefirst` · Normal · Status · pale blue swirls and sparkles round the target, a cyan orb is snatched from it and flies to the user, which flashes blue-green in a cyan ring (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Egotrip
   - Gen 4 APNG: https://www.pokewiki.de/images/e/e2/Egotrip_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/50/Egotrip_Gen5.png
-- [ ] **Metal Burst** / Metallstoß — `metalburst` · Steel · Physical · `projectile`
+- [x] **Metal Burst** / Metallstoß — `metalburst` · Steel · Physical · the scene darkens, silvery sparks spray off the flashing user, thin light streaks shoot to the target, yellow-white spiky burst on it (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Metallsto%C3%9F
   - Gen 4 APNG: https://www.pokewiki.de/images/f/ff/Metallsto%C3%9F_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/c/cb/Metallsto%C3%9F_Gen5.png
-- [ ] **Miracle Eye** / Wunderauge — `miracleeye` · Psychic · Status · `targetAura`
+- [x] **Miracle Eye** / Wunderauge — `miracleeye` · Psychic · Status · dark scene, a glowing yellow-cyan eye opens over the user, coloured light rays burst out from the target, which flashes white (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Wunderauge
   - Gen 4 APNG: https://www.pokewiki.de/images/2/27/Wunderauge_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/ea/Wunderauge_Gen5.png
-- [ ] **Mirror Shot** / Spiegelsalve — `mirrorshot` · Steel · Special · `projectile`
+- [x] **Mirror Shot** / Spiegelsalve — `mirrorshot` · Steel · Special · glints and a dazzling white glow swell over the user, glittering light orbs and a ring shoot to the target, which flashes white (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Spiegelsalve
   - Gen 4 APNG: https://www.pokewiki.de/images/1/12/Spiegelsalve_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/2/2c/Spiegelsalve_Gen5.png
-- [ ] **Mud Bomb** / Schlammbombe — `mudbomb` · Ground · Special · `lob`
+- [x] **Mud Bomb** / Schlammbombe — `mudbomb` · Ground · Special · a mud ball in a glossy bubble is lobbed at the target, bursts into yellow-green splats and a murky grey cloud (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Schlammbombe
   - Gen 4 APNG: https://www.pokewiki.de/images/e/ef/Schlammbombe_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/e/e2/Schlammbombe_Gen5.png
@@ -1314,7 +1314,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/R%C3%A4nkeschmied
   - Gen 4 APNG: https://www.pokewiki.de/images/5/5d/R%C3%A4nkeschmied_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/5/5f/R%C3%A4nkeschmied_Gen5.png
-- [ ] **Natural Gift** / Beerenkräfte — `naturalgift` · Normal · Physical · `projectile`
+- [x] **Natural Gift** / Beerenkräfte — `naturalgift` · Normal · Physical · green sparkles rise round the user as a white light orb swells, green rings of light spread over the whole field, target shakes (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Beerenkr%C3%A4fte
   - Gen 4 APNG: https://www.pokewiki.de/images/f/fc/Beerenkr%C3%A4fte_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/0/0a/Beerenkr%C3%A4fte_Gen5.png
@@ -1322,7 +1322,7 @@ Changes to the generic delivery animations or to this review list alone don't ne
   - Pokewiki: https://www.pokewiki.de/Nachthieb
   - Gen 4 APNG: https://www.pokewiki.de/images/a/a8/Nachthieb_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/d/dd/Nachthieb_Gen5.png
-- [ ] **Ominous Wind** / Unheilböen — `ominouswind` · Ghost · Special · `projectile`
+- [x] **Ominous Wind** / Unheilböen — `ominouswind` · Ghost · Special · an eerie violet wind sweeps over the scene with smeared purple streaks, both Pokémon tinted purple, two dark gusts shake the target (custom, needs review)
   - Pokewiki: https://www.pokewiki.de/Unheilb%C3%B6en
   - Gen 4 APNG: https://www.pokewiki.de/images/1/11/Unheilb%C3%B6en_Gen4.png
   - Gen 5 APNG: https://www.pokewiki.de/images/f/f7/Unheilb%C3%B6en_Gen5.png

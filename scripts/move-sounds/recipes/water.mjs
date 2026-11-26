@@ -3,22 +3,23 @@ import { env } from '../track.mjs';
 
 /** Water-type move sounds: rushing water, splashes, bubbles. */
 export const WATER = {
-  /** Generic melee, priority (lunge 0.12 s): a jet of water, then a splash. */
+  /** AquaJet.play (user shoots off 0-0.18 s, water streak 0.18-0.48 s, water column bursts up at 0.48 s, droplets to 1.1 s): a rushing jet of water, a big splash, then a patter of drops. */
   aquajet: () => {
-    const s = new MoveSfx(0.75, 0xa9e7);
-    s.whoosh(0.0, 0.14, { from: 3000, to: 7000, gain: 0.4 });
-    s.bubbles(0.0, 0.12, 4, { gain: 0.15 });
-    s.splash(0.12, 0.6);
-    s.bubbles(0.2, 0.4, 6, { gain: 0.12 });
+    const s = new MoveSfx(1.25, 0xa9e7);
+    s.whoosh(0.0, 0.18, { from: 2000, to: 5000, gain: 0.3 });
+    s.noise(0.18, 0.3, { clock: env.ramp(3000, 8000), gain: env.ramp(0.12, 0.32) });
+    s.bubbles(0.18, 0.3, 4, { gain: 0.12 });
+    s.splash(0.48, 0.65);
+    s.bubbles(0.55, 0.55, 8, { lo: 700, hi: 1500, gain: 0.12 });
     return s;
   },
 
-  /** Generic self aura (heal): a ring of water bubbles up around the caster. */
+  /** AquaRing.play (water orb swells 0-0.3 s, three rings spin round the user 0.2-1.3 s, drops trickle 0.35-1.0 s, fades to 1.5 s): bubbling with a shimmering hum, a gentle closing arpeggio. */
   aquaring: () => {
-    const s = new MoveSfx(1.2, 0xa917);
-    s.bubbles(0.02, 0.9, 14, { lo: 400, hi: 1100, gain: 0.2 });
-    s.wave(0.05, 0.85, { freq: (u) => 880 * (1 + 0.03 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.16) });
-    s.arpeggio(0.6, [72, 76, 79, 84], 0.07, { gain: 0.18, voice: 'wave', hold: 0.15 });
+    const s = new MoveSfx(1.65, 0xa917);
+    s.bubbles(0.0, 1.2, 14, { lo: 400, hi: 1100, gain: 0.18 });
+    s.wave(0.2, 1.1, { freq: (u) => 880 * (1 + 0.03 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.16) });
+    s.arpeggio(1.0, [72, 76, 79, 84], 0.07, { gain: 0.16, voice: 'wave', hold: 0.15 });
     return s;
   },
 
@@ -34,13 +35,14 @@ export const WATER = {
     return s;
   },
 
-  /** Generic projectile (0.43 s): a salty jet of water. */
+  /** Brine.play (eight spurts shoot up round the target 0.1-1.1 s, shakes at 0.3/0.65 s, mist 0.75-1.3 s): a run of hissing water spurts, then a soft misty hiss. */
   brine: () => {
-    const s = new MoveSfx(0.95, 0xb21e);
-    s.whoosh(0.0, 0.45, { from: 2500, to: 6500, gain: 0.35 });
-    s.bubbles(0.0, 0.4, 5, { gain: 0.12 });
-    s.splash(0.43, 0.6);
-    s.noise(0.5, 0.4, { clock: () => 12000, gain: env.decay(0.12, 1.5) });
+    const s = new MoveSfx(1.45, 0xb21e);
+    for (let i = 0; i < 8; i++) s.noise(0.1 + i * 0.085, 0.2, { clock: env.ramp(3500, 8000), gain: env.attackDecay(0.22, 0.03) });
+    s.splash(0.3, 0.45);
+    s.splash(0.65, 0.45);
+    s.bubbles(0.1, 0.8, 6, { gain: 0.1 });
+    s.noise(0.75, 0.55, { clock: () => 12000, gain: env.decay(0.12, 1.5) });
     return s;
   },
 

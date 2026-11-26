@@ -43,13 +43,14 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic self aura + stat-down fleck: an alluring glance. */
+  /** Captivate.play (hearts pop round the user 0-0.6 s, hearts float to the target 0.5-1.15 s, stat-down bubbles 1.25-2.15 s): a sweet rising chime with sparkles, a dreamy float, then the stat-down jingle. */
   captivate: () => {
-    const s = new MoveSfx(1.5, 0xca97);
-    s.wave(0.02, 0.4, { freq: (u) => 600 * Math.pow(2.5, u), gain: env.swell(0.26) });
-    s.arpeggio(0.4, [88, 84], 0.1, { gain: 0.2, voice: 'wave', hold: 0.18 });
-    s.sparkle(0.1, 0.6, 7, { lo: 3500, hi: 6000, gain: 0.13 });
-    s.statDown(0.85);
+    const s = new MoveSfx(2.3, 0xca97);
+    s.wave(0.02, 0.4, { freq: (u) => 600 * Math.pow(2.5, u), gain: env.swell(0.24) });
+    s.sparkle(0.05, 0.55, 7, { lo: 3500, hi: 6000, gain: 0.13 });
+    s.wave(0.5, 0.6, { freq: (u) => 1200 * (1 + 0.05 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.12) });
+    s.arpeggio(1.1, [88, 84], 0.1, { gain: 0.18, voice: 'wave', hold: 0.18 });
+    s.statDown(1.3);
     return s;
   },
 
@@ -236,13 +237,13 @@ export const NORMAL_STATUS = {
     return s;
   },
 
-  /** Generic target aura (≈ 0.8 s): the user cuts in first - a quick upward dash and a cheeky copying echo. */
+  /** MeFirst.play (swirls + sparkles round the target 0-0.55 s, cyan orb flies to the user 0.55-0.95 s, user flashes in a ring 0.95-1.35 s): a curious twinkle, a quick swoop, a snappy grab. */
   mefirst: () => {
-    const s = new MoveSfx(1.0, 0x3ef1);
-    s.whoosh(0.0, 0.2, { from: 2000, to: 9000, gain: 0.3 });
-    s.arpeggio(0.15, [72, 79, 84], 0.06, { gain: 0.2, duty: 0.25, hold: 0.08 });
-    s.arpeggio(0.45, [72, 79, 84], 0.06, { gain: 0.12, duty: 0.25, hold: 0.08 });
-    s.sparkle(0.35, 0.4, 5, { gain: 0.1 });
+    const s = new MoveSfx(1.5, 0x3ef1);
+    s.sparkle(0.0, 0.55, 6, { lo: 2800, hi: 5000, gain: 0.14 });
+    s.wave(0.05, 0.45, { freq: (u) => 800 * (1 + 0.1 * Math.sin(2 * Math.PI * 4 * u)), gain: env.swell(0.1) });
+    s.whoosh(0.55, 0.4, { from: 3000, to: 1200, gain: 0.25 });
+    s.pulse(0.95, 0.12, { freq: env.ramp(600, 1400), gain: env.decay(0.22, 1), duty: 0.5 });
     return s;
   },
 

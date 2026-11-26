@@ -18,13 +18,15 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic melee punch at priority (lunge 0.12 s): a fast, metallic jab. */
+  /** BulletPunch.play (five steel fists land every 0.14 s from 0.08 s, last burst fades by ~0.95 s): a rapid volley of metallic clanks. */
   bulletpunch: () => {
-    const s = new MoveSfx(0.65, 0xb0e7);
-    s.whoosh(0.0, 0.12, { from: 3000, to: 10000, gain: 0.35 });
-    s.thud(0.12, 0.6, 0.4);
-    s.noise(0.12, 0.08, { clock: () => 9000, gain: env.decay(0.4, 1), short: true });
-    s.pulse(0.12, 0.35, { freq: () => 1850, gain: env.decay(0.14, 2), duty: 0.5 });
+    const s = new MoveSfx(1.1, 0xb0e7);
+    for (let i = 0; i < 5; i++) {
+      const at = 0.08 + i * 0.14;
+      s.thud(at, 0.4, 0.35);
+      s.noise(at, 0.05, { clock: () => 9000, gain: env.decay(0.35, 1), short: true });
+      s.pulse(at, 0.12, { freq: () => 1850 + i * 60, gain: env.decay(0.1, 2), duty: 0.5 });
+    }
     return s;
   },
 
@@ -137,26 +139,25 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic lob (arc 0.52 s → impact): a ticking magnetic mine homes in and detonates with a metallic bang. */
+  /** MagnetBomb.play (steel balls are pulled in onto the target 0-0.7 s, cyan blasts 0.7-1.35 s): metallic clinks drawing in, then a rattling burst of blasts. */
   magnetbomb: () => {
-    const s = new MoveSfx(1.15, 0xb0b3);
-    s.pulse(0.0, 0.52, { freq: (u) => 500 + 600 * u, gain: env.ramp(0.08, 0.18), duty: 0.25 });
-    for (let i = 0; i < 5; i++) s.noise(0.05 + i * 0.1, 0.03, { clock: () => 8000, gain: env.decay(0.18, 1), short: true });
-    s.thud(0.52, 0.7, 0.8);
-    s.noise(0.52, 0.4, { clock: (u) => 6000 - 4500 * u, gain: env.attackDecay(0.4, 0.03) });
-    s.pulse(0.52, 0.5, { freq: () => 1480, gain: env.decay(0.12, 2), duty: 0.5 });
+    const s = new MoveSfx(1.45, 0x3a9b);
+    for (let i = 0; i < 6; i++) s.pulse(0.1 + i * 0.1, 0.05, { freq: () => 2200 + (i % 3) * 300, gain: env.decay(0.14, 1.5), duty: 0.5 });
+    s.wave(0.2, 0.5, { freq: env.ramp(200, 600), gain: env.ramp(0.04, 0.16) });
+    for (let i = 0; i < 4; i++) s.thud(0.7 + i * 0.1, 0.45, 0.5);
+    s.noise(0.7, 0.55, { clock: env.ramp(6000, 1500), gain: env.decay(0.3, 1.2) });
     return s;
   },
 
-  /** Generic projectile (impact 0.43 s): stored damage is flung back as a ringing burst of metal. */
+  /** MetalBurst.play (scene darkens 0-0.3 s, sparks spray off the flashing user 0.3-0.75 s, streaks shoot over 0.5-0.75 s, spiky burst on the target at 0.75 s, clears to 1.4 s): a metallic ring, a hissing zip, a heavy clanging burst. */
   metalburst: () => {
-    const s = new MoveSfx(1.0, 0xb0b5);
-    s.chord(0.0, 0.43, [55, 62, 67], { rate: 0.03, gain: 0.2, voice: 'pulse' });
-    s.noise(0.0, 0.43, { clock: env.ramp(2000, 7000), gain: env.swell(0.15), short: true });
-    s.thud(0.43, 0.4, 0.6);
-    s.noise(0.43, 0.08, { clock: () => 9000, gain: env.decay(0.4, 1), short: true });
-    s.pulse(0.43, 0.5, { freq: () => 1660, gain: env.decay(0.22, 1.5), duty: 0.5 });
-    s.pulse(0.43, 0.45, { freq: () => 2350, gain: env.decay(0.08, 2), duty: 0.5 });
+    const s = new MoveSfx(1.55, 0x3eb0);
+    s.pulse(0.3, 0.4, { freq: () => 1850, gain: env.decay(0.16, 2), duty: 0.5 });
+    s.sparkle(0.3, 0.4, 6, { lo: 3000, hi: 6000, gain: 0.12 });
+    s.whoosh(0.5, 0.25, { from: 3000, to: 10000, gain: 0.28 });
+    s.thud(0.75, 0.8, 0.8);
+    s.noise(0.75, 0.12, { clock: () => 9000, gain: env.decay(0.45, 1), short: true });
+    s.pulse(0.75, 0.4, { freq: () => 1200, gain: env.decay(0.14, 2), duty: 0.5 });
     return s;
   },
 
@@ -205,15 +206,15 @@ export const STEEL = {
     return s;
   },
 
-  /** Generic lob (arcs 0.52 s) + stat-down fleck: a glinting shard flies over, shatters with a mirror flash, then accuracy falls. */
+  /** MirrorShot.play (glints + white glow swell on the user 0-0.65 s, light orbs and a ring shoot over 0.65-0.95 s, target flashes at 0.95 s, glints to 1.35 s): a rising glassy shimmer, a bright zing, a glittering hit. */
   mirrorshot: () => {
-    const s = new MoveSfx(1.35, 0x3a50);
-    s.wave(0.0, 0.52, { freq: (u) => 1200 + 500 * Math.sin(Math.PI * u), gain: env.ramp(0.1, 0.22) });
-    s.sparkle(0.05, 0.45, 5, { lo: 4000, hi: 7000, gain: 0.1 });
-    s.noise(0.52, 0.2, { clock: () => 12000, gain: env.attackDecay(0.35, 0.03), short: true });
-    s.pulse(0.52, 0.3, { freq: () => 2637, gain: env.decay(0.18, 2), duty: 0.25 });
-    s.thud(0.52, 0.35, 0.3);
-    s.statDown(0.68, 0.22);
+    const s = new MoveSfx(1.5, 0x3175);
+    s.sparkle(0.0, 0.6, 7, { lo: 3500, hi: 6500, gain: 0.14 });
+    s.wave(0.05, 0.6, { freq: env.ramp(700, 1700), gain: env.ramp(0.04, 0.18) });
+    s.whoosh(0.65, 0.3, { from: 4000, to: 10000, gain: 0.26 });
+    s.thud(0.95, 0.4, 0.3);
+    s.pulse(0.95, 0.3, { freq: () => 2400, gain: env.decay(0.12, 2), duty: 0.5 });
+    s.sparkle(1.0, 0.35, 5, { lo: 3500, hi: 6500, gain: 0.12 });
     return s;
   },
 

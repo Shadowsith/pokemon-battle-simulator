@@ -20,18 +20,26 @@ import { KnockOff } from './dark/knock-off';
 import { Memento } from './dark/memento';
 import { Snatch } from './dark/snatch';
 import { Torment } from './dark/torment';
+import { Assurance } from './dark/assurance';
+import { DarkVoid } from './dark/dark-void';
+import { Embargo } from './dark/embargo';
+import { Fling } from './dark/fling';
 
-/** Hand-made animations for Dark-type moves (Beat Up, Fake Tears, Feint Attack, Flatter, Foul Play, Hone Claws, Knock Off, Memento, Nasty Plot, Night Slash, Pursuit, Snatch, Sucker Punch, Switcheroo, Thief and Torment live in `dark/`). */
+/** Hand-made animations for Dark-type moves (Assurance, Beat Up, Dark Void, Embargo, Fake Tears, Feint Attack, Flatter, Fling, Foul Play, Hone Claws, Knock Off, Memento, Nasty Plot, Night Slash, Pursuit, Snatch, Sucker Punch, Switcheroo, Thief and Torment live in `dark/`). */
 export class DarkMoveAnimations {
   /** Hand-made Dark move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
+    assurance: (refs, _launch, target) => Assurance.play(refs, target),
     beatup: (refs, _launch, target, v) => BeatUp.play(refs, target, v.dir),
     bite: (refs, _launch, target) => DarkMoveAnimations.playBite(refs, target),
     crunch: (refs, _launch, target) => DarkMoveAnimations.playCrunch(refs, target),
     darkpulse: (refs, launch, target) => DarkMoveAnimations.playDarkPulse(refs, launch, target),
+    darkvoid: (refs, _launch, target, v) => DarkVoid.play(refs, target, v),
+    embargo: (refs, _launch, target) => Embargo.play(refs, target),
     faketears: (refs, launch, target) => FakeTears.play(refs, launch, target),
     feintattack: (refs, _launch, target) => FeintAttack.play(refs, target),
     flatter: (refs, _launch, target) => Flatter.play(refs, target),
+    fling: (refs, launch, target) => Fling.play(refs, launch, target),
     foulplay: (refs, launch, target, v) => FoulPlay.play(refs, launch, target, v),
     honeclaws: (refs, launch, target) => HoneClaws.play(refs, launch, target),
     hyperspacefury: (refs, launch, target) => DarkMoveAnimations.playHyperspaceFury(refs, launch, target),

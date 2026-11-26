@@ -97,13 +97,14 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee: a grip tightens and crushes. */
+  /** CrushGrip.play (hand reaches over 0-0.4 s, squeezes the trembling target 0.4-0.95 s, lets go in a burst at 0.95 s, debris to 1.4 s): a swoop, a creaking squeeze, a crunching burst. */
   crushgrip: () => {
-    const s = new MoveSfx(0.9, 0xc2c9);
-    s.wave(0.0, 0.17, { freq: env.ramp(150, 260), gain: env.ramp(0.1, 0.3) });
-    s.thud(0.17, 0.65, 0.8);
-    for (let i = 0; i < 4; i++) s.noise(0.22 + i * 0.06, 0.04, { clock: () => 1500 + s.random() * 2000, gain: env.decay(0.25, 1) });
-    s.pulse(0.3, 0.4, { freq: env.ramp(90, 60), gain: env.decay(0.18, 1), duty: 0.25 });
+    const s = new MoveSfx(1.5, 0xc7c9);
+    s.whoosh(0.0, 0.4, { from: 600, to: 2000, gain: 0.3 });
+    s.pulse(0.4, 0.55, { freq: (u) => 90 + 40 * u + 8 * Math.sin(2 * Math.PI * 22 * u), gain: env.ramp(0.08, 0.26), duty: 0.125 });
+    s.noise(0.4, 0.55, { clock: () => 2500, gain: env.ramp(0.04, 0.16) });
+    s.thud(0.95, 0.75, 0.8);
+    s.noise(0.95, 0.1, { clock: () => 9000, gain: env.decay(0.45, 1), short: true });
     return s;
   },
 
@@ -149,12 +150,13 @@ export const NORMAL_STRIKE = {
     return s;
   },
 
-  /** Generic melee, 2 hits (impacts at 0.17 / 0.59 s). */
+  /** DoubleHit.play (two whacks at 0.15 s and 0.6 s, each with a pink sparkle burst): two sharp smacks with a twinkle. */
   doublehit: () => {
-    const s = new MoveSfx(0.85, 0xd0b1);
-    for (const at of [0.17, 0.59]) {
-      s.whoosh(at - 0.12, 0.13, { from: 1500, to: 5000, gain: 0.2 });
-      s.thud(at, 0.6, 0.5);
+    const s = new MoveSfx(1.0, 0xd0b1);
+    for (const at of [0.15, 0.6]) {
+      s.thud(at, 0.55, 0.45);
+      s.noise(at, 0.06, { clock: () => 10000, gain: env.decay(0.4, 1), short: true });
+      s.sparkle(at + 0.04, 0.3, 4, { lo: 2800, hi: 4800, gain: 0.12 });
     }
     return s;
   },

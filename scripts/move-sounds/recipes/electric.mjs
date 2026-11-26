@@ -96,13 +96,14 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic beam (grows 0.26 s, holds ~0.21 s, fades 0.2 s): a buzzing electric beam. */
+  /** ChargeBeam.play (scene darkens 0-0.25 s, bolts flicker + sparks gather 0.15-0.75 s, light ball swells 0.6-0.85 s, beam fires 0.85 s and hits 0.98 s, target crackles to 1.35 s, clears to 1.6 s): crackling charge, a rising hum, a zapping beam. */
   chargebeam: () => {
-    const s = new MoveSfx(0.85, 0xc4be);
-    s.pulse(0.0, 0.26, { freq: env.ramp(300, 900), gain: env.ramp(0.08, 0.25), duty: 0.25 });
-    s.noise(0.0, 0.7, { clock: () => 6500, gain: (u) => 0.3 * Math.min(1, u * 4) * Math.min(1, (1 - u) * 3), short: true });
-    s.pulse(0.26, 0.42, { freq: (u) => 880 * (1 + 0.03 * Math.sin(2 * Math.PI * 20 * u)), gain: (u) => 0.2 * (1 - u), duty: 0.125 });
-    s.noise(0.26, 0.15, { clock: (u) => 16000 - 8000 * u, gain: env.attackDecay(0.4, 0.05) });
+    const s = new MoveSfx(1.7, 0xc4be);
+    s.noise(0.15, 0.6, { clock: () => 6500, gain: (u) => 0.25 * Math.min(1, u * 4) * Math.min(1, (1 - u) * 3), short: true });
+    s.pulse(0.3, 0.55, { freq: env.ramp(300, 1000), gain: env.ramp(0.06, 0.24), duty: 0.25 });
+    s.noise(0.85, 0.15, { clock: (u) => 16000 - 8000 * u, gain: env.attackDecay(0.4, 0.05) });
+    s.pulse(0.85, 0.5, { freq: (u) => 880 * (1 + 0.03 * Math.sin(2 * Math.PI * 20 * u)), gain: (u) => 0.2 * (1 - u), duty: 0.125 });
+    s.noise(0.98, 0.37, { clock: () => 7000, gain: env.decay(0.22, 1.2), short: true });
     return s;
   },
 
@@ -231,12 +232,12 @@ export const ELECTRIC = {
     return s;
   },
 
-  /** Generic self aura (≈ 0.8 s): an electromagnetic hum swells and lifts the user off the ground. */
+  /** MagnetRise.play (sparks stream up 0.1-1.1 s, the user lifts off 0.25-0.55 s, hovers 0.55-1.25 s, settles 1.25-1.45 s): a buzzing magnetic hum rising in pitch, holding, then dipping. */
   magnetrise: () => {
-    const s = new MoveSfx(1.1, 0xf15e);
-    s.pulse(0.0, 0.95, { freq: (u) => 110 * Math.pow(3, u) * (1 + 0.03 * Math.sin(2 * Math.PI * 40 * u)), gain: env.swell(0.24), duty: 0.5 });
-    s.wave(0.1, 0.85, { freq: (u) => 220 * Math.pow(3, u), gain: env.swell(0.14) });
-    s.noise(0.0, 0.9, { clock: env.ramp(1500, 5000), gain: env.swell(0.08), short: true });
+    const s = new MoveSfx(1.6, 0x3a91);
+    s.pulse(0.1, 1.35, { freq: (u) => (u < 0.25 ? 200 + 1000 * u : u < 0.8 ? 450 : 450 - 900 * (u - 0.8)) * (1 + 0.02 * Math.sin(2 * Math.PI * 30 * u)), gain: env.swell(0.2), duty: 0.25 });
+    s.noise(0.1, 1.0, { clock: () => 6500, gain: env.swell(0.08), short: true });
+    s.sparkle(0.25, 0.8, 6, { lo: 2500, hi: 4500, gain: 0.1 });
     return s;
   },
 

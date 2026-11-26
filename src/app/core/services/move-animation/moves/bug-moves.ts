@@ -12,15 +12,21 @@ import { UTurn } from './bug/u-turn';
 import { XScissor } from './bug/x-scissor';
 import { SilverWind } from './bug/silver-wind';
 import { TailGlow } from './bug/tail-glow';
+import { BugBite } from './bug/bug-bite';
+import { DefendOrder } from './bug/defend-order';
+import { HealOrder } from './bug/heal-order';
 
-/** Hand-made animations for Bug-type moves (Fury Cutter, Silver Wind, Spider Web, Tail Glow, U-turn and X-Scissor live in `bug/`). */
+/** Hand-made animations for Bug-type moves (Bug Bite, Defend Order, Fury Cutter, Heal Order, Silver Wind, Spider Web, Tail Glow, U-turn and X-Scissor live in `bug/`). */
 export class BugMoveAnimations {
   /** Hand-made Bug move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     attackorder: (refs, _launch, target) => BugMoveAnimations.playAttackOrder(refs, target),
+    bugbite: (refs, _launch, target) => BugBite.play(refs, target),
     bugbuzz: (refs, launch, target) => BugMoveAnimations.playBugBuzz(refs, launch, target),
+    defendorder: (refs, launch) => DefendOrder.play(refs, launch),
     fellstinger: (refs, launch, target) => BugMoveAnimations.playFellStinger(refs, launch, target),
     furycutter: (refs, _launch, target, v) => FuryCutter.play(refs, target, v),
+    healorder: (refs, launch) => HealOrder.play(refs, launch),
     infestation: (refs, _launch, target) => BugMoveAnimations.playInfestation(refs, target),
     // Like Absorb, but blood-red sparkles are drained from the target.
     leechlife: (refs, launch, target) => GrassMoveAnimations.playAbsorb(refs, launch, target, ['#D8201C', '#FF8A80']),
@@ -457,7 +463,7 @@ export class BugMoveAnimations {
 
     // The swarm flies in from the edges of the screen with a wobbly path.
     for (let i = 0; i < 16; i++) {
-      const bee = BugMoveAnimations.beeGlyph(10 + Math.random() * 4);
+      const bee = FxGlyphs.beeGlyph(10 + Math.random() * 4);
       const ang = (Math.PI * 2 * i) / 16 + Math.random() * 0.3;
       const start: Point = {
         x: Fx.clamp(target.x + Math.cos(ang) * W * 0.6, -10, W + 10),
@@ -508,20 +514,6 @@ export class BugMoveAnimations {
       }, 50 + i * 250);
     }
     await Promise.all(effects);
-  }
-
-  /** A tiny cartoon bee: yellow body with black stripes and two white wings, `w` px wide. */
-  private static beeGlyph(w: number): HTMLElement {
-    const ns = 'http://www.w3.org/2000/svg';
-    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
-    svg.setAttribute('viewBox', '0 0 20 16');
-    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${w * 0.8}px`);
-    svg.innerHTML =
-      '<ellipse cx="8" cy="4" rx="4" ry="3.5" fill="#ffffffdd" stroke="#9AA" stroke-width=".6"/>' +
-      '<ellipse cx="13" cy="4" rx="3.5" ry="3" fill="#ffffffdd" stroke="#9AA" stroke-width=".6"/>' +
-      '<ellipse cx="10" cy="10" rx="8" ry="5" fill="#F8D020" stroke="#3A2A0A" stroke-width="1"/>' +
-      '<path d="M7,5.5 V14.5 M11,5 V15 M15,6 V14" stroke="#2A1A0A" stroke-width="1.6"/>';
-    return svg;
   }
 
   /**

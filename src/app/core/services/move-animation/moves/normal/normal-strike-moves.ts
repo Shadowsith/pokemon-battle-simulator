@@ -18,6 +18,7 @@ import { Scratch } from './scratch';
 import { Struggle } from './struggle';
 import { ViseGrip } from './vise-grip';
 import { Wrap } from './wrap';
+import { CrushGrip } from './crush-grip';
 
 /** Crush Claw's marks: black with a red glow. */
 const CRUSH_CLAW: ClawStyle = { glow: ['#FF2A2A', '#E01818'] };
@@ -37,7 +38,7 @@ interface BladeStyle {
 const SLASH: BladeStyle = { blade: '#fff', glow: '#FFF3A0', width: 7, sparks: 16, reach: 1, sink: 10, sparkMs: 520 };
 const CUT: BladeStyle = { blade: '#FFF0A0', glow: '#F8C030', width: 5, sparks: 22, reach: 1.5, sink: 30, sparkMs: 950 };
 
-/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Covet, Endeavor, Fake Out, False Swipe, Guillotine, Head Charge, Horn Drill, Last Resort, Quick Attack, Rage, Rock Climb, Scratch, Struggle, Vise Grip and Wrap live in their own files). */
+/** Hand-made animations for Normal-type contact moves that bite, cut, bind, or ram after charging up (Covet, Crush Grip, Endeavor, Fake Out, False Swipe, Guillotine, Head Charge, Horn Drill, Last Resort, Quick Attack, Rage, Rock Climb, Scratch, Struggle, Vise Grip and Wrap live in their own files). */
 export class NormalStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -46,6 +47,7 @@ export class NormalStrikeMoveAnimations {
     constrict: (refs, _launch, target) => NormalStrikeMoveAnimations.playConstrict(refs, target),
     covet: (refs, launch, target) => Covet.play(refs, launch, target),
     crushclaw: (refs, _launch, target) => NormalStrikeMoveAnimations.playCrushClaw(refs, target),
+    crushgrip: (refs, launch, target) => CrushGrip.play(refs, launch, target),
     cut: (refs, _launch, target, v) => NormalStrikeMoveAnimations.playSlash(refs, target, v, CUT),
     endeavor: (refs, launch, target) => Endeavor.play(refs, launch, target),
     fakeout: (refs, _launch, target) => FakeOut.play(refs, target),

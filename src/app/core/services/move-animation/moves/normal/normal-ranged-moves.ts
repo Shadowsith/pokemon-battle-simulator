@@ -13,8 +13,9 @@ import { Swift } from './swift';
 import { TechnoBlast } from './techno-blast';
 import { SpitUp } from './spit-up';
 import { WeatherBall } from './weather-ball';
+import { NaturalGift } from './natural-gift';
 
-/** Hand-made animations for Normal-type ranged moves (orbs, beams, blasts, gazes; Hidden Power lives in `hidden-power.ts`, Judgment in `judgment.ts`, Pay Day in `pay-day.ts`, Present in `present.ts`, Sonic Boom in `sonic-boom.ts`, Spike Cannon in `spike-cannon.ts`, Spit Up in `spit-up.ts`, Swift in `swift.ts`, Techno Blast in `techno-blast.ts`, Weather Ball in `weather-ball.ts`). */
+/** Hand-made animations for Normal-type ranged moves (orbs, beams, blasts, gazes; Hidden Power lives in `hidden-power.ts`, Judgment in `judgment.ts`, Natural Gift in `natural-gift.ts`, Pay Day in `pay-day.ts`, Present in `present.ts`, Sonic Boom in `sonic-boom.ts`, Spike Cannon in `spike-cannon.ts`, Spit Up in `spit-up.ts`, Swift in `swift.ts`, Techno Blast in `techno-blast.ts`, Weather Ball in `weather-ball.ts`). */
 export class NormalRangedMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -26,6 +27,7 @@ export class NormalRangedMoveAnimations {
     judgment: (refs, _launch, target) => Judgment.play(refs, target),
     hypervoice: (refs, launch, target) => NormalRangedMoveAnimations.playHyperVoice(refs, launch, target),
     hyperbeam: (refs, launch, target) => NormalRangedMoveAnimations.playHyperBeam(refs, launch, target),
+    naturalgift: (refs, launch) => NaturalGift.play(refs, launch),
     payday: (refs, launch, target) => PayDay.play(refs, launch, target),
     technoblast: (refs, launch, target, v) => TechnoBlast.play(refs, launch, target, v.dir),
     present: (refs, launch, target, v) => Present.play(refs, launch, target, v),

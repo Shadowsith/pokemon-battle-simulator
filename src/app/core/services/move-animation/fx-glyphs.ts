@@ -171,6 +171,20 @@ export class FxGlyphs {
     return el;
   }
 
+  /** A tiny cartoon bee: yellow body with black stripes and two white wings, `w` px wide (Attack Order, Defend Order). */
+  static beeGlyph(w: number): HTMLElement {
+    const ns = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(ns, 'svg') as unknown as HTMLElement;
+    svg.setAttribute('viewBox', '0 0 20 16');
+    svg.setAttribute('style', `position:absolute;overflow:visible;pointer-events:none;width:${w}px;height:${w * 0.8}px`);
+    svg.innerHTML =
+      '<ellipse cx="8" cy="4" rx="4" ry="3.5" fill="#ffffffdd" stroke="#9AA" stroke-width=".6"/>' +
+      '<ellipse cx="13" cy="4" rx="3.5" ry="3" fill="#ffffffdd" stroke="#9AA" stroke-width=".6"/>' +
+      '<ellipse cx="10" cy="10" rx="8" ry="5" fill="#F8D020" stroke="#3A2A0A" stroke-width="1"/>' +
+      '<path d="M7,5.5 V14.5 M11,5 V15 M15,6 V14" stroke="#2A1A0A" stroke-width="1.6"/>';
+    return svg;
+  }
+
   /** A white bubble with a blue music note in it (Belly Drum). */
   static noteBubble(size: number, note = '♪'): HTMLElement {
     const el = document.createElement('div');

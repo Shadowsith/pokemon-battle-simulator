@@ -124,12 +124,12 @@ export const GHOST = {
     return s;
   },
 
-  /** Generic projectile (0.43 s), no fleck: a howling, eerie gust rushes over and buffets the target. */
+  /** OminousWind.play (violet wind streaks rush over the scene 0-1.4 s, heavy gusts darken it at 0.45 s and 0.9 s, dies down to 1.65 s): a moaning, howling wind with two surging gusts. */
   ominouswind: () => {
-    const s = new MoveSfx(1.0, 0x0a1d);
-    s.noise(0.0, 0.75, { clock: (u) => 900 + 600 * Math.sin(2 * Math.PI * 3 * u), gain: (u) => 0.3 * Math.min(1, u * 5) * Math.pow(1 - u, 0.8) });
-    s.wave(0.0, 0.7, { freq: (u) => (350 + 250 * Math.sin(Math.PI * u)) * (1 + 0.04 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.22) });
-    s.thud(0.43, 0.4, 0.5);
+    const s = new MoveSfx(1.75, 0x0317);
+    s.noise(0.0, 1.55, { clock: (u) => 2500 + 1500 * Math.sin(2 * Math.PI * 1.5 * u), gain: env.swell(0.26) });
+    s.wave(0.05, 1.45, { freq: (u) => 220 * (1 + 0.15 * Math.sin(2 * Math.PI * 1.2 * u)), gain: env.swell(0.12) });
+    for (const at of [0.45, 0.9]) s.whoosh(at - 0.05, 0.35, { from: 600, to: 1800, gain: 0.3 });
     return s;
   },
 

@@ -149,12 +149,13 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s) on the whole field: space bends and everything is pulled down hard. */
+  /** Gravity.play (scene turns murky 0-0.25 s, vortex at the user's feet 0.2-1.3 s, both Pokémon squashed 0.25-1.3 s, spring back + clear 1.3-1.6 s): a deep pressing drone sinking lower, then a springy release. */
   gravity: () => {
-    const s = new MoveSfx(1.3, 0x6a71);
-    s.wave(0.02, 0.85, { freq: (u) => 440 * Math.pow(0.3, u) * (1 + 0.03 * Math.sin(2 * Math.PI * 10 * u)), gain: env.swell(0.22) });
-    s.pulse(0.02, 0.85, { freq: (u) => 220 * Math.pow(0.4, u), gain: env.swell(0.12), duty: 0.5 });
-    s.rumble(0.3, 0.9, { from: 400, to: 120, gain: 0.25 });
+    const s = new MoveSfx(1.75, 0x6a71);
+    s.wave(0.0, 1.3, { freq: env.ramp(160, 70), gain: env.swell(0.3) });
+    s.rumble(0.25, 1.05, { from: 180, to: 60, gain: 0.3 });
+    s.whoosh(0.2, 1.0, { from: 900, to: 250, gain: 0.18 });
+    s.wave(1.3, 0.25, { freq: env.ramp(200, 500), gain: env.decay(0.18, 1.5) });
     return s;
   },
 
@@ -167,24 +168,21 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): two shields trade places, a rising and a falling warble crossing. */
+  /** SkillSwap.play with GUARD (pale blue orbs cross between user and target 0.05-0.8 s, both flash blue 0.8-1.1 s): two cool warbling tones swap places, then a soft chime. */
   guardswap: () => {
-    const s = new MoveSfx(1.25, 0x65a9);
-    s.wave(0.02, 0.75, { freq: (u) => 330 * Math.pow(2, u) * (1 + 0.02 * Math.sin(2 * Math.PI * 11 * u)), gain: env.swell(0.17) });
-    s.wave(0.02, 0.75, { freq: (u) => 660 * Math.pow(0.5, u) * (1 + 0.02 * Math.sin(2 * Math.PI * 11 * u)), gain: env.swell(0.15) });
-    s.arpeggio(0.78, [76, 72], 0.08, { gain: 0.14, duty: 0.25, hold: 0.12 });
+    const s = new MoveSfx(1.3, 0x6a55);
+    s.wave(0.05, 0.75, { freq: (u) => (350 + 400 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 6 * u)), gain: env.swell(0.24) });
+    s.wave(0.05, 0.75, { freq: (u) => (750 - 400 * u) * (1 + 0.03 * Math.sin(2 * Math.PI * 6 * u + 2)), gain: env.swell(0.12) });
+    s.arpeggio(0.8, [76, 81], 0.07, { gain: 0.16, voice: 'wave', hold: 0.14 });
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a psychic seal buzzes shut over the foes with a dull, denying tone. */
+  /** HealBlock.play (golden sparkles twinkle 0-0.9 s, scene dims 0.45-0.7 s, target darkens 0.5-1.35 s, clears to 1.6 s): a twinkle of sparkles, then a dull sealing tone fading out. */
   healblock: () => {
-    const s = new MoveSfx(1.2, 0x4eb0);
-    s.wave(0.0, 0.7, { freq: (u) => 600 + 80 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.2) });
-    s.pulse(0.0, 0.7, { freq: (u) => 900 + 120 * Math.sin(2 * Math.PI * 7 * u), gain: env.swell(0.1), duty: 0.25 });
-    s.pulse(0.65, 0.18, { freq: () => 233, gain: env.decay(0.2, 1), duty: 0.5 });
-    s.pulse(0.65, 0.18, { freq: () => 247, gain: env.decay(0.16, 1), duty: 0.5 });
-    s.pulse(0.85, 0.25, { freq: () => 175, gain: env.decay(0.2, 1.5), duty: 0.5 });
-    s.pulse(0.85, 0.25, { freq: () => 185, gain: env.decay(0.16, 1.5), duty: 0.5 });
+    const s = new MoveSfx(1.75, 0x6eb1);
+    s.sparkle(0.0, 0.9, 10, { lo: 2800, hi: 5200, gain: 0.16 });
+    s.wave(0.45, 0.9, { freq: env.ramp(500, 220), gain: env.decay(0.22, 1.2) });
+    s.pulse(0.5, 0.2, { freq: () => 180, gain: env.decay(0.18, 1.5), duty: 0.125 });
     return s;
   },
 
@@ -221,12 +219,13 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): two warbling tones trade places as the stat changes are swapped. */
+  /** HeartSwap.play (orbs fly to the target 0.1-0.55 s and back 0.55-1.0 s, both glow with orbit rings 1.0-1.5 s): a rising then falling shimmer, then a warm chime. */
   heartswap: () => {
-    const s = new MoveSfx(1.2, 0x4e5f);
-    s.wave(0.0, 0.85, { freq: (u) => 400 + 400 * u + 30 * Math.sin(2 * Math.PI * 8 * u), gain: env.swell(0.2) });
-    s.pulse(0.0, 0.85, { freq: (u) => 800 - 400 * u + 30 * Math.sin(2 * Math.PI * 8 * u), gain: env.swell(0.1), duty: 0.25 });
-    s.arpeggio(0.75, [76, 81, 76, 81], 0.07, { gain: 0.14, voice: 'wave', hold: 0.1 });
+    const s = new MoveSfx(1.65, 0x6e55);
+    s.wave(0.1, 0.45, { freq: env.ramp(500, 1000), gain: env.swell(0.22) });
+    s.wave(0.55, 0.45, { freq: env.ramp(1000, 500), gain: env.swell(0.22) });
+    s.chord(1.0, 0.5, [72, 76, 79], { gain: 0.16, vibrato: 0.01 });
+    s.sparkle(1.0, 0.45, 6, { lo: 3000, hi: 5000, gain: 0.12 });
     return s;
   },
 
@@ -291,13 +290,13 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s, no fleck): a moonlit dance - a dreamy waltz of warbling waves and soft starlight. */
+  /** LunarDance.play (scene darkens + moon rises 0-0.4 s, pink rings swirl up from a golden glow and sparkles twinkle 0.35-1.45 s, clears to 1.8 s): a soft night chord, a rising shimmer of sparkles, a gentle lullaby turn. */
   lunardance: () => {
-    const s = new MoveSfx(1.25, 0x10da);
-    s.arpeggio(0.02, [69, 76, 81, 79, 76, 84], 0.13, { gain: 0.2, voice: 'wave', hold: 0.22 });
-    s.wave(0.02, 0.85, { freq: (u) => 220 * (1 + 0.03 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.14) });
-    s.chord(0.3, 0.6, [93, 96, 100], { rate: 0.05, gain: 0.08, vibrato: 0.01 });
-    s.sparkle(0.1, 0.8, 8, { lo: 2600, hi: 5000, gain: 0.1 });
+    const s = new MoveSfx(1.95, 0x1d4c);
+    s.chord(0.0, 0.5, [64, 68, 71], { gain: 0.14, vibrato: 0.01 });
+    s.wave(0.35, 1.1, { freq: env.ramp(500, 1100), gain: env.swell(0.16) });
+    s.sparkle(0.4, 1.0, 12, { lo: 3000, hi: 6000, gain: 0.14 });
+    s.arpeggio(1.0, [76, 79, 83, 88], 0.1, { gain: 0.14, voice: 'wave', hold: 0.2 });
     return s;
   },
 
@@ -358,13 +357,13 @@ export const PSYCHIC = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s): a third eye opens with a warbling glow and a sharp seeing "ping". */
+  /** MiracleEye.play (scene darkens 0-0.25 s, the eye opens 0.2-0.45 s and stares to 1.3 s, coloured rays burst off the flashing target 0.65-1.2 s, clears to 1.55 s): a mystic opening tone, then a bright revealing shimmer. */
   miracleeye: () => {
-    const s = new MoveSfx(1.15, 0x3e1e);
-    s.wave(0.02, 0.55, { freq: (u) => (500 + 400 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.26) });
-    s.wave(0.02, 0.55, { freq: (u) => (750 + 600 * u) * (1 + 0.04 * Math.sin(2 * Math.PI * 9 * u)), gain: env.swell(0.1) });
-    s.pulse(0.55, 0.4, { freq: () => 2093, gain: env.decay(0.22, 2), duty: 0.25 });
-    s.sparkle(0.58, 0.3, 4, { lo: 4000, hi: 6000, gain: 0.1 });
+    const s = new MoveSfx(1.7, 0x31ce);
+    s.wave(0.2, 0.3, { freq: env.ramp(300, 900), gain: env.swell(0.2) });
+    s.wave(0.45, 0.85, { freq: (u) => 900 * (1 + 0.04 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.1) });
+    s.noise(0.65, 0.4, { clock: env.ramp(4000, 12000), gain: env.attackDecay(0.2, 0.05) });
+    s.sparkle(0.65, 0.55, 8, { lo: 3500, hi: 6500, gain: 0.14 });
     return s;
   },
 

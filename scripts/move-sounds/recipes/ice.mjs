@@ -17,13 +17,14 @@ export const ICE = {
     return s;
   },
 
-  /** Generic melee: a crash of ice, rolling snow and flying chunks. */
+  /** Avalanche.play (scene turns pale 0-0.3 s, snowballs rain down 0.2-1.35 s with puffs, target shakes at 0.58/0.88/1.18 s, field shake at 1.1 s, clears to 1.7 s): a rising roar of tumbling snow with soft thumps. */
   avalanche: () => {
-    const s = new MoveSfx(1.3, 0xa7a1);
-    s.whoosh(0.0, 0.18, { from: 600, to: 2000, gain: 0.3 });
-    s.thud(0.17, 0.8, 1);
-    s.rumble(0.17, 1.1, { from: 600, to: 150, gain: 0.45 });
-    s.sparkle(0.25, 0.65, 8, { lo: 2000, hi: 3500, gain: 0.16 });
+    const s = new MoveSfx(1.85, 0xa7a1);
+    s.rumble(0.15, 1.35, { from: 400, to: 150, gain: 0.4 });
+    s.noise(0.2, 1.2, { clock: () => 4000, gain: env.swell(0.2) });
+    for (const at of [0.58, 0.88, 1.18]) s.thud(at, 0.45, 0.6);
+    s.thud(1.1, 0.5, 1);
+    s.sparkle(0.6, 0.8, 6, { lo: 2000, hi: 3500, gain: 0.1 });
     return s;
   },
 
@@ -176,14 +177,14 @@ export const ICE = {
     return s;
   },
 
-  /** Generic melee bite (impact 0.17 s) + freeze fleck (0.45 s): frosty fangs snap shut with a crunch. */
+  /** IceFang.play (jaw snaps at 0.45 s, target freezes pale blue 0.45-1.15 s, ice chunks burst off 0.45-1.0 s, mist 0.55-1.3 s): a chomp, a crackling freeze with tinkling ice, a cold hiss. */
   icefang: () => {
-    const s = new MoveSfx(1.0, 0x1cef);
-    s.whoosh(0.0, 0.17, { from: 2500, to: 9000, gain: 0.25 });
-    s.noise(0.17, 0.06, { clock: () => 12000, gain: env.decay(0.4, 1) });
-    s.pulse(0.17, 0.08, { freq: (u) => 1400 - 800 * u, gain: env.decay(0.25, 1.5), duty: 0.25 });
-    s.thud(0.2, 0.45, 0.3);
-    s.freeze(0.45);
+    const s = new MoveSfx(1.45, 0x1cef);
+    s.noise(0.45, 0.07, { clock: () => 12000, gain: env.decay(0.55, 1) });
+    s.thud(0.45, 0.4, 0.35);
+    s.freeze(0.5, 0.22);
+    s.sparkle(0.5, 0.5, 8, { lo: 3000, hi: 6000, gain: 0.16 });
+    s.noise(0.55, 0.75, { clock: () => 11000, gain: env.swell(0.08) });
     return s;
   },
 
@@ -202,14 +203,14 @@ export const ICE = {
     return s;
   },
 
-  /** Generic projectile at priority (impact 0.26 s): a quick, glinting shard that clinks on hit. */
+  /** IceShard.play (scene dims + mist round the user 0-0.4 s, shards fly 0.4-0.65 s, shatter on the target 0.65-0.74 s, glints to 1.15 s, clears to 1.35 s): a cold puff, a quick whizz, shattering ice and glints. */
   iceshard: () => {
-    const s = new MoveSfx(0.75, 0x1c5a);
-    s.whoosh(0.0, 0.26, { from: 4000, to: 12000, gain: 0.25 });
-    s.pulse(0.0, 0.26, { freq: (u) => 2400 + 1200 * u, gain: env.ramp(0.05, 0.12), duty: 0.125 });
-    s.noise(0.26, 0.05, { clock: () => 14000, gain: env.decay(0.4, 1) });
-    s.pulse(0.26, 0.35, { freq: () => 3136, gain: env.decay(0.16, 2), duty: 0.25 });
-    s.sparkle(0.28, 0.3, 5, { lo: 3500, hi: 6500, gain: 0.14 });
+    const s = new MoveSfx(1.5, 0x1c5a);
+    s.noise(0.0, 0.4, { clock: () => 6000, gain: env.swell(0.12) });
+    s.whoosh(0.4, 0.25, { from: 3000, to: 9000, gain: 0.3 });
+    for (let i = 0; i < 4; i++) s.noise(0.65 + i * 0.03, 0.06, { clock: () => 14000, gain: env.decay(0.3, 1), short: true });
+    s.thud(0.65, 0.35, 0.25);
+    s.sparkle(0.8, 0.4, 5, { lo: 3500, hi: 6500, gain: 0.14 });
     return s;
   },
 

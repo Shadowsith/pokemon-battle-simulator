@@ -6,12 +6,14 @@ import { FireFlames } from './fire-flames';
 import { FlameWheel } from './flame-wheel';
 import { HeatCrash } from './heat-crash';
 import { VCreate } from './v-create';
+import { FireFang } from './fire-fang';
 
-/** Hand-made animations for Fire-type contact moves: punches, kicks and charges (Flame Wheel lives in `flame-wheel.ts`, Heat Crash in `heat-crash.ts`, V-create in `v-create.ts`). */
+/** Hand-made animations for Fire-type contact moves: punches, kicks and charges (Fire Fang lives in `fire-fang.ts`, Flame Wheel in `flame-wheel.ts`, Heat Crash in `heat-crash.ts`, V-create in `v-create.ts`). */
 export class FireStrikeMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     blazekick: (refs, _launch, target) => FireStrikeMoveAnimations.playBlazeKick(refs, target),
+    firefang: (refs, _launch, target) => FireFang.play(refs, target),
     firepunch: (refs, _launch, target) => FireStrikeMoveAnimations.playFirePunch(refs, target),
     flamewheel: (refs, launch, target, v) => FlameWheel.play(refs, launch, target, v),
     flareblitz: (refs, launch, target, v) => FireStrikeMoveAnimations.playFlareBlitz(refs, launch, target, v),

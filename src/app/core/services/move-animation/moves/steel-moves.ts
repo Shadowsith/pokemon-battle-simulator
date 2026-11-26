@@ -10,16 +10,21 @@ import { IronHead } from './steel/iron-head';
 import { MetalClaw } from './steel/metal-claw';
 import { ShiftGear } from './steel/shift-gear';
 import { MetalSound } from './steel/metal-sound';
+import { BulletPunch } from './steel/bullet-punch';
+import { MagnetBomb } from './steel/magnet-bomb';
+import { MetalBurst } from './steel/metal-burst';
+import { MirrorShot } from './steel/mirror-shot';
 
 /** Silver tones of Steel moves: sparkle, dust light, dust shade. */
 const SILVER = '#DDE2EC';
 const DUST: [string, string] = ['#E4E8F0', '#A9B0BE'];
 
-/** Hand-made animations for Steel-type moves (Autotomize, Gyro Ball, Heavy Slam, Iron Head, Metal Claw, Metal Sound and Shift Gear live in `steel/`). */
+/** Hand-made animations for Steel-type moves (Autotomize, Bullet Punch, Gyro Ball, Heavy Slam, Iron Head, Magnet Bomb, Metal Burst, Metal Claw, Metal Sound, Mirror Shot and Shift Gear live in `steel/`). */
 export class SteelMoveAnimations {
   /** Hand-made Steel move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     autotomize: (refs, launch) => Autotomize.play(refs, launch),
+    bulletpunch: (refs, _launch, target, v) => BulletPunch.play(refs, target, v),
     doomdesire: (refs) => SteelMoveAnimations.playDoomDesireHit(refs),
     flashcannon: (refs, launch, target) => SteelMoveAnimations.playFlashCannon(refs, launch, target),
     gyroball: (refs, launch, target, v) => GyroBall.play(refs, launch, target, v),
@@ -28,9 +33,12 @@ export class SteelMoveAnimations {
     ironhead: (refs, launch, target, v) => IronHead.play(refs, launch, target, v),
     irontail: (refs, launch, target, v) => SteelMoveAnimations.playIronTail(refs, launch, target, v),
     kingsshield: (refs, launch, _target, v) => SteelMoveAnimations.playKingsShield(refs, launch, v),
+    magnetbomb: (refs, _launch, target) => MagnetBomb.play(refs, target),
+    metalburst: (refs, launch, target) => MetalBurst.play(refs, launch, target),
     metalclaw: (refs, _launch, target, v) => MetalClaw.play(refs, target, v),
     metalsound: (refs, launch, target) => MetalSound.play(refs, launch, target),
     meteormash: (refs, _launch, target) => SteelMoveAnimations.playMeteorMash(refs, target),
+    mirrorshot: (refs, launch, target) => MirrorShot.play(refs, launch, target),
     shiftgear: (refs, launch) => ShiftGear.play(refs, launch),
     steelwing: (refs, launch, target, v) => SteelMoveAnimations.playSteelWing(refs, launch, target, v)
   };

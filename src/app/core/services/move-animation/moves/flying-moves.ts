@@ -14,8 +14,9 @@ import { Hurricane } from './flying/hurricane';
 import { Roost } from './flying/roost';
 import { Tailwind } from './flying/tailwind';
 import { WingAttack } from './flying/wing-attack';
+import { Chatter } from './flying/chatter';
 
-/** Hand-made animations for Flying-type moves (Aerial Ace, Air Cutter, Air Slash, Brave Bird, Defog, Dragon Ascent, Feather Dance, Hurricane, Roost, Tailwind and Wing Attack live in `flying/`). */
+/** Hand-made animations for Flying-type moves (Aerial Ace, Air Cutter, Air Slash, Brave Bird, Chatter, Defog, Dragon Ascent, Feather Dance, Hurricane, Roost, Tailwind and Wing Attack live in `flying/`). */
 export class FlyingMoveAnimations {
   /** Hand-made Flying move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -25,6 +26,7 @@ export class FlyingMoveAnimations {
     airslash: (refs, launch, target) => AirSlash.play(refs, launch, target),
     bounce: (refs, _launch, target) => FlyingMoveAnimations.playBounceDown(refs, target),
     bravebird: (refs, launch, target) => BraveBird.play(refs, launch, target),
+    chatter: (refs, launch) => Chatter.play(refs, launch),
     defog: (refs, launch, target) => Defog.play(refs, launch, target),
     dragonascent: (refs, launch, target, v) => DragonAscent.play(refs, launch, target, v),
     drillpeck: (refs, _launch, target, v) => FlyingMoveAnimations.playDrillPeck(refs, target, v),

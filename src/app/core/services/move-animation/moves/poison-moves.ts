@@ -11,8 +11,9 @@ import { Smog } from './poison/smog';
 import { ToxicSpikes } from './poison/toxic-spikes';
 import { PoisonFang } from './poison/poison-fang';
 import { PoisonTail } from './poison/poison-tail';
+import { GastroAcid } from './poison/gastro-acid';
 
-/** Hand-made animations for Poison-type moves (Coil, Poison Fang, Poison Gas, Poison Jab, Poison Powder, Poison Tail, Sludge Wave, Smog and Toxic Spikes live in `poison/`). */
+/** Hand-made animations for Poison-type moves (Coil, Gastro Acid, Poison Fang, Poison Gas, Poison Jab, Poison Powder, Poison Tail, Sludge Wave, Smog and Toxic Spikes live in `poison/`). */
 export class PoisonMoveAnimations {
   /** Hand-made Poison move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -21,6 +22,7 @@ export class PoisonMoveAnimations {
     belch: (refs, launch, target) => PoisonMoveAnimations.playBelch(refs, launch, target),
     coil: (refs, launch) => Coil.play(refs, launch),
     crosspoison: (refs, _launch, target) => PoisonMoveAnimations.playCrossPoison(refs, target),
+    gastroacid: (refs, _launch, target) => GastroAcid.play(refs, target),
     gunkshot: (refs, launch, target) => PoisonMoveAnimations.playGunkShot(refs, launch, target),
     poisonfang: (refs, _launch, target) => PoisonFang.play(refs, target),
     poisongas: (refs, launch, target) => PoisonGas.play(refs, launch, target),

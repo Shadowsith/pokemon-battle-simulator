@@ -3,14 +3,16 @@ import { env } from '../../track.mjs';
 
 /** Normal-type status moves on the user or its allies (buffs, heals, shields, self effects). */
 export const NORMAL_BUFF = {
-  /** Generic target aura: three precise needle pokes, then pressure releases. */
+  /** Acupressure.play (user flashes white 0-0.25 s, the finger jabs it at 0.45 s and 0.75 s, stat-up bands 1.1-1.9 s): a bright shimmer, two sharp pokes with a twinkle, then the stat-up jingle. */
   acupressure: () => {
-    const s = new MoveSfx(0.95, 0xacc0);
-    for (const at of [0.08, 0.2, 0.32]) {
-      s.pulse(at, 0.03, { freq: () => 3500, gain: env.decay(0.3, 1), duty: 0.25 });
-      s.noise(at, 0.02, { clock: () => 16000, gain: env.decay(0.25, 1) });
+    const s = new MoveSfx(2.1, 0xacc0);
+    s.wave(0.0, 0.25, { freq: env.ramp(900, 1600), gain: env.swell(0.18) });
+    for (const at of [0.45, 0.75]) {
+      s.pulse(at, 0.04, { freq: () => 3500, gain: env.decay(0.3, 1), duty: 0.25 });
+      s.noise(at, 0.03, { clock: () => 16000, gain: env.decay(0.25, 1) });
+      s.sparkle(at + 0.02, 0.2, 3, { lo: 3000, hi: 5000, gain: 0.14 });
     }
-    s.wave(0.45, 0.4, { freq: env.ramp(600, 1250), gain: env.swell(0.3) });
+    s.statUp(1.1);
     return s;
   },
 
@@ -97,12 +99,12 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura: a short phrase, then copied a step higher. */
+  /** Copycat.play (orb swells 0-0.45 s and flares, white ring + dark silhouette 0.45-0.95 s): a rising shimmer, then a soft copying blip. */
   copycat: () => {
-    const s = new MoveSfx(1.0, 0xc0ca);
-    s.arpeggio(0.02, [72, 76, 74], 0.1, { gain: 0.24, voice: 'wave', hold: 0.11 });
-    s.arpeggio(0.4, [77, 81, 79], 0.1, { gain: 0.24, voice: 'wave', hold: 0.11 });
-    s.sparkle(0.7, 0.25, 3, { gain: 0.1 });
+    const s = new MoveSfx(1.1, 0xc0ca);
+    s.wave(0.0, 0.45, { freq: env.ramp(500, 1300), gain: env.ramp(0.05, 0.22) });
+    s.sparkle(0.42, 0.25, 4, { lo: 3000, hi: 5000, gain: 0.14 });
+    s.pulse(0.45, 0.3, { freq: env.ramp(1300, 400), gain: env.decay(0.18, 1.5), duty: 0.5 });
     return s;
   },
 
@@ -267,12 +269,12 @@ export const NORMAL_BUFF = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s, no fleck): a solemn incantation - a chanted three-note figure under twinkling luck charms. */
+  /** LuckyChant.play (pink and white stars swirl in round the user 0-0.65 s, pink ring + pale pink glow 0.65-1.25 s): a twinkling swirl, then a bright lucky chime. */
   luckychant: () => {
-    const s = new MoveSfx(1.15, 0x1c4a);
-    s.arpeggio(0.02, [67, 72, 74, 72, 79], 0.15, { gain: 0.22, voice: 'wave', hold: 0.2 });
-    s.pulse(0.02, 0.8, { freq: () => 196, gain: env.swell(0.1), duty: 0.25 });
-    s.sparkle(0.2, 0.65, 7, { lo: 3000, hi: 5000, gain: 0.12 });
+    const s = new MoveSfx(1.4, 0x1c4a);
+    s.sparkle(0.0, 0.65, 10, { lo: 3000, hi: 6000, gain: 0.16 });
+    s.wave(0.1, 0.55, { freq: env.ramp(700, 1400), gain: env.swell(0.12) });
+    s.arpeggio(0.65, [76, 79, 84, 88], 0.08, { gain: 0.18, voice: 'wave', hold: 0.16 });
     return s;
   },
 

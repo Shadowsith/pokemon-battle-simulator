@@ -93,12 +93,13 @@ export const POISON = {
     return s;
   },
 
-  /** Generic target aura (~0.8 s), no fleck: sticky acid coats the foe with a fizzing gurgle. */
+  /** GastroAcid.play (acid drops splash down 0.1-0.75 s, target turns green 0.3-1.2 s, acid pools and bubbles 0.6-1.25 s): a patter of wet drips, then sizzling bubbles. */
   gastroacid: () => {
-    const s = new MoveSfx(1.25, 0x6a5a);
-    s.noise(0.02, 0.85, { clock: () => 2600, gain: env.swell(0.12) });
-    s.pulse(0.02, 0.8, { freq: (u) => (260 - 80 * u) * (1 + 0.08 * Math.sin(2 * Math.PI * 11 * u)), gain: env.swell(0.2), duty: 0.25 });
-    s.bubbles(0.05, 0.8, 9, { lo: 160, hi: 380, gain: 0.22 });
+    const s = new MoveSfx(1.4, 0x6a5a);
+    for (let i = 0; i < 8; i++) s.noise(0.15 + i * 0.075, 0.05, { clock: () => 3000 + (i % 3) * 800, gain: env.decay(0.22, 1) });
+    s.bubbles(0.55, 0.7, 10, { lo: 250, hi: 700, gain: 0.2 });
+    s.noise(0.6, 0.65, { clock: () => 9000, gain: env.swell(0.08) });
+    s.poison(0.75, 0.18);
     return s;
   },
 

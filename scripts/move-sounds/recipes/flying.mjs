@@ -98,17 +98,12 @@ export const FLYING = {
     return s;
   },
 
-  /** Generic sonic (rings every 0.11 s, impact 0.43 s) + confusion fleck: noisy bird chatter. */
+  /** Chatter.play (six coloured rings pulse out of the user every 0.16 s while it bobs, note bubble 0.3-1.3 s, target shakes at 1.0 s): rapid chirpy squawks, a little melody, a hit. */
   chatter: () => {
-    const s = new MoveSfx(1.2, 0xc4a7);
-    for (let i = 0; i < 12; i++) {
-      const at = i * 0.04 + s.random() * 0.02;
-      const f = 1500 + s.random() * 1500;
-      const up = s.random() < 0.5;
-      s.pulse(at, 0.05, { freq: (u) => f * (up ? 1 + 0.6 * u : 1.4 - 0.5 * u), gain: env.decay(0.22, 1), duty: 0.25 });
-    }
-    s.thud(0.43, 0.35, 0.2);
-    s.confusion(0.6);
+    const s = new MoveSfx(1.45, 0xc4a7);
+    for (let i = 0; i < 6; i++) s.pulse(i * 0.16, 0.09, { freq: (u) => (1400 + (i % 3) * 300) * (1 + 0.4 * Math.sin(Math.PI * u)), gain: env.decay(0.22, 1.2), duty: 0.25 });
+    s.arpeggio(0.55, [79, 83, 86, 83], 0.12, { gain: 0.16, voice: 'wave', hold: 0.1 });
+    s.thud(1.0, 0.35, 0.3);
     return s;
   },
 

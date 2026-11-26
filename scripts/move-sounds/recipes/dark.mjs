@@ -3,12 +3,13 @@ import { env } from '../track.mjs';
 
 /** Dark-type move sounds. */
 export const DARK = {
-  /** Generic melee: a low, menacing swing and a hard blow. */
+  /** Assurance.play (huge hand appears 0-0.25 s, shrinks down onto the target 0.25-0.7 s, burst + orbs scatter 0.7-1.25 s): a falling swoop, a heavy slap, then sparkling scatter. */
   assurance: () => {
-    const s = new MoveSfx(0.75, 0xa55a);
-    s.whoosh(0.0, 0.18, { from: 800, to: 2500, gain: 0.35 });
-    s.thud(0.17, 0.65, 0.7);
-    s.pulse(0.2, 0.4, { freq: env.ramp(110, 70), gain: env.decay(0.2, 1), duty: 0.125 });
+    const s = new MoveSfx(1.35, 0xa55a);
+    s.whoosh(0.2, 0.5, { from: 2500, to: 700, gain: 0.3 });
+    s.thud(0.7, 0.65, 0.6);
+    s.noise(0.7, 0.06, { clock: () => 9000, gain: env.decay(0.4, 1), short: true });
+    s.sparkle(0.75, 0.45, 6, { lo: 2000, hi: 3800, gain: 0.14 });
     return s;
   },
 
@@ -69,22 +70,25 @@ export const DARK = {
     return s;
   },
 
-  /** Generic target aura + sleep fleck: the foes sink into a black void. */
+  /** DarkVoid.play (curtains 0-0.3 s, hole opens 0.2-0.45 s, target sinks 0.65-1.1 s, curtains darken 0.95-1.3 s, clears to 1.5 s, sleep Zs 1.5-2.3 s): an eerie drone, a sinking sweep, then the drowsy sleep tune. */
   darkvoid: () => {
-    const s = new MoveSfx(1.35, 0xda70);
-    s.wave(0.02, 0.6, { freq: (u) => 400 * Math.pow(0.2, u), gain: env.swell(0.35) });
-    s.noise(0.02, 0.6, { clock: env.ramp(1200, 300), gain: env.swell(0.2) });
-    s.sleep(0.62);
+    const s = new MoveSfx(2.4, 0xd7a1);
+    s.wave(0.0, 1.4, { freq: (u) => 110 * (1 + 0.05 * Math.sin(2 * Math.PI * 3 * u)), gain: env.swell(0.24) });
+    s.wave(0.2, 0.3, { freq: env.ramp(400, 150), gain: env.decay(0.16, 1) });
+    s.whoosh(0.65, 0.45, { from: 1500, to: 300, gain: 0.28 });
+    s.rumble(0.95, 0.4, { from: 200, to: 80, gain: 0.25 });
+    s.sleep(1.5);
     return s;
   },
 
-  /** Generic target aura: a heavy, gloomy seal clamps down on the target's items. */
+  /** Embargo.play (hexagon rows slide onto the target 0-0.65 s, lock + flicker 0.65-1.0 s, drift apart 1.0-1.35 s): a sliding hum, a hard locking clack, a fading buzz. */
   embargo: () => {
-    const s = new MoveSfx(1.15, 0xeba2);
-    s.pulse(0.02, 0.8, { freq: (u) => 98 * (1 + 0.02 * Math.sin(2 * Math.PI * 5 * u)), gain: env.swell(0.3), duty: 0.25 });
-    s.pulse(0.02, 0.8, { freq: () => 139, gain: env.swell(0.15), duty: 0.5 });
-    s.noise(0.6, 0.06, { clock: () => 4000, gain: env.decay(0.4, 1), short: true });
-    s.thud(0.6, 0.45, 0.6);
+    const s = new MoveSfx(1.5, 0xe4b0);
+    s.wave(0.0, 0.65, { freq: env.ramp(300, 700), gain: env.ramp(0.06, 0.2) });
+    s.thud(0.65, 0.4, 0.3);
+    s.pulse(0.65, 0.06, { freq: () => 1200, gain: env.decay(0.3, 1), duty: 0.5 });
+    s.pulse(0.7, 0.35, { freq: () => 600, gain: (u) => 0.12 * (0.5 + 0.5 * Math.sin(2 * Math.PI * 12 * u)) * (1 - u), duty: 0.25 });
+    s.wave(1.0, 0.35, { freq: env.ramp(700, 300), gain: env.decay(0.1, 1.5) });
     return s;
   },
 
@@ -121,12 +125,13 @@ export const DARK = {
     return s;
   },
 
-  /** Generic projectile (impact at 0.43 s): an item is hurled end over end and clonks into the target. */
+  /** Fling.play (item flares 0-0.15 s, flies to the target 0.15-0.55 s, bursts into white puffs at 0.55 s): a quick wind-up, a whizz, a puffy thump. */
   fling: () => {
-    const s = new MoveSfx(0.85, 0xf11e);
-    for (const at of [0.04, 0.16, 0.28]) s.whoosh(at, 0.1, { from: 1800, to: 4500, gain: 0.18 });
-    s.thud(0.43, 0.6, 0.5);
-    s.pulse(0.43, 0.2, { freq: (u) => 1200 - 500 * u, gain: env.decay(0.18, 2), duty: 0.25 });
+    const s = new MoveSfx(1.15, 0xf119);
+    s.wave(0.0, 0.15, { freq: env.ramp(800, 1600), gain: env.swell(0.14) });
+    s.whoosh(0.15, 0.4, { from: 1500, to: 5000, gain: 0.32 });
+    s.thud(0.55, 0.6, 0.5);
+    s.noise(0.55, 0.4, { clock: () => 3500, gain: env.decay(0.22, 1.2) });
     return s;
   },
 

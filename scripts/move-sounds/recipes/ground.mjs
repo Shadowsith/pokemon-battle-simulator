@@ -155,15 +155,15 @@ export const GROUND = {
     return s;
   },
 
-  /** Generic lob (arcs 0.52 s) + stat-down fleck: a gloopy mud ball arcs over and splatters wetly. */
+  /** MudBomb.play (mud ball lobbed in an arc 0-0.65 s, bursts with splats at 0.65 s, murky cloud 0.7-1.4 s): a wobbling lob, a wet splat, a muddy rumble. */
   mudbomb: () => {
-    const s = new MoveSfx(1.35, 0x3db0);
-    s.pulse(0.0, 0.52, { freq: (u) => 250 + 150 * Math.sin(Math.PI * u), gain: env.ramp(0.08, 0.18), duty: 0.25 });
-    s.whoosh(0.0, 0.52, { from: 800, to: 2500, gain: 0.12 });
-    s.thud(0.52, 0.6, 0.7);
-    s.noise(0.52, 0.3, { clock: (u) => 3500 - 2500 * u, gain: env.attackDecay(0.45, 0.04) });
-    s.bubbles(0.55, 0.25, 4, { lo: 150, hi: 350, gain: 0.15 });
-    s.statDown(0.68, 0.22);
+    const s = new MoveSfx(1.5, 0x3db0);
+    s.wave(0.0, 0.6, { freq: (u) => 300 + 200 * Math.sin(Math.PI * u), gain: env.swell(0.12) });
+    s.whoosh(0.1, 0.5, { from: 800, to: 2000, gain: 0.18 });
+    s.splash(0.65, 0.55);
+    s.thud(0.65, 0.5, 0.6);
+    s.bubbles(0.7, 0.5, 6, { lo: 150, hi: 400, gain: 0.18 });
+    s.noise(0.75, 0.65, { clock: () => 1500, gain: env.decay(0.12, 1.2) });
     return s;
   },
 

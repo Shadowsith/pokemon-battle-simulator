@@ -21,13 +21,13 @@ export const BUG = {
     return s;
   },
 
-  /** Generic melee bite: clicking mandibles, a crunch and a little munching. */
+  /** BugBite.play (jaw snaps at 0.45 s, nibbles twice more to ~0.85 s, crumbs fly 0.45-1.2 s): a snap, two crunchy nibbles, crumbs pattering down. */
   bugbite: () => {
-    const s = new MoveSfx(0.75, 0xbb17);
-    for (const at of [0.0, 0.06, 0.12]) s.noise(at, 0.025, { clock: () => 10000, gain: env.decay(0.25, 1), short: true });
-    s.noise(0.17, 0.07, { clock: () => 12000, gain: env.decay(0.55, 1) });
-    s.thud(0.17, 0.45, 0.3);
-    for (const at of [0.35, 0.48]) s.noise(at, 0.05, { clock: () => 3500, gain: env.decay(0.2, 1) });
+    const s = new MoveSfx(1.3, 0xbb17);
+    s.noise(0.45, 0.07, { clock: () => 12000, gain: env.decay(0.55, 1) });
+    s.thud(0.45, 0.4, 0.3);
+    for (const at of [0.62, 0.8]) s.noise(at, 0.05, { clock: () => 7000, gain: env.decay(0.35, 1), short: true });
+    for (const at of [0.85, 0.95, 1.05, 1.12]) s.noise(at, 0.03, { clock: () => 3500, gain: env.decay(0.12, 1) });
     return s;
   },
 
@@ -46,14 +46,13 @@ export const BUG = {
     return s;
   },
 
-  /** Generic self aura + stat-up fleck: a swarm forms a protective wall. */
+  /** DefendOrder.play (bees swarm in round the user 0-0.8 s, red ring flash at 0.8 s, stat-up bands 1.15-1.95 s): a swelling buzz, a shield thrum, the stat-up jingle. */
   defendorder: () => {
-    const s = new MoveSfx(1.5, 0xdef0);
-    for (const f of [180, 194, 208]) {
-      s.pulse(0.02, 0.7, { freq: (u) => f * (1 + 0.03 * Math.sin(2 * Math.PI * 16 * u + f)), gain: env.swell(0.1), duty: 0.25 });
-    }
-    s.thud(0.6, 0.35, 0.5);
-    s.statUp(0.85);
+    const s = new MoveSfx(2.1, 0xdef0);
+    s.pulse(0.0, 0.9, { freq: (u) => 220 + 30 * Math.sin(2 * Math.PI * 30 * u), gain: env.swell(0.2), duty: 0.25 });
+    s.noise(0.0, 0.9, { clock: () => 1800, gain: env.swell(0.12) });
+    s.wave(0.8, 0.3, { freq: () => 330, gain: env.decay(0.22, 1.5) });
+    s.statUp(1.15);
     return s;
   },
 
@@ -82,13 +81,14 @@ export const BUG = {
     return s;
   },
 
-  /** Generic self aura (~0.8 s glow + rings): a swarm buzzes in to tend the user, closing with a healing chime. */
+  /** HealOrder.play (bees fly in 0-0.55 s, green cloud 0.55-1.3 s, cyan sparkles 0.9-1.35 s, heal sparkles 1.35-2.25 s): a swelling buzz, a soft puff, a healing chime. */
   healorder: () => {
-    const s = new MoveSfx(1.35, 0x4e0d);
-    s.pulse(0.0, 0.8, { freq: (u) => 220 + 30 * Math.sin(2 * Math.PI * 22 * u), gain: env.swell(0.16), duty: 0.125 });
-    s.pulse(0.05, 0.75, { freq: (u) => 330 + 40 * Math.sin(2 * Math.PI * 27 * u), gain: env.swell(0.1), duty: 0.25 });
-    s.noise(0.0, 0.8, { clock: () => 1800, gain: env.swell(0.08), short: true });
-    s.arpeggio(0.75, [72, 76, 79, 84], 0.07, { gain: 0.16, voice: 'wave', hold: 0.18 });
+    const s = new MoveSfx(2.35, 0xbe0d);
+    s.pulse(0.0, 1.1, { freq: (u) => 240 + 30 * Math.sin(2 * Math.PI * 30 * u), gain: env.swell(0.18), duty: 0.25 });
+    s.noise(0.55, 0.7, { clock: () => 2500, gain: env.swell(0.12) });
+    s.sparkle(0.9, 0.45, 6, { lo: 3000, hi: 5500, gain: 0.13 });
+    s.arpeggio(1.35, [72, 76, 79, 84], 0.09, { gain: 0.18, voice: 'wave', hold: 0.18 });
+    s.sparkle(1.4, 0.7, 6, { gain: 0.1 });
     return s;
   },
 

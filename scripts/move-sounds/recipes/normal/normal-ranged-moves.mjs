@@ -78,14 +78,13 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile, quick (impact 0.26 s): a fake-out jab that slips past protection. */
+  /** Feint.play (fist looms in and swings onto the target 0-0.55 s, hit at 0.55 s, pink sparkles to 1.0 s): a quick swoop, a smack, a twinkle. */
   feint: () => {
-    const s = new MoveSfx(0.75, 0xfe17);
-    s.pulse(0.0, 0.08, { freq: env.ramp(500, 900), gain: env.decay(0.18, 1), duty: 0.25 });
-    s.whoosh(0.08, 0.2, { from: 2500, to: 9000, gain: 0.3 });
-    s.thud(0.26, 0.5, 0.35);
-    s.noise(0.26, 0.06, { clock: () => 14000, gain: env.decay(0.35, 1) });
-    s.pulse(0.3, 0.12, { freq: env.ramp(1200, 800), gain: env.decay(0.16, 1.5), duty: 0.125 });
+    const s = new MoveSfx(1.05, 0xfe17);
+    s.whoosh(0.1, 0.45, { from: 1200, to: 4500, gain: 0.32 });
+    s.thud(0.55, 0.55, 0.45);
+    s.noise(0.55, 0.06, { clock: () => 10000, gain: env.decay(0.35, 1), short: true });
+    s.sparkle(0.6, 0.35, 5, { lo: 3000, hi: 5200, gain: 0.12 });
     return s;
   },
 
@@ -134,14 +133,13 @@ export const NORMAL_RANGED = {
     return s;
   },
 
-  /** Generic projectile (0.43 s), no fleck: a berry's gift floats over with a gentle rising chime and pops on the target. */
+  /** NaturalGift.play (green sparkles rise + light orb swells on the user 0-0.65 s, green rings spread over the field 0.65-1.3 s, target hit at 1.05 s): a leafy twinkle, a rising swell, throbbing pulses and a hit. */
   naturalgift: () => {
-    const s = new MoveSfx(0.8, 0x9a71);
-    s.wave(0.0, 0.43, { freq: env.ramp(600, 1100), gain: env.swell(0.26) });
-    s.sparkle(0.05, 0.38, 5, { lo: 2000, hi: 3500, gain: 0.1 });
-    s.noise(0.43, 0.08, { clock: () => 10000, gain: env.decay(0.4, 1) });
-    s.thud(0.43, 0.45, 0.3);
-    s.arpeggio(0.47, [79, 84], 0.07, { gain: 0.16, voice: 'wave', hold: 0.12 });
+    const s = new MoveSfx(1.45, 0x3a7f);
+    s.sparkle(0.0, 0.6, 7, { lo: 2500, hi: 4500, gain: 0.14 });
+    s.wave(0.1, 0.55, { freq: env.ramp(400, 900), gain: env.ramp(0.04, 0.2) });
+    for (let i = 0; i < 4; i++) s.wave(0.65 + i * 0.11, 0.25, { freq: (u) => 600 * (1 - 0.3 * u), gain: env.decay(0.16, 1.5) });
+    s.thud(1.05, 0.45, 0.4);
     return s;
   },
 

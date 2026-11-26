@@ -154,16 +154,14 @@ export const FIRE = {
     return s;
   },
 
-  /** Generic melee bite (impact 0.17 s) + burn fleck (~0.5 s): blazing fangs clamp down. */
+  /** FireFang.play (jaw snaps at 0.45 s, fire ball 0.45-1.1 s, smoke 0.8-1.4 s): a chomp, a whooshing burst of flame, then a smoky crackle. */
   firefang: () => {
-    const s = new MoveSfx(1.0, 0xf1fa);
-    s.noise(0.0, 0.17, { clock: env.ramp(400, 1500), gain: env.ramp(0.1, 0.3) });
-    s.pulse(0.0, 0.17, { freq: env.ramp(120, 220), gain: env.ramp(0.05, 0.16), duty: 0.125 });
-    s.noise(0.17, 0.05, { clock: () => 12000, gain: env.decay(0.5, 1) });
-    s.noise(0.23, 0.05, { clock: () => 9000, gain: env.decay(0.35, 1) });
-    s.thud(0.17, 0.5, 0.4);
-    s.noise(0.2, 0.3, { clock: env.ramp(1500, 500), gain: env.decay(0.3, 1.5) });
-    s.burn(0.5);
+    const s = new MoveSfx(1.5, 0xf1fa);
+    s.noise(0.45, 0.07, { clock: () => 12000, gain: env.decay(0.55, 1) });
+    s.thud(0.45, 0.45, 0.35);
+    s.noise(0.47, 0.6, { clock: env.ramp(5000, 1500), gain: env.attackDecay(0.4, 0.1) });
+    s.burn(0.6, 0.25);
+    s.noise(0.8, 0.6, { clock: () => 1200, gain: env.decay(0.1, 1.2) });
     return s;
   },
 

@@ -12,8 +12,10 @@ import { Retaliate } from './retaliate';
 import { Return } from './return';
 import { Stomp } from './stomp';
 import { Tackle } from './tackle';
+import { DoubleHit } from './double-hit';
+import { Feint } from './feint';
 
-/** Hand-made animations for Normal-type punches, kicks and body blows (Double Slap lives in `double-slap.ts`, Flail in `flail.ts`, Frustration in `frustration.ts`, Pound in `pound.ts`, Rapid Spin in `rapid-spin.ts`, Retaliate in `retaliate.ts`, Return in `return.ts`, Stomp in `stomp.ts`, Tackle in `tackle.ts`). */
+/** Hand-made animations for Normal-type punches, kicks and body blows (Double Hit lives in `double-hit.ts`, Double Slap in `double-slap.ts`, Feint in `feint.ts`, Flail in `flail.ts`, Frustration in `frustration.ts`, Pound in `pound.ts`, Rapid Spin in `rapid-spin.ts`, Retaliate in `retaliate.ts`, Return in `return.ts`, Stomp in `stomp.ts`, Tackle in `tackle.ts`). */
 export class NormalBlowMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -21,9 +23,11 @@ export class NormalBlowMoveAnimations {
     cometpunch: (refs, _launch, target, v) => NormalBlowMoveAnimations.playCometPunch(refs, target, v),
     dizzypunch: (refs, _launch, target, v) => NormalBlowMoveAnimations.playDizzyPunch(refs, target, v),
     doubleedge: (refs, launch, target, v) => NormalBlowMoveAnimations.playDoubleEdge(refs, launch, target, v),
+    doublehit: (refs, _launch, target, v) => DoubleHit.play(refs, target, v),
     doubleslap: (refs, _launch, target, v) => DoubleSlap.play(refs, target, v),
     facade: (refs, launch, target) => NormalBlowMoveAnimations.playFacade(refs, launch, target),
     extremespeed: (refs, launch, target, v) => NormalBlowMoveAnimations.playExtremeSpeed(refs, launch, target, v),
+    feint: (refs, _launch, target, v) => Feint.play(refs, target, v),
     flail: (refs, launch, target, v) => Flail.play(refs, launch, target, v),
     frustration: (refs, launch, target, v) => Frustration.play(refs, launch, target, v),
     headbutt: (refs, _launch, target, v) => NormalBlowMoveAnimations.playHeadbutt(refs, target, v),

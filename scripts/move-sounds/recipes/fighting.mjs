@@ -233,13 +233,14 @@ export const FIGHTING = {
     return s;
   },
 
-  /** Generic melee (impact at 0.17 s) + paralysis fleck: a palm strike with a shock wave. */
+  /** ForcePalm.play (palm swings in and presses on at 0.35 s, magenta shock wave 0.35-0.75 s, palm draws back 0.75-1.1 s): a swish, a flat slap, a booming pulse. */
   forcepalm: () => {
-    const s = new MoveSfx(1.1, 0xf0ca);
-    s.whoosh(0.0, 0.17, { from: 2000, to: 7000, gain: 0.3 });
-    s.thud(0.17, 0.65, 0.5);
-    s.wave(0.18, 0.22, { freq: (u) => 900 - 500 * u, gain: env.decay(0.2, 1.5) });
-    s.paralyze(0.45);
+    const s = new MoveSfx(1.25, 0xf0ca);
+    s.whoosh(0.0, 0.35, { from: 1000, to: 3500, gain: 0.3 });
+    s.thud(0.35, 0.55, 0.4);
+    s.noise(0.35, 0.05, { clock: () => 9000, gain: env.decay(0.4, 1), short: true });
+    s.wave(0.38, 0.4, { freq: env.ramp(220, 90), gain: env.decay(0.3, 1.2) });
+    s.sparkle(0.75, 0.3, 3, { lo: 2800, hi: 4500, gain: 0.1 });
     return s;
   },
 

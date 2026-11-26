@@ -11,13 +11,19 @@ import { PowderSnow } from './ice/powder-snow';
 import { IcicleCrash } from './ice/icicle-crash';
 import { IcicleSpear } from './ice/icicle-spear';
 import { SheerCold } from './ice/sheer-cold';
+import { Avalanche } from './ice/avalanche';
+import { IceFang } from './ice/ice-fang';
+import { IceShard } from './ice/ice-shard';
 
-/** Hand-made animations for Ice-type moves (Freeze Shock, Ice Ball, Ice Burn, Icicle Crash, Icicle Spear, Icy Wind, Powder Snow and Sheer Cold live in `ice/`). */
+/** Hand-made animations for Ice-type moves (Avalanche, Freeze Shock, Ice Ball, Ice Fang, Ice Shard, Ice Burn, Icicle Crash, Icicle Spear, Icy Wind, Powder Snow and Sheer Cold live in `ice/`). */
 export class IceMoveAnimations {
   /** Hand-made Ice move animations, by @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     aurorabeam: (refs, launch, target) => IceMoveAnimations.playAuroraBeam(refs, launch, target),
+    avalanche: (refs, _launch, target) => Avalanche.play(refs, target),
     iceball: (refs, launch, target) => IceBall.play(refs, launch, target),
+    icefang: (refs, _launch, target) => IceFang.play(refs, target),
+    iceshard: (refs, launch, target) => IceShard.play(refs, launch, target),
     icepunch: (refs, _launch, target) => FxEffects.playElementalPunch(refs, target, 'ice', '#9CD6FF', () => FxGlyphs.iceChunk()),
     blizzard: (refs, launch, target) => IceMoveAnimations.playBlizzard(refs, launch, target),
     freezeshock: (refs, launch, target) => FreezeShock.play(refs, launch, target),

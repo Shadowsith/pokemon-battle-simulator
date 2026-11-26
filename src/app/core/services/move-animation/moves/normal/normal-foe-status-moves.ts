@@ -17,13 +17,16 @@ import { SweetScent } from './sweet-scent';
 import { OdorSleuth } from './odor-sleuth';
 import { TeeterDance } from './teeter-dance';
 import { Tickle } from './tickle';
+import { Captivate } from './captivate';
+import { MeFirst } from './me-first';
 
-/** Hand-made animations for Normal-type status moves aimed at the foe (stat drops, sleep, disabling, forcing out, copying; Attract, Block, Conversion 2, Foresight, Lock-On, Mean Look, Mind Reader, Odor Sleuth, Scary Face, Sketch, Swagger, Sweet Scent, Teeter Dance and Tickle live in their own files). */
+/** Hand-made animations for Normal-type status moves aimed at the foe (stat drops, sleep, disabling, forcing out, copying; Attract, Block, Captivate, Conversion 2, Foresight, Lock-On, Me First, Mean Look, Mind Reader, Odor Sleuth, Scary Face, Sketch, Swagger, Sweet Scent, Teeter Dance and Tickle live in their own files). */
 export class NormalFoeStatusMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
     attract: (refs, _launch, target) => Attract.play(refs, target),
     block: (refs, _launch, target) => Block.play(refs, target),
+    captivate: (refs, launch, target) => Captivate.play(refs, launch, target),
     conversion2: (refs, launch, target) => Conversion2.play(refs, launch, target),
     disable: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playDisable(refs, target),
     encore: (refs, _launch, target) => NormalFoeStatusMoveAnimations.playEncore(refs, target),
@@ -34,6 +37,7 @@ export class NormalFoeStatusMoveAnimations {
     lovelykiss: (refs, _launch, target, v) => NormalFoeStatusMoveAnimations.playLovelyKiss(refs, target, v),
     meanlook: (refs, _launch, target) => MeanLook.play(refs, target),
     mimic: (refs, launch, target) => NormalFoeStatusMoveAnimations.playMimic(refs, launch, target),
+    mefirst: (refs, launch, target) => MeFirst.play(refs, launch, target),
     mindreader: (refs, _launch, target) => MindReader.play(refs, target),
     odorsleuth: (refs, launch, target, v) => OdorSleuth.play(refs, launch, target, v),
     scaryface: (refs, launch, target) => ScaryFace.play(refs, launch, target),

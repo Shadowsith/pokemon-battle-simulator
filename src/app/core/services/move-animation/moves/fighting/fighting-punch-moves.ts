@@ -12,8 +12,9 @@ import { RockSmash } from './rock-smash';
 import { SacredSword } from './sacred-sword';
 import { WakeUpSlap } from './wake-up-slap';
 import { Revenge } from './revenge';
+import { ForcePalm } from './force-palm';
 
-/** Hand-made animations for Fighting-type punches, chops and full-power blows (Arm Thrust, Hammer Arm, Mach Punch, Power-Up Punch, Revenge, Reversal, Rock Smash, Sacred Sword and Wake-Up Slap live in `arm-thrust.ts` / `hammer-arm.ts` / `mach-punch.ts` / `power-up-punch.ts` / `revenge.ts` / `reversal.ts` / `rock-smash.ts` / `sacred-sword.ts` / `wake-up-slap.ts`). */
+/** Hand-made animations for Fighting-type punches, chops and full-power blows (Arm Thrust, Force Palm, Hammer Arm, Mach Punch, Power-Up Punch, Revenge, Reversal, Rock Smash, Sacred Sword and Wake-Up Slap live in `arm-thrust.ts` / `hammer-arm.ts` / `mach-punch.ts` / `power-up-punch.ts` / `revenge.ts` / `reversal.ts` / `rock-smash.ts` / `sacred-sword.ts` / `wake-up-slap.ts`). */
 export class FightingPunchMoveAnimations {
   /** By @pkmn/sim move id. */
   static readonly anims: MoveAnimRegistry = {
@@ -25,6 +26,7 @@ export class FightingPunchMoveAnimations {
     drainpunch: (refs, launch, target) => FightingPunchMoveAnimations.playDrainPunch(refs, launch, target),
     dynamicpunch: (refs, _launch, target) => FightingPunchMoveAnimations.playDynamicPunch(refs, target),
     focuspunch: (refs, launch, target) => FightingPunchMoveAnimations.playFocusPunch(refs, launch, target),
+    forcepalm: (refs, _launch, target, v) => ForcePalm.play(refs, target, v),
     hammerarm: (refs, launch, target, v) => HammerArm.play(refs, launch, target, v),
     karatechop: (refs, _launch, target, v) => FightingPunchMoveAnimations.playKarateChop(refs, target, v),
     machpunch: (refs, _launch, target, v) => MachPunch.play(refs, target, v),
